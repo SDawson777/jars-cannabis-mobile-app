@@ -1,7 +1,7 @@
 {
   "version": 2,
+  "builds": [],
   "build": {
-    "ignoreCommand": "echo \"Skipping build\"; exit 0"
-  },
-  "builds": []
+    "command": "true"
+  }
 }
