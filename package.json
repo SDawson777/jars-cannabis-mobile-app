@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:web": "expo build:web",
-    "vercel-build": "echo 'Skipping build'; exit 0"
+    "vercel-build": "mkdir -p dist && echo 'dist created'; exit 0"
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "8.4.1",
