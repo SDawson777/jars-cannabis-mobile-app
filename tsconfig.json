@@ -1,22 +1,43 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "lib": ["ESNext"],
+    /* Target latest JavaScript features */
+    "target": "esnext",
+    "module": "esnext",
+
+    /* Standard libs */
+    "lib": ["esnext", "dom"],
+
+    /* React Native JSX */
     "jsx": "react-native",
+
+    /* Allow JS files */
     "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
+
+    /* Only type-check, don’t emit */
     "noEmit": true,
+
+    /* Full strictness */
+    "strict": true,
+
+    /* Skip checking all declaration files */
+    "skipLibCheck": true,
+
+    /* Enable CommonJS default interop */
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["src/*"]
-    }
+
+    /* Node-style module resolution */
+    "moduleResolution": "node",
+
+    /* Allow importing JSON files */
+    "resolveJsonModule": true,
+
+    /* Base directory for non-relative imports */
+    "baseUrl": "."
   },
-  "include": ["src", "declarations.d.ts"],
-  "exclude": ["node_modules"]
+
+  /* What files to include */
+  "include": ["src/**/*", "**/*.ts", "**/*.tsx"],
+
+  /* What to ignore */
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
 }
