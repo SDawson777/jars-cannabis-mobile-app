@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.tsx
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,10 +11,11 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -22,8 +23,10 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
+
 export default function HomeScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -37,35 +40,37 @@ export default function HomeScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handleShopNow = () => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('ShopScreen');
-  };
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <Text style={[styles.title, { color: jarsPrimary }]}>
-        Welcome to Jars
-      </Text>
-      <Pressable
-        style={[styles.button, { backgroundColor: jarsPrimary }]}
-        onPress={handleShopNow}
-      >
-        <Text style={styles.buttonText}>Shop Now</Text>
-      </Pressable>
-      {/* additional home content here */}
+      <View style={styles.content}>
+        <Text style={[styles.welcome, { color: jarsPrimary }]}>
+          Welcome back!
+        </Text>
+        <Pressable
+          style={[styles.card, { borderColor: jarsPrimary }]}
+          onPress={() => {
+            hapticLight();
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            navigation.navigate('ShopScreen');
+          }}
+        >
+          <Text style={[styles.cardText, { color: jarsPrimary }]}>
+            Shop Now
+          </Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', padding: 16 },
-  title: { fontSize: 24, fontWeight: '700', marginVertical: 24 },
-  button: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+  container: { flex: 1 },
+  content: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  welcome: { fontSize: 24, fontWeight: '600', marginBottom: 24 },
+  card: {
+    padding: 20,
+    borderWidth: 2,
     borderRadius: 12,
   },
-  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  cardText: { fontSize: 18, fontWeight: '600' },
 });

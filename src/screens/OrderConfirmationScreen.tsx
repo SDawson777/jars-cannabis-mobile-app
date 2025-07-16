@@ -10,10 +10,12 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { CheckCircle } from 'lucide-react-native';
+import { ChevronLeft, Home as HomeIcon } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticSuccess, hapticLight } from '../utils/haptic';
+import { hapticLight, hapticMedium } from '../utils/haptic';
 
 if (
   Platform.OS === 'android' &&
@@ -22,13 +24,17 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type OrderConfirmationNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'OrderConfirmation'
+>;
+
 export default function OrderConfirmationScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsSecondary } = useContext(ThemeContext);
+  const navigation = useNavigation<OrderConfirmationNavProp>();
+  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    hapticSuccess();
   }, []);
 
   const bgColor =
@@ -36,54 +42,42 @@ export default function OrderConfirmationScreen() {
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
-      : '#F9F9F9';
-
-  const handleContinue = () => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('HomeScreen');
-  };
+      : jarsBackground;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.content}>
-        <CheckCircle size={80} color={jarsSecondary} />
-        <Text style={[styles.title, { color: jarsSecondary }]}>
-          Thank You!
+        <HomeIcon color={jarsPrimary} size={48} />
+        <Text style={[styles.title, { color: jarsPrimary }]}>
+          Thank you for your order!
         </Text>
-        <Text style={styles.message}>
-          Your order has been placed successfully.
+        <Text style={styles.subtitle}>
+          Your order is being processed and will be ready soon.
         </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: jarsSecondary }]}
-          onPress={handleContinue}
-        >
-          <Text style={styles.buttonText}>Back to Home</Text>
-        </Pressable>
       </View>
+      <Pressable
+        style={[styles.button, { backgroundColor: jarsPrimary }]}
+        onPress={() => {
+          hapticMedium();
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          navigation.navigate('HomeScreen');
+        }}
+      >
+        <Text style={styles.buttonText}>Back to Home</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  title: { fontSize: 24, fontWeight: '700', marginVertical: 16 },
-  message: {
-    fontSize: 16,
-    color: '#333333',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
+  container: { flex: 1, justifyContent: 'space-between', padding: 24 },
+  content: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: '700', marginTop: 16 },
+  subtitle: { fontSize: 16, color: '#555', textAlign: 'center', marginTop: 8 },
   button: {
     paddingVertical: 14,
-    paddingHorizontal: 32,
     borderRadius: 12,
+    alignItems: 'center',
   },
-  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
 });

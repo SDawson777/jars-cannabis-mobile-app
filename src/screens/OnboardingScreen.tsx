@@ -1,20 +1,23 @@
 // src/screens/OnboardingScreen.tsx
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
-  Image,
   Pressable,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
 } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -22,111 +25,60 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const slides = [
-  {
-    id: '1',
-    title: 'Welcome to Jars',
-    text: 'Discover premium cannabis deliveries near you.',
-    image: require('../assets/onboard1.png'),
-  },
-  {
-    id: '2',
-    title: 'Shop Your Way',
-    text: 'Browse top brands, find deals, and earn rewards.',
-    image: require('../assets/onboard2.png'),
-  },
-  {
-    id: '3',
-    title: 'Get Inspired',
-    text: 'Explore educational content & community tips.',
-    image: require('../assets/onboard3.png'),
-  },
-];
+// Strongly-typed navigation prop
+type OnboardingNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Onboarding'
+>;
 
 export default function OnboardingScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsPrimary } = useContext(ThemeContext);
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, [index]);
+  const navigation = useNavigation<OnboardingNavProp>();
+  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
-      : '#F9F9F9';
+      : jarsBackground;
 
   const handleNext = () => {
     hapticLight();
-    if (index < slides.length - 1) {
-      setIndex(index + 1);
-    } else {
-      navigation.replace('AgeVerification');
-    }
-  };
-
-  const handleSkip = () => {
-    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // Advance through onboarding pages or finish
+    // Here we jump straight to age verification
     navigation.replace('AgeVerification');
   };
 
-  const slide = slides[index];
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={styles.slide}>
-        <Image source={slide.image} style={styles.image} />
+      <View style={styles.content}>
         <Text style={[styles.title, { color: jarsPrimary }]}>
-          {slide.title}
+          Welcome to JARS
         </Text>
-        <Text style={styles.text}>{slide.text}</Text>
+        <Text style={styles.subtitle}>
+          Discover the best cannabis products curated just for you.
+        </Text>
       </View>
-      <View style={styles.footer}>
-        <Pressable onPress={handleSkip}>
-          <Text style={[styles.skip, { color: jarsPrimary }]}>Skip</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.nextBtn, { backgroundColor: jarsPrimary }]}
-          onPress={handleNext}
-        >
-          <Text style={styles.nextText}>
-            {index < slides.length - 1 ? 'Next' : 'Get Started'}
-          </Text>
-        </Pressable>
-      </View>
+      <Pressable style={[styles.nextBtn, { backgroundColor: jarsPrimary }]} onPress={handleNext}>
+        <Text style={styles.nextText}>Get Started</Text>
+        <ChevronRight color="#FFF" size={24} />
+      </Pressable>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center' },
-  slide: {
-    flex: 1,
+  container: { flex: 1, justifyContent: 'space-between', padding: 24 },
+  content: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 32, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
+  subtitle: { fontSize: 16, color: '#555', textAlign: 'center', lineHeight: 22 },
+  nextBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-  },
-  image: { width: 200, height: 200, marginBottom: 24 },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 12 },
-  text: {
-    fontSize: 16,
-    color: '#333333',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 16,
-  },
-  skip: { fontSize: 16, fontWeight: '500' },
-  nextBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: 16,
     borderRadius: 12,
   },
-  nextText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  nextText: { color: '#FFF', fontSize: 18, fontWeight: '600', marginRight: 8 },
 });

@@ -1,5 +1,5 @@
 // src/screens/CartScreen.tsx
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 import { ChevronLeft, Trash2, HelpCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import {
   hapticLight,
@@ -25,7 +27,17 @@ import {
   hapticError,
 } from '../utils/haptic';
 
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+type CartNavProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;
+
 const { width } = Dimensions.get('window');
+const IMAGE_SIZE = 80;
 
 const initialCart = [
   {
@@ -44,60 +56,26 @@ const initialCart = [
   },
 ];
 
-// Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-
 export default function CartScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<CartNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   const [cart, setCart] = useState(initialCart);
   const [promo, setPromo] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
 
-  // Animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
+  }, [cart, promoApplied]);
 
-  // Pricing calculations
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = promoApplied ? 10 : 0;
   const taxes = (subtotal - discount) * 0.07;
   const total = subtotal - discount + taxes;
 
-  // Dynamic background
-  const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
-
-  // Handlers
-  const handleBack = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  const updateQty = (id: string, delta: number) => {
     hapticLight();
-    navigation.goBack();
-  };
-
-  const handleHelp = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    hapticLight();
-    navigation.navigate('HelpFAQ');
-  };
-
-  const updateQty = (id, delta) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    hapticMedium();
     setCart((prev) =>
       prev.map((item) =>
         item.id === id
@@ -107,26 +85,30 @@ export default function CartScreen() {
     );
   };
 
-  const removeItem = (id) => {
-    Alert.alert('Remove Item', 'Are you sure you want to remove this item?', [
-      { text: 'Cancel', style: 'cancel', onPress: () => hapticLight() },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: () => {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          hapticMedium();
-          setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeItem = (id: string) => {
+    hapticHeavy();
+    Alert.alert(
+      'Remove Item',
+      'Are you sure you want to remove this item?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            setCart((prev) => prev.filter((item) => item.id !== id));
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   const applyPromo = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (promo.trim().toUpperCase() === 'JARS10') {
-      setPromoApplied(true);
       hapticSuccess();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setPromoApplied(true);
       Alert.alert('Success', 'Promo code applied!');
     } else {
       hapticError();
@@ -134,23 +116,21 @@ export default function CartScreen() {
     }
   };
 
-  const proceedToCheckout = () => {
+  const goToHelp = () => {
+    hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    hapticHeavy();
-    navigation.navigate('Checkout');
+    navigation.navigate('HelpFAQ');
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
+    <View style={[styles.container, { backgroundColor: jarsBackground }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={handleBack}>
+        <Pressable onPress={() => navigation.goBack()}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Your Cart
-        </Text>
-        <Pressable onPress={handleHelp}>
+        <Text style={[styles.title, { color: jarsPrimary }]}>Your Cart</Text>
+        <Pressable onPress={goToHelp}>
           <HelpCircle color={jarsPrimary} size={24} />
         </Pressable>
       </View>
@@ -166,25 +146,18 @@ export default function CartScreen() {
             <Image source={item.image} style={styles.image} />
             <View style={styles.info}>
               <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+              <Text style={[styles.price, { color: jarsPrimary }]}>
+                ${item.price.toFixed(2)}
+              </Text>
               <View style={styles.qtyRow}>
-                <Pressable
-                  style={styles.qtyBtn}
-                  onPress={() => updateQty(item.id, -1)}
-                >
+                <Pressable onPress={() => updateQty(item.id, -1)} style={styles.qtyBtn}>
                   <Text style={styles.qtyBtnText}>−</Text>
                 </Pressable>
                 <Text style={styles.qty}>{item.quantity}</Text>
-                <Pressable
-                  style={styles.qtyBtn}
-                  onPress={() => updateQty(item.id, 1)}
-                >
+                <Pressable onPress={() => updateQty(item.id, 1)} style={styles.qtyBtn}>
                   <Text style={styles.qtyBtnText}>+</Text>
                 </Pressable>
-                <Pressable
-                  style={styles.remove}
-                  onPress={() => removeItem(item.id)}
-                >
+                <Pressable onPress={() => removeItem(item.id)} style={styles.remove}>
                   <Trash2 color="#6A0572" size={20} />
                 </Pressable>
               </View>
@@ -198,9 +171,9 @@ export default function CartScreen() {
         <TextInput
           style={styles.promoInput}
           placeholder="Enter Promo Code"
+          placeholderTextColor="#999"
           value={promo}
           onChangeText={setPromo}
-          placeholderTextColor="#999999"
         />
         <Pressable style={[styles.promoBtn, { backgroundColor: jarsPrimary }]} onPress={applyPromo}>
           <Text style={styles.promoBtnText}>Apply</Text>
@@ -209,9 +182,7 @@ export default function CartScreen() {
 
       {/* Order Summary */}
       <View style={styles.summary}>
-        <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>
-          Order Summary
-        </Text>
+        <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>Order Summary</Text>
         <View style={styles.line}>
           <Text style={styles.lineLabel}>Subtotal</Text>
           <Text style={styles.lineValue}>${subtotal.toFixed(2)}</Text>
@@ -226,14 +197,20 @@ export default function CartScreen() {
         </View>
         <View style={styles.lineTotal}>
           <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+          <Text style={[styles.totalValue, { color: jarsPrimary }]}>
+            ${total.toFixed(2)}
+          </Text>
         </View>
       </View>
 
       {/* Proceed Button */}
       <Pressable
         style={[styles.checkoutBtn, { backgroundColor: jarsPrimary }]}
-        onPress={proceedToCheckout}
+        onPress={() => {
+          hapticMedium();
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          navigation.navigate('Checkout');
+        }}
       >
         <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
       </Pressable>
@@ -241,16 +218,13 @@ export default function CartScreen() {
   );
 }
 
-const CARD_HEIGHT = 100;
-const IMAGE_SIZE = 80;
-
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     justifyContent: 'space-between',
+    padding: 16,
   },
   title: { fontSize: 20, fontWeight: '600' },
   list: { paddingHorizontal: 16, paddingBottom: 16 },
@@ -258,7 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    height: CARD_HEIGHT,
+    height: IMAGE_SIZE + 20,
     marginBottom: 12,
     padding: 10,
     shadowColor: '#000',
@@ -268,8 +242,8 @@ const styles = StyleSheet.create({
   },
   image: { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: 12 },
   info: { flex: 1, marginLeft: 12, justifyContent: 'space-between' },
-  name: { fontSize: 16, fontWeight: '600', color: '#333333' },
-  price: { fontSize: 16, fontWeight: '700', color: '#2E5D46' },
+  name: { fontSize: 16, fontWeight: '600' },
+  price: { fontSize: 16, fontWeight: '700' },
   qtyRow: { flexDirection: 'row', alignItems: 'center' },
   qtyBtn: {
     backgroundColor: '#EEEEEE',
@@ -279,7 +253,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  qtyBtnText: { fontSize: 20, color: '#333333' },
+  qtyBtnText: { fontSize: 20 },
   qty: { marginHorizontal: 8, fontSize: 16, fontWeight: '500' },
   remove: { marginLeft: 'auto' },
   promoSection: {
@@ -326,10 +300,12 @@ const styles = StyleSheet.create({
   totalLabel: { fontSize: 16, fontWeight: '700' },
   totalValue: { fontSize: 16, fontWeight: '700' },
   checkoutBtn: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  checkoutBtnText: { color: '#FFFFFF', fontSize: 18, fontWeight: '600' },
+  checkoutBtnText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });

@@ -11,8 +11,10 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { Plus, ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
@@ -23,19 +25,30 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const initial = [
+// Typed navigation prop
+type SavedPaymentsNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'SavedPayments'
+>;
+
+interface PaymentMethod {
+  id: string;
+  label: string;
+}
+
+const initialMethods: PaymentMethod[] = [
   { id: '1', label: 'Visa ****1234' },
   { id: '2', label: 'Mastercard ****5678' },
 ];
 
 export default function SavedPaymentsScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<SavedPaymentsNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [payments, setPayments] = useState(initial);
+  const [methods, setMethods] = useState<PaymentMethod[]>(initialMethods);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
+  }, [methods]);
 
   const bgColor =
     colorTemp === 'warm'
@@ -44,7 +57,7 @@ export default function SavedPaymentsScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handleEdit = (pm: any) => {
+  const handleEdit = (pm: PaymentMethod) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('EditPayment', { payment: pm });
@@ -59,19 +72,20 @@ export default function SavedPaymentsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
-        data={payments}
+        data={methods}
         keyExtractor={(p) => p.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable style={styles.row} onPress={() => handleEdit(item)}>
-            <Text style={[styles.label, { color: jarsPrimary }]}>
-              {item.label}
-            </Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
             <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}
         ListFooterComponent={
-          <Pressable style={[styles.addBtn, { borderColor: jarsSecondary }]} onPress={handleAdd}>
+          <Pressable
+            style={[styles.addBtn, { borderColor: jarsSecondary }]}
+            onPress={handleAdd}
+          >
             <Plus color={jarsSecondary} size={20} />
             <Text style={[styles.addText, { color: jarsSecondary }]}>
               Add New Payment
@@ -104,5 +118,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
   },
-  addText: { marginLeft: 8, fontSize: 16 },
+  addText: { marginLeft: 8, fontSize: 16, fontWeight: '600' },
 });

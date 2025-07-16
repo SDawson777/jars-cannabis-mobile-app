@@ -1,5 +1,5 @@
 // src/screens/OrderHistoryScreen.tsx
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -13,8 +13,10 @@ import {
 } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticMedium } from '../utils/haptic';
+import { hapticLight } from '../utils/haptic';
 
 if (
   Platform.OS === 'android' &&
@@ -23,15 +25,25 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const orders = [
-  { id: '12345', date: '2025-07-14', status: 'Delivered', total: 209.0 },
-  { id: '12344', date: '2025-07-10', status: 'Processing', total: 65.0 },
+type OrderHistoryNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'OrderHistory'
+>;
+
+interface OrderSummary {
+  id: string;
+  date: string;
+  total: number;
+}
+
+const sampleOrders: OrderSummary[] = [
+  { id: '12345', date: '2025-07-14', total: 150 },
+  { id: '67890', date: '2025-07-10', total: 85 },
 ];
 
 export default function OrderHistoryScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsBackground, jarsPrimary } = useContext(ThemeContext);
-  const [data] = useState(orders);
+  const navigation = useNavigation<OrderHistoryNavProp>();
+  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -44,8 +56,8 @@ export default function OrderHistoryScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handlePress = (order: any) => {
-    hapticMedium();
+  const handleSelect = (order: OrderSummary) => {
+    hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('OrderDetails', { order });
   };
@@ -53,23 +65,18 @@ export default function OrderHistoryScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
-        data={data}
+        data={sampleOrders}
         keyExtractor={(o) => o.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <Pressable
-            style={styles.row}
-            onPress={() => handlePress(item)}
-          >
+          <Pressable style={styles.row} onPress={() => handleSelect(item)}>
             <View>
               <Text style={[styles.id, { color: jarsPrimary }]}>
-                #{item.id}
+                Order #{item.id}
               </Text>
-              <Text style={styles.meta}>
-                {item.date} · {item.status}
-              </Text>
+              <Text style={styles.date}>{item.date}</Text>
             </View>
-            <View style={styles.rowRight}>
+            <View style={styles.right}>
               <Text style={styles.total}>${item.total.toFixed(2)}</Text>
               <ChevronRight color={jarsPrimary} size={20} />
             </View>
@@ -89,10 +96,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    borderBottomColor: '#EEEEEE',
   },
   id: { fontSize: 16, fontWeight: '600' },
-  meta: { fontSize: 14, color: '#555' },
-  rowRight: { flexDirection: 'row', alignItems: 'center' },
-  total: { fontSize: 16, marginRight: 8 },
+  date: { fontSize: 14, color: '#555', marginTop: 4 },
+  right: { flexDirection: 'row', alignItems: 'center' },
+  total: { fontSize: 16, fontWeight: '600', marginRight: 8 },
 });

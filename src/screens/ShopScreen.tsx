@@ -14,6 +14,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
@@ -25,18 +27,22 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type ShopNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ShopScreen'
+>;
+
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
 
 const sampleProducts = [
   { id: '1', name: 'Rainbow Rozay', price: 79.0, image: require('../assets/product1.png') },
   { id: '2', name: 'Moonwalker OG', price: 65.0, image: require('../assets/product2.png') },
-  // …more
 ];
 
 export default function ShopScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsBackground, jarsPrimary } = useContext(ThemeContext);
+  const navigation = useNavigation<ShopNavProp>();
+  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
   const [products] = useState(sampleProducts);
 
   useEffect(() => {
@@ -50,7 +56,7 @@ export default function ShopScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handleProduct = (product: any) => {
+  const handleProduct = (product: typeof sampleProducts[0]) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('ProductDetails', { product });

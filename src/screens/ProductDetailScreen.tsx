@@ -12,12 +12,17 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { ChevronLeft, Heart, ShoppingCart } from 'lucide-react-native';
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
-// enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -25,18 +30,23 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+// Strongly-typed navigation and route props
+type ProductDetailsNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ProductDetails'
+>;
+type ProductDetailsRouteProp = RouteProp<
+  RootStackParamList,
+  'ProductDetails'
+>;
+
 export default function ProductDetailScreen() {
-  const navigation = useNavigation();
-  const { params } = useRoute<{ params: { product: any } }>();
-  const product = params?.product || {
-    id: '1',
-    name: 'Rainbow Rozay',
-    description: 'A bright, uplifting sativa.',
-    price: 79.0,
-    image: require('../assets/product1.png'),
-    favorited: false,
-  };
+  const navigation = useNavigation<ProductDetailsNavProp>();
+  const route = useRoute<ProductDetailsRouteProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+
+  // Extract product from route params
+  const product = route.params.product;
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -64,7 +74,8 @@ export default function ProductDetailScreen() {
   const handleAddToCart = () => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('CartScreen', { add: product });
+    // Just navigate to cart; CartScreen expects no params
+    navigation.navigate('CartScreen');
   };
 
   return (
@@ -110,7 +121,7 @@ const styles = StyleSheet.create({
   image: { width: 200, height: 200, borderRadius: 16, marginBottom: 16 },
   name: { fontSize: 24, fontWeight: '700', marginBottom: 8 },
   price: { fontSize: 20, fontWeight: '600', marginBottom: 12 },
-  description: { fontSize: 16, color: '#555', textAlign: 'center' },
+  description: { fontSize: 16, color: '#555555', textAlign: 'center' },
   cartBtn: {
     flexDirection: 'row',
     alignItems: 'center',

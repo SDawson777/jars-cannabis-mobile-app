@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
@@ -23,17 +25,28 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const MENU = [
-  { id: 'edit', label: 'Edit Profile', route: 'EditProfile' },
-  { id: 'addresses', label: 'Saved Addresses', route: 'SavedAddresses' },
-  { id: 'payments', label: 'Saved Payments', route: 'SavedPayments' },
-  { id: 'favorites', label: 'Favorites', route: 'Favorites' },
-  { id: 'orders', label: 'Order History', route: 'OrderHistory' },
-  { id: 'settings', label: 'App Settings', route: 'AppSettings' },
+// Only the screens we actually navigate to from Profile
+type ProfileRoute =
+  | 'EditProfile'
+  | 'SavedAddresses'
+  | 'SavedPayments'
+  | 'Favorites'
+  | 'OrderHistory'
+  | 'AppSettings';
+
+type ProfileNavProp = NativeStackNavigationProp<RootStackParamList>;
+
+const MENU: { id: ProfileRoute; label: string }[] = [
+  { id: 'EditProfile', label: 'Edit Profile' },
+  { id: 'SavedAddresses', label: 'Saved Addresses' },
+  { id: 'SavedPayments', label: 'Saved Payments' },
+  { id: 'Favorites', label: 'Favorites' },
+  { id: 'OrderHistory', label: 'Order History' },
+  { id: 'AppSettings', label: 'App Settings' },
 ];
 
 export default function ProfileScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ProfileNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -47,11 +60,31 @@ export default function ProfileScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handlePress = (route: string) => {
+  function navigateTo(route: ProfileRoute) {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate(route as any);
-  };
+
+    switch (route) {
+      case 'EditProfile':
+        navigation.navigate('EditProfile', { profile: undefined });
+        break;
+      case 'SavedAddresses':
+        navigation.navigate('SavedAddresses');
+        break;
+      case 'SavedPayments':
+        navigation.navigate('SavedPayments');
+        break;
+      case 'Favorites':
+        navigation.navigate('Favorites');
+        break;
+      case 'OrderHistory':
+        navigation.navigate('OrderHistory');
+        break;
+      case 'AppSettings':
+        navigation.navigate('AppSettings');
+        break;
+    }
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -62,7 +95,7 @@ export default function ProfileScreen() {
         renderItem={({ item }) => (
           <Pressable
             style={styles.row}
-            onPress={() => handlePress(item.route)}
+            onPress={() => navigateTo(item.id)}
           >
             <Text style={[styles.label, { color: jarsPrimary }]}>
               {item.label}

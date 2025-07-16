@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
@@ -23,6 +25,9 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+// Use the full stack navigation prop so navigate() accepts all screens/params
+type AppNavProp = NativeStackNavigationProp<RootStackParamList>;
+
 const STORES = [
   { id: '1', name: 'Jars Downtown', address: '123 Main St, Detroit, MI' },
   { id: '2', name: 'Jars Midtown', address: '456 Elm St, Detroit, MI' },
@@ -30,7 +35,7 @@ const STORES = [
 ];
 
 export default function StoreLocatorScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<AppNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {

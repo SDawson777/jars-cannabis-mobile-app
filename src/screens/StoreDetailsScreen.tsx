@@ -13,7 +13,6 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft, MapPin, Phone } from 'lucide-react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
@@ -24,10 +23,8 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function StoreDetailsScreen() {
-  const navigation = useNavigation();
-  const { params } = useRoute<{ params: { store: any } }>();
-  const store = params?.store || {
+export default function StoreDetailsScreen({ navigation, route }: any) {
+  const store = route.params?.store || {
     name: 'Jars Downtown',
     address: '123 Main St, Detroit, MI',
     phone: '+1 (800) 555-1234',

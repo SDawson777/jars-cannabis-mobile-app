@@ -1,7 +1,6 @@
 // src/screens/ContactUsScreen.tsx
-import React, { useEffect, useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   Pressable,
@@ -13,10 +12,12 @@ import {
 } from 'react-native';
 import { ChevronLeft, Phone, Mail, MessageCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-// enable LayoutAnimation on Android
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -24,11 +25,15 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type ContactNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ContactUs'
+>;
+
 export default function ContactUsScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ContactNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
-  // animate in on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
@@ -50,20 +55,12 @@ export default function ContactUsScreen() {
     {
       icon: <Phone size={20} color={jarsPrimary} />,
       label: 'Call Us',
-      action: () => {
-        hapticLight();
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        Linking.openURL('tel:+18005551234');
-      },
+      action: () => Linking.openURL('tel:+18005551234'),
     },
     {
       icon: <Mail size={20} color={jarsPrimary} />,
       label: 'Email Us',
-      action: () => {
-        hapticLight();
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        Linking.openURL('mailto:help@jarsapp.com');
-      },
+      action: () => Linking.openURL('mailto:help@jarsapp.com'),
     },
     {
       icon: <MessageCircle size={20} color={jarsPrimary} />,
@@ -77,7 +74,8 @@ export default function ContactUsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <View style={[styles.container, { backgroundColor: bgColor }]}>
+      {/* Header */}
       <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
@@ -97,11 +95,13 @@ export default function ContactUsScreen() {
             android_ripple={{ color: '#EEE' }}
           >
             <View style={styles.iconWrapper}>{c.icon}</View>
-            <Text style={styles.label}>{c.label}</Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>
+              {c.label}
+            </Text>
           </Pressable>
         ))}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -122,6 +122,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#EEEEEE',
   },
-  iconWrapper: { width: 32, alignItems: 'center' },
-  label: { fontSize: 16, marginLeft: 12 },
+  iconWrapper: {
+    width: 32,
+    alignItems: 'center',
+  },
+  label: {
+    fontSize: 16,
+    marginLeft: 12,
+  },
 });

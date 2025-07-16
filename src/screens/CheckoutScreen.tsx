@@ -14,12 +14,10 @@ import {
 } from 'react-native';
 import { ChevronLeft, HelpCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import {
-  hapticLight,
-  hapticMedium,
-  hapticHeavy,
-} from '../utils/haptic';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (
@@ -29,36 +27,31 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+// Strongly-typed navigation prop for this screen
+type CheckoutNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Checkout'
+>;
+
 const steps = ['Delivery', 'Contact', 'Payment', 'Review'];
 
 export default function CheckoutScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<CheckoutNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
-  // Step state
   const [step, setStep] = useState(0);
-
-  // Step 1
   const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [address, setAddress] = useState('');
-
-  // Step 2
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-
-  // Step 3
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
-
-  // Step 4
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  // Animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -79,7 +72,6 @@ export default function CheckoutScreen() {
   };
 
   const onNext = () => {
-    // Validation
     if (step === 0 && method === 'delivery' && !address.trim()) {
       hapticHeavy();
       return Alert.alert('Please enter delivery address');
@@ -93,7 +85,6 @@ export default function CheckoutScreen() {
       return Alert.alert('Please accept the Terms & Conditions');
     }
 
-    // Advance or finish
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (step < steps.length - 1) {
       hapticMedium();
@@ -104,7 +95,6 @@ export default function CheckoutScreen() {
     }
   };
 
-  // Disabled state for Next button
   const nextDisabled =
     (step === 0 && method === 'delivery' && !address.trim()) ||
     (step === 1 && (!fullName || !phone || !email)) ||
@@ -174,7 +164,6 @@ export default function CheckoutScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Enter delivery address"
-                placeholderTextColor="#999999"
                 value={address}
                 onChangeText={(text) => {
                   hapticLight();
@@ -191,7 +180,6 @@ export default function CheckoutScreen() {
             <TextInput
               style={styles.input}
               placeholder="Full Name"
-              placeholderTextColor="#999999"
               value={fullName}
               onChangeText={(t) => {
                 hapticLight();
@@ -201,7 +189,6 @@ export default function CheckoutScreen() {
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
-              placeholderTextColor="#999999"
               keyboardType="phone-pad"
               value={phone}
               onChangeText={(t) => {
@@ -212,7 +199,6 @@ export default function CheckoutScreen() {
             <TextInput
               style={styles.input}
               placeholder="Email Address"
-              placeholderTextColor="#999999"
               keyboardType="email-address"
               value={email}
               onChangeText={(t) => {
@@ -348,12 +334,7 @@ const styles = StyleSheet.create({
   },
   scroll: { padding: 16, paddingBottom: 100 },
   step: { marginBottom: 24 },
-  prompt: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333333',
-    marginBottom: 12,
-  },
+  prompt: { fontSize: 16, fontWeight: '500', color: '#333333', marginBottom: 12 },
   optionRow: { flexDirection: 'row', justifyContent: 'space-between' },
   optionColumn: { flexDirection: 'column' },
   optionCard: {
@@ -386,16 +367,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
   },
-  reviewLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333333',
-  },
-  reviewValue: {
-    fontSize: 14,
-    color: '#333333',
-    marginTop: 4,
-  },
+  reviewLabel: { fontSize: 14, fontWeight: '500', color: '#333333' },
+  reviewValue: { fontSize: 14, color: '#333333', marginTop: 4 },
   termsRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -414,10 +387,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333333',
   },
-  link: {
-    color: '#2E5D46',
-    textDecorationLine: 'underline',
-  },
+  link: { color: '#2E5D46', textDecorationLine: 'underline' },
   nextBtn: {
     position: 'absolute',
     bottom: 0,
@@ -426,9 +396,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
   },
-  nextBtnDisabled: {
-    opacity: 0.5,
-  },
+  nextBtnDisabled: { opacity: 0.5 },
   nextBtnText: {
     color: '#FFFFFF',
     fontSize: 16,

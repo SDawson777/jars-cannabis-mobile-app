@@ -11,8 +11,10 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { Plus, ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
@@ -23,19 +25,32 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const initial = [
+// Typed navigation prop
+type SavedAddressesNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'SavedAddresses'
+>;
+
+interface Address {
+  id: string;
+  label: string;
+  line1: string;
+  city: string;
+}
+
+const initial: Address[] = [
   { id: '1', label: 'Home', line1: '123 Main St', city: 'Detroit, MI' },
   { id: '2', label: 'Work', line1: '456 Elm St', city: 'Detroit, MI' },
 ];
 
 export default function SavedAddressesScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<SavedAddressesNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [addresses, setAddresses] = useState(initial);
+  const [addresses, setAddresses] = useState<Address[]>(initial);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
+  }, [addresses]);
 
   const bgColor =
     colorTemp === 'warm'
@@ -44,7 +59,7 @@ export default function SavedAddressesScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handleEdit = (addr: any) => {
+  const handleEdit = (addr: Address) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('EditAddress', { address: addr });
@@ -74,7 +89,10 @@ export default function SavedAddressesScreen() {
           </Pressable>
         )}
         ListFooterComponent={
-          <Pressable style={[styles.addBtn, { borderColor: jarsSecondary }]} onPress={handleAdd}>
+          <Pressable
+            style={[styles.addBtn, { borderColor: jarsSecondary }]}
+            onPress={handleAdd}
+          >
             <Plus color={jarsSecondary} size={20} />
             <Text style={[styles.addText, { color: jarsSecondary }]}>
               Add New Address
@@ -97,8 +115,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#EEEEEE',
   },
-  label: { fontSize: 16, fontWeight: '600' },
-  subLabel: { fontSize: 14, color: '#555', marginTop: 4 },
+  label: { fontSize: 16, fontWeight: '600', color: '#333333' },
+  subLabel: { fontSize: 14, color: '#555555', marginTop: 4 },
   addBtn: {
     flexDirection: 'row',
     alignItems: 'center',

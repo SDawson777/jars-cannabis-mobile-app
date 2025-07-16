@@ -2,9 +2,8 @@
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
-  FlatList,
-  View,
   Text,
+  FlatList,
   Pressable,
   StyleSheet,
   LayoutAnimation,
@@ -12,15 +11,24 @@ import {
   Platform,
 } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticMedium } from '../utils/haptic';
+import { ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticMedium } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
 ) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
+
+type StoreSelectionNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'StoreSelection'
+>;
 
 const STORES = [
   { id: '1', name: 'Jars Downtown', subtitle: '123 Main St' },
@@ -29,7 +37,7 @@ const STORES = [
 ];
 
 export default function StoreSelection() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StoreSelectionNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -43,7 +51,7 @@ export default function StoreSelection() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const selectStore = (store: any) => {
+  const selectStore = (id: string) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.replace('HomeScreen');
@@ -61,11 +69,11 @@ export default function StoreSelection() {
         renderItem={({ item }) => (
           <Pressable
             style={[styles.card, { borderColor: jarsPrimary }]}
-            onPress={() => selectStore(item)}
-            android_ripple={{ color: '#EEE' }}
+            onPress={() => selectStore(item.id)}
           >
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.subtitle}>{item.subtitle}</Text>
+            <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}
       />
@@ -83,7 +91,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  name: { fontSize: 18, fontWeight: '600', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#555' },
+  name: { fontSize: 18, fontWeight: '600' },
+  subtitle: { fontSize: 14, color: '#555555' },
 });

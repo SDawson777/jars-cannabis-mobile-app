@@ -12,10 +12,13 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -23,19 +26,43 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+// Strongly-typed navigation and route props
+type OrderDetailsNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'OrderDetails'
+>;
+type OrderDetailsRouteProp = RouteProp<RootStackParamList, 'OrderDetails'>;
+
+interface OrderItem {
+  id: string;
+  name: string;
+  qty: number;
+  price: number;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  items: OrderItem[];
+}
+
 export default function OrderDetailsScreen() {
-  const navigation = useNavigation();
-  const { params } = useRoute();
-  const order = (params as any).order || {
-    id: '12345',
-    date: '2025-07-14',
-    status: 'Processing',
-    items: [
-      { id: '1', name: 'Rainbow Rozay', qty: 1, price: 79.0 },
-      { id: '2', name: 'Moonwalker OG', qty: 2, price: 65.0 },
-    ],
-  };
+  const navigation = useNavigation<OrderDetailsNavProp>();
+  const route = useRoute<OrderDetailsRouteProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+
+  // Use passed order or fallback
+  const order: Order =
+    route.params?.order || {
+      id: '12345',
+      date: '2025-07-14',
+      status: 'Processing',
+      items: [
+        { id: '1', name: 'Rainbow Rozay', qty: 1, price: 79.0 },
+        { id: '2', name: 'Moonwalker OG', qty: 2, price: 65.0 },
+      ],
+    };
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -57,11 +84,15 @@ export default function OrderDetailsScreen() {
   const handleReorder = () => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: reorder logic
-    navigation.navigate('CartScreen', { items: order.items });
+    // Simply go to Cart without params (CartScreen expects no params)
+    navigation.navigate('CartScreen');
   };
 
-  const subtotal = order.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  // Calculate summary
+  const subtotal = order.items.reduce(
+    (sum: number, item: OrderItem) => sum + item.price * item.qty,
+    0
+  );
   const taxes = subtotal * 0.07;
   const total = subtotal + taxes;
 
@@ -82,7 +113,7 @@ export default function OrderDetailsScreen() {
         <Text style={styles.meta}>Date: {order.date}</Text>
         <Text style={styles.meta}>Status: {order.status}</Text>
 
-        {order.items.map((item) => (
+        {order.items.map((item: OrderItem) => (
           <View key={item.id} style={styles.itemRow}>
             <Text style={styles.itemName}>
               {item.qty}× {item.name}
@@ -129,7 +160,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
-  meta: { fontSize: 14, color: '#555', marginBottom: 8 },
+  meta: { fontSize: 14, color: '#555555', marginBottom: 8 },
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -137,7 +168,12 @@ const styles = StyleSheet.create({
   },
   itemName: { fontSize: 16 },
   itemPrice: { fontSize: 16, fontWeight: '600' },
-  summary: { marginTop: 16, borderTopWidth: 1, borderTopColor: '#EEE', paddingTop: 16 },
+  summary: {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+    paddingTop: 16,
+  },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -156,5 +192,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
-  reorderText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
+  reorderText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
 });

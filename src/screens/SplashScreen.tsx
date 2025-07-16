@@ -2,19 +2,20 @@
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
   Animated,
   Easing,
+  StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
 } from 'react-native';
-import { ThemeContext } from '../context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
+import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -22,14 +23,21 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+// Strongly-typed navigation prop
+type SplashNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'SplashScreen'
+>;
+
 export default function SplashScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<SplashNavProp>();
   const { colorTemp, jarsPrimary } = useContext(ThemeContext);
-  const fade = new Animated.Value(0);
+  const fade = React.useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticLight();
+
     Animated.timing(fade, {
       toValue: 1,
       duration: 1000,
@@ -40,7 +48,7 @@ export default function SplashScreen() {
         navigation.replace('Onboarding');
       }, 1000);
     });
-  }, []);
+  }, [fade, navigation]);
 
   const bgColor =
     colorTemp === 'warm'
@@ -51,9 +59,9 @@ export default function SplashScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <Animated.View style={{ opacity: fade }}>
-        <Text style={[styles.logo, { color: jarsPrimary }]}>JARS</Text>
-      </Animated.View>
+      <Animated.Text style={[styles.logo, { opacity: fade, color: jarsPrimary }]}>
+        JARS
+      </Animated.Text>
     </SafeAreaView>
   );
 }

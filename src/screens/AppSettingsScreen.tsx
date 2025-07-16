@@ -1,3 +1,4 @@
+// src/screens/AppSettingsScreen.tsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
@@ -25,11 +26,15 @@ if (
 
 export default function AppSettingsScreen() {
   const navigation = useNavigation();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
   const [darkMode, setDarkMode] = useState(false);
 
-  // animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
@@ -40,7 +45,7 @@ export default function AppSettingsScreen() {
     navigation.goBack();
   };
 
-  const toggleDark = (val: boolean) => {
+  const toggleDarkMode = (val: boolean) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setDarkMode(val);
@@ -56,9 +61,9 @@ export default function AppSettingsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      <View style={styles.header}>
         <Pressable onPress={handleBack}>
-          <ChevronLeft color="#333333" size={24} />
+          <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
           App Settings
@@ -71,26 +76,27 @@ export default function AppSettingsScreen() {
         <View style={styles.row}>
           <Text style={styles.label}>Dark Mode</Text>
           <Switch
+            value={darkMode}
+            onValueChange={toggleDarkMode}
             trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
             thumbColor="#FFFFFF"
-            value={darkMode}
-            onValueChange={toggleDark}
           />
         </View>
 
-        {/* Language */}
+        {/* Language (placeholder) */}
         <Pressable
           style={styles.row}
           onPress={() => {
             hapticLight();
-            Alert.alert('Language', 'Language picker coming soon.');
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            // TODO: language picker
           }}
         >
           <Text style={styles.label}>Language</Text>
           <Text style={styles.value}>English</Text>
         </Pressable>
 
-        {/* About */}
+        {/* About App */}
         <View style={[styles.row, { borderBottomWidth: 0 }]}>
           <View>
             <Text style={styles.label}>About App</Text>
@@ -109,8 +115,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
   },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
+  headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
   row: {
     flexDirection: 'row',

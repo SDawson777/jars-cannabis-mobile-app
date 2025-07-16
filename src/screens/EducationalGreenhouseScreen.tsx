@@ -1,27 +1,24 @@
 // src/screens/EducationalGreenhouseScreen.tsx
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
+  FlatList,
   View,
   Text,
-  ScrollView,
   Pressable,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
 } from 'react-native';
-import { BookOpen } from 'lucide-react-native';
+import { ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-const topics = [
-  { id: '1', title: 'Cannabis 101' },
-  { id: '2', title: 'Terpene Guide' },
-  { id: '3', title: 'Consumption Methods' },
-];
-
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -29,8 +26,19 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type EduNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'EducationalGreenhouse'
+>;
+
+const ARTICLES = [
+  { id: '1', title: 'Understanding Terpenes' },
+  { id: '2', title: 'Cannabis & Wellness' },
+  { id: '3', title: 'Growing at Home' },
+];
+
 export default function EducationalGreenhouseScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<EduNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -44,13 +52,7 @@ export default function EducationalGreenhouseScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  const handleBack = () => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.goBack();
-  };
-
-  const handleTopic = (title: string) => {
+  const openArticle = (title: string) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('ArticleDetail', { title });
@@ -58,64 +60,31 @@ export default function EducationalGreenhouseScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
-        <Pressable onPress={handleBack}>
-          <BookOpen color={jarsPrimary} size={24} />
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Educational Greenhouse
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        {topics.map((topic) => (
-          <Pressable
-            key={topic.id}
-            style={styles.card}
-            onPress={() => handleTopic(topic.title)}
-          >
-            <BookOpen color={jarsPrimary} size={32} />
-            <Text style={styles.cardTitle}>{topic.title}</Text>
+      <FlatList
+        data={ARTICLES}
+        keyExtractor={(a) => a.id}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <Pressable style={styles.row} onPress={() => openArticle(item.title)}>
+            <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>
+            <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
-        ))}
-      </ScrollView>
+        )}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: {
+  list: { padding: 16 },
+  row: {
     flexDirection: 'row',
-    padding: 16,
-    alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  headerTitle: { fontSize: 20, fontWeight: '600' },
-  content: {
-    padding: 16,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  card: {
-    width: '48%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
   },
-  cardTitle: {
-    marginTop: 12,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-    textAlign: 'center',
-  },
+  title: { fontSize: 16 },
 });
