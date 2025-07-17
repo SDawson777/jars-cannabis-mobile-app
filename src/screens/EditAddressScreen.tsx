@@ -1,6 +1,7 @@
 // src/screens/EditAddressScreen.tsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -27,9 +28,9 @@ if (
 export default function EditAddressScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
-  // Assume address passed in params
+  // Existing address passed via params
   const addr = (route.params as any)?.address || {};
   const [label, setLabel] = useState(addr.label || '');
   const [line1, setLine1] = useState(addr.line1 || '');
@@ -55,16 +56,17 @@ export default function EditAddressScreen() {
   };
 
   const onSave = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticMedium();
-    // TODO: save updated address
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // TODO: persist updated address via API/Context
     Alert.alert('Address Updated', 'Your address changes have been saved.');
     navigation.goBack();
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -74,58 +76,59 @@ export default function EditAddressScreen() {
         <View style={styles.iconBtn} />
       </View>
 
+      {/* Form */}
       <View style={styles.form}>
-        <Text style={styles.label}>Label</Text>
+        <Text style={[styles.label, { color: jarsPrimary }]}>Label</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: jarsSecondary }]}
           value={label}
           onChangeText={(t) => {
             hapticLight();
             setLabel(t);
           }}
           placeholder="Home, Work, etc."
-          placeholderTextColor="#999999"
+          placeholderTextColor={jarsSecondary}
         />
 
-        <Text style={styles.label}>Street Address</Text>
+        <Text style={[styles.label, { color: jarsPrimary }]}>Street Address</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: jarsSecondary }]}
           value={line1}
           onChangeText={(t) => {
             hapticLight();
             setLine1(t);
           }}
           placeholder="123 Main St"
-          placeholderTextColor="#999999"
+          placeholderTextColor={jarsSecondary}
         />
 
-        <Text style={styles.label}>City</Text>
+        <Text style={[styles.label, { color: jarsPrimary }]}>City</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: jarsSecondary }]}
           value={city}
           onChangeText={(t) => {
             hapticLight();
             setCity(t);
           }}
           placeholder="City"
-          placeholderTextColor="#999999"
+          placeholderTextColor={jarsSecondary}
         />
 
-        <Text style={styles.label}>State</Text>
+        <Text style={[styles.label, { color: jarsPrimary }]}>State</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: jarsSecondary }]}
           value={stateField}
           onChangeText={(t) => {
             hapticLight();
             setStateField(t);
           }}
           placeholder="State"
-          placeholderTextColor="#999999"
+          placeholderTextColor={jarsSecondary}
         />
 
-        <Text style={styles.label}>ZIP Code</Text>
+        <Text style={[styles.label, { color: jarsPrimary }]}>ZIP Code</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { borderColor: jarsSecondary }]}
           value={zip}
           onChangeText={(t) => {
             hapticLight();
@@ -133,7 +136,7 @@ export default function EditAddressScreen() {
           }}
           placeholder="ZIP"
           keyboardType="numeric"
-          placeholderTextColor="#999999"
+          placeholderTextColor={jarsSecondary}
         />
 
         <Pressable
@@ -143,7 +146,7 @@ export default function EditAddressScreen() {
           <Text style={styles.saveText}>Save Changes</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -154,13 +157,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   form: { padding: 16 },
   label: {
     fontSize: 14,
-    color: '#777777',
     marginTop: 16,
     marginBottom: 4,
   },
@@ -170,9 +173,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    color: '#333333',
     borderWidth: 1,
-    borderColor: '#EEEEEE',
   },
   saveBtn: {
     marginTop: 32,

@@ -1,5 +1,5 @@
 // src/screens/OnboardingScreen.tsx
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -25,7 +25,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Strongly-typed navigation prop
 type OnboardingNavProp = NativeStackNavigationProp<
   RootStackParamList,
   'Onboarding'
@@ -33,8 +32,14 @@ type OnboardingNavProp = NativeStackNavigationProp<
 
 export default function OnboardingScreen() {
   const navigation = useNavigation<OnboardingNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
+  // Animate on mount
+  useEffect(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, []);
+
+  // Background based on time/weather
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -42,11 +47,29 @@ export default function OnboardingScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
+  // “Glow” effect for the button
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
+
   const handleNext = () => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // Advance through onboarding pages or finish
-    // Here we jump straight to age verification
     navigation.replace('AgeVerification');
   };
 
@@ -56,11 +79,15 @@ export default function OnboardingScreen() {
         <Text style={[styles.title, { color: jarsPrimary }]}>
           Welcome to JARS
         </Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.subtitle, { color: jarsSecondary }]}>
           Discover the best cannabis products curated just for you.
         </Text>
       </View>
-      <Pressable style={[styles.nextBtn, { backgroundColor: jarsPrimary }]} onPress={handleNext}>
+
+      <Pressable
+        style={[styles.nextBtn, { backgroundColor: jarsPrimary }, glowStyle]}
+        onPress={handleNext}
+      >
         <Text style={styles.nextText}>Get Started</Text>
         <ChevronRight color="#FFF" size={24} />
       </Pressable>
@@ -69,10 +96,28 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'space-between', padding: 24 },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 32, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
-  subtitle: { fontSize: 16, color: '#555', textAlign: 'center', lineHeight: 22 },
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 24,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 12,
+  },
   nextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -80,5 +125,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
   },
-  nextText: { color: '#FFF', fontSize: 18, fontWeight: '600', marginRight: 8 },
+  nextText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginRight: 8,
+  },
 });

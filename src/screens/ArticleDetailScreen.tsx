@@ -12,7 +12,13 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
@@ -24,19 +30,26 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type ArticleNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ArticleDetail'
+>;
+type ArticleRouteProp = RouteProp<
+  RootStackParamList,
+  'ArticleDetail'
+>;
+
 export default function ArticleDetailScreen() {
-  const navigation = useNavigation();
-  const { params } = useRoute();
-  const title = (params as any).title || 'Article';
+  const navigation = useNavigation<ArticleNavProp>();
+  const route = useRoute<ArticleRouteProp>();
+  const { title } = route.params;
 
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
-  // Animate in on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -45,17 +58,17 @@ export default function ArticleDetailScreen() {
       : jarsBackground;
 
   const handleBack = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.goBack();
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack} style={styles.iconBtn}>
-          <ChevronLeft color="#333333" size={24} />
+          <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
           {title}
@@ -65,7 +78,7 @@ export default function ArticleDetailScreen() {
 
       {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.articleText}>
+        <Text style={[styles.articleText, { color: jarsSecondary }]}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel dui
           vitae risus vulputate convallis. Sed quis lacus non turpis ullamcorper
           cursus. In hac habitasse platea dictumst. Duis nec hendrerit nunc.
@@ -87,13 +100,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
   articleText: {
     fontSize: 15,
-    color: '#333333',
     lineHeight: 24,
   },
 });

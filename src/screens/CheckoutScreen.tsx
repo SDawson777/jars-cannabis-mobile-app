@@ -2,6 +2,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
+  SafeAreaView,
   Text,
   ScrollView,
   Pressable,
@@ -27,7 +28,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Strongly-typed navigation prop for this screen
 type CheckoutNavProp = NativeStackNavigationProp<
   RootStackParamList,
   'Checkout'
@@ -37,7 +37,12 @@ const steps = ['Delivery', 'Contact', 'Payment', 'Review'];
 
 export default function CheckoutScreen() {
   const navigation = useNavigation<CheckoutNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
   const [step, setStep] = useState(0);
   const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
@@ -48,10 +53,12 @@ export default function CheckoutScreen() {
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  // animate on any state change
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
+  }, [step, method, address, fullName, phone, email, payment, termsAccepted]);
 
+  // dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -59,49 +66,70 @@ export default function CheckoutScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
+  // glow for the next/place-order button
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
+
   const handleBack = () => {
     hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.goBack();
   };
 
   const handleHelp = () => {
     hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('HelpFAQ');
   };
 
   const onNext = () => {
     if (step === 0 && method === 'delivery' && !address.trim()) {
       hapticHeavy();
-      return Alert.alert('Please enter delivery address');
+      return Alert.alert('Error', 'Please enter delivery address.');
     }
-    if (step === 1 && (!fullName || !phone || !email)) {
+    if (
+      step === 1 &&
+      (!fullName.trim() || !phone.trim() || !email.trim())
+    ) {
       hapticHeavy();
-      return Alert.alert('Please fill in all contact fields');
+      return Alert.alert('Error', 'Please fill in all contact fields.');
     }
     if (step === 3 && !termsAccepted) {
       hapticHeavy();
-      return Alert.alert('Please accept the Terms & Conditions');
+      return Alert.alert('Error', 'Please accept Terms & Conditions.');
     }
 
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (step < steps.length - 1) {
       hapticMedium();
       setStep(step + 1);
     } else {
-      hapticHeavy();
+      hapticMedium();
       navigation.navigate('OrderConfirmation');
     }
   };
 
   const nextDisabled =
     (step === 0 && method === 'delivery' && !address.trim()) ||
-    (step === 1 && (!fullName || !phone || !email)) ||
+    (step === 1 &&
+      (!fullName.trim() || !phone.trim() || !email.trim())) ||
     (step === 3 && !termsAccepted);
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={handleBack}>
@@ -117,9 +145,9 @@ export default function CheckoutScreen() {
 
       {/* Progress Bar */}
       <View style={styles.progressBar}>
-        {steps.map((label, idx) => (
+        {steps.map((_, idx) => (
           <View
-            key={label}
+            key={idx}
             style={[
               styles.progressSegment,
               idx <= step && { backgroundColor: jarsPrimary },
@@ -130,9 +158,10 @@ export default function CheckoutScreen() {
 
       {/* Content */}
       <ScrollView contentContainerStyle={styles.scroll}>
+        {/* Step 0: Delivery or Pickup */}
         {step === 0 && (
           <View style={styles.step}>
-            <Text style={styles.prompt}>
+            <Text style={[styles.prompt, { color: jarsPrimary }]}>
               How would you like to receive your order?
             </Text>
             <View style={styles.optionRow}>
@@ -148,13 +177,10 @@ export default function CheckoutScreen() {
                   ]}
                   onPress={() => {
                     hapticLight();
-                    LayoutAnimation.configureNext(
-                      LayoutAnimation.Presets.easeInEaseOut
-                    );
                     setMethod(opt);
                   }}
                 >
-                  <Text style={styles.optionText}>
+                  <Text style={[styles.optionText, { color: jarsPrimary }]}>
                     {opt === 'pickup' ? 'Pickup' : 'Delivery'}
                   </Text>
                 </Pressable>
@@ -162,33 +188,44 @@ export default function CheckoutScreen() {
             </View>
             {method === 'delivery' && (
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  { borderColor: jarsSecondary, color: jarsPrimary },
+                ]}
                 placeholder="Enter delivery address"
+                placeholderTextColor={jarsSecondary}
                 value={address}
-                onChangeText={(text) => {
+                onChangeText={(t) => {
                   hapticLight();
-                  setAddress(text);
+                  setAddress(t);
                 }}
               />
             )}
           </View>
         )}
 
+        {/* Step 1: Contact Info */}
         {step === 1 && (
           <View style={styles.step}>
-            <Text style={styles.prompt}>Who is picking up this order?</Text>
+            <Text style={[styles.prompt, { color: jarsPrimary }]}>
+              Who is picking up this order?
+            </Text>
+
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder="Full Name"
+              placeholderTextColor={jarsSecondary}
               value={fullName}
               onChangeText={(t) => {
                 hapticLight();
                 setFullName(t);
               }}
             />
+
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder="Phone Number"
+              placeholderTextColor={jarsSecondary}
               keyboardType="phone-pad"
               value={phone}
               onChangeText={(t) => {
@@ -196,9 +233,11 @@ export default function CheckoutScreen() {
                 setPhone(t);
               }}
             />
+
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder="Email Address"
+              placeholderTextColor={jarsSecondary}
               keyboardType="email-address"
               value={email}
               onChangeText={(t) => {
@@ -206,15 +245,19 @@ export default function CheckoutScreen() {
                 setEmail(t);
               }}
             />
-            <Text style={styles.note}>
+
+            <Text style={[styles.note, { color: jarsSecondary }]}>
               Must match your government-issued ID at pickup.
             </Text>
           </View>
         )}
 
+        {/* Step 2: Payment Method */}
         {step === 2 && (
           <View style={styles.step}>
-            <Text style={styles.prompt}>How would you like to pay?</Text>
+            <Text style={[styles.prompt, { color: jarsPrimary }]}>
+              How would you like to pay?
+            </Text>
             <View style={styles.optionColumn}>
               {(['online', 'atPickup'] as const).map((opt) => (
                 <Pressable
@@ -228,13 +271,10 @@ export default function CheckoutScreen() {
                   ]}
                   onPress={() => {
                     hapticLight();
-                    LayoutAnimation.configureNext(
-                      LayoutAnimation.Presets.easeInEaseOut
-                    );
                     setPayment(opt);
                   }}
                 >
-                  <Text style={styles.optionText}>
+                  <Text style={[styles.optionText, { color: jarsPrimary }]}>
                     {opt === 'online' ? 'Pay Online' : 'Pay at Pickup/Delivery'}
                   </Text>
                 </Pressable>
@@ -243,34 +283,42 @@ export default function CheckoutScreen() {
           </View>
         )}
 
+        {/* Step 3: Review & Terms */}
         {step === 3 && (
           <View style={styles.step}>
-            <Text style={styles.prompt}>Review Your Order</Text>
+            <Text style={[styles.prompt, { color: jarsPrimary }]}>
+              Review Your Order
+            </Text>
+
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Method:</Text>
-              <Text style={styles.reviewValue}>
+              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>
+                Method:
+              </Text>
+              <Text style={[styles.reviewValue, { color: jarsSecondary }]}>
                 {method === 'pickup' ? 'Pickup' : address}
               </Text>
             </View>
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Contact:</Text>
-              <Text style={styles.reviewValue}>
+              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>
+                Contact:
+              </Text>
+              <Text style={[styles.reviewValue, { color: jarsSecondary }]}>
                 {fullName}, {phone}, {email}
               </Text>
             </View>
             <View style={styles.reviewCard}>
-              <Text style={styles.reviewLabel}>Payment:</Text>
-              <Text style={styles.reviewValue}>
+              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>
+                Payment:
+              </Text>
+              <Text style={[styles.reviewValue, { color: jarsSecondary }]}>
                 {payment === 'online' ? 'Online' : 'At Pickup/Delivery'}
               </Text>
             </View>
+
             <Pressable
               style={styles.termsRow}
               onPress={() => {
                 hapticLight();
-                LayoutAnimation.configureNext(
-                  LayoutAnimation.Presets.easeInEaseOut
-                );
                 setTermsAccepted(!termsAccepted);
               }}
             >
@@ -283,21 +331,28 @@ export default function CheckoutScreen() {
                   },
                 ]}
               />
-              <Text style={styles.termsText}>
+              <Text style={[styles.termsText, { color: jarsSecondary }]}>
                 I agree to Jars’{' '}
-                <Text style={styles.link}>Terms & Conditions</Text> and{' '}
-                <Text style={styles.link}>Privacy Policy</Text>.
+                <Text style={[styles.link, { color: jarsPrimary }]}>
+                  Terms & Conditions
+                </Text>{' '}
+                and{' '}
+                <Text style={[styles.link, { color: jarsPrimary }]}>
+                  Privacy Policy
+                </Text>
+                .
               </Text>
             </Pressable>
           </View>
         )}
       </ScrollView>
 
-      {/* Bottom Button */}
+      {/* Next / Place Order */}
       <Pressable
         style={[
           styles.nextBtn,
           { backgroundColor: jarsPrimary },
+          glowStyle,
           nextDisabled && styles.nextBtnDisabled,
         ]}
         onPress={onNext}
@@ -307,7 +362,7 @@ export default function CheckoutScreen() {
           {step < steps.length - 1 ? 'Continue' : 'Place Order'}
         </Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -332,9 +387,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     borderRadius: 2,
   },
-  scroll: { padding: 16, paddingBottom: 100 },
+  scroll: { padding: 16, paddingBottom: 120 },
   step: { marginBottom: 24 },
-  prompt: { fontSize: 16, fontWeight: '500', color: '#333333', marginBottom: 12 },
+  prompt: { fontSize: 16, fontWeight: '500' },
   optionRow: { flexDirection: 'row', justifyContent: 'space-between' },
   optionColumn: { flexDirection: 'column' },
   optionCard: {
@@ -344,31 +399,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     marginRight: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
   },
-  optionText: { fontSize: 16, fontWeight: '600', color: '#333333' },
+  optionText: { fontSize: 16, fontWeight: '600' },
   input: {
     backgroundColor: '#FFFFFF',
     padding: 12,
     borderRadius: 12,
+    borderWidth: 1,
     marginTop: 12,
   },
-  note: {
-    fontSize: 12,
-    color: '#777777',
-    marginTop: 8,
-  },
+  note: { fontSize: 12, marginTop: 8 },
   reviewCard: {
     backgroundColor: '#FFFFFF',
     padding: 12,
     borderRadius: 12,
     marginBottom: 12,
   },
-  reviewLabel: { fontSize: 14, fontWeight: '500', color: '#333333' },
-  reviewValue: { fontSize: 14, color: '#333333', marginTop: 4 },
+  reviewLabel: { fontSize: 14, fontWeight: '500' },
+  reviewValue: { fontSize: 14, marginTop: 4 },
   termsRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -382,12 +430,8 @@ const styles = StyleSheet.create({
     borderColor: '#CCCCCC',
     marginRight: 8,
   },
-  termsText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#333333',
-  },
-  link: { color: '#2E5D46', textDecorationLine: 'underline' },
+  termsText: { flex: 1, fontSize: 14 },
+  link: { textDecorationLine: 'underline' },
   nextBtn: {
     position: 'absolute',
     bottom: 0,

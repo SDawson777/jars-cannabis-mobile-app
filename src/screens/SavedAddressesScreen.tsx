@@ -18,6 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -25,7 +26,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Typed navigation prop
 type SavedAddressesNavProp = NativeStackNavigationProp<
   RootStackParamList,
   'SavedAddresses'
@@ -45,7 +45,12 @@ const initial: Address[] = [
 
 export default function SavedAddressesScreen() {
   const navigation = useNavigation<SavedAddressesNavProp>();
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
   const [addresses, setAddresses] = useState<Address[]>(initial);
 
   useEffect(() => {
@@ -78,10 +83,16 @@ export default function SavedAddressesScreen() {
         keyExtractor={(a) => a.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <Pressable style={styles.row} onPress={() => handleEdit(item)}>
+          <Pressable
+            style={[styles.row, { borderBottomColor: jarsSecondary }]}
+            android_ripple={{ color: `${jarsSecondary}20` }}
+            onPress={() => handleEdit(item)}
+          >
             <View>
-              <Text style={styles.label}>{item.label}</Text>
-              <Text style={styles.subLabel}>
+              <Text style={[styles.label, { color: jarsPrimary }]}>
+                {item.label}
+              </Text>
+              <Text style={[styles.subLabel, { color: jarsSecondary }]}>
                 {item.line1}, {item.city}
               </Text>
             </View>
@@ -91,6 +102,7 @@ export default function SavedAddressesScreen() {
         ListFooterComponent={
           <Pressable
             style={[styles.addBtn, { borderColor: jarsSecondary }]}
+            android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={handleAdd}
           >
             <Plus color={jarsSecondary} size={20} />
@@ -113,10 +125,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
-  label: { fontSize: 16, fontWeight: '600', color: '#333333' },
-  subLabel: { fontSize: 14, color: '#555555', marginTop: 4 },
+  label: { fontSize: 16, fontWeight: '600' },
+  subLabel: { fontSize: 14, marginTop: 4 },
   addBtn: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -34,7 +34,7 @@ type DataTransparencyNavProp = NativeStackNavigationProp<
 
 export default function DataTransparencyScreen() {
   const navigation = useNavigation<DataTransparencyNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -56,13 +56,13 @@ export default function DataTransparencyScreen() {
   const handleDownload = () => {
     hapticSuccess();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    Alert.alert('Download', 'Data transparency report downloaded.');
+    Alert.alert('Download', 'Your data transparency report is downloading.');
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -73,10 +73,10 @@ export default function DataTransparencyScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.paragraph}>
+        <Text style={[styles.paragraph, { color: jarsSecondary }]}>
           We collect minimal personal data and never share it without your consent.
         </Text>
-        <Text style={styles.paragraph}>
+        <Text style={[styles.paragraph, { color: jarsSecondary }]}>
           You can request a full export of your data at any time.
         </Text>
 
@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
   paragraph: {
     fontSize: 16,
-    color: '#333333',
     marginBottom: 16,
     lineHeight: 22,
   },

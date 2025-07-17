@@ -2,6 +2,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+// normal import (no `import type`)
+import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
 
 import SplashScreen from './src/screens/SplashScreen';
@@ -41,22 +43,18 @@ import EducationalGreenhouseScreen from './src/screens/EducationalGreenhouseScre
 import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
 import CommunityGardenScreen from './src/screens/CommunityGardenScreen';
 import ConciergeChatScreen from './src/screens/ConciergeChatScreen';
-
 import DataTransparencyScreen from './src/screens/DataTransparencyScreen';
 import AccessibilitySettingsScreen from './src/screens/AccessibilitySettingsScreen';
 import AwardsScreen from './src/screens/AwardsScreen';
+import LegalScreen from './src/screens/LegalScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator(); // no generic
 
 export default function App() {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="SplashScreen"
-          screenOptions={{ headerShown: false }}
-        >
-          {/* Phase 1–3 */}
+        <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           <Stack.Screen name="AgeVerification" component={AgeVerification} />
@@ -90,24 +88,14 @@ export default function App() {
           <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
           <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
           <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-          <Stack.Screen
-            name="EducationalGreenhouse"
-            component={EducationalGreenhouseScreen}
-          />
+          <Stack.Screen name="EducationalGreenhouse" component={EducationalGreenhouseScreen} />
           <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
-          <Stack.Screen
-            name="CommunityGarden"
-            component={CommunityGardenScreen}
-          />
+          <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
           <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
-
-          {/* Phase 4 */}
           <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />
-          <Stack.Screen
-            name="AccessibilitySettings"
-            component={AccessibilitySettingsScreen}
-          />
+          <Stack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} />
           <Stack.Screen name="Awards" component={AwardsScreen} />
+          <Stack.Screen name="Legal" component={LegalScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>

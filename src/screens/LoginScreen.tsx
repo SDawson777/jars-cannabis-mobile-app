@@ -18,6 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -29,15 +30,17 @@ type LoginNavProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
+  // Background based on time/weather
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -45,48 +48,87 @@ export default function LoginScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
+  // Glow effect for buttons
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
+
   const handleLogin = () => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: real auth logic
+    // TODO: replace with real authentication
     navigation.replace('HomeScreen');
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}>
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            navigation.goBack();
+          }}
+        >
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.title, { color: jarsPrimary }]}>Log In</Text>
         <View style={{ width: 24 }} />
       </View>
+
       <View style={styles.form}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { borderColor: jarsSecondary, color: jarsPrimary },
+          ]}
           placeholder="Email"
+          placeholderTextColor={jarsSecondary}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { borderColor: jarsSecondary, color: jarsPrimary },
+          ]}
           placeholder="Password"
+          placeholderTextColor={jarsSecondary}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
         />
-        <Pressable onPress={() => {
-          hapticLight();
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          navigation.navigate('ForgotPassword');
-        }}>
+
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            navigation.navigate('ForgotPassword');
+          }}
+        >
           <Text style={[styles.link, { color: jarsPrimary }]}>
             Forgot Password?
           </Text>
         </Pressable>
+
         <Pressable
-          style={[styles.button, { backgroundColor: jarsPrimary }]}
+          style={[styles.button, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={handleLogin}
         >
           <Text style={styles.buttonText}>Log In</Text>
@@ -112,9 +154,8 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#EEE',
   },
-  link: { textAlign: 'right', marginBottom: 24 },
+  link: { textAlign: 'right', marginBottom: 24, fontWeight: '500' },
   button: {
     paddingVertical: 14,
     borderRadius: 12,

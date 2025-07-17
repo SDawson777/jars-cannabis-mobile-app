@@ -1,6 +1,7 @@
 // src/screens/AppSettingsScreen.tsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   Switch,
@@ -26,13 +27,7 @@ if (
 
 export default function AppSettingsScreen() {
   const navigation = useNavigation();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
-
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -59,9 +54,9 @@ export default function AppSettingsScreen() {
       : jarsBackground;
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -73,8 +68,8 @@ export default function AppSettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         {/* Dark Mode */}
-        <View style={styles.row}>
-          <Text style={styles.label}>Dark Mode</Text>
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Dark Mode</Text>
           <Switch
             value={darkMode}
             onValueChange={toggleDarkMode}
@@ -85,26 +80,28 @@ export default function AppSettingsScreen() {
 
         {/* Language (placeholder) */}
         <Pressable
-          style={styles.row}
+          style={[styles.row, { borderBottomColor: jarsSecondary }]}
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             // TODO: language picker
           }}
         >
-          <Text style={styles.label}>Language</Text>
-          <Text style={styles.value}>English</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Language</Text>
+          <Text style={[styles.value, { color: jarsSecondary }]}>English</Text>
         </Pressable>
 
         {/* About App */}
         <View style={[styles.row, { borderBottomWidth: 0 }]}>
           <View>
-            <Text style={styles.label}>About App</Text>
-            <Text style={styles.subLabel}>Version 1.0.0 (Build 1)</Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>About App</Text>
+            <Text style={[styles.subLabel, { color: jarsSecondary }]}>
+              Version 1.0.0 (Build 1)
+            </Text>
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -116,7 +113,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
@@ -126,9 +122,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
-  label: { fontSize: 16, color: '#333333' },
-  value: { fontSize: 16, color: '#777777' },
-  subLabel: { fontSize: 14, color: '#777777', marginTop: 4 },
+  label: { fontSize: 16 },
+  value: { fontSize: 16 },
+  subLabel: { fontSize: 14, marginTop: 4 },
 });

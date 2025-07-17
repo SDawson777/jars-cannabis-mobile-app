@@ -30,14 +30,12 @@ const AWARDS = [
 ];
 
 export default function AwardsScreen() {
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
-  // Animate in on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -56,18 +54,20 @@ export default function AwardsScreen() {
         <Text style={[styles.title, { color: jarsPrimary }]}>
           Jars Awards
         </Text>
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: jarsSecondary }]}>
           Celebrate our community’s top contributors—and cast your vote!
         </Text>
 
         {AWARDS.map((award) => (
           <TouchableOpacity
             key={award.id}
-            style={styles.card}
+            style={[styles.card, { borderColor: jarsPrimary }]}
             onPress={handleSelect}
             activeOpacity={0.7}
           >
-            <Text style={styles.cardText}>{award.label}</Text>
+            <Text style={[styles.cardText, { color: jarsPrimary }]}>
+              {award.label}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -85,23 +85,17 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: '#777777',
     marginBottom: 24,
   },
   card: {
     backgroundColor: '#FFFFFF',
+    borderWidth: 2,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
   },
   cardText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
   },
 });

@@ -1,47 +1,81 @@
 // src/screens/AddAddressScreen.tsx
 import React, { useState, useContext, useEffect } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   TextInput,
   Pressable,
-  StyleSheet,
   Alert,
+  StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type AddAddressNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'AddAddress'
+>;
+
 export default function AddAddressScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsPrimary } = useContext(ThemeContext);
+  const navigation = useNavigation<AddAddressNavProp>();
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
-  // Determine background from colorTemp
-  const bgColor =
-    colorTemp === 'warm' ? '#FAF8F4' :
-    colorTemp === 'cool' ? '#F7F9FA' :
-                          '#F9F9F9';
-
-  // Form state
   const [label, setLabel] = useState('');
   const [line1, setLine1] = useState('');
   const [city, setCity] = useState('');
   const [stateField, setStateField] = useState('');
   const [zip, setZip] = useState('');
 
-  // Animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
+
+  const bgColor =
+    colorTemp === 'warm'
+      ? '#FAF8F4'
+      : colorTemp === 'cool'
+      ? '#F7F9FA'
+      : jarsBackground;
+
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
 
   const handleBack = () => {
     hapticLight();
@@ -50,82 +84,63 @@ export default function AddAddressScreen() {
   };
 
   const onSave = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (!label.trim() || !line1.trim() || !city.trim()) {
+      hapticLight();
+      return Alert.alert('Error', 'Please fill in all required fields.');
+    }
     hapticMedium();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // TODO: integrate actual save logic
     Alert.alert('Address Added', 'Your new address has been saved.');
     navigation.goBack();
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack} style={styles.iconBtn}>
-          <ChevronLeft color="#333333" size={24} />
+          <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
           Add Address
         </Text>
         <View style={styles.iconBtn} />
       </View>
-
-      {/* Form */}
       <View style={styles.form}>
-        <Text style={styles.label}>Label (e.g. Home)</Text>
-        <TextInput
-          style={styles.input}
-          value={label}
-          onChangeText={setLabel}
-          placeholder="Home, Work, etc."
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>Street Address</Text>
-        <TextInput
-          style={styles.input}
-          value={line1}
-          onChangeText={setLine1}
-          placeholder="123 Main St"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>City</Text>
-        <TextInput
-          style={styles.input}
-          value={city}
-          onChangeText={setCity}
-          placeholder="City"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>State</Text>
-        <TextInput
-          style={styles.input}
-          value={stateField}
-          onChangeText={setStateField}
-          placeholder="State"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>ZIP Code</Text>
-        <TextInput
-          style={styles.input}
-          value={zip}
-          onChangeText={setZip}
-          placeholder="ZIP"
-          keyboardType="numeric"
-          placeholderTextColor="#999999"
-        />
+        {[
+          { label: 'Label (Home, Work)', value: label, setter: setLabel },
+          { label: 'Street Address', value: line1, setter: setLine1 },
+          { label: 'City', value: city, setter: setCity },
+          { label: 'State', value: stateField, setter: setStateField },
+          { label: 'ZIP Code', value: zip, setter: setZip, keyboard: 'numeric' },
+        ].map(({ label: lbl, value, setter, keyboard }) => (
+          <View key={lbl}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{lbl}</Text>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: jarsSecondary, color: jarsPrimary },
+              ]}
+              placeholder={lbl}
+              placeholderTextColor={jarsSecondary}
+              keyboardType={keyboard as any}
+              value={value}
+              onChangeText={(t) => {
+                hapticLight();
+                setter(t);
+              }}
+            />
+          </View>
+        ))}
 
         <Pressable
-          style={[styles.saveBtn, { backgroundColor: jarsPrimary }]}
+          style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={onSave}
         >
           <Text style={styles.saveText}>Save Address</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -136,25 +151,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   form: { padding: 16 },
   label: {
     fontSize: 14,
-    color: '#777777',
     marginTop: 16,
     marginBottom: 4,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 16,
-    color: '#333333',
     borderWidth: 1,
-    borderColor: '#EEEEEE',
   },
   saveBtn: {
     marginTop: 32,
@@ -163,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
   },

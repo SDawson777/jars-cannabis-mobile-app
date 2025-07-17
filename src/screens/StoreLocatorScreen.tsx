@@ -25,8 +25,10 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Use the full stack navigation prop so navigate() accepts all screens/params
-type AppNavProp = NativeStackNavigationProp<RootStackParamList>;
+type LocatorNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'StoreLocator'
+>;
 
 const STORES = [
   { id: '1', name: 'Jars Downtown', address: '123 Main St, Detroit, MI' },
@@ -35,8 +37,13 @@ const STORES = [
 ];
 
 export default function StoreLocatorScreen() {
-  const navigation = useNavigation<AppNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const navigation = useNavigation<LocatorNavProp>();
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -55,7 +62,7 @@ export default function StoreLocatorScreen() {
     navigation.goBack();
   };
 
-  const handleSelectStore = (store: any) => {
+  const handleSelectStore = (store: typeof STORES[0]) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('StoreDetails', { store });
@@ -63,7 +70,8 @@ export default function StoreLocatorScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -73,19 +81,24 @@ export default function StoreLocatorScreen() {
         <View style={{ width: 24 }} />
       </View>
 
+      {/* List */}
       <FlatList
         data={STORES}
-        keyExtractor={(s) => s.id}
+        keyExtractor={s => s.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
             style={styles.row}
+            android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={() => handleSelectStore(item)}
-            android_ripple={{ color: '#EEE' }}
           >
             <View>
-              <Text style={styles.storeName}>{item.name}</Text>
-              <Text style={styles.storeAddress}>{item.address}</Text>
+              <Text style={[styles.storeName, { color: jarsPrimary }]}>
+                {item.name}
+              </Text>
+              <Text style={[styles.storeAddress, { color: jarsSecondary }]}>
+                {item.address}
+              </Text>
             </View>
           </Pressable>
         )}
@@ -101,11 +114,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   title: { fontSize: 20, fontWeight: '600' },
   list: { padding: 16 },
   row: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -115,5 +129,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   storeName: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  storeAddress: { fontSize: 14, color: '#555' },
+  storeAddress: { fontSize: 14 },
 });

@@ -6,38 +6,51 @@ import {
   View,
   Text,
   Switch,
+  Pressable,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
 } from 'react-native';
+import { ChevronLeft } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function AccessibilitySettingsScreen() {
-  const { colorTemp, jarsPrimary } = useContext(ThemeContext);
+type AccessibilityNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'AccessibilitySettings'
+>;
 
-  // Map our colorTemperature to background shades
+export default function AccessibilitySettingsScreen() {
+  const navigation = useNavigation<AccessibilityNavProp>();
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+
   const bgColor =
-    colorTemp === 'warm' ? '#FAF8F4' :
-    colorTemp === 'cool' ? '#F7F9FA' :
-                          '#F9F9F9';
+    colorTemp === 'warm'
+      ? '#FAF8F4'
+      : colorTemp === 'cool'
+      ? '#F7F9FA'
+      : jarsBackground;
 
   const [reducedMotion, setReducedMotion] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [dyslexiaFont, setDyslexiaFont] = useState(false);
 
-  // Animate the entire view on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Helper to animate + haptic + state
   const onToggle = (
     setter: React.Dispatch<React.SetStateAction<boolean>>,
     value: boolean
@@ -47,43 +60,63 @@ export default function AccessibilitySettingsScreen() {
     hapticLight();
   };
 
+  const handleBack = () => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
+        <Pressable onPress={handleBack}>
+          <ChevronLeft color={jarsPrimary} size={24} />
+        </Pressable>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
+          Accessibility Settings
+        </Text>
+        <View style={{ width: 24 }} />
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Accessibility Settings
-        </Text>
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: jarsSecondary }]}>
           Tailor the app’s look & feel for your comfort.
         </Text>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Reduced Motion & Sensory Mode</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>
+            Reduced Motion & Sensory Mode
+          </Text>
           <Switch
             value={reducedMotion}
             onValueChange={val => onToggle(setReducedMotion, val)}
-            trackColor={{ true: jarsPrimary }}
+            trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>High Contrast</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>
+            High Contrast
+          </Text>
           <Switch
             value={highContrast}
             onValueChange={val => onToggle(setHighContrast, val)}
-            trackColor={{ true: jarsPrimary }}
+            trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Dyslexia-Friendly Font</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>
+            Dyslexia-Friendly Font
+          </Text>
           <Switch
             value={dyslexiaFont}
             onValueChange={val => onToggle(setDyslexiaFont, val)}
-            trackColor={{ true: jarsPrimary }}
+            trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
       </ScrollView>
@@ -93,16 +126,19 @@ export default function AccessibilitySettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 20 },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
   },
+  headerTitle: { fontSize: 20, fontWeight: '600' },
+  content: { padding: 20 },
   description: {
     fontSize: 16,
-    color: '#777777',
     marginBottom: 24,
+    lineHeight: 22,
   },
   row: {
     flexDirection: 'row',
@@ -114,6 +150,5 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#333333',
   },
 });

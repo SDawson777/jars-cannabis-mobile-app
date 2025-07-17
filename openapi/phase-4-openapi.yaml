@@ -1,0 +1,5 @@
+jars-mobile-app/
+├── src/
+│   └── … your React Native code …
+└── openapi/
+    └── phase-4-openapi.yaml   ← your Postman-compatible spec

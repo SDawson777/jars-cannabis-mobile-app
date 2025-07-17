@@ -1,6 +1,7 @@
 // src/screens/ContactUsScreen.tsx
 import React, { useContext, useEffect } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   Pressable,
@@ -32,7 +33,7 @@ type ContactNavProp = NativeStackNavigationProp<
 
 export default function ContactUsScreen() {
   const navigation = useNavigation<ContactNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -55,12 +56,18 @@ export default function ContactUsScreen() {
     {
       icon: <Phone size={20} color={jarsPrimary} />,
       label: 'Call Us',
-      action: () => Linking.openURL('tel:+18005551234'),
+      action: () => {
+        hapticLight();
+        Linking.openURL('tel:+18005551234');
+      },
     },
     {
       icon: <Mail size={20} color={jarsPrimary} />,
       label: 'Email Us',
-      action: () => Linking.openURL('mailto:help@jarsapp.com'),
+      action: () => {
+        hapticLight();
+        Linking.openURL('mailto:help@jarsapp.com');
+      },
     },
     {
       icon: <MessageCircle size={20} color={jarsPrimary} />,
@@ -74,9 +81,8 @@ export default function ContactUsScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -85,7 +91,6 @@ export default function ContactUsScreen() {
         </Text>
         <View style={{ width: 24 }} />
       </View>
-
       <View style={styles.content}>
         {contacts.map((c, idx) => (
           <Pressable
@@ -101,7 +106,7 @@ export default function ContactUsScreen() {
           </Pressable>
         ))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -112,6 +117,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },

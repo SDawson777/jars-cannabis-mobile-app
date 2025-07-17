@@ -16,6 +16,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -29,16 +30,44 @@ export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
+  // animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
+  // dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
       : jarsBackground;
+
+  // glow for the card
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
+
+  const goToShop = () => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    navigation.navigate('ShopScreen');
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -47,12 +76,12 @@ export default function HomeScreen() {
           Welcome back!
         </Text>
         <Pressable
-          style={[styles.card, { borderColor: jarsPrimary }]}
-          onPress={() => {
-            hapticLight();
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            navigation.navigate('ShopScreen');
-          }}
+          style={[
+            styles.card,
+            { borderColor: jarsPrimary, backgroundColor: '#FFF' },
+            glowStyle,
+          ]}
+          onPress={goToShop}
         >
           <Text style={[styles.cardText, { color: jarsPrimary }]}>
             Shop Now

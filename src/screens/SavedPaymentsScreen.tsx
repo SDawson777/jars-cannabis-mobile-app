@@ -18,6 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -25,7 +26,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Typed navigation prop
 type SavedPaymentsNavProp = NativeStackNavigationProp<
   RootStackParamList,
   'SavedPayments'
@@ -51,11 +51,28 @@ export default function SavedPaymentsScreen() {
   }, [methods]);
 
   const bgColor =
+    colorTemp === 'warm' ? '#FAF8F4'
+    : colorTemp === 'cool' ? '#F7F9FA'
+    : jarsBackground;
+
+  const glowStyle =
     colorTemp === 'warm'
-      ? '#FAF8F4'
+      ? {
+          shadowColor: jarsSecondary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
       : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
 
   const handleEdit = (pm: PaymentMethod) => {
     hapticMedium();
@@ -76,14 +93,21 @@ export default function SavedPaymentsScreen() {
         keyExtractor={(p) => p.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <Pressable style={styles.row} onPress={() => handleEdit(item)}>
-            <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
+          <Pressable
+            style={[styles.row, { borderBottomColor: jarsSecondary }]}
+            android_ripple={{ color: `${jarsSecondary}20` }}
+            onPress={() => handleEdit(item)}
+          >
+            <Text style={[styles.label, { color: jarsPrimary }]}>
+              {item.label}
+            </Text>
             <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}
         ListFooterComponent={
           <Pressable
-            style={[styles.addBtn, { borderColor: jarsSecondary }]}
+            style={[styles.addBtn, { borderColor: jarsSecondary }, glowStyle]}
+            android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={handleAdd}
           >
             <Plus color={jarsSecondary} size={20} />
@@ -106,7 +130,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
   label: { fontSize: 16 },
   addBtn: {
