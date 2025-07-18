@@ -1,5 +1,148 @@
-jars-mobile-app/
-├── src/
-│   └── … your React Native code …
-└── openapi/
-    └── phase-4-openapi.yaml   ← your Postman-compatible spec
+openapi: 3.0.3
+info:
+  title: JARS Mobile App Phase 4 API
+  version: 1.0.0
+  description: |
+    Defines the Phase 4 vanguard endpoints for Awards, Data-Transparency export, and Accessibility preferences.
+servers:
+  - url: https://<YOUR_MOCK_SERVER_URL>
+    description: Postman mock server URL (replace after you create your mock)
+paths:
+  /awards:
+    get:
+      summary: List all earned awards/badges
+      tags:
+        - Awards
+      responses:
+        '200':
+          description: An array of award objects
+          content:
+            application/json:
+              example:
+                - id: "badge-1"
+                  title: "First Purchase"
+                  description: "Awarded after first successful purchase"
+                  iconUrl: "https://example.com/icons/badge1.png"
+                  earnedDate: "2025-07-01"
+                - id: "badge-2"
+                  title: "Loyal Customer"
+                  description: "Awarded after 10 purchases"
+                  iconUrl: "https://example.com/icons/badge2.png"
+                  earnedDate: "2025-07-10"
+
+  /data-transparency/export:
+    post:
+      summary: Request a user data export
+      tags:
+        - DataTransparency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+              required:
+                - userId
+            example:
+              userId: "user-123"
+      responses:
+        '200':
+          description: Export queued
+          content:
+            application/json:
+              example:
+                exportId: "export-456"
+                status: "pending"
+
+  /data-transparency/export/{exportId}:
+    get:
+      summary: Check export status & download
+      tags:
+        - DataTransparency
+      parameters:
+        - in: path
+          name: exportId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Export details
+          content:
+            application/json:
+              example:
+                exportId: "export-456"
+                status: "completed"
+                downloadUrl: "https://example.com/downloads/export-456.zip"
+
+  /accessibility-settings:
+    get:
+      summary: Get a user’s accessibility preferences
+      tags:
+        - Accessibility
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: The user’s prefs
+          content:
+            application/json:
+              example:
+                userId: "user-123"
+                textSize: "large"
+                colorContrast: "high"
+                animationsEnabled: true
+
+    patch:
+      summary: Update a user’s accessibility preferences
+      tags:
+        - Accessibility
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                textSize:
+                  type: string
+                  enum: [small, medium, large]
+                colorContrast:
+                  type: string
+                  enum: [normal, high]
+                animationsEnabled:
+                  type: boolean
+              required:
+                - userId
+            example:
+              userId: "user-123"
+              textSize: "medium"
+              colorContrast: "high"
+              animationsEnabled: false
+      responses:
+        '200':
+          description: Updated prefs
+          content:
+            application/json:
+              example:
+                userId: "user-123"
+                textSize: "medium"
+                colorContrast: "high"
+                animationsEnabled: false
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth:
