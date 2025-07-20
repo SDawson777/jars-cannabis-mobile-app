@@ -7,6 +7,8 @@ import {
   Text,
   Switch,
   Pressable,
+  ActivityIndicator,
+  Button,
   StyleSheet,
   LayoutAnimation,
   UIManager,
@@ -16,48 +18,72 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
+import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type AccessibilityNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'AccessibilitySettings'
->;
+type AccessibilityPrefs = {
+  userId: string;
+  textSize: 'small' | 'medium' | 'large';
+  colorContrast: 'normal' | 'high';
+  animationsEnabled: boolean;
+};
+
+type AccessibilityNavProp = NativeStackNavigationProp<RootStackParamList, 'AccessibilitySettings'>;
 
 export default function AccessibilitySettingsScreen() {
   const navigation = useNavigation<AccessibilityNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [dyslexiaFont, setDyslexiaFont] = useState(false);
+  const [prefs, setPrefs] = useState<AccessibilityPrefs | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Load preferences on mount
   useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    (async () => {
+      try {
+        const res = await phase4Client.get<AccessibilityPrefs>('/accessibility-settings', {
+          params: { userId: 'user-123' },
+        });
+        setPrefs(res.data);
+      } catch (e) {
+        setError((e as Error).message);
+      } finally {
+        setLoading(false);
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      }
+    })();
   }, []);
 
-  const onToggle = (
-    setter: React.Dispatch<React.SetStateAction<boolean>>,
-    value: boolean
-  ) => {
+  // Save preferences
+  const handleSave = async () => {
+    if (!prefs) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await phase4Client.patch<AccessibilityPrefs>('/accessibility-settings', prefs);
+      setPrefs(res.data);
+      hapticLight();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Toggle a pref, ensure prefs is non-null
+  const handleToggle = (key: keyof AccessibilityPrefs) => {
+    if (!prefs) return;
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setter(value);
-    hapticLight();
+    setPrefs({ ...prefs, [key]: !prefs[key] });
   };
 
   const handleBack = () => {
@@ -66,59 +92,76 @@ export default function AccessibilitySettingsScreen() {
     navigation.goBack();
   };
 
+  // Loading and error states
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>        
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>        
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: jarsPrimary }]}>Error: {error}</Text>
+          <Button title="Retry" onPress={() => {
+            setLoading(true);
+            setError(null);
+            phase4Client.get<AccessibilityPrefs>('/accessibility-settings', { params: { userId: 'user-123' } })
+              .then(res => setPrefs(res.data))
+              .catch(err => setError(err.message))
+              .finally(() => setLoading(false));
+          }} color={jarsPrimary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Now prefs is guaranteed non-null
+  if (!prefs) return null;
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>      
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>        
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Accessibility Settings
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Accessibility Settings</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={[styles.description, { color: jarsSecondary }]}>
-          Tailor the app’s look & feel for your comfort.
-        </Text>
-
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.row}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Reduced Motion & Sensory Mode
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Large Text</Text>
           <Switch
-            value={reducedMotion}
-            onValueChange={val => onToggle(setReducedMotion, val)}
+            value={prefs.textSize === 'large'}
+            onValueChange={() => handleToggle('textSize')}
             trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            High Contrast
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>High Contrast</Text>
           <Switch
-            value={highContrast}
-            onValueChange={val => onToggle(setHighContrast, val)}
+            value={prefs.colorContrast === 'high'}
+            onValueChange={() => handleToggle('colorContrast')}
             trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Dyslexia-Friendly Font
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Animations</Text>
           <Switch
-            value={dyslexiaFont}
-            onValueChange={val => onToggle(setDyslexiaFont, val)}
+            value={prefs.animationsEnabled}
+            onValueChange={() => handleToggle('animationsEnabled')}
             trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
+
+        <Button title="Save" onPress={handleSave} color={jarsPrimary} disabled={loading} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -135,11 +178,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 20 },
-  description: {
-    fontSize: 16,
-    marginBottom: 24,
-    lineHeight: 22,
-  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -148,7 +186,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#EEEEEE',
   },
-  label: {
-    fontSize: 16,
-  },
+  label: { fontSize: 16 },
+  errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  errorText: { fontSize: 16, marginBottom: 8 },
 });

@@ -1,0 +1,56 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  // Emit into the safe “.prisma/client” folder
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"          // you can switch to postgres/mysql later
+  url      = "file:./dev.db"   // local SQLite file
+}
+
+/// A user of the JARS app
+model User {
+  id            String                @id @default(uuid())
+  email         String                @unique
+  passwordHash  String
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  // Relations
+  awards        Award[]
+  dataExports   DataExport[]
+  accessibility AccessibilitySetting?
+}
+
+/// Earned badges and awards
+model Award {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  description String
+  iconUrl     String
+  earnedDate  DateTime
+}
+
+/// Data‐export jobs for transparency
+model DataExport {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  status      String
+  downloadUrl String?
+  createdAt   DateTime @default(now())
+}
+
+/// Per‐user accessibility preferences
+model AccessibilitySetting {
+  userId            String  @id
+  user              User    @relation(fields: [userId], references: [id])
+  textSize          String
+  colorContrast     String
+  animationsEnabled Boolean
+}
