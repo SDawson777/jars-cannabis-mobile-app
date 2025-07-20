@@ -1,6 +1,7 @@
 // src/screens/CartScreen.tsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   FlatList,
@@ -58,7 +59,7 @@ const initialCart = [
 
 export default function CartScreen() {
   const navigation = useNavigation<CartNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const [cart, setCart] = useState(initialCart);
   const [promo, setPromo] = useState('');
@@ -67,6 +68,34 @@ export default function CartScreen() {
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, [cart, promoApplied]);
+
+  // Dynamic background
+  const bgColor =
+    colorTemp === 'warm'
+      ? '#FAF8F4'
+      : colorTemp === 'cool'
+      ? '#F7F9FA'
+      : jarsBackground;
+
+  // Glow for Checkout button
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = promoApplied ? 10 : 0;
@@ -123,13 +152,15 @@ export default function CartScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: jarsBackground }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => { hapticLight(); LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); navigation.goBack(); }}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.title, { color: jarsPrimary }]}>Your Cart</Text>
+        <Text style={[styles.title, { color: jarsPrimary }]}>
+          Your Cart
+        </Text>
         <Pressable onPress={goToHelp}>
           <HelpCircle color={jarsPrimary} size={24} />
         </Pressable>
@@ -145,8 +176,10 @@ export default function CartScreen() {
           <View style={styles.card}>
             <Image source={item.image} style={styles.image} />
             <View style={styles.info}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={[styles.price, { color: jarsPrimary }]}>
+              <Text style={[styles.name, { color: jarsPrimary }]}>
+                {item.name}
+              </Text>
+              <Text style={[styles.price, { color: jarsSecondary }]}>
                 ${item.price.toFixed(2)}
               </Text>
               <View style={styles.qtyRow}>
@@ -158,7 +191,7 @@ export default function CartScreen() {
                   <Text style={styles.qtyBtnText}>+</Text>
                 </Pressable>
                 <Pressable onPress={() => removeItem(item.id)} style={styles.remove}>
-                  <Trash2 color="#6A0572" size={20} />
+                  <Trash2 color={jarsPrimary} size={20} />
                 </Pressable>
               </View>
             </View>
@@ -169,20 +202,25 @@ export default function CartScreen() {
       {/* Promo Code */}
       <View style={styles.promoSection}>
         <TextInput
-          style={styles.promoInput}
+          style={[styles.promoInput, { borderColor: jarsSecondary, color: jarsPrimary }]}
           placeholder="Enter Promo Code"
-          placeholderTextColor="#999"
+          placeholderTextColor={jarsSecondary}
           value={promo}
           onChangeText={setPromo}
         />
-        <Pressable style={[styles.promoBtn, { backgroundColor: jarsPrimary }]} onPress={applyPromo}>
+        <Pressable
+          style={[styles.promoBtn, { backgroundColor: jarsPrimary }, glowStyle]}
+          onPress={applyPromo}
+        >
           <Text style={styles.promoBtnText}>Apply</Text>
         </Pressable>
       </View>
 
       {/* Order Summary */}
-      <View style={styles.summary}>
-        <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>Order Summary</Text>
+      <View style={[styles.summary, { backgroundColor: '#FFF' }]}>
+        <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>
+          Order Summary
+        </Text>
         <View style={styles.line}>
           <Text style={styles.lineLabel}>Subtotal</Text>
           <Text style={styles.lineValue}>${subtotal.toFixed(2)}</Text>
@@ -203,9 +241,9 @@ export default function CartScreen() {
         </View>
       </View>
 
-      {/* Proceed Button */}
+      {/* Proceed to Checkout */}
       <Pressable
-        style={[styles.checkoutBtn, { backgroundColor: jarsPrimary }]}
+        style={[styles.checkoutBtn, { backgroundColor: jarsPrimary }, glowStyle]}
         onPress={() => {
           hapticMedium();
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -214,7 +252,7 @@ export default function CartScreen() {
       >
         <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -235,10 +273,6 @@ const styles = StyleSheet.create({
     height: IMAGE_SIZE + 20,
     marginBottom: 12,
     padding: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
   },
   image: { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: 12 },
   info: { flex: 1, marginLeft: 12, justifyContent: 'space-between' },
@@ -267,18 +301,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     marginRight: 8,
+    borderWidth: 1,
   },
   promoBtn: {
     borderRadius: 12,
     paddingHorizontal: 16,
     justifyContent: 'center',
   },
-  promoBtnText: { color: '#FFFFFF', fontWeight: '600' },
+  promoBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },
   summary: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     marginHorizontal: 16,
+    borderRadius: 16,
     padding: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 4 },

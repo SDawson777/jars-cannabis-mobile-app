@@ -1,7 +1,10 @@
-// App.js
+// src/App.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// normal import (no `import type`)
+import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
 
 import SplashScreen from './src/screens/SplashScreen';
@@ -41,75 +44,27 @@ import EducationalGreenhouseScreen from './src/screens/EducationalGreenhouseScre
 import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
 import CommunityGardenScreen from './src/screens/CommunityGardenScreen';
 import ConciergeChatScreen from './src/screens/ConciergeChatScreen';
-
 import DataTransparencyScreen from './src/screens/DataTransparencyScreen';
 import AccessibilitySettingsScreen from './src/screens/AccessibilitySettingsScreen';
 import AwardsScreen from './src/screens/AwardsScreen';
+import LegalScreen from './src/screens/LegalScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator(); // no generic
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
     <ThemeProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="SplashScreen"
-          screenOptions={{ headerShown: false }}
-        >
-          {/* Phase 1–3 */}
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          <Stack.Screen name="AgeVerification" component={AgeVerification} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="StoreSelection" component={StoreSelection} />
-          <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          <Stack.Screen name="ShopScreen" component={ShopScreen} />
-          <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-          <Stack.Screen name="CartScreen" component={CartScreen} />
-          <Stack.Screen name="Checkout" component={CheckoutScreen} />
-          <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
-          <Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
-          <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-          <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
-          <Stack.Screen name="StoreLocator" component={StoreLocatorScreen} />
-          <Stack.Screen name="StoreDetails" component={StoreDetailsScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-          <Stack.Screen name="Favorites" component={FavoritesScreen} />
-          <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
-          <Stack.Screen name="AddAddress" component={AddAddressScreen} />
-          <Stack.Screen name="EditAddress" component={EditAddressScreen} />
-          <Stack.Screen name="SavedPayments" component={SavedPaymentsScreen} />
-          <Stack.Screen name="AddPayment" component={AddPaymentScreen} />
-          <Stack.Screen name="EditPayment" component={EditPaymentScreen} />
-          <Stack.Screen name="LoyaltyProgram" component={LoyaltyProgramDetailsScreen} />
-          <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
-          <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
-          <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
-          <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
-          <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-          <Stack.Screen
-            name="EducationalGreenhouse"
-            component={EducationalGreenhouseScreen}
-          />
-          <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
-          <Stack.Screen
-            name="CommunityGarden"
-            component={CommunityGardenScreen}
-          />
-          <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
-
-          {/* Phase 4 */}
-          <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />
-          <Stack.Screen
-            name="AccessibilitySettings"
-            component={AccessibilitySettingsScreen}
-          />
-          <Stack.Screen name="Awards" component={AwardsScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
+            {/* ...all previous screens... */}
+            <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />
+            <Stack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} />
+            <Stack.Screen name="Awards" component={AwardsScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

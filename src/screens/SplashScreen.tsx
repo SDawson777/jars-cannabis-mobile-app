@@ -1,5 +1,5 @@
 // src/screens/SplashScreen.tsx
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useRef } from 'react';
 import {
   SafeAreaView,
   Animated,
@@ -23,7 +23,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Strongly-typed navigation prop
 type SplashNavProp = NativeStackNavigationProp<
   RootStackParamList,
   'SplashScreen'
@@ -31,8 +30,8 @@ type SplashNavProp = NativeStackNavigationProp<
 
 export default function SplashScreen() {
   const navigation = useNavigation<SplashNavProp>();
-  const { colorTemp, jarsPrimary } = useContext(ThemeContext);
-  const fade = React.useRef(new Animated.Value(0)).current;
+  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const fade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -55,7 +54,7 @@ export default function SplashScreen() {
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
-      : '#F9F9F9';
+      : jarsBackground;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>

@@ -1,5 +1,5 @@
 // src/screens/ShopScreen.tsx
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -19,7 +19,6 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -42,19 +41,41 @@ const sampleProducts = [
 
 export default function ShopScreen() {
   const navigation = useNavigation<ShopNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [products] = useState(sampleProducts);
 
+  // animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
+  // dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
       : jarsBackground;
+
+  // glow for product cards
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
 
   const handleProduct = (product: typeof sampleProducts[0]) => {
     hapticLight();
@@ -66,18 +87,26 @@ export default function ShopScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
         data={products}
-        keyExtractor={i => i.id}
+        keyExtractor={item => item.id}
         numColumns={2}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
-            style={styles.card}
+            style={[
+              styles.card,
+              { borderColor: jarsPrimary, backgroundColor: '#FFF' },
+              glowStyle,
+            ]}
             onPress={() => handleProduct(item)}
             android_ripple={{ color: '#EEE' }}
           >
             <Image source={item.image} style={styles.image} />
-            <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
-            <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+            <Text style={[styles.name, { color: jarsPrimary }]}>
+              {item.name}
+            </Text>
+            <Text style={[styles.price, { color: jarsSecondary }]}>
+              ${item.price.toFixed(2)}
+            </Text>
           </Pressable>
         )}
       />
@@ -91,16 +120,17 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     margin: 8,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
     padding: 12,
+    borderRadius: 12,
+    borderWidth: 2,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
   },
-  image: { width: CARD_WIDTH - 24, height: CARD_WIDTH - 24, borderRadius: 8, marginBottom: 8 },
+  image: {
+    width: CARD_WIDTH - 24,
+    height: CARD_WIDTH - 24,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
   name: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  price: { fontSize: 14, color: '#555' },
+  price: { fontSize: 14, fontWeight: '500' },
 });

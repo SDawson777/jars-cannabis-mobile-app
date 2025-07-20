@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -26,7 +27,7 @@ if (
 
 export default function PrivacySettingsScreen() {
   const navigation = useNavigation();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const [analytics, setAnalytics] = useState(true);
   const [personalization, setPersonalization] = useState(true);
@@ -61,7 +62,7 @@ export default function PrivacySettingsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -72,8 +73,10 @@ export default function PrivacySettingsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.row}>
-          <Text style={styles.label}>Analytics Sharing</Text>
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>
+            Analytics Sharing
+          </Text>
           <Switch
             value={analytics}
             onValueChange={(v) => toggle(setAnalytics, v)}
@@ -81,8 +84,11 @@ export default function PrivacySettingsScreen() {
             thumbColor="#FFFFFF"
           />
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Personalization</Text>
+
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>
+            Personalization
+          </Text>
           <Switch
             value={personalization}
             onValueChange={(v) => toggle(setPersonalization, v)}
@@ -90,8 +96,11 @@ export default function PrivacySettingsScreen() {
             thumbColor="#FFFFFF"
           />
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Targeted Ads</Text>
+
+        <View style={[styles.row, { borderBottomWidth: 0 }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>
+            Targeted Ads
+          </Text>
           <Switch
             value={ads}
             onValueChange={(v) => toggle(setAds, v)}
@@ -111,6 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
@@ -120,7 +130,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
-  label: { fontSize: 16, color: '#333333' },
+  label: { fontSize: 16 },
 });

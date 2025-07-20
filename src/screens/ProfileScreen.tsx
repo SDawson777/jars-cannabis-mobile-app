@@ -25,18 +25,9 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Only the screens we actually navigate to from Profile
-type ProfileRoute =
-  | 'EditProfile'
-  | 'SavedAddresses'
-  | 'SavedPayments'
-  | 'Favorites'
-  | 'OrderHistory'
-  | 'AppSettings';
-
 type ProfileNavProp = NativeStackNavigationProp<RootStackParamList>;
 
-const MENU: { id: ProfileRoute; label: string }[] = [
+const MENU: { id: keyof RootStackParamList; label: string }[] = [
   { id: 'EditProfile', label: 'Edit Profile' },
   { id: 'SavedAddresses', label: 'Saved Addresses' },
   { id: 'SavedPayments', label: 'Saved Payments' },
@@ -47,7 +38,12 @@ const MENU: { id: ProfileRoute; label: string }[] = [
 
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -60,31 +56,11 @@ export default function ProfileScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
-  function navigateTo(route: ProfileRoute) {
+  const navigateTo = (route: keyof RootStackParamList) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    switch (route) {
-      case 'EditProfile':
-        navigation.navigate('EditProfile', { profile: undefined });
-        break;
-      case 'SavedAddresses':
-        navigation.navigate('SavedAddresses');
-        break;
-      case 'SavedPayments':
-        navigation.navigate('SavedPayments');
-        break;
-      case 'Favorites':
-        navigation.navigate('Favorites');
-        break;
-      case 'OrderHistory':
-        navigation.navigate('OrderHistory');
-        break;
-      case 'AppSettings':
-        navigation.navigate('AppSettings');
-        break;
-    }
-  }
+    navigation.navigate(route as any);
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -94,7 +70,8 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
-            style={styles.row}
+            style={[styles.row, { borderBottomColor: jarsSecondary }]}
+            android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={() => navigateTo(item.id)}
           >
             <Text style={[styles.label, { color: jarsPrimary }]}>
@@ -117,7 +94,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
   label: { fontSize: 16 },
 });

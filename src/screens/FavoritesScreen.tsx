@@ -11,16 +11,12 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Heart } from 'lucide-react-native';
+import { ChevronLeft, Heart as HeartIcon } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticMedium } from '../utils/haptic';
-
-const items = [
-  { id: '1', name: 'Rainbow Rozay' },
-  { id: '2', name: 'Moonwalker OG' },
-  { id: '3', name: 'Purple Haze' },
-];
+import { hapticMedium, hapticLight } from '../utils/haptic';
 
 if (
   Platform.OS === 'android' &&
@@ -29,14 +25,30 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+type FavoritesNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Favorites'
+>;
+
+const ITEMS = [
+  { id: '1', name: 'Rainbow Rozay' },
+  { id: '2', name: 'Moonwalker OG' },
+  { id: '3', name: 'Purple Haze' },
+];
+
 export default function FavoritesScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
-  const [favorites, setFavorites] = useState<string[]>(items.map(i => i.id));
+  const navigation = useNavigation<FavoritesNavProp>();
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
+  const [favorites, setFavorites] = useState<string[]>(ITEMS.map(i => i.id));
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
+  }, [favorites]);
 
   const bgColor =
     colorTemp === 'warm'
@@ -53,27 +65,36 @@ export default function FavoritesScreen() {
     );
   };
 
+  const handleBack = () => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Heart color={jarsPrimary} size={24} />
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
+        <Pressable onPress={handleBack}>
+          <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
           Favorites
         </Text>
         <View style={{ width: 24 }} />
       </View>
-
+      {/* List */}
       <FlatList
-        data={items}
+        data={ITEMS}
         keyExtractor={i => i.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={styles.name}>{item.name}</Text>
+          <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+            <Text style={[styles.name, { color: jarsPrimary }]}>
+              {item.name}
+            </Text>
             <Pressable onPress={() => toggleFav(item.id)}>
-              <Heart
+              <HeartIcon
                 color={favorites.includes(item.id) ? jarsPrimary : '#CCCCCC'}
                 size={24}
               />
@@ -92,6 +113,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   list: { padding: 16 },
@@ -101,7 +123,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
   },
-  name: { fontSize: 16, color: '#333333' },
+  name: { fontSize: 16 },
 });

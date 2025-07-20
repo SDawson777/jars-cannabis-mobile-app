@@ -1,6 +1,7 @@
 // src/screens/EditProfileScreen.tsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -12,11 +13,12 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
-// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -24,15 +26,21 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function EditProfileScreen() {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+type EditProfileNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'EditProfile'
+>;
+type EditProfileRouteProp = RouteProp<RootStackParamList, 'EditProfile'>;
 
-  const profile = (route.params as any)?.profile || {};
-  const [name, setName] = useState(profile.name || '');
-  const [email, setEmail] = useState(profile.email || '');
-  const [phone, setPhone] = useState(profile.phone || '');
+export default function EditProfileScreen() {
+  const navigation = useNavigation<EditProfileNavProp>();
+  const route = useRoute<EditProfileRouteProp>();
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+
+  const profile = route.params?.profile ?? {};
+  const [name, setName] = useState(profile.name ?? '');
+  const [email, setEmail] = useState(profile.email ?? '');
+  const [phone, setPhone] = useState(profile.phone ?? '');
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -45,6 +53,25 @@ export default function EditProfileScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
+
   const handleBack = () => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -52,16 +79,19 @@ export default function EditProfileScreen() {
   };
 
   const onSave = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (!name.trim() || !email.trim()) {
+      return Alert.alert('Error', 'Name and email cannot be empty.');
+    }
     hapticMedium();
-    // TODO: save profile changes
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // TODO: persist changes
     Alert.alert('Profile Updated', 'Your profile has been saved.');
     navigation.goBack();
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -72,52 +102,38 @@ export default function EditProfileScreen() {
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={(t) => {
-            hapticLight();
-            setName(t);
-          }}
-          placeholder="Jane Doe"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={(t) => {
-            hapticLight();
-            setEmail(t);
-          }}
-          placeholder="you@example.com"
-          keyboardType="email-address"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          value={phone}
-          onChangeText={(t) => {
-            hapticLight();
-            setPhone(t);
-          }}
-          placeholder="(123) 456-7890"
-          keyboardType="phone-pad"
-          placeholderTextColor="#999999"
-        />
+        {[
+          { label: 'Full Name', value: name, setter: setName, keyboard: 'default' },
+          { label: 'Email Address', value: email, setter: setEmail, keyboard: 'email-address' },
+          { label: 'Phone Number', value: phone, setter: setPhone, keyboard: 'phone-pad' },
+        ].map(({ label, value, setter, keyboard }) => (
+          <View key={label}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: jarsSecondary, color: jarsPrimary },
+              ]}
+              placeholder={label}
+              placeholderTextColor={jarsSecondary}
+              keyboardType={keyboard as any}
+              value={value}
+              onChangeText={(t) => {
+                hapticLight();
+                setter(t);
+              }}
+            />
+          </View>
+        ))}
 
         <Pressable
-          style={[styles.saveBtn, { backgroundColor: jarsPrimary }]}
+          style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={onSave}
         >
           <Text style={styles.saveText}>Save Profile</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -128,25 +144,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   form: { padding: 16 },
   label: {
     fontSize: 14,
-    color: '#777777',
     marginTop: 16,
     marginBottom: 4,
   },
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 16,
-    color: '#333333',
     borderWidth: 1,
-    borderColor: '#EEEEEE',
+    marginBottom: 8,
   },
   saveBtn: {
     marginTop: 32,
@@ -155,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
   },

@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -25,7 +26,7 @@ if (
 
 export default function LoyaltyProgramDetailsScreen() {
   const navigation = useNavigation();
-  const { colorTemp, jarsPrimary, jarsSecondary } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -36,17 +37,18 @@ export default function LoyaltyProgramDetailsScreen() {
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
-      : '#F9F9F9';
+      : jarsBackground;
 
   const handleBack = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.goBack();
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -56,19 +58,18 @@ export default function LoyaltyProgramDetailsScreen() {
         <View style={{ width: 24 }} />
       </View>
 
+      {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={[styles.points, { color: jarsPrimary }]}>120 points</Text>
-        <Text style={styles.description}>
+        <Text style={[styles.description, { color: jarsPrimary }]}>
           You’re only 20 points away from your next reward!
         </Text>
         <Pressable
           style={[styles.button, { backgroundColor: jarsSecondary }]}
           onPress={() => {
             hapticLight();
-            LayoutAnimation.configureNext(
-              LayoutAnimation.Presets.easeInEaseOut
-            );
-            /* TODO: Redeem logic */
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            // TODO: Redeem logic
           }}
         >
           <Text style={styles.buttonText}>Redeem Reward</Text>
@@ -85,6 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: {
@@ -98,7 +100,6 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: '#555555',
     textAlign: 'center',
     marginBottom: 24,
   },

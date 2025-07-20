@@ -14,6 +14,9 @@ import {
   UIManager,
 } from 'react-native';
 import { Send } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
@@ -31,10 +34,20 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function ConciergeChatScreen() {
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+type ChatNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ConciergeChat'
+>;
 
-  // Dynamic background
+export default function ConciergeChatScreen() {
+  const navigation = useNavigation<ChatNavProp>();
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
+
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -48,12 +61,10 @@ export default function ConciergeChatScreen() {
   const [input, setInput] = useState('');
   const listRef = useRef<FlatList<Message>>(null);
 
-  // Animate in on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Scroll to bottom on new message
   useEffect(() => {
     listRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
@@ -67,11 +78,11 @@ export default function ConciergeChatScreen() {
       text: input,
       sender: 'user',
     };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setTimeout(() => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setMessages((prev) => [
+      setMessages(prev => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
@@ -82,6 +93,12 @@ export default function ConciergeChatScreen() {
     }, 1000);
   };
 
+  const handleBack = () => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <KeyboardAvoidingView
@@ -89,31 +106,45 @@ export default function ConciergeChatScreen() {
         behavior={Platform.select({ ios: 'padding', android: undefined })}
       >
         {/* Header */}
-        <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
-          <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-            Jars Concierge
-          </Text>
+        <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
+          <Pressable onPress={handleBack}>
+            <Send color={jarsPrimary} size={24} />
+          </Pressable>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
+              Concierge Chat
+            </Text>
+          </View>
+          <View style={{ width: 24 }} />
         </View>
 
-        {/* Chat messages */}
+        {/* Messages */}
         <FlatList
           ref={listRef}
           data={messages}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.chatContainer}
           renderItem={({ item }) => (
             <View
               style={[
                 styles.messageBubble,
                 item.sender === 'user'
-                  ? [styles.userBubble, { backgroundColor: jarsPrimary }]
-                  : styles.botBubble,
+                  ? [
+                      styles.userBubble,
+                      { backgroundColor: jarsPrimary },
+                    ]
+                  : [
+                      styles.botBubble,
+                      { backgroundColor: jarsBackground },
+                    ],
               ]}
             >
               <Text
                 style={[
                   styles.messageText,
-                  item.sender === 'user' ? styles.userText : styles.botText,
+                  item.sender === 'user'
+                    ? { color: '#FFFFFF' }
+                    : { color: jarsPrimary },
                 ]}
               >
                 {item.text}
@@ -122,19 +153,30 @@ export default function ConciergeChatScreen() {
           )}
         />
 
-        {/* Input row */}
-        <View style={[styles.inputRow, { borderTopColor: '#EEEEEE' }]}>
+        {/* Input */}
+        <View
+          style={[
+            styles.inputRow,
+            { borderTopColor: jarsSecondary, backgroundColor: jarsBackground },
+          ]}
+        >
           <TextInput
-            style={[styles.input, { backgroundColor: '#F9F9F9' }]}
+            style={[
+              styles.input,
+              { backgroundColor: jarsBackground, color: jarsPrimary },
+            ]}
             placeholder="Type your message..."
-            placeholderTextColor="#999999"
+            placeholderTextColor={jarsSecondary}
             value={input}
-            onChangeText={(text) => {
+            onChangeText={text => {
               hapticLight();
               setInput(text);
             }}
           />
-          <Pressable onPress={sendMessage} style={[styles.sendButton, { backgroundColor: jarsPrimary }]}>
+          <Pressable
+            style={[styles.sendButton, { backgroundColor: jarsPrimary }]}
+            onPress={sendMessage}
+          >
             <Send size={20} color="#FFFFFF" />
           </Pressable>
         </View>
@@ -147,6 +189,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   container: { flex: 1 },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
   },
@@ -158,25 +202,19 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
-  userBubble: {
-    alignSelf: 'flex-end',
-  },
+  userBubble: { alignSelf: 'flex-end' },
   botBubble: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
   },
   messageText: { fontSize: 15, lineHeight: 20 },
-  userText: { color: '#FFFFFF' },
-  botText: { color: '#333333' },
   inputRow: {
     flexDirection: 'row',
     padding: 8,
     borderTopWidth: 1,
-    backgroundColor: '#FFFFFF',
   },
   input: {
     flex: 1,

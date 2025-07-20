@@ -2,19 +2,26 @@
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
+  ScrollView,
   View,
   Text,
-  Image,
   Pressable,
   StyleSheet,
-  ScrollView,
   LayoutAnimation,
   UIManager,
   Platform,
+  Linking,
 } from 'react-native';
-import { ChevronLeft, MapPin, Phone } from 'lucide-react-native';
+import { ChevronLeft, Phone, Clock } from 'lucide-react-native';
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight } from '../utils/haptic';
+import { hapticLight, hapticMedium } from '../utils/haptic';
 
 if (
   Platform.OS === 'android' &&
@@ -23,15 +30,34 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function StoreDetailsScreen({ navigation, route }: any) {
-  const store = route.params?.store || {
-    name: 'Jars Downtown',
-    address: '123 Main St, Detroit, MI',
-    phone: '+1 (800) 555-1234',
-    hours: '9am–9pm',
-    image: require('../assets/store.jpg'),
-  };
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+type StoreDetailsNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'StoreDetails'
+>;
+type StoreDetailsRouteProp = RouteProp<
+  RootStackParamList,
+  'StoreDetails'
+>;
+
+interface Store {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  hours: string;
+}
+
+export default function StoreDetailsScreen() {
+  const navigation = useNavigation<StoreDetailsNavProp>();
+  const route = useRoute<StoreDetailsRouteProp>();
+  const store: Store = route.params.store;
+
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -50,28 +76,49 @@ export default function StoreDetailsScreen({ navigation, route }: any) {
     navigation.goBack();
   };
 
+  const callStore = () => {
+    hapticMedium();
+    Linking.openURL(`tel:${store.phone.replace(/[^\d]/g, '')}`);
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEE' }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
+        <Text style={[styles.title, { color: jarsPrimary }]}>
+          {store.name}
+        </Text>
+        <View style={{ width: 24 }} />
       </View>
+
       <ScrollView contentContainerStyle={styles.content}>
-        <Image source={store.image} style={styles.image} />
-        <Text style={[styles.name, { color: jarsPrimary }]}>{store.name}</Text>
-        <View style={styles.row}>
-          <MapPin size={20} color={jarsPrimary} />
-          <Text style={styles.text}>{store.address}</Text>
+        <View style={styles.infoRow}>
+          <Clock color={jarsSecondary} size={20} style={{ marginRight: 8 }} />
+          <Text style={[styles.infoText, { color: jarsSecondary }]}>
+            {store.hours}
+          </Text>
         </View>
-        <View style={styles.row}>
-          <Phone size={20} color={jarsPrimary} />
-          <Text style={styles.text}>{store.phone}</Text>
+        <View style={styles.infoRow}>
+          <Phone color={jarsSecondary} size={20} style={{ marginRight: 8 }} />
+          <Text style={[styles.infoText, { color: jarsSecondary }]}>
+            {store.phone}
+          </Text>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Hours:</Text>
-          <Text style={styles.text}>{store.hours}</Text>
+        <View style={styles.infoRow}>
+          <Text style={[styles.address, { color: jarsPrimary }]}>
+            {store.address}
+          </Text>
         </View>
+
+        <Pressable
+          style={[styles.callBtn, { backgroundColor: jarsPrimary }]}
+          onPress={callStore}
+        >
+          <Text style={styles.callText}>Call Store</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -79,11 +126,27 @@ export default function StoreDetailsScreen({ navigation, route }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', padding: 16 },
-  content: { padding: 16, alignItems: 'center' },
-  image: { width: '100%', height: 200, borderRadius: 12, marginBottom: 16 },
-  name: { fontSize: 24, fontWeight: '700', marginBottom: 12 },
-  row: { flexDirection: 'row', alignItems: 'center', marginVertical: 4 },
-  text: { fontSize: 16, marginLeft: 8 },
-  label: { fontSize: 16, fontWeight: '600', marginRight: 8 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  title: { fontSize: 20, fontWeight: '600' },
+  content: { padding: 16 },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  infoText: { fontSize: 16 },
+  address: { fontSize: 16, marginLeft: 28 },
+  callBtn: {
+    marginTop: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  callText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
 });

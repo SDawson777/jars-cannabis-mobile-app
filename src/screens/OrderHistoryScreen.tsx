@@ -18,6 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
+// Enable LayoutAnimation on Android
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -43,12 +44,18 @@ const sampleOrders: OrderSummary[] = [
 
 export default function OrderHistoryScreen() {
   const navigation = useNavigation<OrderHistoryNavProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
+  // dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
@@ -69,15 +76,23 @@ export default function OrderHistoryScreen() {
         keyExtractor={(o) => o.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <Pressable style={styles.row} onPress={() => handleSelect(item)}>
+          <Pressable
+            style={styles.row}
+            android_ripple={{ color: '#DDD' }}
+            onPress={() => handleSelect(item)}
+          >
             <View>
               <Text style={[styles.id, { color: jarsPrimary }]}>
                 Order #{item.id}
               </Text>
-              <Text style={styles.date}>{item.date}</Text>
+              <Text style={[styles.date, { color: jarsSecondary }]}>
+                {item.date}
+              </Text>
             </View>
             <View style={styles.right}>
-              <Text style={styles.total}>${item.total.toFixed(2)}</Text>
+              <Text style={[styles.total, { color: jarsPrimary }]}>
+                ${item.total.toFixed(2)}
+              </Text>
               <ChevronRight color={jarsPrimary} size={20} />
             </View>
           </Pressable>
@@ -99,7 +114,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#EEEEEE',
   },
   id: { fontSize: 16, fontWeight: '600' },
-  date: { fontSize: 14, color: '#555', marginTop: 4 },
+  date: { fontSize: 14, marginTop: 4 },
   right: { flexDirection: 'row', alignItems: 'center' },
   total: { fontSize: 16, fontWeight: '600', marginRight: 8 },
 });

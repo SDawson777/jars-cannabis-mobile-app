@@ -1,107 +1,104 @@
 // src/screens/AwardsScreen.tsx
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   SafeAreaView,
-  ScrollView,
+  FlatList,
   View,
   Text,
-  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Button,
   StyleSheet,
-  LayoutAnimation,
-  UIManager,
-  Platform,
+  ListRenderItemInfo,
 } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium } from '../utils/haptic';
 
-// Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
+// Define Award type
+interface Award {
+  id: string;
+  title: string;
+  description: string;
+  iconUrl: string;
+  earnedDate: string;
 }
 
-const AWARDS = [
-  { id: 'reviewYear', label: 'Review of the Year' },
-  { id: 'pairing', label: 'Best Product Pairing' },
-  { id: 'gardener', label: 'Top Greenhouse Contributor' },
-  { id: 'concierge', label: 'Most Helpful Concierge Interaction' },
-];
-
 export default function AwardsScreen() {
+  // Fetch awards with React Query
+  const {
+    data: awards,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<Award[], Error>(
+    {
+      queryKey: ['awards'],
+      queryFn: async () => {
+        const res = await phase4Client.get<Award[]>('/awards');
+        return res.data;
+      },
+    }
+  );
+
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
-
-  // Animate in on mount
-  useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
-
-  // Dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
-  const handleSelect = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    hapticMedium();
-  };
+  // Render each award item
+  const renderItem = ({ item }: ListRenderItemInfo<Award>) => (
+    <View style={[styles.card, { borderColor: jarsPrimary }]}>      
+      <Image source={{ uri: item.iconUrl }} style={styles.icon} />
+      <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>
+      <Text style={styles.desc}>{item.description}</Text>
+      <Text style={styles.date}>Earned: {item.earnedDate}</Text>
+    </View>
+  );
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>        
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: jarsPrimary }]}>Error: {error.message}</Text>
+          <Button title="Retry" onPress={() => { hapticMedium(); refetch(); }} color={jarsPrimary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Success state
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Jars Awards
-        </Text>
-        <Text style={styles.description}>
-          Celebrate our community’s top contributors—and cast your vote!
-        </Text>
-
-        {AWARDS.map((award) => (
-          <TouchableOpacity
-            key={award.id}
-            style={styles.card}
-            onPress={handleSelect}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cardText}>{award.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>      
+      <FlatList
+        data={awards ?? []}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 20 },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 16,
-    color: '#777777',
-    marginBottom: 24,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  cardText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333333',
-  },
+  list: { padding: 20 },
+  card: { backgroundColor: '#fff', borderWidth: 2, borderRadius: 16, padding: 16, marginBottom: 12 },
+  icon: { width: 40, height: 40, marginBottom: 8 },
+  title: { fontSize: 20, fontWeight: '600' },
+  desc: { fontSize: 14, marginVertical: 4 },
+  date: { fontSize: 12, color: '#777' },
+  errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  errorText: { fontSize: 16, marginBottom: 8 },
 });

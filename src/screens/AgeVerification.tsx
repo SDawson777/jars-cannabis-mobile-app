@@ -1,6 +1,7 @@
 // src/screens/AgeVerification.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   Pressable,
@@ -15,7 +16,8 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
-import { hapticLight, hapticHeavy } from '../utils/haptic';
+import { ThemeContext } from '../context/ThemeContext';
+import { hapticLight, hapticHeavy, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (
@@ -32,8 +34,44 @@ type AgeVerificationNavProp = NativeStackNavigationProp<
 
 export default function AgeVerification() {
   const navigation = useNavigation<AgeVerificationNavProp>();
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+
   const [date, setDate] = useState<Date>();
   const [showPicker, setShowPicker] = useState(false);
+  const [underage, setUnderage] = useState(false);
+
+  // Animate on mount (and on state change)
+  useEffect(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, [underage]);
+
+  // Background based on time/weather
+  const bgColor =
+    colorTemp === 'warm'
+      ? '#FFF8ED'
+      : colorTemp === 'cool'
+      ? '#EFF5F9'
+      : jarsBackground;
+
+  // Glow effect for buttons
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.25,
+          shadowRadius: 8,
+          elevation: 5,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.25,
+          shadowRadius: 8,
+          elevation: 5,
+        }
+      : {};
 
   const handleDateChange = (_: any, selected?: Date) => {
     setShowPicker(Platform.OS === 'ios');
@@ -56,24 +94,59 @@ export default function AgeVerification() {
       navigation.replace('StoreSelection');
     } else {
       hapticHeavy();
-      Alert.alert('Access Denied', 'You must be at least 21 years old.');
+      // Enter the under-21 path
+      setUnderage(true);
     }
   };
 
+  const handleUnderageBack = () => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    navigation.replace('Onboarding');
+  };
+
+  // Under-21 view
+  if (underage) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: jarsPrimary }]}>
+            Access Denied
+          </Text>
+          <Text style={[styles.subtitle, { color: jarsSecondary }]}>
+            You must be at least 21 to continue.
+          </Text>
+        </View>
+        <Pressable
+          style={[styles.enterBtn, { backgroundColor: jarsPrimary }, glowStyle]}
+          onPress={handleUnderageBack}
+        >
+          <ChevronLeft color="#FFF" size={20} style={{ marginRight: 8 }} />
+          <Text style={styles.enterText}>Back to Start</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
+
+  // Default age-verification view
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Verify Your Age</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <Text style={[styles.title, { color: jarsPrimary }]}>
+        Verify Your Age
+      </Text>
+
       <Pressable
-        style={styles.dateButton}
+        style={[styles.dateButton, glowStyle]}
         onPress={() => {
           hapticLight();
           setShowPicker(true);
         }}
       >
-        <Text style={styles.dateText}>
+        <Text style={[styles.dateText, { color: jarsSecondary }]}>
           {date ? date.toDateString() : 'Select Date of Birth'}
         </Text>
       </Pressable>
+
       {showPicker && (
         <DateTimePicker
           mode="date"
@@ -83,34 +156,63 @@ export default function AgeVerification() {
           onChange={handleDateChange}
         />
       )}
-      <Pressable style={styles.enterBtn} onPress={handleEnter}>
+
+      <Pressable
+        style={[styles.enterBtn, { backgroundColor: jarsPrimary }, glowStyle]}
+        onPress={handleEnter}
+      >
         <Text style={styles.enterText}>Enter</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F9F9',
-    alignItems: 'center',
+    padding: 24,
     justifyContent: 'center',
-    padding: 20,
   },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#2E5D46', marginBottom: 20 },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 12,
+    marginTop: 8,
+  },
   dateButton: {
     backgroundColor: '#EEEEEE',
-    padding: 12,
+    padding: 14,
     borderRadius: 12,
-    marginBottom: 20,
+    alignItems: 'center',
+    marginBottom: 24,
   },
-  dateText: { fontSize: 16, color: '#333333' },
+  dateText: {
+    fontSize: 16,
+  },
   enterBtn: {
-    backgroundColor: '#2E5D46',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
     borderRadius: 12,
+    marginTop: 16,
   },
-  enterText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
+  enterText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });

@@ -1,6 +1,7 @@
 // src/screens/EditPaymentScreen.tsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -12,7 +13,13 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
@@ -24,13 +31,23 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function EditPaymentScreen() {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+type EditPaymentNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'EditPayment'
+>;
+type EditPaymentRouteProp = RouteProp<RootStackParamList, 'EditPayment'>;
 
-  // Assume payment details passed in params
-  const pm = (route.params as any)?.payment || {};
+export default function EditPaymentScreen() {
+  const navigation = useNavigation<EditPaymentNavProp>();
+  const route = useRoute<EditPaymentRouteProp>();
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
+
+  const pm = route.params?.payment || {};
   const [cardNumber, setCardNumber] = useState(pm.cardNumber || '');
   const [name, setName] = useState(pm.name || '');
   const [expiry, setExpiry] = useState(pm.expiry || '');
@@ -47,6 +64,25 @@ export default function EditPaymentScreen() {
       ? '#F7F9FA'
       : jarsBackground;
 
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
+
   const handleBack = () => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -54,16 +90,59 @@ export default function EditPaymentScreen() {
   };
 
   const onSave = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (
+      !cardNumber.trim() ||
+      !name.trim() ||
+      !expiry.trim() ||
+      !cvv.trim()
+    ) {
+      hapticLight();
+      return Alert.alert('Error', 'Please fill in all fields.');
+    }
     hapticMedium();
-    // TODO: save updated payment
-    Alert.alert('Payment Updated', 'Your payment method has been updated.');
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // TODO: persist updated payment
+    Alert.alert(
+      'Payment Updated',
+      'Your payment method has been updated.'
+    );
     navigation.goBack();
   };
 
+  const fields = [
+    {
+      label: 'Card Number',
+      value: cardNumber,
+      setter: setCardNumber,
+      keyboard: 'numeric',
+      secure: false,
+    },
+    {
+      label: 'Name on Card',
+      value: name,
+      setter: setName,
+      keyboard: 'default',
+      secure: false,
+    },
+    {
+      label: 'Expiry (MM/YY)',
+      value: expiry,
+      setter: setExpiry,
+      keyboard: 'default',
+      secure: false,
+    },
+    {
+      label: 'CVV',
+      value: cvv,
+      setter: setCvv,
+      keyboard: 'numeric',
+      secure: true,
+    },
+  ];
+
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -74,65 +153,37 @@ export default function EditPaymentScreen() {
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Card Number</Text>
-        <TextInput
-          style={styles.input}
-          value={cardNumber}
-          onChangeText={(t) => {
-            hapticLight();
-            setCardNumber(t);
-          }}
-          placeholder="1234 5678 9012 3456"
-          keyboardType="numeric"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>Name on Card</Text>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={(t) => {
-            hapticLight();
-            setName(t);
-          }}
-          placeholder="John Doe"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>Expiry (MM/YY)</Text>
-        <TextInput
-          style={styles.input}
-          value={expiry}
-          onChangeText={(t) => {
-            hapticLight();
-            setExpiry(t);
-          }}
-          placeholder="MM/YY"
-          placeholderTextColor="#999999"
-        />
-
-        <Text style={styles.label}>CVV</Text>
-        <TextInput
-          style={styles.input}
-          value={cvv}
-          onChangeText={(t) => {
-            hapticLight();
-            setCvv(t);
-          }}
-          placeholder="123"
-          secureTextEntry
-          keyboardType="numeric"
-          placeholderTextColor="#999999"
-        />
+        {fields.map(({ label, value, setter, keyboard, secure }) => (
+          <View key={label} style={styles.field}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>
+              {label}
+            </Text>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: jarsSecondary, color: jarsPrimary },
+              ]}
+              placeholder={label}
+              placeholderTextColor={jarsSecondary}
+              keyboardType={keyboard as any}
+              secureTextEntry={secure}
+              value={value}
+              onChangeText={(t) => {
+                hapticLight();
+                setter(t);
+              }}
+            />
+          </View>
+        ))}
 
         <Pressable
-          style={[styles.saveBtn, { backgroundColor: jarsPrimary }]}
+          style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={onSave}
         >
           <Text style={styles.saveText}>Save Changes</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -143,14 +194,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   form: { padding: 16 },
+  field: { marginBottom: 12 },
   label: {
     fontSize: 14,
-    color: '#777777',
-    marginTop: 16,
     marginBottom: 4,
   },
   input: {
@@ -158,10 +209,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 16,
-    color: '#333333',
     borderWidth: 1,
-    borderColor: '#EEEEEE',
   },
   saveBtn: {
     marginTop: 32,

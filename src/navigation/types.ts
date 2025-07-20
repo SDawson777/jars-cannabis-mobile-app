@@ -1,9 +1,4 @@
 // src/navigation/types.ts
-
-/**
- * Define the full stack param list for your navigation.
- * Adjust the `any` types below to your real interfaces as needed.
- */
 export type RootStackParamList = {
   SplashScreen: undefined;
   Onboarding: undefined;
@@ -39,10 +34,13 @@ export type RootStackParamList = {
   HelpFAQ: undefined;
   ContactUs: undefined;
   EducationalGreenhouse: undefined;
+  /** Now requires a title param */
   ArticleDetail: { title: string };
   CommunityGarden: undefined;
   ConciergeChat: undefined;
   DataTransparency: undefined;
   AccessibilitySettings: undefined;
   Awards: undefined;
+  /** New Legal route */
+  Legal: undefined;
 };

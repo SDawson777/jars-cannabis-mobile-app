@@ -12,7 +12,11 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+} from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
@@ -26,7 +30,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Strongly-typed navigation and route props
 type OrderDetailsNavProp = NativeStackNavigationProp<
   RootStackParamList,
   'OrderDetails'
@@ -50,9 +53,14 @@ interface Order {
 export default function OrderDetailsScreen() {
   const navigation = useNavigation<OrderDetailsNavProp>();
   const route = useRoute<OrderDetailsRouteProp>();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const {
+    colorTemp,
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+  } = useContext(ThemeContext);
 
-  // Use passed order or fallback
+  // fallback order if none provided
   const order: Order =
     route.params?.order || {
       id: '12345',
@@ -68,12 +76,33 @@ export default function OrderDetailsScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
+  // dynamic background
   const bgColor =
     colorTemp === 'warm'
       ? '#FAF8F4'
       : colorTemp === 'cool'
       ? '#F7F9FA'
       : jarsBackground;
+
+  // glow for reorder button
+  const glowStyle =
+    colorTemp === 'warm'
+      ? {
+          shadowColor: jarsPrimary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : colorTemp === 'cool'
+      ? {
+          shadowColor: '#00A4FF',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      : {};
 
   const handleBack = () => {
     hapticLight();
@@ -84,13 +113,11 @@ export default function OrderDetailsScreen() {
   const handleReorder = () => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // Simply go to Cart without params (CartScreen expects no params)
     navigation.navigate('CartScreen');
   };
 
-  // Calculate summary
   const subtotal = order.items.reduce(
-    (sum: number, item: OrderItem) => sum + item.price * item.qty,
+    (sum, item) => sum + item.price * item.qty,
     0
   );
   const taxes = subtotal * 0.07;
@@ -110,15 +137,19 @@ export default function OrderDetailsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.meta}>Date: {order.date}</Text>
-        <Text style={styles.meta}>Status: {order.status}</Text>
+        <Text style={[styles.meta, { color: jarsSecondary }]}>
+          Date: {order.date}
+        </Text>
+        <Text style={[styles.meta, { color: jarsSecondary }]}>
+          Status: {order.status}
+        </Text>
 
-        {order.items.map((item: OrderItem) => (
+        {order.items.map((item) => (
           <View key={item.id} style={styles.itemRow}>
-            <Text style={styles.itemName}>
+            <Text style={[styles.itemName, { color: jarsPrimary }]}>
               {item.qty}× {item.name}
             </Text>
-            <Text style={styles.itemPrice}>
+            <Text style={[styles.itemPrice, { color: jarsPrimary }]}>
               ${(item.price * item.qty).toFixed(2)}
             </Text>
           </View>
@@ -126,21 +157,29 @@ export default function OrderDetailsScreen() {
 
         <View style={styles.summary}>
           <View style={styles.summaryRow}>
-            <Text>Subtotal</Text>
-            <Text>${subtotal.toFixed(2)}</Text>
+            <Text style={styles.summaryLabel}>Subtotal</Text>
+            <Text style={styles.summaryValue}>
+              ${subtotal.toFixed(2)}
+            </Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text>Taxes</Text>
-            <Text>${taxes.toFixed(2)}</Text>
+            <Text style={styles.summaryLabel}>Taxes</Text>
+            <Text style={styles.summaryValue}>
+              ${taxes.toFixed(2)}
+            </Text>
           </View>
           <View style={styles.summaryTotal}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+            <Text style={[styles.totalLabel, { color: jarsPrimary }]}>
+              Total
+            </Text>
+            <Text style={[styles.totalValue, { color: jarsPrimary }]}>
+              ${total.toFixed(2)}
+            </Text>
           </View>
         </View>
 
         <Pressable
-          style={[styles.reorderBtn, { backgroundColor: jarsPrimary }]}
+          style={[styles.reorderBtn, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={handleReorder}
         >
           <Text style={styles.reorderText}>Reorder</Text>
@@ -157,10 +196,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
-  meta: { fontSize: 14, color: '#555555', marginBottom: 8 },
+  meta: { fontSize: 14, marginBottom: 8 },
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -179,6 +219,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 4,
   },
+  summaryLabel: { fontSize: 14 },
+  summaryValue: { fontSize: 14 },
   summaryTotal: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -192,5 +234,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
-  reorderText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  reorderText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
 });

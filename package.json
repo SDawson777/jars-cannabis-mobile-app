@@ -1,22 +1,60 @@
 {
+  "name": "jars-cannabis-mobile-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build:web": "expo build:web",
+    "vercel-build": "mkdir -p dist && echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Placeholder</title></head><body></body></html>' > dist/index.html"
+  },
   "dependencies": {
+    "@prisma/client": "^6.12.0",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "8.4.1",
-    "@react-navigation/native": "^6.1.6",
+    "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.9.12",
-    "@react-navigation/stack": "^7.4.2",
+    "@react-navigation/stack": "^6.3.16",
+    "@tanstack/react-query": "^5.83.0",
+    "axios": "^1.10.0",
+    "bcrypt": "^6.0.0",
+    "bull": "^4.16.5",
     "expo": "^53.0.19",
     "expo-haptics": "^14.1.4",
+    "expo-localization": "^16.1.6",
     "expo-location": "~18.1.6",
+    "express": "^5.1.0",
+    "ioredis": "^5.6.1",
+    "jsonwebtoken": "^9.0.2",
     "nativewind": "^4.1.23",
+    "prisma": "^6.12.0",
     "react": "^19.1.0",
-    "react-dom": "^18.3.1",
     "react-native-haptic-feedback": "^2.3.3",
     "react-native-reanimated": "^3.18.0",
     "react-native-safe-area-context": "^5.5.2",
-    "react-native-screens": "^4.12.0"
+    "react-native-screens": "^4.12.0",
+    "rtl-detect": "^1.1.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/bull": "^3.15.9",
+    "@types/express": "^5.0.3",
+    "@types/hammerjs": "^2.0.46",
+    "@types/istanbul-lib-report": "^3.0.3",
+    "@types/istanbul-reports": "^3.0.4",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.15",
     "@types/react": "^19.1.8",
-    "@types/react-native": "^0.73.0"
+    "@types/react-native": "^0.73.0",
+    "@types/uuid": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

@@ -32,7 +32,7 @@ const FAQS = [
 
 export default function HelpFAQScreen() {
   const navigation = useNavigation();
-  const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [openIds, setOpenIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -53,8 +53,8 @@ export default function HelpFAQScreen() {
   };
 
   const toggleFAQ = (id: string) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setOpenIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
@@ -62,8 +62,7 @@ export default function HelpFAQScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: '#EEEEEE' }]}>
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -72,8 +71,6 @@ export default function HelpFAQScreen() {
         </Text>
         <View style={{ width: 24 }} />
       </View>
-
-      {/* FAQ List */}
       <ScrollView contentContainerStyle={styles.content}>
         {FAQS.map((item) => (
           <View key={item.id} style={styles.faqItem}>
@@ -83,7 +80,9 @@ export default function HelpFAQScreen() {
               </Text>
             </Pressable>
             {openIds.includes(item.id) && (
-              <Text style={styles.answer}>{item.answer}</Text>
+              <Text style={[styles.answer, { color: jarsSecondary }]}>
+                {item.answer}
+              </Text>
             )}
           </View>
         ))}
@@ -99,6 +98,7 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderBottomWidth: 1,
   },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
@@ -108,5 +108,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   question: { fontSize: 16, fontWeight: '500' },
-  answer: { fontSize: 14, color: '#333333', marginTop: 8, lineHeight: 20 },
+  answer: { fontSize: 14, marginTop: 8, lineHeight: 20 },
 });
