@@ -1,36 +1,132 @@
 // backend/src/routes/phase4.ts
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/authMiddleware';
-import {
-  getAwards,
-  redeemAward,
-  getAwardById,
-} from '../controllers/awardsController';
-import {
-  requestExport,
-  getExportStatus,
-  cancelExport,
-} from '../controllers/dataTransparencyController';
-import {
-  getAccessibilitySettings,
-  updateAccessibilitySettings,
-} from '../controllers/accessibilityController';
+import admin from 'firebase-admin';
+import { db } from '../firebaseAdmin';
 
-const router = Router();
+export const phase4Router = Router();
 
-// Awards endpoints (requires auth)
-router.get('/awards', authMiddleware, getAwards);
-router.post('/awards/redeem', authMiddleware, redeemAward);
-// Public award details (no auth)
-router.get('/awards/:awardId', getAwardById);
+// ——————————————
+// Awards (already in place)
+// ——————————————
+phase4Router.get('/awards', async (_req, res) => {
+  try {
+    const snapshot = await db.collection('awards').get();
+    const awards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return res.json(awards);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error fetching awards' });
+  }
+});
 
-// Data-Transparency endpoints (requires auth)
-router.post('/data-transparency/export', authMiddleware, requestExport);
-router.get('/data-transparency/export/:exportId', authMiddleware, getExportStatus);
-router.delete('/data-transparency/export/:exportId', authMiddleware, cancelExport);
+// ——————————————
+// Data-Transparency: queue an export
+// POST /data-transparency/export
+// ——————————————
+phase4Router.post('/data-transparency/export', async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return res.status(400).json({ message: 'userId is required' });
+  }
 
-// Accessibility endpoints (requires auth)
-router.get('/accessibility-settings', authMiddleware, getAccessibilitySettings);
-router.patch('/accessibility-settings', authMiddleware, updateAccessibilitySettings);
+  try {
+    // Create a new export record with auto-ID
+    const docRef = db.collection('exports').doc();
+    await docRef.set({
+      userId,
+      status: 'pending',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
-export default router;
+    return res.json({
+      exportId: docRef.id,
+      status: 'pending',
+    });
+  } catch (err) {
+    console.error('Error queuing data export:', err);
+    return res.status(500).json({ message: 'Error queuing export' });
+  }
+});
+
+// ——————————————
+// Data-Transparency: check status & download
+// GET /data-transparency/export/:exportId
+// ——————————————
+phase4Router.get('/data-transparency/export/:exportId', async (req, res) => {
+  const { exportId } = req.params;
+
+  try {
+    const docRef = db.collection('exports').doc(exportId);
+    const snap = await docRef.get();
+
+    if (!snap.exists) {
+      return res.status(404).json({ message: 'Export not found' });
+    }
+
+    const data = snap.data()!;
+    return res.json({
+      exportId,
+      status: data.status,
+      // downloadUrl only populated when the Cloud Function finishes
+      ...(data.downloadUrl && { downloadUrl: data.downloadUrl }),
+    });
+  } catch (err) {
+    console.error('Error fetching export status:', err);
+    return res.status(500).json({ message: 'Error fetching export status' });
+  }
+});
+// GET /accessibility-settings?userId=...
+phase4Router.get('/accessibility-settings', async (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    return res.status(400).json({ message: 'Missing userId query parameter' });
+  }
+
+  try {
+    const doc = await db.collection('accessibilityPrefs').doc(userId).get();
+    if (!doc.exists) {
+      return res.status(404).json({ message: 'No settings found for user' });
+    }
+    return res.json(doc.data());
+  } catch (err) {
+    console.error('Error fetching accessibility settings:', err);
+    return res.status(500).json({ message: 'Error fetching settings' });
+  }
+});
+
+// PATCH /accessibility-settings
+phase4Router.patch('/accessibility-settings', async (req, res) => {
+  const { userId, textSize, colorContrast, animationsEnabled } = req.body;
+  if (!userId) {
+    return res.status(400).json({ message: 'userId is required in body' });
+  }
+
+  // build only the fields that were sent
+  const updates: Record<string, any> = {};
+  if (textSize) updates.textSize = textSize;
+  if (colorContrast) updates.colorContrast = colorContrast;
+  if (typeof animationsEnabled === 'boolean') {
+    updates.animationsEnabled = animationsEnabled;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: 'No valid fields to update' });
+  }
+
+  try {
+    const docRef = db.collection('accessibilityPrefs').doc(userId);
+    await docRef.set(
+      {
+        ...updates,
+        /* server timestamp */
+        updatedAt: (await import('firebase-admin')).firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    const updated = await docRef.get();
+    return res.json(updated.data());
+  } catch (err) {
+    console.error('Error updating accessibility settings:', err);
+    return res.status(500).json({ message: 'Error updating settings' });
+  }
+});

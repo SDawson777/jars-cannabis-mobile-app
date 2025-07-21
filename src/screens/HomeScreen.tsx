@@ -17,10 +17,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -37,11 +34,7 @@ export default function HomeScreen() {
 
   // dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // glow for the card
   const glowStyle =
@@ -54,14 +47,14 @@ export default function HomeScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const goToShop = () => {
     hapticLight();
@@ -72,20 +65,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.content}>
-        <Text style={[styles.welcome, { color: jarsPrimary }]}>
-          Welcome back!
-        </Text>
+        <Text style={[styles.welcome, { color: jarsPrimary }]}>Welcome back!</Text>
         <Pressable
-          style={[
-            styles.card,
-            { borderColor: jarsPrimary, backgroundColor: '#FFF' },
-            glowStyle,
-          ]}
+          style={[styles.card, { borderColor: jarsPrimary, backgroundColor: '#FFF' }, glowStyle]}
           onPress={goToShop}
         >
-          <Text style={[styles.cardText, { color: jarsPrimary }]}>
-            Shop Now
-          </Text>
+          <Text style={[styles.cardText, { color: jarsPrimary }]}>Shop Now</Text>
         </Pressable>
       </View>
     </SafeAreaView>

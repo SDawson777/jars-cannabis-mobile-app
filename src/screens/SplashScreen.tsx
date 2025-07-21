@@ -16,17 +16,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type SplashNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'SplashScreen'
->;
+type SplashNavProp = NativeStackNavigationProp<RootStackParamList, 'SplashScreen'>;
 
 export default function SplashScreen() {
   const navigation = useNavigation<SplashNavProp>();
@@ -50,11 +44,7 @@ export default function SplashScreen() {
   }, [fade, navigation]);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>

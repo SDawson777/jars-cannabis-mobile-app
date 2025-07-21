@@ -18,10 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -43,11 +40,7 @@ export default function EditAddressScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -70,9 +63,7 @@ export default function EditAddressScreen() {
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Edit Address
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Edit Address</Text>
         <View style={styles.iconBtn} />
       </View>
 
@@ -82,7 +73,7 @@ export default function EditAddressScreen() {
         <TextInput
           style={[styles.input, { borderColor: jarsSecondary }]}
           value={label}
-          onChangeText={(t) => {
+          onChangeText={t => {
             hapticLight();
             setLabel(t);
           }}
@@ -94,7 +85,7 @@ export default function EditAddressScreen() {
         <TextInput
           style={[styles.input, { borderColor: jarsSecondary }]}
           value={line1}
-          onChangeText={(t) => {
+          onChangeText={t => {
             hapticLight();
             setLine1(t);
           }}
@@ -106,7 +97,7 @@ export default function EditAddressScreen() {
         <TextInput
           style={[styles.input, { borderColor: jarsSecondary }]}
           value={city}
-          onChangeText={(t) => {
+          onChangeText={t => {
             hapticLight();
             setCity(t);
           }}
@@ -118,7 +109,7 @@ export default function EditAddressScreen() {
         <TextInput
           style={[styles.input, { borderColor: jarsSecondary }]}
           value={stateField}
-          onChangeText={(t) => {
+          onChangeText={t => {
             hapticLight();
             setStateField(t);
           }}
@@ -130,7 +121,7 @@ export default function EditAddressScreen() {
         <TextInput
           style={[styles.input, { borderColor: jarsSecondary }]}
           value={zip}
-          onChangeText={(t) => {
+          onChangeText={t => {
             hapticLight();
             setZip(t);
           }}
@@ -139,10 +130,7 @@ export default function EditAddressScreen() {
           placeholderTextColor={jarsSecondary}
         />
 
-        <Pressable
-          style={[styles.saveBtn, { backgroundColor: jarsPrimary }]}
-          onPress={onSave}
-        >
+        <Pressable style={[styles.saveBtn, { backgroundColor: jarsPrimary }]} onPress={onSave}>
           <Text style={styles.saveText}>Save Changes</Text>
         </Pressable>
       </View>

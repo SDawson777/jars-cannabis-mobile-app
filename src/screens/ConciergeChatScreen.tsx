@@ -27,33 +27,18 @@ interface Message {
 }
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type ChatNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ConciergeChat'
->;
+type ChatNavProp = NativeStackNavigationProp<RootStackParamList, 'ConciergeChat'>;
 
 export default function ConciergeChatScreen() {
   const navigation = useNavigation<ChatNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const [messages, setMessages] = useState<Message[]>([
     { id: '1', text: 'Hi, how can I assist you today?', sender: 'bot' },
@@ -111,9 +96,7 @@ export default function ConciergeChatScreen() {
             <Send color={jarsPrimary} size={24} />
           </Pressable>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-              Concierge Chat
-            </Text>
+            <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Concierge Chat</Text>
           </View>
           <View style={{ width: 24 }} />
         </View>
@@ -129,22 +112,14 @@ export default function ConciergeChatScreen() {
               style={[
                 styles.messageBubble,
                 item.sender === 'user'
-                  ? [
-                      styles.userBubble,
-                      { backgroundColor: jarsPrimary },
-                    ]
-                  : [
-                      styles.botBubble,
-                      { backgroundColor: jarsBackground },
-                    ],
+                  ? [styles.userBubble, { backgroundColor: jarsPrimary }]
+                  : [styles.botBubble, { backgroundColor: jarsBackground }],
               ]}
             >
               <Text
                 style={[
                   styles.messageText,
-                  item.sender === 'user'
-                    ? { color: '#FFFFFF' }
-                    : { color: jarsPrimary },
+                  item.sender === 'user' ? { color: '#FFFFFF' } : { color: jarsPrimary },
                 ]}
               >
                 {item.text}
@@ -161,10 +136,7 @@ export default function ConciergeChatScreen() {
           ]}
         >
           <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: jarsBackground, color: jarsPrimary },
-            ]}
+            style={[styles.input, { backgroundColor: jarsBackground, color: jarsPrimary }]}
             placeholder="Type your message..."
             placeholderTextColor={jarsSecondary}
             value={input}

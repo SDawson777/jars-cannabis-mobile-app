@@ -1,0 +1,148 @@
+[debug] [2025-07-21T16:32:58.295Z] ----------------------------------------------------------------------
+[debug] [2025-07-21T16:32:58.297Z] Command:       /usr/local/share/nvm/versions/node/v22.16.0/bin/node /workspaces/jars-cannabis-mobile-app/functions/node_modules/.bin/firebase emulators:start --only functions,firestore
+[debug] [2025-07-21T16:32:58.297Z] CLI Version:   14.11.0
+[debug] [2025-07-21T16:32:58.298Z] Platform:      linux
+[debug] [2025-07-21T16:32:58.298Z] Node Version:  v22.16.0
+[debug] [2025-07-21T16:32:58.298Z] Time:          Mon Jul 21 2025 16:32:58 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-07-21T16:32:58.298Z] Env Overrides: GITHUB_API_URL, GITHUB_API_URL
+[debug] [2025-07-21T16:32:58.298Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-21T16:32:58.610Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-21T16:32:58.610Z] > authorizing via signed-in user (sdawson1024@gmail.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[warn] ⚠  firestore: Not starting the firestore emulator, make sure you have run firebase init. {"metadata":{"emulator":{"name":"firestore"},"message":"Not starting the \u001b[1mfirestore\u001b[22m emulator, make sure you have run \u001b[1mfirebase init\u001b[22m."}}
+[debug] [2025-07-21T16:32:58.637Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-07-21T16:32:58.637Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-07-21T16:32:58.653Z] [hub] writing locator at /tmp/hub-jars-mobile-app.json
+[debug] [2025-07-21T16:32:58.676Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-07-21T16:32:58.676Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-07-21T16:32:58.676Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-07-21T16:32:58.676Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] ⚠  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[debug] [2025-07-21T16:32:58.695Z] defaultcredentials: writing to file /home/codespace/.config/firebase/sdawson1024_gmail_com_application_default_credentials.json
+[debug] [2025-07-21T16:32:58.699Z] Setting GAC to /home/codespace/.config/firebase/sdawson1024_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to /home/codespace/.config/firebase/sdawson1024_gmail_com_application_default_credentials.json"}}
+[debug] [2025-07-21T16:32:58.699Z] Checked if tokens are valid: true, expires at: 1753118626342
+[debug] [2025-07-21T16:32:58.700Z] Checked if tokens are valid: true, expires at: 1753118626342
+[debug] [2025-07-21T16:32:58.701Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/jars-mobile-app/adminSdkConfig [none]
+[debug] [2025-07-21T16:32:59.009Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/jars-mobile-app/adminSdkConfig 200
+[debug] [2025-07-21T16:32:59.009Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/jars-mobile-app/adminSdkConfig {"projectId":"jars-mobile-app","storageBucket":"jars-mobile-app.firebasestorage.app"}
+[info] i  functions: Watching "/workspaces/jars-cannabis-mobile-app/functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"/workspaces/jars-cannabis-mobile-app/functions\" for Cloud Functions..."}}
+[debug] [2025-07-21T16:32:59.027Z] Validating nodejs source
+[warn] ⚠  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] ⚠  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2025-07-21T16:32:59.410Z] > [functions] package.json contents: {
+  "name": "functions",
+  "engines": {
+    "node": "18"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "firebase deploy --only functions",
+    "serve": "npm run build && firebase emulators:start --only functions,firestore"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.0.0",
+    "firebase-functions": "^4.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.11.0",
+    "typescript": "^4.9.5"
+  }
+}
+[debug] [2025-07-21T16:32:59.410Z] Building nodejs source
+[debug] [2025-07-21T16:32:59.410Z] Failed to find version of module node: reached end of search path /workspaces/jars-cannabis-mobile-app/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "18" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: You are using a version of firebase-functions SDK (4.9.0) that does not have support for the newest Firebase Extensions features. Please update firebase-functions SDK to >=5.1.0 to use them correctly 
+[debug] [2025-07-21T16:32:59.414Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-07-21T16:32:59.418Z] Found firebase-functions binary at '/workspaces/jars-cannabis-mobile-app/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8919
+
+[debug] [2025-07-21T16:32:59.804Z] Got response from /__/functions.yaml {"endpoints":{"processDataExport":{"platform":"gcfv1","availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"serviceAccountEmail":null,"vpc":null,"eventTrigger":{"eventType":"providers/cloud.firestore/eventTypes/document.create","eventFilters":{"resource":"projects/jars-mobile-app/databases/(default)/documents/exports/{exportId}"},"retry":false},"labels":{},"entryPoint":"processDataExport"}},"specVersion":"v1alpha1","requiredAPIs":[]}
+[info] ✔  functions: Loaded functions definitions from source: processDataExport. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: processDataExport."}}
+[info] i  functions[us-central1-processDataExport]: function ignored because the firestore emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the firestore emulator does not exist or is not running."}}
+[debug] [2025-07-21T16:33:03.830Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2025-07-21T16:36:46.738Z] File /workspaces/jars-cannabis-mobile-app/functions/package.json changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /workspaces/jars-cannabis-mobile-app/functions/package.json changed, reloading triggers"}}
+[debug] [2025-07-21T16:36:47.739Z] Validating nodejs source
+[warn] ⚠  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] ⚠  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2025-07-21T16:36:48.155Z] > [functions] package.json contents: {
+  "name": "functions",
+  "engines": {
+    "node": "18"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "firebase deploy --only functions",
+    "serve": "npm run build && cd ../ && npx firebase emulators:start --only functions,firestore"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.0.0",
+    "firebase-functions": "^4.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.11.0",
+    "typescript": "^4.9.5"
+  }
+}
+[debug] [2025-07-21T16:36:48.155Z] Building nodejs source
+[debug] [2025-07-21T16:36:48.155Z] Failed to find version of module node: reached end of search path /workspaces/jars-cannabis-mobile-app/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "18" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: You are using a version of firebase-functions SDK (4.9.0) that does not have support for the newest Firebase Extensions features. Please update firebase-functions SDK to >=5.1.0 to use them correctly 
+[debug] [2025-07-21T16:36:48.157Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-07-21T16:36:48.158Z] Found firebase-functions binary at '/workspaces/jars-cannabis-mobile-app/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8031
+
+[debug] [2025-07-21T16:36:48.507Z] Got response from /__/functions.yaml {"endpoints":{"processDataExport":{"platform":"gcfv1","availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"serviceAccountEmail":null,"vpc":null,"eventTrigger":{"eventType":"providers/cloud.firestore/eventTypes/document.create","eventFilters":{"resource":"projects/jars-mobile-app/databases/(default)/documents/exports/{exportId}"},"retry":false},"labels":{},"entryPoint":"processDataExport"}},"specVersion":"v1alpha1","requiredAPIs":[]}
+[info] ✔  functions: Loaded functions definitions from source: processDataExport. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: processDataExport."}}
+[debug] [2025-07-21T16:37:14.554Z] File /workspaces/jars-cannabis-mobile-app/functions/lib/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /workspaces/jars-cannabis-mobile-app/functions/lib/index.js changed, reloading triggers"}}
+[debug] [2025-07-21T16:37:15.554Z] Validating nodejs source
+[warn] ⚠  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] ⚠  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2025-07-21T16:37:16.191Z] > [functions] package.json contents: {
+  "name": "functions",
+  "engines": {
+    "node": "18"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "firebase deploy --only functions",
+    "serve": "npm run build && cd ../ && npx firebase emulators:start --only functions,firestore"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.0.0",
+    "firebase-functions": "^4.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.11.0",
+    "typescript": "^4.9.5"
+  }
+}
+[debug] [2025-07-21T16:37:16.191Z] Building nodejs source
+[debug] [2025-07-21T16:37:16.192Z] Failed to find version of module node: reached end of search path /workspaces/jars-cannabis-mobile-app/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "18" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: You are using a version of firebase-functions SDK (4.9.0) that does not have support for the newest Firebase Extensions features. Please update firebase-functions SDK to >=5.1.0 to use them correctly 
+[debug] [2025-07-21T16:37:16.193Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-07-21T16:37:16.194Z] Found firebase-functions binary at '/workspaces/jars-cannabis-mobile-app/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8393
+
+[debug] [2025-07-21T16:37:16.745Z] Got response from /__/functions.yaml {"endpoints":{"processDataExport":{"platform":"gcfv1","availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"serviceAccountEmail":null,"vpc":null,"eventTrigger":{"eventType":"providers/cloud.firestore/eventTypes/document.create","eventFilters":{"resource":"projects/jars-mobile-app/databases/(default)/documents/exports/{exportId}"},"retry":false},"labels":{},"entryPoint":"processDataExport"}},"specVersion":"v1alpha1","requiredAPIs":[]}
+[info] ✔  functions: Loaded functions definitions from source: processDataExport. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: processDataExport."}}

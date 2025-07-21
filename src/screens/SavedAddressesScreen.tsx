@@ -19,17 +19,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type SavedAddressesNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'SavedAddresses'
->;
+type SavedAddressesNavProp = NativeStackNavigationProp<RootStackParamList, 'SavedAddresses'>;
 
 interface Address {
   id: string;
@@ -45,12 +39,7 @@ const initial: Address[] = [
 
 export default function SavedAddressesScreen() {
   const navigation = useNavigation<SavedAddressesNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [addresses, setAddresses] = useState<Address[]>(initial);
 
   useEffect(() => {
@@ -58,11 +47,7 @@ export default function SavedAddressesScreen() {
   }, [addresses]);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleEdit = (addr: Address) => {
     hapticMedium();
@@ -80,7 +65,7 @@ export default function SavedAddressesScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
         data={addresses}
-        keyExtractor={(a) => a.id}
+        keyExtractor={a => a.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
@@ -89,9 +74,7 @@ export default function SavedAddressesScreen() {
             onPress={() => handleEdit(item)}
           >
             <View>
-              <Text style={[styles.label, { color: jarsPrimary }]}>
-                {item.label}
-              </Text>
+              <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
               <Text style={[styles.subLabel, { color: jarsSecondary }]}>
                 {item.line1}, {item.city}
               </Text>
@@ -106,9 +89,7 @@ export default function SavedAddressesScreen() {
             onPress={handleAdd}
           >
             <Plus color={jarsSecondary} size={20} />
-            <Text style={[styles.addText, { color: jarsSecondary }]}>
-              Add New Address
-            </Text>
+            <Text style={[styles.addText, { color: jarsSecondary }]}>Add New Address</Text>
           </Pressable>
         }
       />

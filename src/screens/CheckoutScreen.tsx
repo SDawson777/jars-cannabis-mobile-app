@@ -21,28 +21,17 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type CheckoutNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Checkout'
->;
+type CheckoutNavProp = NativeStackNavigationProp<RootStackParamList, 'Checkout'>;
 
 const steps = ['Delivery', 'Contact', 'Payment', 'Review'];
 
 export default function CheckoutScreen() {
   const navigation = useNavigation<CheckoutNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const [step, setStep] = useState(0);
   const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
@@ -60,11 +49,7 @@ export default function CheckoutScreen() {
 
   // dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // glow for the next/place-order button
   const glowStyle =
@@ -77,14 +62,14 @@ export default function CheckoutScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -101,10 +86,7 @@ export default function CheckoutScreen() {
       hapticHeavy();
       return Alert.alert('Error', 'Please enter delivery address.');
     }
-    if (
-      step === 1 &&
-      (!fullName.trim() || !phone.trim() || !email.trim())
-    ) {
+    if (step === 1 && (!fullName.trim() || !phone.trim() || !email.trim())) {
       hapticHeavy();
       return Alert.alert('Error', 'Please fill in all contact fields.');
     }
@@ -124,8 +106,7 @@ export default function CheckoutScreen() {
 
   const nextDisabled =
     (step === 0 && method === 'delivery' && !address.trim()) ||
-    (step === 1 &&
-      (!fullName.trim() || !phone.trim() || !email.trim())) ||
+    (step === 1 && (!fullName.trim() || !phone.trim() || !email.trim())) ||
     (step === 3 && !termsAccepted);
 
   return (
@@ -135,9 +116,7 @@ export default function CheckoutScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          {steps[step]}
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>{steps[step]}</Text>
         <Pressable onPress={handleHelp}>
           <HelpCircle color={jarsPrimary} size={24} />
         </Pressable>
@@ -148,10 +127,7 @@ export default function CheckoutScreen() {
         {steps.map((_, idx) => (
           <View
             key={idx}
-            style={[
-              styles.progressSegment,
-              idx <= step && { backgroundColor: jarsPrimary },
-            ]}
+            style={[styles.progressSegment, idx <= step && { backgroundColor: jarsPrimary }]}
           />
         ))}
       </View>
@@ -165,7 +141,7 @@ export default function CheckoutScreen() {
               How would you like to receive your order?
             </Text>
             <View style={styles.optionRow}>
-              {(['pickup', 'delivery'] as const).map((opt) => (
+              {(['pickup', 'delivery'] as const).map(opt => (
                 <Pressable
                   key={opt}
                   style={[
@@ -188,14 +164,11 @@ export default function CheckoutScreen() {
             </View>
             {method === 'delivery' && (
               <TextInput
-                style={[
-                  styles.input,
-                  { borderColor: jarsSecondary, color: jarsPrimary },
-                ]}
+                style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
                 placeholder="Enter delivery address"
                 placeholderTextColor={jarsSecondary}
                 value={address}
-                onChangeText={(t) => {
+                onChangeText={t => {
                   hapticLight();
                   setAddress(t);
                 }}
@@ -216,7 +189,7 @@ export default function CheckoutScreen() {
               placeholder="Full Name"
               placeholderTextColor={jarsSecondary}
               value={fullName}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setFullName(t);
               }}
@@ -228,7 +201,7 @@ export default function CheckoutScreen() {
               placeholderTextColor={jarsSecondary}
               keyboardType="phone-pad"
               value={phone}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setPhone(t);
               }}
@@ -240,7 +213,7 @@ export default function CheckoutScreen() {
               placeholderTextColor={jarsSecondary}
               keyboardType="email-address"
               value={email}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setEmail(t);
               }}
@@ -255,11 +228,9 @@ export default function CheckoutScreen() {
         {/* Step 2: Payment Method */}
         {step === 2 && (
           <View style={styles.step}>
-            <Text style={[styles.prompt, { color: jarsPrimary }]}>
-              How would you like to pay?
-            </Text>
+            <Text style={[styles.prompt, { color: jarsPrimary }]}>How would you like to pay?</Text>
             <View style={styles.optionColumn}>
-              {(['online', 'atPickup'] as const).map((opt) => (
+              {(['online', 'atPickup'] as const).map(opt => (
                 <Pressable
                   key={opt}
                   style={[
@@ -286,30 +257,22 @@ export default function CheckoutScreen() {
         {/* Step 3: Review & Terms */}
         {step === 3 && (
           <View style={styles.step}>
-            <Text style={[styles.prompt, { color: jarsPrimary }]}>
-              Review Your Order
-            </Text>
+            <Text style={[styles.prompt, { color: jarsPrimary }]}>Review Your Order</Text>
 
             <View style={styles.reviewCard}>
-              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>
-                Method:
-              </Text>
+              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>Method:</Text>
               <Text style={[styles.reviewValue, { color: jarsSecondary }]}>
                 {method === 'pickup' ? 'Pickup' : address}
               </Text>
             </View>
             <View style={styles.reviewCard}>
-              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>
-                Contact:
-              </Text>
+              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>Contact:</Text>
               <Text style={[styles.reviewValue, { color: jarsSecondary }]}>
                 {fullName}, {phone}, {email}
               </Text>
             </View>
             <View style={styles.reviewCard}>
-              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>
-                Payment:
-              </Text>
+              <Text style={[styles.reviewLabel, { color: jarsPrimary }]}>Payment:</Text>
               <Text style={[styles.reviewValue, { color: jarsSecondary }]}>
                 {payment === 'online' ? 'Online' : 'At Pickup/Delivery'}
               </Text>
@@ -333,14 +296,8 @@ export default function CheckoutScreen() {
               />
               <Text style={[styles.termsText, { color: jarsSecondary }]}>
                 I agree to Jars’{' '}
-                <Text style={[styles.link, { color: jarsPrimary }]}>
-                  Terms & Conditions
-                </Text>{' '}
-                and{' '}
-                <Text style={[styles.link, { color: jarsPrimary }]}>
-                  Privacy Policy
-                </Text>
-                .
+                <Text style={[styles.link, { color: jarsPrimary }]}>Terms & Conditions</Text> and{' '}
+                <Text style={[styles.link, { color: jarsPrimary }]}>Privacy Policy</Text>.
               </Text>
             </Pressable>
           </View>

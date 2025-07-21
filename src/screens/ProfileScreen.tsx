@@ -18,10 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -38,23 +35,14 @@ const MENU: { id: keyof RootStackParamList; label: string }[] = [
 
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const navigateTo = (route: keyof RootStackParamList) => {
     hapticLight();
@@ -66,7 +54,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
         data={MENU}
-        keyExtractor={(m) => m.id}
+        keyExtractor={m => m.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
@@ -74,9 +62,7 @@ export default function ProfileScreen() {
             android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={() => navigateTo(item.id)}
           >
-            <Text style={[styles.label, { color: jarsPrimary }]}>
-              {item.label}
-            </Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
             <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}

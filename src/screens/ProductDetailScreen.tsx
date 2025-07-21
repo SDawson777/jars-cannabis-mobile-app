@@ -13,32 +13,19 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft, Heart, ShoppingCart } from 'lucide-react-native';
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type ProductDetailsNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ProductDetails'
->;
-type ProductDetailsRouteProp = RouteProp<
-  RootStackParamList,
-  'ProductDetails'
->;
+type ProductDetailsNavProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetails'>;
+type ProductDetailsRouteProp = RouteProp<RootStackParamList, 'ProductDetails'>;
 
 export default function ProductDetailScreen() {
   const navigation = useNavigation<ProductDetailsNavProp>();
@@ -52,11 +39,7 @@ export default function ProductDetailScreen() {
 
   // Dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // Glow for Add to Cart button
   const glowStyle =
@@ -69,14 +52,14 @@ export default function ProductDetailScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -110,15 +93,9 @@ export default function ProductDetailScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Image source={product.image} style={styles.image} />
-        <Text style={[styles.name, { color: jarsPrimary }]}>
-          {product.name}
-        </Text>
-        <Text style={[styles.price, { color: jarsSecondary }]}>
-          ${product.price.toFixed(2)}
-        </Text>
-        <Text style={[styles.description, { color: jarsSecondary }]}>
-          {product.description}
-        </Text>
+        <Text style={[styles.name, { color: jarsPrimary }]}>{product.name}</Text>
+        <Text style={[styles.price, { color: jarsSecondary }]}>${product.price.toFixed(2)}</Text>
+        <Text style={[styles.description, { color: jarsSecondary }]}>{product.description}</Text>
       </ScrollView>
 
       <Pressable

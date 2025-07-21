@@ -95,7 +95,7 @@ export default function AccessibilitySettingsScreen() {
   // Loading and error states
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>        
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
         <ActivityIndicator />
       </SafeAreaView>
     );
@@ -103,17 +103,24 @@ export default function AccessibilitySettingsScreen() {
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>        
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
         <View style={styles.errorContainer}>
           <Text style={[styles.errorText, { color: jarsPrimary }]}>Error: {error}</Text>
-          <Button title="Retry" onPress={() => {
-            setLoading(true);
-            setError(null);
-            phase4Client.get<AccessibilityPrefs>('/accessibility-settings', { params: { userId: 'user-123' } })
-              .then(res => setPrefs(res.data))
-              .catch(err => setError(err.message))
-              .finally(() => setLoading(false));
-          }} color={jarsPrimary} />
+          <Button
+            title="Retry"
+            onPress={() => {
+              setLoading(true);
+              setError(null);
+              phase4Client
+                .get<AccessibilityPrefs>('/accessibility-settings', {
+                  params: { userId: 'user-123' },
+                })
+                .then(res => setPrefs(res.data))
+                .catch(err => setError(err.message))
+                .finally(() => setLoading(false));
+            }}
+            color={jarsPrimary}
+          />
         </View>
       </SafeAreaView>
     );
@@ -123,9 +130,9 @@ export default function AccessibilitySettingsScreen() {
   if (!prefs) return null;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>      
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>        
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>

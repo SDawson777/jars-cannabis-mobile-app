@@ -20,17 +20,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type AddPaymentNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'AddPayment'
->;
+type AddPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'AddPayment'>;
 
 export default function AddPaymentScreen() {
   const navigation = useNavigation<AddPaymentNavProp>();
@@ -46,9 +40,7 @@ export default function AddPaymentScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm' ? '#FAF8F4'
-    : colorTemp === 'cool' ? '#F7F9FA'
-    : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const glowStyle =
     colorTemp === 'warm'
@@ -60,14 +52,14 @@ export default function AddPaymentScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -88,9 +80,21 @@ export default function AddPaymentScreen() {
   };
 
   const fields = [
-    { label: 'Card Number', value: cardNumber, setter: setCardNumber, keyboard: 'numeric', secure: false },
+    {
+      label: 'Card Number',
+      value: cardNumber,
+      setter: setCardNumber,
+      keyboard: 'numeric',
+      secure: false,
+    },
     { label: 'Name on Card', value: name, setter: setName, keyboard: 'default', secure: false },
-    { label: 'Expiry (MM/YY)', value: expiry, setter: setExpiry, keyboard: 'default', secure: false },
+    {
+      label: 'Expiry (MM/YY)',
+      value: expiry,
+      setter: setExpiry,
+      keyboard: 'default',
+      secure: false,
+    },
     { label: 'CVV', value: cvv, setter: setCvv, keyboard: 'numeric', secure: true },
   ];
 
@@ -100,9 +104,7 @@ export default function AddPaymentScreen() {
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Add Payment
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Add Payment</Text>
         <View style={styles.iconBtn} />
       </View>
       <View style={styles.form}>
@@ -110,16 +112,13 @@ export default function AddPaymentScreen() {
           <View key={label}>
             <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
             <TextInput
-              style={[
-                styles.input,
-                { borderColor: jarsSecondary, color: jarsPrimary },
-              ]}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder={label}
               placeholderTextColor={jarsSecondary}
               keyboardType={keyboard as any}
               secureTextEntry={secure}
               value={value}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setter(t);
               }}

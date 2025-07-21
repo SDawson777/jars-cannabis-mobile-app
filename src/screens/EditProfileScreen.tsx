@@ -19,17 +19,11 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type EditProfileNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'EditProfile'
->;
+type EditProfileNavProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 type EditProfileRouteProp = RouteProp<RootStackParamList, 'EditProfile'>;
 
 export default function EditProfileScreen() {
@@ -47,11 +41,7 @@ export default function EditProfileScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const glowStyle =
     colorTemp === 'warm'
@@ -63,14 +53,14 @@ export default function EditProfileScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -95,9 +85,7 @@ export default function EditProfileScreen() {
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Edit Profile
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Edit Profile</Text>
         <View style={styles.iconBtn} />
       </View>
 
@@ -110,15 +98,12 @@ export default function EditProfileScreen() {
           <View key={label}>
             <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
             <TextInput
-              style={[
-                styles.input,
-                { borderColor: jarsSecondary, color: jarsPrimary },
-              ]}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder={label}
               placeholderTextColor={jarsSecondary}
               keyboardType={keyboard as any}
               value={value}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setter(t);
               }}

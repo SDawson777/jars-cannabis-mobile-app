@@ -17,17 +17,26 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 const FAQS = [
-  { id: '1', question: 'How do I track my order?', answer: 'Go to Order Tracking on the Home screen.' },
-  { id: '2', question: 'How do I apply a promo code?', answer: 'Enter your code in the Cart screen under Promo Code.' },
-  { id: '3', question: 'How can I contact support?', answer: 'Use the Contact Us screen or in-app chat via Concierge.' },
+  {
+    id: '1',
+    question: 'How do I track my order?',
+    answer: 'Go to Order Tracking on the Home screen.',
+  },
+  {
+    id: '2',
+    question: 'How do I apply a promo code?',
+    answer: 'Enter your code in the Cart screen under Promo Code.',
+  },
+  {
+    id: '3',
+    question: 'How can I contact support?',
+    answer: 'Use the Contact Us screen or in-app chat via Concierge.',
+  },
 ];
 
 export default function HelpFAQScreen() {
@@ -40,11 +49,7 @@ export default function HelpFAQScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -55,9 +60,7 @@ export default function HelpFAQScreen() {
   const toggleFAQ = (id: string) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setOpenIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setOpenIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
   };
 
   return (
@@ -66,23 +69,17 @@ export default function HelpFAQScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Help & FAQ
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Help & FAQ</Text>
         <View style={{ width: 24 }} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        {FAQS.map((item) => (
+        {FAQS.map(item => (
           <View key={item.id} style={styles.faqItem}>
             <Pressable onPress={() => toggleFAQ(item.id)}>
-              <Text style={[styles.question, { color: jarsPrimary }]}>
-                {item.question}
-              </Text>
+              <Text style={[styles.question, { color: jarsPrimary }]}>{item.question}</Text>
             </Pressable>
             {openIds.includes(item.id) && (
-              <Text style={[styles.answer, { color: jarsSecondary }]}>
-                {item.answer}
-              </Text>
+              <Text style={[styles.answer, { color: jarsSecondary }]}>{item.answer}</Text>
             )}
           </View>
         ))}

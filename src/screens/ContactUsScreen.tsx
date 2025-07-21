@@ -19,17 +19,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type ContactNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ContactUs'
->;
+type ContactNavProp = NativeStackNavigationProp<RootStackParamList, 'ContactUs'>;
 
 export default function ContactUsScreen() {
   const navigation = useNavigation<ContactNavProp>();
@@ -40,11 +34,7 @@ export default function ContactUsScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -86,9 +76,7 @@ export default function ContactUsScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Contact Us
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Contact Us</Text>
         <View style={{ width: 24 }} />
       </View>
       <View style={styles.content}>
@@ -100,9 +88,7 @@ export default function ContactUsScreen() {
             android_ripple={{ color: '#EEE' }}
           >
             <View style={styles.iconWrapper}>{c.icon}</View>
-            <Text style={[styles.label, { color: jarsPrimary }]}>
-              {c.label}
-            </Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>{c.label}</Text>
           </Pressable>
         ))}
       </View>

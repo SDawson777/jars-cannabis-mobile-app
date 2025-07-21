@@ -7,14 +7,14 @@ import { getLocales } from 'expo-localization';
 const OPEN_WEATHER_KEY = 'aa7128228c09cea5b92b508cf1a200bc';
 
 // Tuned threshold constants
-const COOL_THRESHOLD_METRIC = 12;        // °C below which we consider it 'cool'
-const WARM_THRESHOLD_METRIC = 22;        // °C above which we consider it 'warm'
-const COOL_THRESHOLD_IMPERIAL = 54;      // °F below which we consider it 'cool'
-const WARM_THRESHOLD_IMPERIAL = 72;      // °F above which we consider it 'warm'
+const COOL_THRESHOLD_METRIC = 12; // °C below which we consider it 'cool'
+const WARM_THRESHOLD_METRIC = 22; // °C above which we consider it 'warm'
+const COOL_THRESHOLD_IMPERIAL = 54; // °F below which we consider it 'cool'
+const WARM_THRESHOLD_IMPERIAL = 72; // °F above which we consider it 'warm'
 
 // Cloud-cover adjustment thresholds (percent)
-const SUNNY_CLOUD_THRESHOLD = 30;        // clouds% below which we boost toward 'warm'
-const CLOUDY_CLOUD_THRESHOLD = 70;       // clouds% above which we boost toward 'cool'
+const SUNNY_CLOUD_THRESHOLD = 30; // clouds% below which we boost toward 'warm'
+const CLOUDY_CLOUD_THRESHOLD = 70; // clouds% above which we boost toward 'cool'
 
 type ColorTemp = 'warm' | 'neutral' | 'cool';
 
@@ -45,10 +45,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // 1. Time-of-day fallback
   const computeTimeTemp = (): ColorTemp => {
     const hour = new Date().getHours();
-    if (hour >= 6 && hour < 12) return 'warm';      // morning
-    if (hour >= 17 && hour < 20) return 'warm';     // golden hour
-    if (hour >= 12 && hour < 17) return 'neutral';  // midday
-    return 'cool';                                  // evening/night
+    if (hour >= 6 && hour < 12) return 'warm'; // morning
+    if (hour >= 17 && hour < 20) return 'warm'; // golden hour
+    if (hour >= 12 && hour < 17) return 'neutral'; // midday
+    return 'cool'; // evening/night
   };
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         let temp: ColorTemp = computeTimeTemp();
 
         // 2. Pull measurementSystem from first locale entry
-        const { measurementSystem } = getLocales()[0];  
+        const { measurementSystem } = getLocales()[0];
         // measurementSystem is 'metric' | 'us' | 'uk' | null
         const usesImperial = measurementSystem === 'us';
         const units = usesImperial ? 'imperial' : 'metric';
@@ -70,10 +70,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const { latitude, longitude } = coords;
 
           // 4. Fetch weather with proper units
-          const url = `https://api.openweathermap.org/data/2.5/weather` +
-                      `?lat=${latitude}&lon=${longitude}` +
-                      `&appid=${OPEN_WEATHER_KEY}` +
-                      `&units=${units}`;
+          const url =
+            `https://api.openweathermap.org/data/2.5/weather` +
+            `?lat=${latitude}&lon=${longitude}` +
+            `&appid=${OPEN_WEATHER_KEY}` +
+            `&units=${units}`;
           const resp = await fetch(url);
           const data = await resp.json();
           const current = data.main?.temp as number | undefined;
@@ -123,9 +124,5 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     loading,
   };
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };

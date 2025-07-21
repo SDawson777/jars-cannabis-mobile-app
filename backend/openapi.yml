@@ -9,16 +9,47 @@ servers:
     description: Stoplight mock server URL (replace after you create your mock)
 
 paths:
+  /:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+
   /awards:
     get:
-      summary: List all earned awards/badges
+      summary: List all awards
       tags:
         - Awards
       responses:
-        '200':
-          description: An array of award objects
+        "200":
+          description: OK
           content:
             application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    iconUrl:
+                      type: string
+                    earnedDate:
+                      type: string
+                      format: date
               example:
                 - id: "badge-1"
                   title: "First Purchase"

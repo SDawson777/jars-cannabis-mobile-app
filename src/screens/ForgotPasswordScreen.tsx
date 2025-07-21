@@ -20,21 +20,16 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type ForgotPasswordNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ForgotPassword'
->;
+type ForgotPasswordNavProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 
 export default function ForgotPasswordScreen() {
   const navigation = useNavigation<ForgotPasswordNavProp>();
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground, loading } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground, loading } =
+    useContext(ThemeContext);
 
   const [email, setEmail] = useState('');
 
@@ -45,11 +40,7 @@ export default function ForgotPasswordScreen() {
 
   // Background based on time/weather
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // Glow effect for buttons
   const glowStyle =
@@ -62,14 +53,14 @@ export default function ForgotPasswordScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -85,10 +76,7 @@ export default function ForgotPasswordScreen() {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // TODO: integrate real reset-link logic
-    Alert.alert(
-      'Reset Link Sent',
-      'Please check your email for password reset instructions.'
-    );
+    Alert.alert('Reset Link Sent', 'Please check your email for password reset instructions.');
     navigation.goBack();
   };
 
@@ -98,18 +86,12 @@ export default function ForgotPasswordScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Forgot Password
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Forgot Password</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <View style={styles.content}>
-        <Mail
-          color={jarsPrimary}
-          size={48}
-          style={{ alignSelf: 'center', marginVertical: 24 }}
-        />
+        <Mail color={jarsPrimary} size={48} style={{ alignSelf: 'center', marginVertical: 24 }} />
         <Text style={[styles.prompt, { color: jarsPrimary }]}>
           Enter your email address and we’ll send you a reset link.
         </Text>
@@ -126,7 +108,7 @@ export default function ForgotPasswordScreen() {
           placeholderTextColor={jarsSecondary}
           keyboardType="email-address"
           value={email}
-          onChangeText={(t) => {
+          onChangeText={t => {
             hapticLight();
             setEmail(t);
           }}

@@ -13,31 +13,18 @@ import {
   Linking,
 } from 'react-native';
 import { ChevronLeft, Phone, Clock } from 'lucide-react-native';
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type StoreDetailsNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'StoreDetails'
->;
-type StoreDetailsRouteProp = RouteProp<
-  RootStackParamList,
-  'StoreDetails'
->;
+type StoreDetailsNavProp = NativeStackNavigationProp<RootStackParamList, 'StoreDetails'>;
+type StoreDetailsRouteProp = RouteProp<RootStackParamList, 'StoreDetails'>;
 
 interface Store {
   id: string;
@@ -52,23 +39,14 @@ export default function StoreDetailsScreen() {
   const route = useRoute<StoreDetailsRouteProp>();
   const store: Store = route.params.store;
 
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -88,35 +66,24 @@ export default function StoreDetailsScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          {store.name}
-        </Text>
+        <Text style={[styles.title, { color: jarsPrimary }]}>{store.name}</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.infoRow}>
           <Clock color={jarsSecondary} size={20} style={{ marginRight: 8 }} />
-          <Text style={[styles.infoText, { color: jarsSecondary }]}>
-            {store.hours}
-          </Text>
+          <Text style={[styles.infoText, { color: jarsSecondary }]}>{store.hours}</Text>
         </View>
         <View style={styles.infoRow}>
           <Phone color={jarsSecondary} size={20} style={{ marginRight: 8 }} />
-          <Text style={[styles.infoText, { color: jarsSecondary }]}>
-            {store.phone}
-          </Text>
+          <Text style={[styles.infoText, { color: jarsSecondary }]}>{store.phone}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Text style={[styles.address, { color: jarsPrimary }]}>
-            {store.address}
-          </Text>
+          <Text style={[styles.address, { color: jarsPrimary }]}>{store.address}</Text>
         </View>
 
-        <Pressable
-          style={[styles.callBtn, { backgroundColor: jarsPrimary }]}
-          onPress={callStore}
-        >
+        <Pressable style={[styles.callBtn, { backgroundColor: jarsPrimary }]} onPress={callStore}>
           <Text style={styles.callText}>Call Store</Text>
         </Pressable>
       </ScrollView>

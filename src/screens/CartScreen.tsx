@@ -28,10 +28,7 @@ import {
   hapticError,
 } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -71,11 +68,7 @@ export default function CartScreen() {
 
   // Dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // Glow for Checkout button
   const glowStyle =
@@ -88,14 +81,14 @@ export default function CartScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = promoApplied ? 10 : 0;
@@ -105,32 +98,26 @@ export default function CartScreen() {
   const updateQty = (id: string, delta: number) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
+    setCart(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
       )
     );
   };
 
   const removeItem = (id: string) => {
     hapticHeavy();
-    Alert.alert(
-      'Remove Item',
-      'Are you sure you want to remove this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setCart((prev) => prev.filter((item) => item.id !== id));
-          },
+    Alert.alert('Remove Item', 'Are you sure you want to remove this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setCart(prev => prev.filter(item => item.id !== id));
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const applyPromo = () => {
@@ -155,12 +142,16 @@ export default function CartScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => { hapticLight(); LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); navigation.goBack(); }}>
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            navigation.goBack();
+          }}
+        >
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Your Cart
-        </Text>
+        <Text style={[styles.title, { color: jarsPrimary }]}>Your Cart</Text>
         <Pressable onPress={goToHelp}>
           <HelpCircle color={jarsPrimary} size={24} />
         </Pressable>
@@ -169,19 +160,15 @@ export default function CartScreen() {
       {/* Cart Items */}
       <FlatList
         data={cart}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Image source={item.image} style={styles.image} />
             <View style={styles.info}>
-              <Text style={[styles.name, { color: jarsPrimary }]}>
-                {item.name}
-              </Text>
-              <Text style={[styles.price, { color: jarsSecondary }]}>
-                ${item.price.toFixed(2)}
-              </Text>
+              <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
+              <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
               <View style={styles.qtyRow}>
                 <Pressable onPress={() => updateQty(item.id, -1)} style={styles.qtyBtn}>
                   <Text style={styles.qtyBtnText}>−</Text>
@@ -218,9 +205,7 @@ export default function CartScreen() {
 
       {/* Order Summary */}
       <View style={[styles.summary, { backgroundColor: '#FFF' }]}>
-        <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>
-          Order Summary
-        </Text>
+        <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>Order Summary</Text>
         <View style={styles.line}>
           <Text style={styles.lineLabel}>Subtotal</Text>
           <Text style={styles.lineValue}>${subtotal.toFixed(2)}</Text>
@@ -235,9 +220,7 @@ export default function CartScreen() {
         </View>
         <View style={styles.lineTotal}>
           <Text style={styles.totalLabel}>Total</Text>
-          <Text style={[styles.totalValue, { color: jarsPrimary }]}>
-            ${total.toFixed(2)}
-          </Text>
+          <Text style={[styles.totalValue, { color: jarsPrimary }]}>${total.toFixed(2)}</Text>
         </View>
       </View>
 

@@ -19,17 +19,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type OrderHistoryNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'OrderHistory'
->;
+type OrderHistoryNavProp = NativeStackNavigationProp<RootStackParamList, 'OrderHistory'>;
 
 interface OrderSummary {
   id: string;
@@ -44,12 +38,7 @@ const sampleOrders: OrderSummary[] = [
 
 export default function OrderHistoryScreen() {
   const navigation = useNavigation<OrderHistoryNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -57,11 +46,7 @@ export default function OrderHistoryScreen() {
 
   // dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleSelect = (order: OrderSummary) => {
     hapticLight();
@@ -73,7 +58,7 @@ export default function OrderHistoryScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
         data={sampleOrders}
-        keyExtractor={(o) => o.id}
+        keyExtractor={o => o.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
@@ -82,17 +67,11 @@ export default function OrderHistoryScreen() {
             onPress={() => handleSelect(item)}
           >
             <View>
-              <Text style={[styles.id, { color: jarsPrimary }]}>
-                Order #{item.id}
-              </Text>
-              <Text style={[styles.date, { color: jarsSecondary }]}>
-                {item.date}
-              </Text>
+              <Text style={[styles.id, { color: jarsPrimary }]}>Order #{item.id}</Text>
+              <Text style={[styles.date, { color: jarsSecondary }]}>{item.date}</Text>
             </View>
             <View style={styles.right}>
-              <Text style={[styles.total, { color: jarsPrimary }]}>
-                ${item.total.toFixed(2)}
-              </Text>
+              <Text style={[styles.total, { color: jarsPrimary }]}>${item.total.toFixed(2)}</Text>
               <ChevronRight color={jarsPrimary} size={20} />
             </View>
           </Pressable>
