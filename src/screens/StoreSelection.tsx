@@ -18,17 +18,11 @@ import type { RootStackParamList } from '../navigation/types';
 import { hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type StoreSelectionNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'StoreSelection'
->;
+type StoreSelectionNavProp = NativeStackNavigationProp<RootStackParamList, 'StoreSelection'>;
 
 const STORES = [
   { id: '1', name: 'Jars Downtown', subtitle: '123 Main St' },
@@ -45,11 +39,7 @@ export default function StoreSelection() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const selectStore = (id: string) => {
     hapticMedium();
@@ -59,12 +49,10 @@ export default function StoreSelection() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <Text style={[styles.header, { color: jarsPrimary }]}>
-        Select Your Store
-      </Text>
+      <Text style={[styles.header, { color: jarsPrimary }]}>Select Your Store</Text>
       <FlatList
         data={STORES}
-        keyExtractor={(s) => s.id}
+        keyExtractor={s => s.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable

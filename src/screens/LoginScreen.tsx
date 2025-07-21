@@ -6,6 +6,8 @@ import {
   Text,
   TextInput,
   Pressable,
+  ActivityIndicator,
+  Alert,
   StyleSheet,
   LayoutAnimation,
   UIManager,
@@ -16,39 +18,37 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
+import { AuthContext, User } from '../context/AuthContext';
+import { useMutation } from '@tanstack/react-query';
+import { phase4Client } from '../api/phase4Client';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 type LoginNavProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+interface AuthResponse {
+  token: string;
+  user: User;
+}
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { setToken, setUser } = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Animate on mount
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Background based on time/weather
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
-  // Glow effect for buttons
   const glowStyle =
     colorTemp === 'warm'
       ? {
@@ -59,21 +59,41 @@ export default function LoginScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
-  const handleLogin = () => {
-    hapticMedium();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: replace with real authentication
-    navigation.replace('HomeScreen');
-  };
+  const loginMutation = useMutation<AuthResponse, Error, void>({
+    mutationFn: async () => {
+      // Use phase4Client for consistency
+      const { data } = await phase4Client.post<AuthResponse>('/auth/login', {
+        email,
+        password,
+      });
+      return data;
+    },
+    onSuccess: async ({ token, user }) => {
+      hapticMedium();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      await setToken(token);
+      await setUser(user);
+      navigation.replace('HomeScreen');
+    },
+    onError: err => {
+      hapticLight();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      Alert.alert('Login failed', err.message);
+    },
+  });
+
+  const handleLogin = () => loginMutation.mutate();
+
+  const isPending = loginMutation.status === 'pending';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -93,27 +113,26 @@ export default function LoginScreen() {
 
       <View style={styles.form}>
         <TextInput
-          style={[
-            styles.input,
-            { borderColor: jarsSecondary, color: jarsPrimary },
-          ]}
+          style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
           placeholder="Email"
           placeholderTextColor={jarsSecondary}
           keyboardType="email-address"
+          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
-          style={[
-            styles.input,
-            { borderColor: jarsSecondary, color: jarsPrimary },
-          ]}
+          style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
           placeholder="Password"
           placeholderTextColor={jarsSecondary}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
         />
+
+        {loginMutation.error && (
+          <Text style={[styles.error, { color: 'red' }]}>{loginMutation.error.message}</Text>
+        )}
 
         <Pressable
           onPress={() => {
@@ -122,16 +141,19 @@ export default function LoginScreen() {
             navigation.navigate('ForgotPassword');
           }}
         >
-          <Text style={[styles.link, { color: jarsPrimary }]}>
-            Forgot Password?
-          </Text>
+          <Text style={[styles.link, { color: jarsPrimary }]}>Forgot Password?</Text>
         </Pressable>
 
         <Pressable
           style={[styles.button, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={handleLogin}
+          disabled={isPending}
         >
-          <Text style={styles.buttonText}>Log In</Text>
+          {isPending ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Log In</Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
@@ -156,10 +178,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   link: { textAlign: 'right', marginBottom: 24, fontWeight: '500' },
-  button: {
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
+  button: { paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
+  error: { marginBottom: 12, textAlign: 'center' },
 });

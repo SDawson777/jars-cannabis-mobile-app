@@ -18,17 +18,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type OnboardingNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Onboarding'
->;
+type OnboardingNavProp = NativeStackNavigationProp<RootStackParamList, 'Onboarding'>;
 
 export default function OnboardingScreen() {
   const navigation = useNavigation<OnboardingNavProp>();
@@ -41,11 +35,7 @@ export default function OnboardingScreen() {
 
   // Background based on time/weather
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // “Glow” effect for the button
   const glowStyle =
@@ -58,14 +48,14 @@ export default function OnboardingScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleNext = () => {
     hapticLight();
@@ -76,9 +66,7 @@ export default function OnboardingScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.content}>
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Welcome to JARS
-        </Text>
+        <Text style={[styles.title, { color: jarsPrimary }]}>Welcome to JARS</Text>
         <Text style={[styles.subtitle, { color: jarsSecondary }]}>
           Discover the best cannabis products curated just for you.
         </Text>

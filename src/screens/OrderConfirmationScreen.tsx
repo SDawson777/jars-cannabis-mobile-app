@@ -18,17 +18,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type OrderConfirmationNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'OrderConfirmation'
->;
+type OrderConfirmationNavProp = NativeStackNavigationProp<RootStackParamList, 'OrderConfirmation'>;
 
 export default function OrderConfirmationScreen() {
   const navigation = useNavigation<OrderConfirmationNavProp>();
@@ -39,11 +33,7 @@ export default function OrderConfirmationScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // glow for button
   const glowStyle =
@@ -56,14 +46,14 @@ export default function OrderConfirmationScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleHome = () => {
     hapticMedium();
@@ -75,9 +65,7 @@ export default function OrderConfirmationScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.content}>
         <HomeIcon color={jarsPrimary} size={48} />
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Thank you for your order!
-        </Text>
+        <Text style={[styles.title, { color: jarsPrimary }]}>Thank you for your order!</Text>
         <Text style={[styles.subtitle, { color: jarsSecondary }]}>
           Your order is being processed and will be ready soon.
         </Text>

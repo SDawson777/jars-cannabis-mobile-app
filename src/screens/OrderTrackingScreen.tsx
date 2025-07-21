@@ -19,19 +19,13 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 const steps = ['Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
 
-type OrderTrackingNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'OrderTracking'
->;
+type OrderTrackingNavProp = NativeStackNavigationProp<RootStackParamList, 'OrderTracking'>;
 type OrderTrackingRouteProp = RouteProp<RootStackParamList, 'OrderTracking'>;
 
 export default function OrderTrackingScreen() {
@@ -45,11 +39,7 @@ export default function OrderTrackingScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -63,9 +53,7 @@ export default function OrderTrackingScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Track Order
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Track Order</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -74,19 +62,9 @@ export default function OrderTrackingScreen() {
           const done = steps.indexOf(status) >= idx;
           return (
             <View key={label} style={styles.stepRow}>
-              <View
-                style={[
-                  styles.dot,
-                  done && { backgroundColor: jarsPrimary },
-                ]}
-              />
+              <View style={[styles.dot, done && { backgroundColor: jarsPrimary }]} />
               <Text
-                style={[
-                  styles.stepLabel,
-                  done
-                    ? { color: jarsPrimary }
-                    : { color: jarsSecondary },
-                ]}
+                style={[styles.stepLabel, done ? { color: jarsPrimary } : { color: jarsSecondary }]}
               >
                 {label}
               </Text>

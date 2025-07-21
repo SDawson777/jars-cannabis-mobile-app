@@ -32,7 +32,9 @@ export default function DataTransparencyScreen() {
     setLoading(true);
     setError(null);
     try {
-      const res = await phase4Client.post<{ exportId: string }>('/data-transparency/export', { userId: 'user-123' });
+      const res = await phase4Client.post<{ exportId: string }>('/data-transparency/export', {
+        userId: 'user-123',
+      });
       setExportId(res.data.exportId);
       setStatus('pending');
       hapticMedium();
@@ -49,9 +51,11 @@ export default function DataTransparencyScreen() {
     if (exportId && status === 'pending') {
       interval = setInterval(async () => {
         try {
-          const res = await phase4Client.get<{ exportId: string; status: ExportStatus; downloadUrl?: string }>(
-            `/data-transparency/export/${exportId}`
-          );
+          const res = await phase4Client.get<{
+            exportId: string;
+            status: ExportStatus;
+            downloadUrl?: string;
+          }>(`/data-transparency/export/${exportId}`);
           setStatus(res.data.status);
           if (res.data.status === 'completed') {
             setDownloadUrl(res.data.downloadUrl || null);
@@ -73,7 +77,7 @@ export default function DataTransparencyScreen() {
   }, [exportId, status]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>      
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.content}>
         <Button
           title={loading ? 'Requesting Export...' : 'Request Data Export'}

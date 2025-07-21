@@ -33,15 +33,13 @@ export default function AwardsScreen() {
     isError,
     error,
     refetch,
-  } = useQuery<Award[], Error>(
-    {
-      queryKey: ['awards'],
-      queryFn: async () => {
-        const res = await phase4Client.get<Award[]>('/awards');
-        return res.data;
-      },
-    }
-  );
+  } = useQuery<Award[], Error>({
+    queryKey: ['awards'],
+    queryFn: async () => {
+      const res = await phase4Client.get<Award[]>('/awards');
+      return res.data;
+    },
+  });
 
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
   const bgColor =
@@ -49,7 +47,7 @@ export default function AwardsScreen() {
 
   // Render each award item
   const renderItem = ({ item }: ListRenderItemInfo<Award>) => (
-    <View style={[styles.card, { borderColor: jarsPrimary }]}>      
+    <View style={[styles.card, { borderColor: jarsPrimary }]}>
       <Image source={{ uri: item.iconUrl }} style={styles.icon} />
       <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>
       <Text style={styles.desc}>{item.description}</Text>
@@ -69,10 +67,17 @@ export default function AwardsScreen() {
   // Error state
   if (isError) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>        
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
         <View style={styles.errorContainer}>
           <Text style={[styles.errorText, { color: jarsPrimary }]}>Error: {error.message}</Text>
-          <Button title="Retry" onPress={() => { hapticMedium(); refetch(); }} color={jarsPrimary} />
+          <Button
+            title="Retry"
+            onPress={() => {
+              hapticMedium();
+              refetch();
+            }}
+            color={jarsPrimary}
+          />
         </View>
       </SafeAreaView>
     );
@@ -80,7 +85,7 @@ export default function AwardsScreen() {
 
   // Success state
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>      
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
         data={awards ?? []}
         keyExtractor={item => item.id}
@@ -94,7 +99,13 @@ export default function AwardsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   list: { padding: 20 },
-  card: { backgroundColor: '#fff', borderWidth: 2, borderRadius: 16, padding: 16, marginBottom: 12 },
+  card: {
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+  },
   icon: { width: 40, height: 40, marginBottom: 8 },
   title: { fontSize: 20, fontWeight: '600' },
   desc: { fontSize: 14, marginVertical: 4 },

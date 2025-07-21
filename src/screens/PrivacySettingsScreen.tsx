@@ -18,10 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -38,11 +35,7 @@ export default function PrivacySettingsScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -50,10 +43,7 @@ export default function PrivacySettingsScreen() {
     navigation.goBack();
   };
 
-  const toggle = (
-    setter: React.Dispatch<React.SetStateAction<boolean>>,
-    val: boolean
-  ) => {
+  const toggle = (setter: React.Dispatch<React.SetStateAction<boolean>>, val: boolean) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setter(val);
     hapticLight();
@@ -66,44 +56,36 @@ export default function PrivacySettingsScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Privacy Settings
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Privacy Settings</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Analytics Sharing
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Analytics Sharing</Text>
           <Switch
             value={analytics}
-            onValueChange={(v) => toggle(setAnalytics, v)}
+            onValueChange={v => toggle(setAnalytics, v)}
             trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           />
         </View>
 
         <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Personalization
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Personalization</Text>
           <Switch
             value={personalization}
-            onValueChange={(v) => toggle(setPersonalization, v)}
+            onValueChange={v => toggle(setPersonalization, v)}
             trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           />
         </View>
 
         <View style={[styles.row, { borderBottomWidth: 0 }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Targeted Ads
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Targeted Ads</Text>
           <Switch
             value={ads}
-            onValueChange={(v) => toggle(setAds, v)}
+            onValueChange={v => toggle(setAds, v)}
             trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           />

@@ -20,17 +20,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticHeavy, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type AgeVerificationNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'AgeVerification'
->;
+type AgeVerificationNavProp = NativeStackNavigationProp<RootStackParamList, 'AgeVerification'>;
 
 export default function AgeVerification() {
   const navigation = useNavigation<AgeVerificationNavProp>();
@@ -47,11 +41,7 @@ export default function AgeVerification() {
 
   // Background based on time/weather
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FFF8ED'
-      : colorTemp === 'cool'
-      ? '#EFF5F9'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FFF8ED' : colorTemp === 'cool' ? '#EFF5F9' : jarsBackground;
 
   // Glow effect for buttons
   const glowStyle =
@@ -64,14 +54,14 @@ export default function AgeVerification() {
           elevation: 5,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.25,
-          shadowRadius: 8,
-          elevation: 5,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.25,
+            shadowRadius: 8,
+            elevation: 5,
+          }
+        : {};
 
   const handleDateChange = (_: any, selected?: Date) => {
     setShowPicker(Platform.OS === 'ios');
@@ -110,9 +100,7 @@ export default function AgeVerification() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
         <View style={styles.content}>
-          <Text style={[styles.title, { color: jarsPrimary }]}>
-            Access Denied
-          </Text>
+          <Text style={[styles.title, { color: jarsPrimary }]}>Access Denied</Text>
           <Text style={[styles.subtitle, { color: jarsSecondary }]}>
             You must be at least 21 to continue.
           </Text>
@@ -131,9 +119,7 @@ export default function AgeVerification() {
   // Default age-verification view
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <Text style={[styles.title, { color: jarsPrimary }]}>
-        Verify Your Age
-      </Text>
+      <Text style={[styles.title, { color: jarsPrimary }]}>Verify Your Age</Text>
 
       <Pressable
         style={[styles.dateButton, glowStyle]}

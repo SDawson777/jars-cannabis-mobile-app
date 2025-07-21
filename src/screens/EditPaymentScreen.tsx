@@ -13,39 +13,24 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type EditPaymentNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'EditPayment'
->;
+type EditPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'EditPayment'>;
 type EditPaymentRouteProp = RouteProp<RootStackParamList, 'EditPayment'>;
 
 export default function EditPaymentScreen() {
   const navigation = useNavigation<EditPaymentNavProp>();
   const route = useRoute<EditPaymentRouteProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const pm = route.params?.payment || {};
   const [cardNumber, setCardNumber] = useState(pm.cardNumber || '');
@@ -58,11 +43,7 @@ export default function EditPaymentScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const glowStyle =
     colorTemp === 'warm'
@@ -74,14 +55,14 @@ export default function EditPaymentScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -90,22 +71,14 @@ export default function EditPaymentScreen() {
   };
 
   const onSave = () => {
-    if (
-      !cardNumber.trim() ||
-      !name.trim() ||
-      !expiry.trim() ||
-      !cvv.trim()
-    ) {
+    if (!cardNumber.trim() || !name.trim() || !expiry.trim() || !cvv.trim()) {
       hapticLight();
       return Alert.alert('Error', 'Please fill in all fields.');
     }
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // TODO: persist updated payment
-    Alert.alert(
-      'Payment Updated',
-      'Your payment method has been updated.'
-    );
+    Alert.alert('Payment Updated', 'Your payment method has been updated.');
     navigation.goBack();
   };
 
@@ -146,29 +119,22 @@ export default function EditPaymentScreen() {
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Edit Payment
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Edit Payment</Text>
         <View style={styles.iconBtn} />
       </View>
 
       <View style={styles.form}>
         {fields.map(({ label, value, setter, keyboard, secure }) => (
           <View key={label} style={styles.field}>
-            <Text style={[styles.label, { color: jarsSecondary }]}>
-              {label}
-            </Text>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
             <TextInput
-              style={[
-                styles.input,
-                { borderColor: jarsSecondary, color: jarsPrimary },
-              ]}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder={label}
               placeholderTextColor={jarsSecondary}
               keyboardType={keyboard as any}
               secureTextEntry={secure}
               value={value}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setter(t);
               }}

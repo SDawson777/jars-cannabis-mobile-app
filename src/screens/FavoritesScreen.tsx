@@ -18,17 +18,11 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium, hapticLight } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type FavoritesNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Favorites'
->;
+type FavoritesNavProp = NativeStackNavigationProp<RootStackParamList, 'Favorites'>;
 
 const ITEMS = [
   { id: '1', name: 'Rainbow Rozay' },
@@ -38,12 +32,7 @@ const ITEMS = [
 
 export default function FavoritesScreen() {
   const navigation = useNavigation<FavoritesNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [favorites, setFavorites] = useState<string[]>(ITEMS.map(i => i.id));
 
   useEffect(() => {
@@ -51,18 +40,12 @@ export default function FavoritesScreen() {
   }, [favorites]);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const toggleFav = (id: string) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setFavorites(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+    setFavorites(prev => (prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]));
   };
 
   const handleBack = () => {
@@ -78,9 +61,7 @@ export default function FavoritesScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Favorites
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Favorites</Text>
         <View style={{ width: 24 }} />
       </View>
       {/* List */}
@@ -90,14 +71,9 @@ export default function FavoritesScreen() {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-            <Text style={[styles.name, { color: jarsPrimary }]}>
-              {item.name}
-            </Text>
+            <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
             <Pressable onPress={() => toggleFav(item.id)}>
-              <HeartIcon
-                color={favorites.includes(item.id) ? jarsPrimary : '#CCCCCC'}
-                size={24}
-              />
+              <HeartIcon color={favorites.includes(item.id) ? jarsPrimary : '#CCCCCC'} size={24} />
             </Pressable>
           </View>
         )}

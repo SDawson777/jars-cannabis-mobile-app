@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // support private class fields
+    "module": "commonjs",
+    "lib": ["es2020"],
+    "rootDir": "src",
+    "outDir": "lib",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true // ignore node_modules type errors
+  },
+  "include": ["src"]
+}

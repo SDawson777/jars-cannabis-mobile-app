@@ -18,10 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -38,11 +35,7 @@ export default function NotificationSettingsScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -50,10 +43,7 @@ export default function NotificationSettingsScreen() {
     navigation.goBack();
   };
 
-  const toggle = (
-    setter: React.Dispatch<React.SetStateAction<boolean>>,
-    val: boolean
-  ) => {
+  const toggle = (setter: React.Dispatch<React.SetStateAction<boolean>>, val: boolean) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setter(val);
     hapticLight();
@@ -66,44 +56,36 @@ export default function NotificationSettingsScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Notifications
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Notifications</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Email Notifications
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Email Notifications</Text>
           <Switch
             value={emailNotifications}
-            onValueChange={(v) => toggle(setEmailNotifications, v)}
+            onValueChange={v => toggle(setEmailNotifications, v)}
             trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           />
         </View>
 
         <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            SMS Notifications
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>SMS Notifications</Text>
           <Switch
             value={smsNotifications}
-            onValueChange={(v) => toggle(setSmsNotifications, v)}
+            onValueChange={v => toggle(setSmsNotifications, v)}
             trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           />
         </View>
 
         <View style={[styles.row, { borderBottomWidth: 0 }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>
-            Push Notifications
-          </Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Push Notifications</Text>
           <Switch
             value={pushNotifications}
-            onValueChange={(v) => toggle(setPushNotifications, v)}
+            onValueChange={v => toggle(setPushNotifications, v)}
             trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           />

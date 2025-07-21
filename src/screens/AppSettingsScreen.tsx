@@ -18,10 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -47,11 +44,7 @@ export default function AppSettingsScreen() {
   };
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -60,9 +53,7 @@ export default function AppSettingsScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          App Settings
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>App Settings</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -95,9 +86,7 @@ export default function AppSettingsScreen() {
         <View style={[styles.row, { borderBottomWidth: 0 }]}>
           <View>
             <Text style={[styles.label, { color: jarsPrimary }]}>About App</Text>
-            <Text style={[styles.subLabel, { color: jarsSecondary }]}>
-              Version 1.0.0 (Build 1)
-            </Text>
+            <Text style={[styles.subLabel, { color: jarsSecondary }]}>Version 1.0.0 (Build 1)</Text>
           </View>
         </View>
       </ScrollView>

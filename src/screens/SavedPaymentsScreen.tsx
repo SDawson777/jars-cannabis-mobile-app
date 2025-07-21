@@ -19,17 +19,11 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type SavedPaymentsNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'SavedPayments'
->;
+type SavedPaymentsNavProp = NativeStackNavigationProp<RootStackParamList, 'SavedPayments'>;
 
 interface PaymentMethod {
   id: string;
@@ -51,9 +45,7 @@ export default function SavedPaymentsScreen() {
   }, [methods]);
 
   const bgColor =
-    colorTemp === 'warm' ? '#FAF8F4'
-    : colorTemp === 'cool' ? '#F7F9FA'
-    : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const glowStyle =
     colorTemp === 'warm'
@@ -65,14 +57,14 @@ export default function SavedPaymentsScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleEdit = (pm: PaymentMethod) => {
     hapticMedium();
@@ -90,7 +82,7 @@ export default function SavedPaymentsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList
         data={methods}
-        keyExtractor={(p) => p.id}
+        keyExtractor={p => p.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
@@ -98,9 +90,7 @@ export default function SavedPaymentsScreen() {
             android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={() => handleEdit(item)}
           >
-            <Text style={[styles.label, { color: jarsPrimary }]}>
-              {item.label}
-            </Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
             <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}
@@ -111,9 +101,7 @@ export default function SavedPaymentsScreen() {
             onPress={handleAdd}
           >
             <Plus color={jarsSecondary} size={20} />
-            <Text style={[styles.addText, { color: jarsSecondary }]}>
-              Add New Payment
-            </Text>
+            <Text style={[styles.addText, { color: jarsSecondary }]}>Add New Payment</Text>
           </Pressable>
         }
       />

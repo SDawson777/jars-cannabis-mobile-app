@@ -18,10 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -36,11 +33,7 @@ export default function LegalScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -55,32 +48,25 @@ export default function LegalScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Legal & Privacy
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Legal & Privacy</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>
-          Terms & Conditions
-        </Text>
+        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Terms & Conditions</Text>
         <Text style={[styles.bodyText, { color: jarsSecondary }]}>
           {/* Replace with real legal text */}
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-          tincidunt, nisl sit amet luctus scelerisque, urna justo pellentesque
-          arcu, vitae aliquet sapien nisi sit amet metus. Nulla facilisi. 
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt, nisl sit amet
+          luctus scelerisque, urna justo pellentesque arcu, vitae aliquet sapien nisi sit amet
+          metus. Nulla facilisi.
         </Text>
 
-        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>
-          Privacy Policy
-        </Text>
+        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Privacy Policy</Text>
         <Text style={[styles.bodyText, { color: jarsSecondary }]}>
           {/* Replace with real privacy text */}
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-          accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae
-          ab illo inventore veritatis et quasi architecto beatae vitae dicta
-          sunt explicabo.
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+          laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
+          architecto beatae vitae dicta sunt explicabo.
         </Text>
       </ScrollView>
     </SafeAreaView>

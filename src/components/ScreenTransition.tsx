@@ -21,10 +21,7 @@ interface ScreenTransitionProps {
  * Wrap each screen’s root in <ScreenTransition> to get a quick fade-in.
  * On unmount, it will fade out before removal.
  */
-export default function ScreenTransition({
-  children,
-  duration = 300,
-}: ScreenTransitionProps) {
+export default function ScreenTransition({ children, duration = 300 }: ScreenTransitionProps) {
   const opacity = useSharedValue(0);
 
   useEffect(() => {
@@ -43,9 +40,7 @@ export default function ScreenTransition({
     opacity: opacity.value,
   }));
 
-  return (
-    <Animated.View style={[styles.container, style]}>{children}</Animated.View>
-  );
+  return <Animated.View style={[styles.container, style]}>{children}</Animated.View>;
 }
 
 const styles = StyleSheet.create({

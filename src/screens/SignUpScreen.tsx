@@ -18,10 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -41,11 +38,7 @@ export default function SignUpScreen() {
 
   // Background based on time/weather
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // Glow effect for the sign-up button
   const glowStyle =
@@ -58,14 +51,14 @@ export default function SignUpScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleSignUp = () => {
     hapticMedium();
@@ -76,9 +69,7 @@ export default function SignUpScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <Text style={[styles.title, { color: jarsPrimary }]}>
-        Create Account
-      </Text>
+      <Text style={[styles.title, { color: jarsPrimary }]}>Create Account</Text>
 
       <TextInput
         style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
@@ -114,9 +105,7 @@ export default function SignUpScreen() {
       </Pressable>
 
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: jarsSecondary }]}>
-          Already have an account?
-        </Text>
+        <Text style={[styles.footerText, { color: jarsSecondary }]}>Already have an account?</Text>
         <Pressable
           onPress={() => {
             hapticLight();
@@ -124,9 +113,7 @@ export default function SignUpScreen() {
             navigation.replace('Login');
           }}
         >
-          <Text style={[styles.linkText, { color: jarsPrimary }]}>
-            Log In
-          </Text>
+          <Text style={[styles.linkText, { color: jarsPrimary }]}>Log In</Text>
         </Pressable>
       </View>
     </SafeAreaView>

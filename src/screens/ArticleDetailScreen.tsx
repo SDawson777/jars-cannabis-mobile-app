@@ -12,32 +12,19 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type ArticleNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ArticleDetail'
->;
-type ArticleRouteProp = RouteProp<
-  RootStackParamList,
-  'ArticleDetail'
->;
+type ArticleNavProp = NativeStackNavigationProp<RootStackParamList, 'ArticleDetail'>;
+type ArticleRouteProp = RouteProp<RootStackParamList, 'ArticleDetail'>;
 
 export default function ArticleDetailScreen() {
   const navigation = useNavigation<ArticleNavProp>();
@@ -51,11 +38,7 @@ export default function ArticleDetailScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -70,23 +53,19 @@ export default function ArticleDetailScreen() {
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          {title}
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>{title}</Text>
         <View style={styles.iconBtn} />
       </View>
 
       {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={[styles.articleText, { color: jarsSecondary }]}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel dui
-          vitae risus vulputate convallis. Sed quis lacus non turpis ullamcorper
-          cursus. In hac habitasse platea dictumst. Duis nec hendrerit nunc.
-          Pellentesque habitant morbi tristique senectus et netus et malesuada
-          fames ac turpis egestas. Donec sit amet sapien sed nisi luctus
-          ullamcorper. Maecenas quis ex nec sapien tincidunt mollis. Nulla
-          facilisi. Curabitur ultrices sem eu tortor tincidunt, quis consequat
-          metus suscipit.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel dui vitae risus vulputate
+          convallis. Sed quis lacus non turpis ullamcorper cursus. In hac habitasse platea dictumst.
+          Duis nec hendrerit nunc. Pellentesque habitant morbi tristique senectus et netus et
+          malesuada fames ac turpis egestas. Donec sit amet sapien sed nisi luctus ullamcorper.
+          Maecenas quis ex nec sapien tincidunt mollis. Nulla facilisi. Curabitur ultrices sem eu
+          tortor tincidunt, quis consequat metus suscipit.
         </Text>
       </ScrollView>
     </SafeAreaView>

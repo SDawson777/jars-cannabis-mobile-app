@@ -12,28 +12,18 @@ import {
   Platform,
 } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type EduNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'EducationalGreenhouse'
->;
+type EduNavProp = NativeStackNavigationProp<RootStackParamList, 'EducationalGreenhouse'>;
 
 export default function EducationalGreenhouseScreen() {
   const navigation = useNavigation<EduNavProp>();
@@ -44,11 +34,7 @@ export default function EducationalGreenhouseScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const ARTICLES = [
     { id: '1', title: 'Understanding Terpenes' },
@@ -75,9 +61,7 @@ export default function EducationalGreenhouseScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Greenhouse
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Greenhouse</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -91,9 +75,7 @@ export default function EducationalGreenhouseScreen() {
             onPress={() => openArticle(item.title)}
             android_ripple={{ color: `${jarsSecondary}20` }}
           >
-            <Text style={[styles.title, { color: jarsPrimary }]}>
-              {item.title}
-            </Text>
+            <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>
             <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}

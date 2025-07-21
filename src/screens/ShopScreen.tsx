@@ -19,17 +19,11 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type ShopNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ShopScreen'
->;
+type ShopNavProp = NativeStackNavigationProp<RootStackParamList, 'ShopScreen'>;
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
@@ -51,11 +45,7 @@ export default function ShopScreen() {
 
   // dynamic background
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   // glow for product cards
   const glowStyle =
@@ -68,16 +58,16 @@ export default function ShopScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
-  const handleProduct = (product: typeof sampleProducts[0]) => {
+  const handleProduct = (product: (typeof sampleProducts)[0]) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('ProductDetails', { product });
@@ -92,21 +82,13 @@ export default function ShopScreen() {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
-            style={[
-              styles.card,
-              { borderColor: jarsPrimary, backgroundColor: '#FFF' },
-              glowStyle,
-            ]}
+            style={[styles.card, { borderColor: jarsPrimary, backgroundColor: '#FFF' }, glowStyle]}
             onPress={() => handleProduct(item)}
             android_ripple={{ color: '#EEE' }}
           >
             <Image source={item.image} style={styles.image} />
-            <Text style={[styles.name, { color: jarsPrimary }]}>
-              {item.name}
-            </Text>
-            <Text style={[styles.price, { color: jarsSecondary }]}>
-              ${item.price.toFixed(2)}
-            </Text>
+            <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
+            <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
           </Pressable>
         )}
       />

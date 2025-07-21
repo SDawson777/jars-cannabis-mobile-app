@@ -20,26 +20,15 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type AddAddressNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'AddAddress'
->;
+type AddAddressNavProp = NativeStackNavigationProp<RootStackParamList, 'AddAddress'>;
 
 export default function AddAddressScreen() {
   const navigation = useNavigation<AddAddressNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const [label, setLabel] = useState('');
   const [line1, setLine1] = useState('');
@@ -52,11 +41,7 @@ export default function AddAddressScreen() {
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const glowStyle =
     colorTemp === 'warm'
@@ -68,14 +53,14 @@ export default function AddAddressScreen() {
           elevation: 6,
         }
       : colorTemp === 'cool'
-      ? {
-          shadowColor: '#00A4FF',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 6,
-        }
-      : {};
+        ? {
+            shadowColor: '#00A4FF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
 
   const handleBack = () => {
     hapticLight();
@@ -101,9 +86,7 @@ export default function AddAddressScreen() {
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>
-          Add Address
-        </Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Add Address</Text>
         <View style={styles.iconBtn} />
       </View>
       <View style={styles.form}>
@@ -117,15 +100,12 @@ export default function AddAddressScreen() {
           <View key={lbl}>
             <Text style={[styles.label, { color: jarsSecondary }]}>{lbl}</Text>
             <TextInput
-              style={[
-                styles.input,
-                { borderColor: jarsSecondary, color: jarsPrimary },
-              ]}
+              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
               placeholder={lbl}
               placeholderTextColor={jarsSecondary}
               keyboardType={keyboard as any}
               value={value}
-              onChangeText={(t) => {
+              onChangeText={t => {
                 hapticLight();
                 setter(t);
               }}

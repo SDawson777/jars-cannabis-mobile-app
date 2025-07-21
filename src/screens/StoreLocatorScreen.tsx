@@ -18,17 +18,11 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type LocatorNavProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'StoreLocator'
->;
+type LocatorNavProp = NativeStackNavigationProp<RootStackParamList, 'StoreLocator'>;
 
 const STORES = [
   { id: '1', name: 'Jars Downtown', address: '123 Main St, Detroit, MI' },
@@ -38,23 +32,14 @@ const STORES = [
 
 export default function StoreLocatorScreen() {
   const navigation = useNavigation<LocatorNavProp>();
-  const {
-    colorTemp,
-    jarsPrimary,
-    jarsSecondary,
-    jarsBackground,
-  } = useContext(ThemeContext);
+  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
   const bgColor =
-    colorTemp === 'warm'
-      ? '#FAF8F4'
-      : colorTemp === 'cool'
-      ? '#F7F9FA'
-      : jarsBackground;
+    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const handleBack = () => {
     hapticLight();
@@ -62,7 +47,7 @@ export default function StoreLocatorScreen() {
     navigation.goBack();
   };
 
-  const handleSelectStore = (store: typeof STORES[0]) => {
+  const handleSelectStore = (store: (typeof STORES)[0]) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('StoreDetails', { store });
@@ -75,9 +60,7 @@ export default function StoreLocatorScreen() {
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.title, { color: jarsPrimary }]}>
-          Store Locator
-        </Text>
+        <Text style={[styles.title, { color: jarsPrimary }]}>Store Locator</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -93,12 +76,8 @@ export default function StoreLocatorScreen() {
             onPress={() => handleSelectStore(item)}
           >
             <View>
-              <Text style={[styles.storeName, { color: jarsPrimary }]}>
-                {item.name}
-              </Text>
-              <Text style={[styles.storeAddress, { color: jarsSecondary }]}>
-                {item.address}
-              </Text>
+              <Text style={[styles.storeName, { color: jarsPrimary }]}>{item.name}</Text>
+              <Text style={[styles.storeAddress, { color: jarsSecondary }]}>{item.address}</Text>
             </View>
           </Pressable>
         )}

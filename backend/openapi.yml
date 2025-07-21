@@ -3,21 +3,53 @@ info:
   title: JARS Mobile App Phase 4 API
   version: 1.0.0
   description: |
-    Defines the Phase 4 vanguard endpoints for Awards, Data-Transparency export, and Accessibility preferences.
+    Defines the Phase 4 endpoints for Awards, Data-Transparency export, and Accessibility preferences.
 servers:
-  - url: https://<YOUR_MOCK_SERVER_URL>
-    description: Postman mock server URL (replace after you create your mock)
+  - url: https://expert-spoon-x54gvp656j4xhvwqw-4010.app.github.dev/
+    description: Stoplight mock server URL (replace after you create your mock)
+
 paths:
+  /:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+
   /awards:
     get:
-      summary: List all earned awards/badges
+      summary: List all awards
       tags:
         - Awards
       responses:
-        '200':
-          description: An array of award objects
+        "200":
+          description: OK
           content:
             application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    iconUrl:
+                      type: string
+                    earnedDate:
+                      type: string
+                      format: date
               example:
                 - id: "badge-1"
                   title: "First Purchase"
@@ -138,11 +170,13 @@ paths:
                 textSize: "medium"
                 colorContrast: "high"
                 animationsEnabled: false
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
 security:
-  - bearerAuth:
+  - bearerAuth: []
