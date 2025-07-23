@@ -19,3 +19,7 @@ yarn.lock
 .env
 .env.*
 !.env.example
+
+# Firebase logs
+firebase-debug.log
+firestore-debug.log
