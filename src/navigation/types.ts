@@ -17,6 +17,8 @@ export type RootStackParamList = {
   OrderHistory: undefined;
   OrderDetails: { order: any };
   StoreLocator: undefined;
+  StoreLocatorMap: undefined;
+  StoreLocatorList: undefined;
   StoreDetails: { store: any };
   Profile: undefined;
   EditProfile: { profile?: any };
@@ -43,4 +45,7 @@ export type RootStackParamList = {
   Awards: undefined;
   /** New Legal route */
   Legal: undefined;
+  MyJars: undefined;
+  JournalEntry: { item: import('../@types/jars').StashItem };
+  MyJarsInsights: undefined;
 };
