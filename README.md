@@ -68,7 +68,7 @@ npm install
 3. Setup the backend
 
 cd backend
-cp .env.example .env # Add your SENTRY_DSN, etc. (see below)
+cp .env.example .env # Add your SENTRY_DSN, etc. (see /backend/.env.example and below)
 npm install
 npm run build
 npm run dev # Runs backend API at http://localhost:3000
@@ -118,7 +118,7 @@ Just connect repo, use default build settings.
 
 ⚙️ Environment Variables
 
-Backend (/backend/.env):
+Backend (/backend/.env – see /backend/.env.example for defaults):
 
 # Sentry DSN (error monitoring)
 
