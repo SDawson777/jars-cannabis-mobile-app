@@ -24,6 +24,8 @@ import OrderTrackingScreen from './src/screens/OrderTrackingScreen';
 import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
 import OrderDetailsScreen from './src/screens/OrderDetailsScreen';
 import StoreLocatorScreen from './src/screens/StoreLocatorScreen';
+import StoreLocatorMapScreen from './src/screens/StoreLocatorMapScreen';
+import StoreLocatorListScreen from './src/screens/StoreLocatorListScreen';
 import StoreDetailsScreen from './src/screens/StoreDetailsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
@@ -48,6 +50,9 @@ import DataTransparencyScreen from './src/screens/DataTransparencyScreen';
 import AccessibilitySettingsScreen from './src/screens/AccessibilitySettingsScreen';
 import AwardsScreen from './src/screens/AwardsScreen';
 import LegalScreen from './src/screens/LegalScreen';
+import MyJarsScreen from './src/screens/MyJarsScreen';
+import JournalEntryScreen from './src/screens/JournalEntryScreen';
+import MyJarsInsightsScreen from './src/screens/MyJarsInsightsScreen';
 
 const Stack = createNativeStackNavigator(); // no generic
 const queryClient = new QueryClient();
@@ -75,6 +80,8 @@ export default function App() {
             <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
             <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
             <Stack.Screen name="StoreLocator" component={StoreLocatorScreen} />
+            <Stack.Screen name="StoreLocatorMap" component={StoreLocatorMapScreen} />
+            <Stack.Screen name="StoreLocatorList" component={StoreLocatorListScreen} />
             <Stack.Screen name="StoreDetails" component={StoreDetailsScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
@@ -99,6 +106,9 @@ export default function App() {
             <Stack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} />
             <Stack.Screen name="Awards" component={AwardsScreen} />
             <Stack.Screen name="Legal" component={LegalScreen} />
+            <Stack.Screen name="MyJars" component={MyJarsScreen} />
+            <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
+            <Stack.Screen name="MyJarsInsights" component={MyJarsInsightsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </QueryClientProvider>
