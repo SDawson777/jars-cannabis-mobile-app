@@ -24,6 +24,37 @@ paths:
                     type: string
                     example: healthy
 
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required:
+                - email
+                - password
+            example:
+              email: user@example.com
+              password: secret
+      responses:
+        '200':
+          description: JWT token
+          content:
+            application/json:
+              example:
+                token: <jwt>
+
   /awards:
     get:
       summary: List all awards
