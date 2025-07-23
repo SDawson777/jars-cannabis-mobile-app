@@ -112,6 +112,17 @@ export default function AgeVerification() {
           <ChevronLeft color="#FFF" size={20} style={{ marginRight: 8 }} />
           <Text style={styles.enterText}>Back to Start</Text>
         </Pressable>
+        <View style={styles.footer}>
+          <Text style={[styles.disclaimer, { color: jarsSecondary }]}>Questions?</Text>
+          <Pressable
+            onPress={() => {
+              hapticLight();
+              navigation.navigate('Legal');
+            }}
+          >
+            <Text style={[styles.link, { color: jarsPrimary }]}>See our policies</Text>
+          </Pressable>
+        </View>
       </SafeAreaView>
     );
   }
@@ -149,6 +160,20 @@ export default function AgeVerification() {
       >
         <Text style={styles.enterText}>Enter</Text>
       </Pressable>
+
+      <View style={styles.footer}>
+        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
+          By tapping Enter you confirm you are 21+ and agree to our
+        </Text>
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            navigation.navigate('Legal');
+          }}
+        >
+          <Text style={[styles.link, { color: jarsPrimary }]}>Terms & Privacy</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
@@ -200,5 +225,19 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: '600',
+  },
+  footer: {
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  disclaimer: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  link: {
+    fontSize: 12,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

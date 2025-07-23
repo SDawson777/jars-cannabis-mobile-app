@@ -40,8 +40,7 @@ export async function getAccessibilitySettings(req: Request, res: Response) {
  * Creates or updates the user’s accessibility settings.
  */
 export async function updateAccessibilitySettings(req: Request, res: Response) {
-  const { userId, textSize, colorContrast, animationsEnabled } =
-    req.body as UpdateBody;
+  const { userId, textSize, colorContrast, animationsEnabled } = req.body as UpdateBody;
 
   const updated = await prisma.accessibilitySetting.upsert({
     where: { userId },

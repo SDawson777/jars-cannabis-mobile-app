@@ -16,10 +16,7 @@ interface RequestExportBody {
  * Kick off a new data export for the given user.
  * Responds with { exportId, status }.
  */
-export async function requestExport(
-  req: Request<{}, any, RequestExportBody>,
-  res: Response
-) {
+export async function requestExport(req: Request<{}, any, RequestExportBody>, res: Response) {
   const { userId } = req.body;
   const exportId = uuidv4();
 
@@ -34,9 +31,7 @@ export async function requestExport(
 
     return res.json({ exportId, status: 'pending' });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: (err as Error).message });
+    return res.status(500).json({ error: (err as Error).message });
   }
 }
 
@@ -44,10 +39,7 @@ export async function requestExport(
  * GET /api/data-transparency/export/:exportId
  * Return the current status (and downloadUrl if ready).
  */
-export async function getExportStatus(
-  req: Request<{ exportId: string }>,
-  res: Response
-) {
+export async function getExportStatus(req: Request<{ exportId: string }>, res: Response) {
   const { exportId } = req.params;
 
   try {
@@ -56,16 +48,12 @@ export async function getExportStatus(
     });
 
     if (!record) {
-      return res
-        .status(404)
-        .json({ error: 'Export not found' });
+      return res.status(404).json({ error: 'Export not found' });
     }
 
     return res.json(record);
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: (err as Error).message });
+    return res.status(500).json({ error: (err as Error).message });
   }
 }
 
@@ -73,10 +61,7 @@ export async function getExportStatus(
  * DELETE /api/data-transparency/export/:exportId
  * Cancel (delete) a pending export.
  */
-export async function cancelExport(
-  req: Request<{ exportId: string }>,
-  res: Response
-) {
+export async function cancelExport(req: Request<{ exportId: string }>, res: Response) {
   const { exportId } = req.params;
 
   try {
@@ -85,8 +70,6 @@ export async function cancelExport(
     });
     return res.sendStatus(204);
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: (err as Error).message });
+    return res.status(500).json({ error: (err as Error).message });
   }
 }
