@@ -29,11 +29,7 @@ export async function login(req: Request, res: Response) {
   }
 
   // Sign a JWT
-  const token = jwt.sign(
-    { userId: user.id },
-    process.env.JWT_SECRET!,
-    { expiresIn: '1h' }
-  );
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
   res.json({ token });
 }

@@ -104,6 +104,20 @@ export default function SignUpScreen() {
         <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>
 
+      <View style={styles.policy}>
+        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
+          By creating an account you agree to our
+        </Text>
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            navigation.navigate('Legal');
+          }}
+        >
+          <Text style={[styles.linkText, { color: jarsPrimary }]}>Terms & Privacy</Text>
+        </Pressable>
+      </View>
+
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: jarsSecondary }]}>Already have an account?</Text>
         <Pressable
@@ -163,4 +177,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  policy: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  disclaimer: { fontSize: 12, textAlign: 'center', marginBottom: 4 },
 });

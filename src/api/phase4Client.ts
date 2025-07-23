@@ -2,7 +2,7 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { getAuthToken } from '../utils/auth';
 
-const BASE_URL = 'http://127.0.0.1:4010';
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 function createPhase4Client(): AxiosInstance {
   const client = axios.create({

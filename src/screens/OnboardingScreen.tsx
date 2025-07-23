@@ -79,6 +79,20 @@ export default function OnboardingScreen() {
         <Text style={styles.nextText}>Get Started</Text>
         <ChevronRight color="#FFF" size={24} />
       </Pressable>
+
+      <View style={styles.footer}>
+        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
+          By continuing you agree to our
+        </Text>
+        <Pressable
+          onPress={() => {
+            hapticLight();
+            navigation.navigate('Legal');
+          }}
+        >
+          <Text style={[styles.link, { color: jarsPrimary }]}>Terms & Privacy</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
@@ -118,5 +132,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginRight: 8,
+  },
+  footer: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  disclaimer: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  link: {
+    fontSize: 12,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

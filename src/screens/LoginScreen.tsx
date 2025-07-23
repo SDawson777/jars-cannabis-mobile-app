@@ -155,6 +155,20 @@ export default function LoginScreen() {
             <Text style={styles.buttonText}>Log In</Text>
           )}
         </Pressable>
+
+        <View style={styles.footer}>
+          <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
+            By logging in you agree to our
+          </Text>
+          <Pressable
+            onPress={() => {
+              hapticLight();
+              navigation.navigate('Legal');
+            }}
+          >
+            <Text style={[styles.linkText, { color: jarsPrimary }]}>Terms & Privacy</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -181,4 +195,10 @@ const styles = StyleSheet.create({
   button: { paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
   error: { marginBottom: 12, textAlign: 'center' },
+  footer: {
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  disclaimer: { fontSize: 12, textAlign: 'center', marginBottom: 4 },
+  linkText: { fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' },
 });

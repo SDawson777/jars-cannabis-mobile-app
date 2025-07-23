@@ -136,6 +136,10 @@ PORT=3000
 
 DATABASE_URL=your-postgres-url
 
+Frontend (/.env):
+
+EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
+
 🧪 Testing & Quality
 
 Lint:npm run lint (ESLint)
