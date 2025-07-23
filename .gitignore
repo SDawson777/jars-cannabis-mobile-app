@@ -18,3 +18,4 @@ yarn.lock
 # Environment
 .env
 .env.*
+!.env.example
