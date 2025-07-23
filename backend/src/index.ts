@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/node';
 import './firebaseAdmin';
 import express, { Request, Response, NextFunction } from 'express';
 import { phase4Router } from './routes/phase4';
+import { authRouter } from './routes/auth';
 import SentryInit from './utils/sentry'; // triggers Sentry.init()
 
 const app = express();
@@ -15,6 +16,7 @@ app.get('/', (_req, res) => {
   res.json({ status: 'healthy' });
 });
 
+app.use('/', authRouter);
 app.use('/', phase4Router);
 
 // Type-safe Sentry error handler (always after all routes)
