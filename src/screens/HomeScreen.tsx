@@ -28,6 +28,8 @@ import {
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import ForYouTodayCard from '../components/ForYouTodayCard';
+import { useForYouToday } from '../hooks/useForYouToday';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -59,6 +61,7 @@ const ways = [
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { data: forYou } = useForYouToday('1', '1');
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -127,6 +130,14 @@ export default function HomeScreen() {
             <Text style={[styles.heroBtnText, { color: jarsPrimary }]}>Shop Deli</Text>
           </Pressable>
         </View>
+
+        {forYou && (
+          <ForYouTodayCard
+            data={forYou}
+            onSelectProduct={id => navigation.navigate('ProductDetails', { product: { id } })}
+            onSeeAll={() => navigation.navigate('ShopScreen')}
+          />
+        )}
 
         {/* Categories */}
         <View style={styles.sectionHeader}>

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // normal import (no `import type`)
 import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { LoyaltyProvider } from './src/context/LoyaltyContext';
 
 import SplashScreen from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
@@ -24,6 +25,8 @@ import OrderTrackingScreen from './src/screens/OrderTrackingScreen';
 import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
 import OrderDetailsScreen from './src/screens/OrderDetailsScreen';
 import StoreLocatorScreen from './src/screens/StoreLocatorScreen';
+import StoreLocatorMapScreen from './src/screens/StoreLocatorMapScreen';
+import StoreLocatorListScreen from './src/screens/StoreLocatorListScreen';
 import StoreDetailsScreen from './src/screens/StoreDetailsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
@@ -45,63 +48,75 @@ import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
 import CommunityGardenScreen from './src/screens/CommunityGardenScreen';
 import ConciergeChatScreen from './src/screens/ConciergeChatScreen';
 import DataTransparencyScreen from './src/screens/DataTransparencyScreen';
+import PrivacyIntelligenceScreen from './src/screens/PrivacyIntelligenceScreen';
 import AccessibilitySettingsScreen from './src/screens/AccessibilitySettingsScreen';
 import AwardsScreen from './src/screens/AwardsScreen';
 import LegalScreen from './src/screens/LegalScreen';
+import MyJarsScreen from './src/screens/MyJarsScreen';
+import JournalEntryScreen from './src/screens/JournalEntryScreen';
+import MyJarsInsightsScreen from './src/screens/MyJarsInsightsScreen';
 
 const Stack = createNativeStackNavigator(); // no generic
 const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="SplashScreen" component={SplashScreen} />
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-            <Stack.Screen name="AgeVerification" component={AgeVerification} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-            <Stack.Screen name="StoreSelection" component={StoreSelection} />
-            <Stack.Screen name="HomeScreen" component={HomeScreen} />
-            <Stack.Screen name="ShopScreen" component={ShopScreen} />
-            <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-            <Stack.Screen name="CartScreen" component={CartScreen} />
-            <Stack.Screen name="Checkout" component={CheckoutScreen} />
-            <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
-            <Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
-            <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-            <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
-            <Stack.Screen name="StoreLocator" component={StoreLocatorScreen} />
-            <Stack.Screen name="StoreDetails" component={StoreDetailsScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-            <Stack.Screen name="Favorites" component={FavoritesScreen} />
-            <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
-            <Stack.Screen name="AddAddress" component={AddAddressScreen} />
-            <Stack.Screen name="EditAddress" component={EditAddressScreen} />
-            <Stack.Screen name="SavedPayments" component={SavedPaymentsScreen} />
-            <Stack.Screen name="AddPayment" component={AddPaymentScreen} />
-            <Stack.Screen name="EditPayment" component={EditPaymentScreen} />
-            <Stack.Screen name="LoyaltyProgram" component={LoyaltyProgramDetailsScreen} />
-            <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
-            <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
-            <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
-            <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
-            <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-            <Stack.Screen name="EducationalGreenhouse" component={EducationalGreenhouseScreen} />
-            <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
-            <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
-            <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
-            <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />
-            <Stack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} />
-            <Stack.Screen name="Awards" component={AwardsScreen} />
-            <Stack.Screen name="Legal" component={LegalScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <LoyaltyProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreen} />
+              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+              <Stack.Screen name="AgeVerification" component={AgeVerification} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+              <Stack.Screen name="StoreSelection" component={StoreSelection} />
+              <Stack.Screen name="HomeScreen" component={HomeScreen} />
+              <Stack.Screen name="ShopScreen" component={ShopScreen} />
+              <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+              <Stack.Screen name="CartScreen" component={CartScreen} />
+              <Stack.Screen name="Checkout" component={CheckoutScreen} />
+              <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
+              <Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
+              <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+              <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+              <Stack.Screen name="StoreLocator" component={StoreLocatorScreen} />
+              <Stack.Screen name="StoreLocatorMap" component={StoreLocatorMapScreen} />
+              <Stack.Screen name="StoreLocatorList" component={StoreLocatorListScreen} />
+              <Stack.Screen name="StoreDetails" component={StoreDetailsScreen} />
+              <Stack.Screen name="Profile" component={ProfileScreen} />
+              <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+              <Stack.Screen name="Favorites" component={FavoritesScreen} />
+              <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
+              <Stack.Screen name="AddAddress" component={AddAddressScreen} />
+              <Stack.Screen name="EditAddress" component={EditAddressScreen} />
+              <Stack.Screen name="SavedPayments" component={SavedPaymentsScreen} />
+              <Stack.Screen name="AddPayment" component={AddPaymentScreen} />
+              <Stack.Screen name="EditPayment" component={EditPaymentScreen} />
+              <Stack.Screen name="LoyaltyProgram" component={LoyaltyProgramDetailsScreen} />
+              <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
+              <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
+              <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
+              <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
+              <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+              <Stack.Screen name="EducationalGreenhouse" component={EducationalGreenhouseScreen} />
+              <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+              <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
+              <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
+              <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />
+              <Stack.Screen name="PrivacyIntelligence" component={PrivacyIntelligenceScreen} />
+              <Stack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} />
+              <Stack.Screen name="Awards" component={AwardsScreen} />
+              <Stack.Screen name="Legal" component={LegalScreen} />
+              <Stack.Screen name="MyJars" component={MyJarsScreen} />
+              <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
+              <Stack.Screen name="MyJarsInsights" component={MyJarsInsightsScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </LoyaltyProvider>
   );
 }
