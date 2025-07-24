@@ -1,9 +1,17 @@
 {
   "expo": {
+    "name": "JARS",
+    "slug": "jars-cannabis-mobile-app",
     "extra": {
       "eas": {
         "projectId": "f480819a-c0e4-430e-82bc-1a761385db05"
       }
+    },
+    "ios": {
+      "bundleIdentifier": "com.jars.app"
+    },
+    "android": {
+      "package": "com.jars.android"
     }
   }
 }

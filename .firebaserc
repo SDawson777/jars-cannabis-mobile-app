@@ -1,7 +1,5 @@
 {
   "projects": {
     "default": "jars-mobile-app"
-  },
-  "targets": {},
-  "etags": {}
+  }
 }

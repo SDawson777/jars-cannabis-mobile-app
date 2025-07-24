@@ -41,6 +41,7 @@ export type RootStackParamList = {
   CommunityGarden: undefined;
   ConciergeChat: undefined;
   DataTransparency: undefined;
+  PrivacyIntelligence: undefined; // no param change, just for completeness
   AccessibilitySettings: undefined;
   Awards: undefined;
   /** New Legal route */
