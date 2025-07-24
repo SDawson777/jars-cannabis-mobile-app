@@ -219,3 +219,12 @@ For technical support or additional services, open an issue in your private repo
 This project is plug-and-play for cannabis retail: just add your branding, API keys, and deploy.
 
 Contact for licensing, transfer, or deployment help!
+
+## Local Dev Quick-start
+
+```
+cp .env.example .env   # fill keys
+npm run dev:emulators  # Firestore/Auth/CF
+npm run dev:expo       # Expo client against local emu
+```
+

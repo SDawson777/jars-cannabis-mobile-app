@@ -1,0 +1,24 @@
+import { expectedAssets } from './expectedAssets';
+import { readdirSync, statSync } from 'fs';
+import { join } from 'path';
+
+const ASSETS_DIR = join(__dirname, '..', 'src', 'assets');
+
+function walk(dir: string): string[] {
+  return readdirSync(dir).flatMap(name => {
+    const full = join(dir, name);
+    return statSync(full).isDirectory() ? walk(full) : full;
+  });
+}
+
+const actualFiles = walk(ASSETS_DIR).map(p => p.split('/assets/')[1]);
+const missing = expectedAssets.filter(need => !actualFiles.includes(need));
+
+if (missing.length) {
+  console.error(`\n\u274C  MISSING ASSETS (${missing.length})`);
+  missing.forEach(m => console.error('   \u2022 ' + m));
+  console.error('\nAdd the files above to /assets before shipping.\n');
+  process.exit(1);
+} else {
+  console.log('\u2705  All spec assets are present. Good to go!');
+}
