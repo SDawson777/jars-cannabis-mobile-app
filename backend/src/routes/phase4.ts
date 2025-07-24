@@ -1,6 +1,6 @@
 // backend/src/routes/phase4.ts
 import { Router } from 'express';
-import admin from 'firebase-admin';
+import admin from '@server/firebaseAdmin';
 import { db } from '../firebaseAdmin';
 
 export const phase4Router = Router();
@@ -119,7 +119,7 @@ phase4Router.patch('/accessibility-settings', async (req, res) => {
       {
         ...updates,
         /* server timestamp */
-        updatedAt: (await import('firebase-admin')).firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
