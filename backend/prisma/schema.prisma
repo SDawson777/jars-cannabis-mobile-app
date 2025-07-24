@@ -32,6 +32,8 @@ model Award {
   user        User     @relation(fields: [userId], references: [id])
   title       String
   description String
+  status     String      @default("PENDING")
+  redeemedAt DateTime?
   iconUrl     String
   earnedDate  DateTime
 }
