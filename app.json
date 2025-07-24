@@ -12,6 +12,11 @@
     },
     "android": {
       "package": "com.jars.dev.android"
+
+      "bundleIdentifier": "com.jars.app"
+    },
+    "android": {
+      "package": "com.jars.android"
     }
   }
 }
