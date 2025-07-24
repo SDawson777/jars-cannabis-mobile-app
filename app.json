@@ -8,6 +8,11 @@
       }
     },
     "ios": {
+      "bundleIdentifier": "com.jarss.dev"
+    },
+    "android": {
+      "package": "com.jars.dev.android"
+
       "bundleIdentifier": "com.jars.app"
     },
     "android": {

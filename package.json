@@ -16,6 +16,8 @@
     "format": "prettier --check \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",
     "check-assets": "npx ts-node --esm scripts/checkAssets.ts",
+    "firebase:check": "ts-node scripts/verifyFirebaseSetup.ts",
+    "test:e2e:firebase": "jest tests/firebase.e2e.ts --runInBand",
     "dev:expo": "expo start",
     "dev:server": "nodemon src/index.ts",
     "dev:emulators": "firebase emulators:start --only firestore,functions,auth",
