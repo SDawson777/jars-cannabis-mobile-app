@@ -15,6 +15,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import PointsProgressBar from '../components/PointsProgressBar';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -55,6 +56,7 @@ export default function LoyaltyProgramDetailsScreen() {
         <Text style={[styles.description, { color: jarsPrimary }]}>
           You’re only 20 points away from your next reward!
         </Text>
+        <PointsProgressBar current={120} target={140} />
         <Pressable
           style={[styles.button, { backgroundColor: jarsSecondary }]}
           onPress={() => {

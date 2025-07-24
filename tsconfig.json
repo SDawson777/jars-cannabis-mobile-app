@@ -3,7 +3,10 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "jsx": "react-native",
     "allowJs": true,
     "noEmit": true,
@@ -12,8 +15,24 @@
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@server/*": [
+        "server/*"
+      ]
+    }
   },
-  "include": ["src/**/*", "backend/src/**/*", "backend/src/routes/phase4.ts"],
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
+  "include": [
+    "src/**/*",
+    "backend/src/**/*",
+    "backend/src/routes/phase4.ts",
+    "server/**/*",
+    "functions/src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
 }
