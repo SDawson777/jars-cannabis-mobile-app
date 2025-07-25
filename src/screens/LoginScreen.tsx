@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { AuthContext, User } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { useMutation } from '@tanstack/react-query';
 import { phase4Client } from '../api/phase4Client';
 import { hapticLight, hapticMedium } from '../utils/haptic';
@@ -31,13 +31,13 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 type LoginNavProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 interface AuthResponse {
   token: string;
-  user: User;
+  user: any;
 }
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { setToken, setUser } = useContext(AuthContext);
+  const { setToken } = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -77,11 +77,10 @@ export default function LoginScreen() {
       });
       return data;
     },
-    onSuccess: async ({ token, user }) => {
+    onSuccess: async ({ token }) => {
       hapticMedium();
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       await setToken(token);
-      await setUser(user);
       navigation.replace('HomeScreen');
     },
     onError: err => {

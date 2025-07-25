@@ -1,23 +1,26 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode } from 'react';
+import { useLoyaltyStatus } from '../api/hooks/useLoyaltyStatus';
 
 interface LoyaltyContextValue {
-  points: number;
-  addPoints: (pts: number) => void;
+  data: any;
+  isLoading: boolean;
+  isError: boolean;
+  error: unknown;
 }
 
 export const LoyaltyContext = createContext<LoyaltyContextValue>({
-  points: 0,
-  addPoints: () => {},
+  data: undefined,
+  isLoading: false,
+  isError: false,
+  error: undefined,
 });
 
 export function LoyaltyProvider({ children }: { children: ReactNode }) {
-  const [points, setPoints] = useState(0);
-
-  const addPoints = (pts: number) => {
-    setPoints(prev => prev + pts);
-  };
+  const { data, isLoading, isError, error } = useLoyaltyStatus();
 
   return (
-    <LoyaltyContext.Provider value={{ points, addPoints }}>{children}</LoyaltyContext.Provider>
+    <LoyaltyContext.Provider value={{ data, isLoading, isError, error }}>
+      {children}
+    </LoyaltyContext.Provider>
   );
 }

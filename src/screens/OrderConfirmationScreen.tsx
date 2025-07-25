@@ -15,7 +15,6 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { LoyaltyContext } from '../context/LoyaltyContext';
 import { hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
@@ -28,7 +27,6 @@ type OrderConfirmationNavProp = NativeStackNavigationProp<RootStackParamList, 'O
 export default function OrderConfirmationScreen() {
   const navigation = useNavigation<OrderConfirmationNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { addPoints } = useContext(LoyaltyContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -60,7 +58,6 @@ export default function OrderConfirmationScreen() {
   const handleHome = () => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    addPoints(120);
     navigation.replace('HomeScreen');
   };
 
