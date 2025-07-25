@@ -1,5 +1,5 @@
 // src/screens/ProductDetailScreen.tsx
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -18,6 +18,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { TerpeneWheel } from '../terpene_wheel/components/TerpeneWheel';
+import TerpeneInfoModal from '../components/TerpeneInfoModal';
+import { TerpeneInfo, TERPENES } from '../terpene_wheel/data/terpenes';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -32,6 +35,7 @@ export default function ProductDetailScreen() {
   const route = useRoute<ProductDetailsRouteProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const product = route.params.product;
+  const [selectedTerpene, setSelectedTerpene] = useState<TerpeneInfo | null>(null);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -96,7 +100,16 @@ export default function ProductDetailScreen() {
         <Text style={[styles.name, { color: jarsPrimary }]}>{product.name}</Text>
         <Text style={[styles.price, { color: jarsSecondary }]}>${product.price.toFixed(2)}</Text>
         <Text style={[styles.description, { color: jarsSecondary }]}>{product.description}</Text>
+
+        <View style={styles.wheelSection}>
+          <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>
+            Terpene Profile &amp; Genetics
+          </Text>
+          <TerpeneWheel onSelect={setSelectedTerpene} data={product.terpenes ?? TERPENES} />
+        </View>
       </ScrollView>
+
+      <TerpeneInfoModal terpene={selectedTerpene} onClose={() => setSelectedTerpene(null)} />
 
       <Pressable
         style={[styles.cartBtn, { backgroundColor: jarsPrimary }, glowStyle]}
@@ -122,6 +135,8 @@ const styles = StyleSheet.create({
   name: { fontSize: 24, fontWeight: '700', marginBottom: 8 },
   price: { fontSize: 20, fontWeight: '600', marginBottom: 12 },
   description: { fontSize: 16, textAlign: 'center', lineHeight: 22 },
+  wheelSection: { marginTop: 24, alignItems: 'center' },
+  sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
   cartBtn: {
     flexDirection: 'row',
     alignItems: 'center',

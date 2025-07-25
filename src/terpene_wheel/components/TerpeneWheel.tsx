@@ -15,6 +15,11 @@ const CY = SIZE / 2;
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 
+type Props = { onSelect: (t: TerpeneInfo) => void; data?: TerpeneInfo[] };
+
+export const TerpeneWheel: React.FC<Props> = ({ onSelect, data = TERPENES }) => {
+  const angleStep = 360 / data.length;
+
 type Props = {
   data?: TerpeneInfo[];
   onSelect: (t: TerpeneInfo) => void;
@@ -22,7 +27,7 @@ type Props = {
 
 export const TerpeneWheel: React.FC<Props> = ({ data = TERPENES, onSelect }) => {
   const angleStep = 360 / data.length;
-=======
+
 export type DisplayMode = 'full' | 'compact';
 
 interface Props {
@@ -51,6 +56,8 @@ export const TerpeneWheel: React.FC<Props> = ({
 
       {data.map((_, i) => {
 
+      {data.map((_, i) => {
+
       {terpenes.map((_, i) => {
 
         const a = ((i * angleStep - 90) * Math.PI) / 180;
@@ -69,7 +76,6 @@ export const TerpeneWheel: React.FC<Props> = ({
       })}
 
       {/* Segments */}
-
       {data.map((t, i) => (
         <TerpeneSegment key={t.key} index={i} info={t} angleStep={angleStep} onSelect={onSelect} />
 
