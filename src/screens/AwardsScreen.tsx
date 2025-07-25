@@ -1,5 +1,4 @@
-// src/screens/AwardsScreen.tsx
-
+// src/screens/AwardsScreen.tsxg
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
@@ -21,9 +20,12 @@ import {
 } from 'react-native';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { trackEvent } from '../utils/analytics';
+import { useRedeemReward } from '../api/hooks/useRedeemReward';
 import { ChevronLeft, Settings } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -58,35 +60,37 @@ export default function AwardsScreen() {
   const navigation = useNavigation<AwardsNavProp>();
 
   // Fetch awards with React Query
-  const {
-    data: awards,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery<Award[], Error>({
+  const { data, isLoading, isError, error, refetch } = useQuery<
+    { user: { name: string; points: number; tier: string; progress: number }; awards: Award[] },
+    Error
+  >({
     queryKey: ['awards'],
     queryFn: async () => {
-      const res = await phase4Client.get<Award[]>('/awards');
+      const res = await phase4Client.get('/awards');
       return res.data;
     },
   });
+
+  const awards = data?.awards ?? [];
 
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const [pulse] = useState(new Animated.Value(1));
+  const confettiRef = useRef<ConfettiCannon | null>(null);
   const [selectedTerpene, setSelectedTerpene] = useState<TerpeneInfo | null>(null);
   const soundRef = useRef<AnimatedSoundPlayerHandle>(null);
 
-  const user = { name: 'Jane Doe', tier: 'Gold', points: 420, progress: 0.65 };
+  const user = data?.user ?? { name: '---', tier: '', points: 0, progress: 0 };
+  const progressAnim = useRef(new Animated.Value(user.progress)).current;
   const REWARDS = [
     { id: '1', title: '10% Off', points: 100, image: '' },
     { id: '2', title: 'Free Pre-roll', points: 200, image: '' },
     { id: '3', title: 'VIP Event', points: 500, image: '' },
   ];
 
+  const prevAwardsCount = useRef(awards.length);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedTerpene, setSelectedTerpene] = useState<TerpeneInfo | null>(null);
 
@@ -107,6 +111,20 @@ export default function AwardsScreen() {
     return () => anim.stop();
   }, []);
 
+  // Animate progress bar and trigger confetti on new awards
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: user.progress,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+
+    if (awards.length > prevAwardsCount.current) {
+      confettiRef.current?.start();
+    }
+    prevAwardsCount.current = awards.length;
+  }, [user.progress, awards.length]);
+
   const handleBack = () => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -119,10 +137,13 @@ export default function AwardsScreen() {
     navigation.navigate('AppSettings');
   };
 
+  const redeemMutation = useRedeemReward();
+
   const redeemReward = (reward: (typeof REWARDS)[0]) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: handle redeem
+    trackEvent('award_item_tap', { id: reward.id });
+    redeemMutation.mutate({ id: reward.id, points: reward.points });
   };
 
   const openFaq = () => {
@@ -138,8 +159,18 @@ export default function AwardsScreen() {
 
   // Render each award item
   const renderItem = ({ item }: ListRenderItemInfo<Award>) => (
-    <View style={[styles.card, { borderColor: jarsPrimary }]}>
-      <Image source={{ uri: item.iconUrl }} style={styles.icon} />
+    <View
+      style={[styles.card, { borderColor: jarsPrimary }]}
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`${item.title}. Earned ${item.earnedDate}`}
+    >
+      <Image
+        source={{ uri: item.iconUrl }}
+        style={styles.icon}
+        accessibilityLabel={`${item.title} icon`}
+        accessible
+      />
       <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>
       <Text style={styles.desc}>{item.description}</Text>
       <Text style={styles.date}>Earned: {item.earnedDate}</Text>
@@ -176,6 +207,101 @@ export default function AwardsScreen() {
 
   // Success state
   return (
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
+        <Pressable
+          onPress={handleBack}
+          style={styles.iconBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          accessible
+        >
+          <ChevronLeft color={jarsPrimary} size={24} />
+        </Pressable>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]} accessibilityRole="header">
+          Rewards & Recognition
+        </Text>
+        <Pressable
+          onPress={openSettings}
+          style={styles.iconBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Open settings"
+          accessible
+        >
+          <Settings color={jarsPrimary} size={24} />
+        </Pressable>
+      </View>
+      <ConfettiCannon
+        ref={confettiRef}
+        count={75}
+        origin={{ x: 0, y: 0 }}
+        autoStart={false}
+        fadeOut
+      />
+
+      <ScrollView>
+        {/* Hero */}
+        <View style={styles.hero}>
+          <Text style={[styles.name, { color: jarsPrimary }]}>{user.name}</Text>
+          <Animated.Text
+            style={[styles.points, { color: jarsPrimary, transform: [{ scale: pulse }] }]}
+          >
+            {user.points} pts
+          </Animated.Text>
+          <View style={[styles.progressBar, { borderColor: jarsSecondary }]}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                {
+                  backgroundColor: jarsPrimary,
+                  width: progressAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0%', '100%'],
+                  }),
+                },
+              ]}
+            />
+          </View>
+          <Text style={[styles.tier, { color: jarsPrimary }]}>Tier: {user.tier}</Text>
+        </View>
+
+        {/* Rewards Carousel */}
+        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Available Rewards</Text>
+        <FlatList
+          data={REWARDS}
+          keyExtractor={r => r.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.carousel}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => redeemReward(item)}
+              style={[styles.rewardCard, { borderColor: jarsPrimary }]}
+              android_ripple={{ color: `${jarsPrimary}20` }}
+              accessibilityRole="button"
+              accessibilityLabel={`Redeem ${item.title}`}
+              accessible
+            >
+              {item.image ? (
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.rewardImage}
+                  accessibilityLabel={`${item.title} image`}
+                  accessible
+                />
+              ) : (
+                <View
+                  style={styles.rewardImagePlaceholder}
+                  accessibilityLabel="Placeholder image"
+                  accessible
+                />
+              )}
+              <Text style={[styles.rewardTitle, { color: jarsPrimary }]}>{item.title}</Text>
+              <Text style={styles.rewardPoints}>{item.points} pts</Text>
+            </Pressable>
+          )}
+        />
     <BottomSheetModalProvider>
       <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
         {/* Header */}
@@ -221,7 +347,7 @@ export default function AwardsScreen() {
           onClose={() => setSelectedTerpene(null)}
         />
         <AnimatedSoundPlayer ref={soundRef} source={require('../assets/rustle_leaves_swipe.mp3')} />
-=======
+
           {/* Rewards Carousel */}
           <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Available Rewards</Text>
           <FlatList
@@ -247,6 +373,20 @@ export default function AwardsScreen() {
             )}
           />
 
+
+
+        {/* FAQ Link */}
+        <Pressable
+          onPress={openFaq}
+          style={styles.linkRow}
+          accessibilityRole="button"
+          accessibilityLabel="Open Loyalty FAQs"
+          accessible
+        >
+          <Text style={[styles.linkText, { color: jarsPrimary }]}>Loyalty FAQs</Text>
+        </Pressable>
+      </ScrollView>
+    </SafeAreaView>
 
           {/* Terpene Wheel */}
           <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Exclusive Insights</Text>
