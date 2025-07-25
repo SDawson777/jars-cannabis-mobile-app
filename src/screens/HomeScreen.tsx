@@ -30,6 +30,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import ForYouTodayCard from '../components/ForYouTodayCard';
 import { useForYouToday } from '../hooks/useForYouToday';
+import { TERPENES } from '../terpene_wheel/data/terpenes';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -47,8 +48,22 @@ const categories = [
 ];
 
 const featured = [
-  { id: '1', name: 'Rainbow Rozay', price: 79.0, image: require('../assets/product1.png') },
-  { id: '2', name: 'Moonwalker OG', price: 65.0, image: require('../assets/product2.png') },
+  {
+    id: '1',
+    name: 'Rainbow Rozay',
+    price: 79.0,
+    image: require('../assets/product1.png'),
+    description: 'A flavorful hybrid with fruity notes.',
+    terpenes: TERPENES,
+  },
+  {
+    id: '2',
+    name: 'Moonwalker OG',
+    price: 65.0,
+    image: require('../assets/product2.png'),
+    description: 'Potent indica leaning strain for relaxation.',
+    terpenes: TERPENES,
+  },
 ];
 
 const ways = [
