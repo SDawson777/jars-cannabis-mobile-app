@@ -13,6 +13,12 @@ import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium } from '../utils/haptic';
 
+type Preferences = {
+  personalizedAds: boolean;
+  emailTracking: boolean;
+  shareWithPartners: boolean;
+};
+
 // Export status type
 type ExportStatus = 'pending' | 'completed' | 'failed';
 
@@ -26,6 +32,31 @@ export default function DataTransparencyScreen() {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prefs, setPrefs] = useState<Preferences | null>(null);
+  const [prefLoading, setPrefLoading] = useState<keyof Preferences | null>(null);
+
+  useEffect(() => {
+    phase4Client
+      .get<Preferences>('/profile/preferences')
+      .then(res => setPrefs(res.data))
+      .catch(e => setError((e as Error).message));
+  }, []);
+
+  const handleToggle = async (key: keyof Preferences) => {
+    if (!prefs) return;
+    const newVal = !prefs[key];
+    setPrefLoading(key);
+    try {
+      const updated = { ...prefs, [key]: newVal };
+      await phase4Client.put('/profile/preferences', updated);
+      setPrefs(updated);
+      hapticMedium();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setPrefLoading(null);
+    }
+  };
 
   // Request a data export
   const requestExport = async () => {
@@ -79,14 +110,69 @@ export default function DataTransparencyScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.content}>
+        {!prefs ? (
+          <ActivityIndicator style={styles.spinner} />
+        ) : (
+          <>
+            <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Data Preferences</Text>
+
+            <View style={styles.prefRow}>
+              <Text style={{ color: jarsPrimary }}>Personalized Ads</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Button
+                  title={prefs.personalizedAds ? 'On' : 'Off'}
+                  color={prefs.personalizedAds ? jarsPrimary : '#CCCCCC'}
+                  onPress={() => handleToggle('personalizedAds')}
+                  disabled={prefLoading !== null}
+                  accessibilityLabel="Toggle personalized ads"
+                />
+                {prefLoading === 'personalizedAds' && (
+                  <ActivityIndicator style={{ marginLeft: 8 }} />
+                )}
+              </View>
+            </View>
+
+            <View style={styles.prefRow}>
+              <Text style={{ color: jarsPrimary }}>Email Tracking</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Button
+                  title={prefs.emailTracking ? 'On' : 'Off'}
+                  color={prefs.emailTracking ? jarsPrimary : '#CCCCCC'}
+                  onPress={() => handleToggle('emailTracking')}
+                  disabled={prefLoading !== null}
+                  accessibilityLabel="Toggle email tracking"
+                />
+                {prefLoading === 'emailTracking' && <ActivityIndicator style={{ marginLeft: 8 }} />}
+              </View>
+            </View>
+
+            <View style={styles.prefRow}>
+              <Text style={{ color: jarsPrimary }}>Share With Partners</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Button
+                  title={prefs.shareWithPartners ? 'On' : 'Off'}
+                  color={prefs.shareWithPartners ? jarsPrimary : '#CCCCCC'}
+                  onPress={() => handleToggle('shareWithPartners')}
+                  disabled={prefLoading !== null}
+                  accessibilityLabel="Toggle share with partners"
+                />
+                {prefLoading === 'shareWithPartners' && (
+                  <ActivityIndicator style={{ marginLeft: 8 }} />
+                )}
+              </View>
+            </View>
+          </>
+        )}
+
         <Button
           title={loading ? 'Requesting Export...' : 'Request Data Export'}
           color={jarsPrimary}
           onPress={requestExport}
-          disabled={loading}
+          disabled={loading || status === 'pending'}
+          accessibilityLabel="Request data export"
         />
 
-        {loading && <ActivityIndicator style={styles.spinner} />}
+        {(loading || status === 'pending') && <ActivityIndicator style={styles.spinner} />}
 
         {status === 'pending' && (
           <Text style={[styles.statusText, { color: jarsPrimary }]}>Export pending...</Text>
@@ -96,6 +182,8 @@ export default function DataTransparencyScreen() {
           <Text
             style={[styles.linkText, { color: jarsPrimary }]}
             onPress={() => Linking.openURL(downloadUrl)}
+            accessibilityLabel="Download data export"
+            accessible
           >
             Download Export
           </Text>
@@ -104,7 +192,12 @@ export default function DataTransparencyScreen() {
         {error && (
           <View style={styles.errorContainer}>
             <Text style={[styles.errorText, { color: jarsPrimary }]}>Error: {error}</Text>
-            <Button title="Retry" onPress={requestExport} color={jarsPrimary} />
+            <Button
+              title="Retry"
+              onPress={requestExport}
+              color={jarsPrimary}
+              accessibilityLabel="Retry export"
+            />
           </View>
         )}
       </View>
@@ -120,4 +213,12 @@ const styles = StyleSheet.create({
   linkText: { marginTop: 16, fontSize: 16, textDecorationLine: 'underline' },
   errorContainer: { marginTop: 20, alignItems: 'center' },
   errorText: { fontSize: 16, marginBottom: 8 },
+  sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
+  prefRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 12,
+  },
 });
