@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
+import { TERPENES } from '../terpene_wheel/data/terpenes';
 import { hapticLight } from '../utils/haptic';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,8 +30,22 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
 
 const sampleProducts = [
-  { id: '1', name: 'Rainbow Rozay', price: 79.0, image: require('../assets/product1.png') },
-  { id: '2', name: 'Moonwalker OG', price: 65.0, image: require('../assets/product2.png') },
+  {
+    id: '1',
+    name: 'Rainbow Rozay',
+    price: 79.0,
+    image: require('../assets/product1.png'),
+    description: 'A flavorful hybrid with fruity notes.',
+    terpenes: TERPENES,
+  },
+  {
+    id: '2',
+    name: 'Moonwalker OG',
+    price: 65.0,
+    image: require('../assets/product2.png'),
+    description: 'Potent indica leaning strain for relaxation.',
+    terpenes: TERPENES,
+  },
 ];
 
 export default function ShopScreen() {

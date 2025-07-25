@@ -140,6 +140,16 @@ Frontend (/.env):
 
 EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
 
+## Design Assets
+
+Certain icons, audio cues and Lottie animations are required under `src/assets`.
+The list of files lives in `scripts/expectedAssets.ts` and can be verified with
+`npm run check-assets`. CI will fail if any are missing.
+
+The repo also includes a `Terpene_Wheel_Code_Kit.zip` archive. Run
+`npm run integrate-terpene-assets` to extract this kit into `assets/terpene-wheel`
+when you want to use the terpene wheel module.
+
 🧪 Testing & Quality
 
 Lint:npm run lint (ESLint)
