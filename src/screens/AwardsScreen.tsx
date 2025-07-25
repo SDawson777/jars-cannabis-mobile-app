@@ -1,5 +1,5 @@
 // src/screens/AwardsScreen.tsx
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -25,6 +25,14 @@ import { ChevronLeft, Settings } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
+import { TerpeneWheel } from '../terpene_wheel/components/TerpeneWheel';
+import { ALL_TERPENES_DATA } from '../terpene_wheel/data/allTerpenes';
+import { TerpeneInfoModal } from '../terpene_wheel/components/TerpeneInfoModal';
+import {
+  AnimatedSoundPlayer,
+  AnimatedSoundPlayerHandle,
+} from '../terpene_wheel/components/AnimatedSoundPlayer';
+import type { TerpeneInfo } from '../terpene_wheel/data/terpenes';
 
 // Define Award type
 interface Award {
@@ -64,6 +72,8 @@ export default function AwardsScreen() {
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
   const [pulse] = useState(new Animated.Value(1));
+  const [selectedTerpene, setSelectedTerpene] = useState<TerpeneInfo | null>(null);
+  const soundRef = useRef<AnimatedSoundPlayerHandle>(null);
 
   const user = { name: 'Jane Doe', tier: 'Gold', points: 420, progress: 0.65 };
   const REWARDS = [
@@ -106,6 +116,11 @@ export default function AwardsScreen() {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('HelpFAQ');
+  };
+
+  const handleSelectTerpene = (t: TerpeneInfo) => {
+    setSelectedTerpene(t);
+    soundRef.current?.play();
   };
 
   // Render each award item
@@ -205,11 +220,17 @@ export default function AwardsScreen() {
           )}
         />
 
-        {/* Terpene Wheel Placeholder */}
+        {/* Terpene Wheel */}
         <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Exclusive Insights</Text>
-        <View style={styles.wheelPlaceholder}>
-          <Text style={{ color: jarsPrimary }}>Terpene Wheel</Text>
+        <View style={styles.wheelContainer}>
+          <TerpeneWheel data={ALL_TERPENES_DATA} onSelect={handleSelectTerpene} />
         </View>
+        <TerpeneInfoModal
+          terpene={selectedTerpene}
+          visible={!!selectedTerpene}
+          onClose={() => setSelectedTerpene(null)}
+        />
+        <AnimatedSoundPlayer ref={soundRef} source={require('../assets/rustle_leaves_swipe.mp3')} />
 
         {/* Reward History */}
         <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Reward History</Text>
@@ -279,7 +300,7 @@ const styles = StyleSheet.create({
   },
   rewardTitle: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
   rewardPoints: { fontSize: 12, color: '#777' },
-  wheelPlaceholder: {
+  wheelContainer: {
     height: 200,
     marginHorizontal: 16,
     borderRadius: 100,
