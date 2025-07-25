@@ -1,5 +1,4 @@
-// src/screens/AwardsScreen.tsxg
-import React, { useContext, useEffect, useState, useRef } from 'react';
+// src/screens/AwardsScreen.tsx
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   SafeAreaView,
@@ -18,7 +17,6 @@ import {
   Animated,
   ListRenderItemInfo,
 } from 'react-native';
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useQuery } from '@tanstack/react-query';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { phase4Client } from '../api/phase4Client';
@@ -30,16 +28,6 @@ import { ChevronLeft, Settings } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
-import { TerpeneWheel } from '../terpene_wheel/components/TerpeneWheel';
-import { ALL_TERPENES_DATA } from '../terpene_wheel/data/allTerpenes';
-import { TerpeneInfoModal } from '../terpene_wheel/components/TerpeneInfoModal';
-import {
-  AnimatedSoundPlayer,
-  AnimatedSoundPlayerHandle,
-} from '../terpene_wheel/components/AnimatedSoundPlayer';
-import type { TerpeneInfo } from '../terpene_wheel/data/terpenes';
-import type { TerpeneInfo } from '../terpene_wheel/data/terpenes';
-import TerpeneInfoModal from '../components/TerpeneWheel/TerpeneInfoModal';
 
 // Define Award type
 interface Award {
@@ -79,8 +67,6 @@ export default function AwardsScreen() {
 
   const [pulse] = useState(new Animated.Value(1));
   const confettiRef = useRef<ConfettiCannon | null>(null);
-  const [selectedTerpene, setSelectedTerpene] = useState<TerpeneInfo | null>(null);
-  const soundRef = useRef<AnimatedSoundPlayerHandle>(null);
 
   const user = data?.user ?? { name: '---', tier: '', points: 0, progress: 0 };
   const progressAnim = useRef(new Animated.Value(user.progress)).current;
@@ -91,13 +77,6 @@ export default function AwardsScreen() {
   ];
 
   const prevAwardsCount = useRef(awards.length);
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [selectedTerpene, setSelectedTerpene] = useState<TerpeneInfo | null>(null);
-
-  const onSelectTerpene = (t: TerpeneInfo) => {
-    setSelectedTerpene(t);
-    bottomSheetRef.current?.present();
-  };
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -150,11 +129,6 @@ export default function AwardsScreen() {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('HelpFAQ');
-  };
-
-  const handleSelectTerpene = (t: TerpeneInfo) => {
-    setSelectedTerpene(t);
-    soundRef.current?.play();
   };
 
   // Render each award item
@@ -302,78 +276,22 @@ export default function AwardsScreen() {
             </Pressable>
           )}
         />
-    <BottomSheetModalProvider>
-      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-        {/* Header */}
-        <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
-          <Pressable onPress={handleBack} style={styles.iconBtn}>
-            <ChevronLeft color={jarsPrimary} size={24} />
-          </Pressable>
-          <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Rewards & Recognition</Text>
-          <Pressable onPress={openSettings} style={styles.iconBtn}>
-            <Settings color={jarsPrimary} size={24} />
-          </Pressable>
-        </View>
 
-        <ScrollView>
-          {/* Hero */}
-          <View style={styles.hero}>
-            <Text style={[styles.name, { color: jarsPrimary }]}>{user.name}</Text>
-            <Animated.Text
-              style={[styles.points, { color: jarsPrimary, transform: [{ scale: pulse }] }]}
-            >
-              {user.points} pts
-            </Animated.Text>
-            <View style={[styles.progressBar, { borderColor: jarsSecondary }]}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { backgroundColor: jarsPrimary, width: `${user.progress * 100}%` },
-                ]}
-              />
-            </View>
-            <Text style={[styles.tier, { color: jarsPrimary }]}>Tier: {user.tier}</Text>
-          </View>
-
-
-        {/* Terpene Wheel */}
+        {/* Terpene Wheel Placeholder */}
         <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Exclusive Insights</Text>
-        <View style={styles.wheelContainer}>
-          <TerpeneWheel data={ALL_TERPENES_DATA} onSelect={handleSelectTerpene} />
+        <View style={styles.wheelPlaceholder}>
+          <Text style={{ color: jarsPrimary }}>Terpene Wheel</Text>
         </View>
-        <TerpeneInfoModal
-          terpene={selectedTerpene}
-          visible={!!selectedTerpene}
-          onClose={() => setSelectedTerpene(null)}
+
+        {/* Reward History */}
+        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Reward History</Text>
+        <FlatList
+          data={awards ?? []}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+          scrollEnabled={false}
         />
-        <AnimatedSoundPlayer ref={soundRef} source={require('../assets/rustle_leaves_swipe.mp3')} />
-
-          {/* Rewards Carousel */}
-          <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Available Rewards</Text>
-          <FlatList
-            data={REWARDS}
-            keyExtractor={r => r.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.carousel}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => redeemReward(item)}
-                style={[styles.rewardCard, { borderColor: jarsPrimary }]}
-                android_ripple={{ color: `${jarsPrimary}20` }}
-              >
-                {item.image ? (
-                  <Image source={{ uri: item.image }} style={styles.rewardImage} />
-                ) : (
-                  <View style={styles.rewardImagePlaceholder} />
-                )}
-                <Text style={[styles.rewardTitle, { color: jarsPrimary }]}>{item.title}</Text>
-                <Text style={styles.rewardPoints}>{item.points} pts</Text>
-              </Pressable>
-            )}
-          />
-
-
 
         {/* FAQ Link */}
         <Pressable
@@ -387,31 +305,6 @@ export default function AwardsScreen() {
         </Pressable>
       </ScrollView>
     </SafeAreaView>
-
-          {/* Terpene Wheel */}
-          <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Exclusive Insights</Text>
-          <View style={styles.wheelWrapper}>
-            <TerpeneWheel onSelect={onSelectTerpene} />
-          </View>
-
-          {/* Reward History */}
-          <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Reward History</Text>
-          <FlatList
-            data={awards ?? []}
-            keyExtractor={item => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={styles.list}
-            scrollEnabled={false}
-          />
-
-          {/* FAQ Link */}
-          <Pressable onPress={openFaq} style={styles.linkRow}>
-            <Text style={[styles.linkText, { color: jarsPrimary }]}>Loyalty FAQs</Text>
-          </Pressable>
-        </ScrollView>
-        <TerpeneInfoModal ref={bottomSheetRef} info={selectedTerpene} />
-      </SafeAreaView>
-    </BottomSheetModalProvider>
   );
 }
 
@@ -464,8 +357,7 @@ const styles = StyleSheet.create({
   },
   rewardTitle: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
   rewardPoints: { fontSize: 12, color: '#777' },
-
-  wheelContainer: {
+  wheelPlaceholder: {
     height: 200,
     marginHorizontal: 16,
     borderRadius: 100,
@@ -473,9 +365,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  wheelWrapper: { alignItems: 'center', marginVertical: 16 },
-
   list: { paddingHorizontal: 16, paddingBottom: 16 },
   card: {
     backgroundColor: '#fff',

@@ -2,9 +2,8 @@ import React from 'react';
 import { Dimensions, Pressable } from 'react-native';
 import Svg, { Circle, Line, Text as SvgText, Path } from 'react-native-svg';
 import Animated, { useSharedValue, withTiming, useAnimatedProps } from 'react-native-reanimated';
-import { hapticLight } from '../../utils/haptic';
-import { TERPENES } from '../data/terpenes';
-import type { TerpeneInfo, TerpeneProfileData } from '../../@types/terpene';
+import * as Haptics from 'expo-haptics';
+import { TERPENES, TerpeneInfo } from '../data/terpenes';
 
 const { width } = Dimensions.get('window');
 const SIZE = Math.min(width - 32, 320);
@@ -14,38 +13,10 @@ const CY = SIZE / 2;
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
-
 type Props = { onSelect: (t: TerpeneInfo) => void; data?: TerpeneInfo[] };
 
 export const TerpeneWheel: React.FC<Props> = ({ onSelect, data = TERPENES }) => {
   const angleStep = 360 / data.length;
-
-type Props = {
-  data?: TerpeneInfo[];
-  onSelect: (t: TerpeneInfo) => void;
-};
-
-export const TerpeneWheel: React.FC<Props> = ({ data = TERPENES, onSelect }) => {
-  const angleStep = 360 / data.length;
-
-export type DisplayMode = 'full' | 'compact';
-
-interface Props {
-  data: TerpeneProfileData;
-  onSelectTerpene: (terpene: TerpeneInfo | null) => void;
-  isInteractive?: boolean;
-  displayMode?: DisplayMode;
-}
-
-export const TerpeneWheel: React.FC<Props> = ({
-  data,
-  onSelectTerpene,
-  isInteractive = true,
-  displayMode = 'full',
-}) => {
-  const terpenes = data?.terpenes ?? TERPENES;
-  const angleStep = terpenes.length ? 360 / terpenes.length : 0;
-
 
   return (
     <Svg width={SIZE} height={SIZE}>
@@ -53,13 +24,7 @@ export const TerpeneWheel: React.FC<Props> = ({
       <Circle cx={CX} cy={CY} r={R} stroke="#2E5D46" strokeWidth={2} fill="none" />
 
       {/* Radial lines */}
-
       {data.map((_, i) => {
-
-      {data.map((_, i) => {
-
-      {terpenes.map((_, i) => {
-
         const a = ((i * angleStep - 90) * Math.PI) / 180;
         return (
           <Line
@@ -78,17 +43,6 @@ export const TerpeneWheel: React.FC<Props> = ({
       {/* Segments */}
       {data.map((t, i) => (
         <TerpeneSegment key={t.key} index={i} info={t} angleStep={angleStep} onSelect={onSelect} />
-
-      {terpenes.map((t, i) => (
-        <TerpeneSegment
-          key={t.key}
-          index={i}
-          info={t}
-          angleStep={angleStep}
-          onSelect={onSelectTerpene}
-          isInteractive={isInteractive}
-          displayMode={displayMode}
-        />
       ))}
     </Svg>
   );
@@ -98,10 +52,8 @@ const TerpeneSegment: React.FC<{
   index: number;
   info: TerpeneInfo;
   angleStep: number;
-  onSelect: (t: TerpeneInfo | null) => void;
-  isInteractive: boolean;
-  displayMode: DisplayMode;
-}> = ({ index, info, angleStep, onSelect, isInteractive, displayMode }) => {
+  onSelect: (t: TerpeneInfo) => void;
+}> = ({ index, info, angleStep, onSelect }) => {
   // Compute wedge geometry
   const startDeg = index * angleStep - 90;
   const endDeg = startDeg + angleStep;
@@ -154,10 +106,8 @@ const TerpeneSegment: React.FC<{
   };
 
   const handlePress = () => {
-    if (!isInteractive) return;
-
     highlight.value = 1;
-    hapticLight();
+    Haptics.selectionAsync();
     triggerWave();
     onSelect(info);
     setTimeout(() => {
@@ -171,7 +121,7 @@ const TerpeneSegment: React.FC<{
   const labelY = CY + (R + 18) * Math.sin((midDeg * Math.PI) / 180);
 
   return (
-    <Pressable onPress={handlePress} disabled={!isInteractive}>
+    <Pressable onPress={handlePress}>
       {/* Wave overlay */}
       <AnimatedPath
         animatedProps={waveProps}
@@ -191,18 +141,16 @@ const TerpeneSegment: React.FC<{
       />
 
       {/* Label */}
-      {displayMode === 'full' && (
-        <SvgText
-          x={labelX}
-          y={labelY}
-          fontSize={14}
-          fontFamily="Inter-Medium"
-          fill="#333"
-          textAnchor="middle"
-        >
-          {info.name}
-        </SvgText>
-      )}
+      <SvgText
+        x={labelX}
+        y={labelY}
+        fontSize={14}
+        fontFamily="Inter-Medium"
+        fill="#333"
+        textAnchor="middle"
+      >
+        {info.name}
+      </SvgText>
     </Pressable>
   );
 };
