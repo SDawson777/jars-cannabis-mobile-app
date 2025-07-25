@@ -22,7 +22,12 @@
     "dev:server": "nodemon src/index.ts",
     "dev:emulators": "firebase emulators:start --only firestore,functions,auth",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "integrate-terpene-assets": "mkdir -p assets/terpene-wheel && cp Terpene_Wheel_Code_Kit.zip assets/terpene-wheel && unzip -o assets/terpene-wheel/Terpene_Wheel_Code_Kit.zip -d assets/terpene-wheel",
+    "scaffold:award-redemption": "ts-node scripts/setupAwardRedemption.ts",
+    "test:award-redemption": "jest tests/awards.redeem.test.ts --runInBand"
   },
   "lint-staged": {
     "{*,src/**,!src/terpene_wheel/snippets/**}/*.{js,jsx,ts,tsx}": [
