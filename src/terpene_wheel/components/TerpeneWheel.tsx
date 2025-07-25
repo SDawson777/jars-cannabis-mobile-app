@@ -14,6 +14,15 @@ const CY = SIZE / 2;
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
+
+type Props = {
+  data?: TerpeneInfo[];
+  onSelect: (t: TerpeneInfo) => void;
+};
+
+export const TerpeneWheel: React.FC<Props> = ({ data = TERPENES, onSelect }) => {
+  const angleStep = 360 / data.length;
+=======
 export type DisplayMode = 'full' | 'compact';
 
 interface Props {
@@ -32,13 +41,18 @@ export const TerpeneWheel: React.FC<Props> = ({
   const terpenes = data?.terpenes ?? TERPENES;
   const angleStep = terpenes.length ? 360 / terpenes.length : 0;
 
+
   return (
     <Svg width={SIZE} height={SIZE}>
       {/* Outer ring */}
       <Circle cx={CX} cy={CY} r={R} stroke="#2E5D46" strokeWidth={2} fill="none" />
 
       {/* Radial lines */}
+
+      {data.map((_, i) => {
+
       {terpenes.map((_, i) => {
+
         const a = ((i * angleStep - 90) * Math.PI) / 180;
         return (
           <Line
@@ -55,6 +69,10 @@ export const TerpeneWheel: React.FC<Props> = ({
       })}
 
       {/* Segments */}
+
+      {data.map((t, i) => (
+        <TerpeneSegment key={t.key} index={i} info={t} angleStep={angleStep} onSelect={onSelect} />
+
       {terpenes.map((t, i) => (
         <TerpeneSegment
           key={t.key}
