@@ -23,3 +23,8 @@ yarn.lock
 # Firebase logs
 firebase-debug.log
 firestore-debug.log
+
+# Local database and assets
+Terpene_Wheel_Code_Kit.zip
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
