@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react-hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useUserProfile } from '../api/hooks/useUserProfile';
+import { useDataCategories } from '../api/hooks/useDataCategories';
 import { phase4Client } from '../api/phase4Client';
 
 jest.mock('../api/phase4Client');
@@ -11,18 +11,17 @@ const wrapper: any = ({ children }: any) => {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 };
 
-describe('useUserProfile', () => {
+describe('useDataCategories', () => {
   it('returns data on success', async () => {
-    (phase4Client.get as jest.Mock).mockResolvedValue({ data: { name: 'Jane' } });
-    const { result, waitFor } = renderHook(() => useUserProfile(), { wrapper });
-    expect(result.current.isLoading).toBe(true);
+    (phase4Client.get as jest.Mock).mockResolvedValue({ data: [{ id: '1', label: 'Category' }] });
+    const { result, waitFor } = renderHook(() => useDataCategories(), { wrapper });
     await waitFor(() => result.current.isSuccess);
-    expect(result.current.data).toEqual({ name: 'Jane' });
+    expect(result.current.data).toEqual([{ id: '1', label: 'Category' }]);
   });
 
   it('handles error', async () => {
     (phase4Client.get as jest.Mock).mockRejectedValue(new Error('fail'));
-    const { result, waitFor } = renderHook(() => useUserProfile(), { wrapper });
+    const { result, waitFor } = renderHook(() => useDataCategories(), { wrapper });
     await waitFor(() => result.current.isError);
     expect(result.current.isError).toBe(true);
   });
