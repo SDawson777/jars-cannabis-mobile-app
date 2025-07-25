@@ -130,3 +130,22 @@ phase4Router.patch('/accessibility-settings', async (req, res) => {
     return res.status(500).json({ message: 'Error updating settings' });
   }
 });
+
+// ------- Ethical AI Dashboard mock endpoints -------
+// GET /profile/data-categories
+phase4Router.get('/profile/data-categories', (_req, res) => {
+  return res.json([
+    { id: 'usage', label: 'Usage Data' },
+    { id: 'purchase', label: 'Purchase History' },
+  ]);
+});
+
+// GET & PUT /profile/preferences
+let prefs = { highContrast: false };
+phase4Router.get('/profile/preferences', (_req, res) => {
+  return res.json(prefs);
+});
+phase4Router.put('/profile/preferences', (req, res) => {
+  prefs = { ...prefs, ...req.body };
+  return res.json(prefs);
+});

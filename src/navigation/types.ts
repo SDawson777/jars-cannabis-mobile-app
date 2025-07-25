@@ -49,4 +49,5 @@ export type RootStackParamList = {
   MyJars: undefined;
   JournalEntry: { item: import('../@types/jars').StashItem };
   MyJarsInsights: undefined;
+  EthicalAIDashboard: undefined;
 };
