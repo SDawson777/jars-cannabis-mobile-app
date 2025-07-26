@@ -17,6 +17,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import { useLegal } from '../hooks/useLegal';
+import PreviewBadge from '../components/PreviewBadge';
+import { useCMSPreview } from '../context/CMSPreviewContext';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -27,6 +30,8 @@ type LegalNavProp = NativeStackNavigationProp<RootStackParamList, 'Legal'>;
 export default function LegalScreen() {
   const navigation = useNavigation<LegalNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { data, isLoading, isError } = useLegal();
+  const { preview } = useCMSPreview();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -41,8 +46,25 @@ export default function LegalScreen() {
     navigation.goBack();
   };
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>\
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>\
+        <Text>Unable to load legal info.</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      {preview && <PreviewBadge />}
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
@@ -54,20 +76,10 @@ export default function LegalScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Terms & Conditions</Text>
-        <Text style={[styles.bodyText, { color: jarsSecondary }]}>
-          {/* Replace with real legal text */}
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt, nisl sit amet
-          luctus scelerisque, urna justo pellentesque arcu, vitae aliquet sapien nisi sit amet
-          metus. Nulla facilisi.
-        </Text>
+        <Text style={[styles.bodyText, { color: jarsSecondary }]}>{data.terms}</Text>
 
         <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Privacy Policy</Text>
-        <Text style={[styles.bodyText, { color: jarsSecondary }]}>
-          {/* Replace with real privacy text */}
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-          laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-          architecto beatae vitae dicta sunt explicabo.
-        </Text>
+        <Text style={[styles.bodyText, { color: jarsSecondary }]}>{data.privacy}</Text>
       </ScrollView>
     </SafeAreaView>
   );
