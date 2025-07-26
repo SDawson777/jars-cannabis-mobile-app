@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import type { StoreData } from '../@types/store';
 import { usePreferredStore } from '../state/store';
+import { usePreferredStoreId } from '../../store/usePreferredStore';
 
 interface StoreContextState {
   preferredStore?: StoreData;
@@ -14,10 +15,12 @@ const StoreContext = createContext<StoreContextState>({
 
 export const StoreProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const { preferredStore, setPreferredStore, hydrate } = usePreferredStore();
+  const { hydrate: hydrateId } = usePreferredStoreId();
 
   useEffect(() => {
     hydrate();
-  }, [hydrate]);
+    hydrateId();
+  }, [hydrate, hydrateId]);
 
   return (
     <StoreContext.Provider value={{ preferredStore, setPreferredStore }}>
