@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { Alert } from 'react-native';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import * as LocalAuthentication from 'expo-local-authentication';
 import auth from '@react-native-firebase/auth';
 import { Buffer } from 'buffer';
@@ -86,6 +87,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                   : usePrint
                     ? 'Unlock Jars with Touch ID'
                     : 'Unlock Jars';
+                hapticLight();
                 const authPromise = LocalAuthentication.authenticateAsync({
                   promptMessage,
                   disableDeviceFallback: true,
@@ -98,9 +100,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                   ),
                 ]);
                 if (result.success) {
+                  hapticMedium();
                   setTokenState(storedToken);
                   return;
                 }
+                hapticHeavy();
               } else if (!hasHardware) {
                 Alert.alert('Biometric unlock not available on this device.');
               }
