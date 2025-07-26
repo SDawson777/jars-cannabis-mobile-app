@@ -17,6 +17,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import { useArticles } from '../hooks/useArticles';
+import ArticlePreviewCard from '../components/ArticlePreviewCard';
+import SkeletonArticleCard from '../components/SkeletonArticleCard';
+import PreviewBadge from '../components/PreviewBadge';
+import { useCMSPreview } from '../context/CMSPreviewContext';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -28,6 +33,8 @@ type EduNavProp = NativeStackNavigationProp<RootStackParamList, 'EducationalGree
 export default function EducationalGreenhouseScreen() {
   const navigation = useNavigation<EduNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { data, isLoading, isError } = useArticles();
+  const { preview } = useCMSPreview();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -36,11 +43,6 @@ export default function EducationalGreenhouseScreen() {
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
-  const ARTICLES = [
-    { id: '1', title: 'Understanding Terpenes' },
-    { id: '2', title: 'Cannabis & Wellness' },
-    { id: '3', title: 'Growing at Home' },
-  ];
 
   const handleBack = () => {
     hapticLight();
@@ -56,6 +58,7 @@ export default function EducationalGreenhouseScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      {preview && <PreviewBadge />}
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
@@ -65,21 +68,28 @@ export default function EducationalGreenhouseScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <FlatList
-        data={ARTICLES}
-        keyExtractor={a => a.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <Pressable
-            style={[styles.row, { borderBottomColor: jarsSecondary }]}
-            onPress={() => openArticle(item.id)}
-            android_ripple={{ color: `${jarsSecondary}20` }}
-          >
-            <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>
-            <ChevronRight color={jarsPrimary} size={20} />
-          </Pressable>
-        )}
-      />
+      {isLoading && (
+        <View style={styles.list}>
+          <SkeletonArticleCard />
+          <SkeletonArticleCard />
+          <SkeletonArticleCard />
+        </View>
+      )}
+      {isError && (
+        <View style={[styles.list, { alignItems: 'center' }]}>\
+          <Text>Unable to load articles.</Text>
+        </View>
+      )}
+      {!isLoading && !isError && data && (
+        <FlatList
+          data={data}
+          keyExtractor={a => a._id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <ArticlePreviewCard article={item} onPress={() => openArticle(item.slug)} />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }

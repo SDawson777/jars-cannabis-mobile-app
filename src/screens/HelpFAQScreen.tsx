@@ -15,34 +15,22 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import { useFAQ } from '../hooks/useFAQ';
+import PreviewBadge from '../components/PreviewBadge';
+import { useCMSPreview } from '../context/CMSPreviewContext';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const FAQS = [
-  {
-    id: '1',
-    question: 'How do I track my order?',
-    answer: 'Go to Order Tracking on the Home screen.',
-  },
-  {
-    id: '2',
-    question: 'How do I apply a promo code?',
-    answer: 'Enter your code in the Cart screen under Promo Code.',
-  },
-  {
-    id: '3',
-    question: 'How can I contact support?',
-    answer: 'Use the Contact Us screen or in-app chat via Concierge.',
-  },
-];
 
 export default function HelpFAQScreen() {
   const navigation = useNavigation();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [openIds, setOpenIds] = useState<string[]>([]);
+  const { data, isLoading, isError } = useFAQ();
+  const { preview } = useCMSPreview();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -63,8 +51,25 @@ export default function HelpFAQScreen() {
     setOpenIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
   };
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>
+        <Text>Unable to load FAQ.</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      {preview && <PreviewBadge />}
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack}>
           <ChevronLeft color={jarsPrimary} size={24} />
@@ -73,7 +78,7 @@ export default function HelpFAQScreen() {
         <View style={{ width: 24 }} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        {FAQS.map(item => (
+        {data.map(item => (
           <View key={item.id} style={styles.faqItem}>
             <Pressable onPress={() => toggleFAQ(item.id)}>
               <Text style={[styles.question, { color: jarsPrimary }]}>{item.question}</Text>
