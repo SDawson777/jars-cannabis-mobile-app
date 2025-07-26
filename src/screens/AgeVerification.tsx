@@ -18,6 +18,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticHeavy, hapticMedium } from '../utils/haptic';
+import Animated, { useSharedValue, withTiming } from 'react-native-reanimated';
+import * as Speech from 'expo-speech';
+import { AccessibilityInfo } from 'react-native';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -33,6 +36,7 @@ export default function AgeVerification() {
   const [date, setDate] = useState<Date>();
   const [showPicker, setShowPicker] = useState(false);
   const [underage, setUnderage] = useState(false);
+  const tint = useSharedValue(0);
 
   // Animate on mount (and on state change)
   useEffect(() => {
@@ -86,6 +90,12 @@ export default function AgeVerification() {
       hapticHeavy();
       // Enter the under-21 path
       setUnderage(true);
+      tint.value = withTiming(0.8, { duration: 300 });
+      AccessibilityInfo.isScreenReaderEnabled().then(enabled => {
+        if (enabled) {
+          Speech.speak('Access Denied. You must be 21 years or older.');
+        }
+      });
     }
   };
 
@@ -130,6 +140,10 @@ export default function AgeVerification() {
   // Default age-verification view
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <Animated.View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, { backgroundColor: '#6A0572', opacity: tint }]}
+      />
       <Text style={[styles.title, { color: jarsPrimary }]}>Verify Your Age</Text>
 
       <Pressable
@@ -151,12 +165,14 @@ export default function AgeVerification() {
           value={date || new Date(2000, 0, 1)}
           maximumDate={new Date()}
           onChange={handleDateChange}
+          accessibilityLabel="Date of Birth"
         />
       )}
 
       <Pressable
         style={[styles.enterBtn, { backgroundColor: jarsPrimary }, glowStyle]}
         onPress={handleEnter}
+        accessibilityRole="button"
       >
         <Text style={styles.enterText}>Enter</Text>
       </Pressable>

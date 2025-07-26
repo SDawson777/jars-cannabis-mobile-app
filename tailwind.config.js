@@ -10,6 +10,20 @@ module.exports = {
         jarsTextDark: '#333333',
         jarsLightGray: '#EEEEEE',
       },
+      animation: {
+        'fade-in-up': 'fadeInUp 0.3s ease-out',
+        'slide-left': 'slideLeft 0.3s ease-out',
+      },
+      keyframes: {
+        fadeInUp: {
+          '0%': { opacity: 0, transform: 'translateY(10px)' },
+          '100%': { opacity: 1, transform: 'translateY(0px)' },
+        },
+        slideLeft: {
+          '0%': { transform: 'translateX(20px)' },
+          '100%': { transform: 'translateX(0px)' },
+        },
+      },
     },
   },
   plugins: [],

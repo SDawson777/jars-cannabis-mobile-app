@@ -1,5 +1,5 @@
 // src/App.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,9 +7,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { LoyaltyProvider } from './src/context/LoyaltyContext';
+import * as SecureStore from 'expo-secure-store';
 
-import SplashScreen from './src/screens/SplashScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen';
+import SplashScreenWrapper from './src/screens/SplashScreenWrapper';
+import OnboardingPager from './src/screens/OnboardingPager';
 import AgeVerification from './src/screens/AgeVerification';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
@@ -63,14 +64,26 @@ const Stack = createNativeStackNavigator(); // no generic
 const queryClient = new QueryClient();
 
 export default function App() {
+  const [initialRoute, setInitialRoute] = useState('SplashScreen');
+
+  useEffect(() => {
+    const checkFlag = async () => {
+      const flag = await SecureStore.getItemAsync('onboardingComplete');
+      setInitialRoute(flag ? 'AgeVerification' : 'SplashScreen');
+    };
+    checkFlag();
+  }, []);
+
+  if (!initialRoute) return null;
+
   return (
     <LoyaltyProvider>
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
           <NavigationContainer>
-            <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="SplashScreen" component={SplashScreen} />
-              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreenWrapper} />
+              <Stack.Screen name="Onboarding" component={OnboardingPager} />
               <Stack.Screen name="AgeVerification" component={AgeVerification} />
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
