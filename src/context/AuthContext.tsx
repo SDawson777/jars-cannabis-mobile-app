@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+import { Alert } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import { Buffer } from 'buffer';
+import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 import { useUserProfile, UserProfile } from '../api/hooks/useUserProfile';
 
 export interface User extends UserProfile {}
@@ -34,19 +36,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setToken = async (newToken: string) => {
     setTokenState(newToken);
-    await SecureStore.setItemAsync('jwtToken', newToken);
+    await saveSecure('jwtToken', newToken);
+    const user = auth().currentUser;
+    if (user?.displayName) await saveSecure('userName', user.displayName);
+    if (user?.email) await saveSecure('userEmail', user.email);
   };
 
   const clearAuth = async () => {
     setTokenState(null);
-    await SecureStore.deleteItemAsync('jwtToken');
+    await Promise.all([
+      deleteSecure('jwtToken'),
+      deleteSecure('userName'),
+      deleteSecure('userEmail'),
+    ]);
+  };
+
+  const isExpired = (t: string) => {
+    try {
+      const [, payload] = t.split('.');
+      const { exp } = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+      return exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
   };
 
   useEffect(() => {
     const loadAuth = async () => {
       try {
-        const storedToken = await SecureStore.getItemAsync('jwtToken');
-        if (storedToken) setTokenState(storedToken);
+        const storedToken = await getSecure('jwtToken');
+        if (storedToken) {
+          if (isExpired(storedToken)) {
+            await clearAuth();
+            Alert.alert('Session expired', 'Please log in again.');
+          } else {
+            setTokenState(storedToken);
+          }
+        }
       } catch (e) {
         console.warn('Failed to load auth from storage', e);
       }
