@@ -48,10 +48,10 @@ export default function EducationalGreenhouseScreen() {
     navigation.goBack();
   };
 
-  const openArticle = (title: string) => {
+  const openArticle = (slug: string) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('ArticleDetail', { title });
+    navigation.navigate('ArticleDetail', { slug });
   };
 
   return (
@@ -72,7 +72,7 @@ export default function EducationalGreenhouseScreen() {
         renderItem={({ item }) => (
           <Pressable
             style={[styles.row, { borderBottomColor: jarsSecondary }]}
-            onPress={() => openArticle(item.title)}
+            onPress={() => openArticle(item.id)}
             android_ripple={{ color: `${jarsSecondary}20` }}
           >
             <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>

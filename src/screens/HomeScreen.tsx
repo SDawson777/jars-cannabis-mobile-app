@@ -149,7 +149,7 @@ export default function HomeScreen() {
         {forYou && (
           <ForYouTodayCard
             data={forYou}
-            onSelectProduct={id => navigation.navigate('ProductDetails', { product: { id } })}
+            onSelectProduct={id => navigation.navigate('ProductDetail', { slug: id })}
             onSeeAll={() => navigation.navigate('ShopScreen')}
           />
         )}
@@ -188,7 +188,7 @@ export default function HomeScreen() {
             <Pressable
               key={item.id}
               style={[styles.productCard, { borderColor: jarsPrimary }]}
-              onPress={() => navigation.navigate('ProductDetails', { product: item })}
+              onPress={() => navigation.navigate('ProductDetail', { slug: item.id })}
             >
               <Image source={item.image} style={styles.productImage} />
               <Text style={[styles.productName, { color: jarsPrimary }]}>{item.name}</Text>

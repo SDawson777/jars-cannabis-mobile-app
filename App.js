@@ -17,7 +17,8 @@ import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import StoreSelection from './src/screens/StoreSelection';
 import HomeScreen from './src/screens/HomeScreen';
 import ShopScreen from './src/screens/ShopScreen';
-import ProductDetailsScreen from './src/screens/ProductDetailsScreen';
+import ProductListScreen from './src/screens/ProductListScreen';
+import ProductDetailScreen from './src/screens/ProductDetailScreen';
 import CartScreen from './src/screens/CartScreen';
 import CheckoutScreen from './src/screens/CheckoutScreen';
 import OrderConfirmationScreen from './src/screens/OrderConfirmationScreen';
@@ -44,6 +45,7 @@ import AppSettingsScreen from './src/screens/AppSettingsScreen';
 import HelpFAQScreen from './src/screens/HelpFAQScreen';
 import ContactUsScreen from './src/screens/ContactUsScreen';
 import EducationalGreenhouseScreen from './src/screens/EducationalGreenhouseScreen';
+import ArticleListScreen from './src/screens/ArticleListScreen';
 import ArticleDetailScreen from './src/screens/ArticleDetailScreen';
 import CommunityGardenScreen from './src/screens/CommunityGardenScreen';
 import ConciergeChatScreen from './src/screens/ConciergeChatScreen';
@@ -76,7 +78,8 @@ export default function App() {
               <Stack.Screen name="StoreSelection" component={StoreSelection} />
               <Stack.Screen name="HomeScreen" component={HomeScreen} />
               <Stack.Screen name="ShopScreen" component={ShopScreen} />
-              <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+              <Stack.Screen name="ProductList" component={ProductListScreen} />
+              <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
               <Stack.Screen name="CartScreen" component={CartScreen} />
               <Stack.Screen name="Checkout" component={CheckoutScreen} />
               <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
@@ -103,6 +106,7 @@ export default function App() {
               <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
               <Stack.Screen name="ContactUs" component={ContactUsScreen} />
               <Stack.Screen name="EducationalGreenhouse" component={EducationalGreenhouseScreen} />
+              <Stack.Screen name="ArticleList" component={ArticleListScreen} />
               <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
               <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
               <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />

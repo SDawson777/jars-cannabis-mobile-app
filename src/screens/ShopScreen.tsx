@@ -85,7 +85,7 @@ export default function ShopScreen() {
   const handleProduct = (product: (typeof sampleProducts)[0]) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('ProductDetails', { product });
+    navigation.navigate('ProductDetail', { slug: product.id });
   };
 
   return (
