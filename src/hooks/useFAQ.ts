@@ -1,6 +1,6 @@
 import type { FAQItem } from '../types/cmsExtra';
 import { useCMSContent } from './useCMSContent';
 
-export function useFAQ() {
-  return useCMSContent<FAQItem[]>(['faq'], '/api/content/faq');
+export function useFAQQuery() {
+  return useCMSContent<FAQItem[]>(['faq'], '/content/faq');
 }

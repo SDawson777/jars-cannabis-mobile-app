@@ -15,7 +15,8 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
-import { useFAQ } from '../hooks/useFAQ';
+import { useFAQQuery } from '../hooks/useFAQ';
+import FAQSkeleton from '../components/FAQSkeleton';
 import PreviewBadge from '../components/PreviewBadge';
 import { useCMSPreview } from '../context/CMSPreviewContext';
 
@@ -29,7 +30,7 @@ export default function HelpFAQScreen() {
   const navigation = useNavigation();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [openIds, setOpenIds] = useState<string[]>([]);
-  const { data, isLoading, isError } = useFAQ();
+  const { data, isLoading, isError } = useFAQQuery();
   const { preview } = useCMSPreview();
 
   useEffect(() => {
@@ -53,8 +54,12 @@ export default function HelpFAQScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>
-        <Text>Loading...</Text>
+      <SafeAreaView
+        style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}
+      >
+        <FAQSkeleton />
+        <FAQSkeleton />
+        <FAQSkeleton />
       </SafeAreaView>
     );
   }

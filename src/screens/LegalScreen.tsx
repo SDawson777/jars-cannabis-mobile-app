@@ -18,6 +18,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import { useLegal } from '../hooks/useLegal';
+import useSkeletonText from '../components/useSkeletonText';
 import PreviewBadge from '../components/PreviewBadge';
 import { useCMSPreview } from '../context/CMSPreviewContext';
 
@@ -48,8 +49,12 @@ export default function LegalScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>\
-        <Text>Loading...</Text>
+      <SafeAreaView
+        style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}
+      >
+        {useSkeletonText(200, 16)}
+        {useSkeletonText(260, 16)}
+        {useSkeletonText(220, 16)}
       </SafeAreaView>
     );
   }
@@ -75,11 +80,8 @@ export default function LegalScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Terms & Conditions</Text>
-        <Text style={[styles.bodyText, { color: jarsSecondary }]}>{data.terms}</Text>
-
-        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Privacy Policy</Text>
-        <Text style={[styles.bodyText, { color: jarsSecondary }]}>{data.privacy}</Text>
+        <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>{data.title}</Text>
+        <Text style={[styles.bodyText, { color: jarsSecondary }]}>{data.body}</Text>
       </ScrollView>
     </SafeAreaView>
   );

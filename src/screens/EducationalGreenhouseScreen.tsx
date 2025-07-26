@@ -17,9 +17,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
-import { useArticles } from '../hooks/useArticles';
+import { useArticlesQuery } from '../hooks/useArticles';
 import ArticlePreviewCard from '../components/ArticlePreviewCard';
-import SkeletonArticleCard from '../components/SkeletonArticleCard';
+import ArticleSkeletonCard from '../components/ArticleSkeletonCard';
 import PreviewBadge from '../components/PreviewBadge';
 import { useCMSPreview } from '../context/CMSPreviewContext';
 
@@ -33,7 +33,7 @@ type EduNavProp = NativeStackNavigationProp<RootStackParamList, 'EducationalGree
 export default function EducationalGreenhouseScreen() {
   const navigation = useNavigation<EduNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { data, isLoading, isError } = useArticles();
+  const { data, isLoading, isError } = useArticlesQuery();
   const { preview } = useCMSPreview();
 
   useEffect(() => {
@@ -70,9 +70,9 @@ export default function EducationalGreenhouseScreen() {
 
       {isLoading && (
         <View style={styles.list}>
-          <SkeletonArticleCard />
-          <SkeletonArticleCard />
-          <SkeletonArticleCard />
+          <ArticleSkeletonCard />
+          <ArticleSkeletonCard />
+          <ArticleSkeletonCard />
         </View>
       )}
       {isError && (

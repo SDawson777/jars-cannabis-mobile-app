@@ -5,6 +5,11 @@ export interface FAQItem {
 }
 
 export interface LegalContent {
-  terms: string;
-  privacy: string;
+  title: string;
+  body: string;
+}
+
+export interface ShopFilter {
+  id: string;
+  label: string;
 }
