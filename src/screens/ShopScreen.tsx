@@ -1,26 +1,32 @@
 // src/screens/ShopScreen.tsx
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   FlatList,
   View,
   Text,
-  Image,
   Pressable,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
   Dimensions,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { TERPENES } from '../terpene_wheel/data/terpenes';
-import { hapticLight } from '../utils/haptic';
+import { hapticLight, hapticMedium } from '../utils/haptic';
+import { toast } from '../utils/toast';
 import { useFiltersQuery } from '../hooks/useFilters';
 import useSkeletonText from '../components/useSkeletonText';
+import { useProducts } from '../hooks/useProducts';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
+import CMSImage from '../components/CMSImage';
+import OfflineNotice from '../components/OfflineNotice';
+import type { CMSProduct } from '../types/cms';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -31,30 +37,27 @@ type ShopNavProp = NativeStackNavigationProp<RootStackParamList, 'ShopScreen'>;
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
 
-const sampleProducts = [
-  {
-    id: '1',
-    name: 'Rainbow Rozay',
-    price: 79.0,
-    image: require('../assets/product1.png'),
-    description: 'A flavorful hybrid with fruity notes.',
-    terpenes: TERPENES,
-  },
-  {
-    id: '2',
-    name: 'Moonwalker OG',
-    price: 65.0,
-    image: require('../assets/product2.png'),
-    description: 'Potent indica leaning strain for relaxation.',
-    terpenes: TERPENES,
-  },
-];
-
 export default function ShopScreen() {
   const navigation = useNavigation<ShopNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [products] = useState(sampleProducts);
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+    isRefetching,
+  } = useProducts('1');
+  const products = data?.pages.flat() ?? [];
   const { data: filters, isLoading: filtersLoading } = useFiltersQuery();
+
+  useEffect(() => {
+    if (error) {
+      toast('Failed to load products');
+    }
+  }, [error]);
 
   // animate on mount
   useEffect(() => {
@@ -85,7 +88,7 @@ export default function ShopScreen() {
           }
         : {};
 
-  const handleProduct = (product: (typeof sampleProducts)[0]) => {
+  const handleProduct = (product: CMSProduct) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('ProductDetail', { slug: product.id });
@@ -93,6 +96,7 @@ export default function ShopScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <OfflineNotice />
       <View style={styles.filterRow}>
         {filtersLoading && (
           <>
@@ -102,28 +106,54 @@ export default function ShopScreen() {
         )}
         {!filtersLoading &&
           filters?.map(f => (
-            <View key={f.id} style={[styles.filterChip, { borderColor: jarsPrimary }]}>\
-              <Text style={{ color: jarsPrimary }}>{f.label}</Text>
+            <View key={f.id} style={[styles.filterChip, { borderColor: jarsPrimary }]}>
+              \<Text style={{ color: jarsPrimary }}>{f.label}</Text>
             </View>
           ))}
       </View>
-      <FlatList
-        data={products}
-        keyExtractor={item => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <Pressable
-            style={[styles.card, { borderColor: jarsPrimary, backgroundColor: '#FFF' }, glowStyle]}
-            onPress={() => handleProduct(item)}
-            android_ripple={{ color: '#EEE' }}
-          >
-            <Image source={item.image} style={styles.image} />
-            <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
-            <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
-          </Pressable>
-        )}
-      />
+      {isLoading && products.length === 0 ? (
+        <View style={styles.list}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <ProductCardSkeleton key={i} width={CARD_WIDTH} />
+          ))}
+        </View>
+      ) : (
+        <FlatList
+          data={products}
+          keyExtractor={item => item._id || item.id}
+          numColumns={2}
+          contentContainerStyle={styles.list}
+          onEndReached={() => hasNextPage && fetchNextPage()}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={() => {
+                hapticMedium();
+                refetch();
+              }}
+            />
+          }
+          ListFooterComponent={
+            isFetchingNextPage ? <ActivityIndicator style={{ margin: 16 }} /> : null
+          }
+          renderItem={({ item }) => (
+            <Pressable
+              style={[
+                styles.card,
+                { borderColor: jarsPrimary, backgroundColor: '#FFF' },
+                glowStyle,
+              ]}
+              onPress={() => handleProduct(item)}
+              android_ripple={{ color: '#EEE' }}
+            >
+              {item.image && <CMSImage uri={item.image.url} alt={item.name} style={styles.image} />}
+              <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
+              <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
+            </Pressable>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
