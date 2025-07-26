@@ -18,6 +18,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { SUPPORT_EMAIL } from '../constants/links';
+import * as Linking from 'expo-linking';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -32,6 +34,7 @@ export default function ForgotPasswordScreen() {
     useContext(ThemeContext);
 
   const [email, setEmail] = useState('');
+  const [focused, setFocused] = useState<boolean>(false);
 
   // Animate on mount
   useEffect(() => {
@@ -83,7 +86,12 @@ export default function ForgotPasswordScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
-        <Pressable onPress={handleBack}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Go Back"
+          onPress={handleBack}
+          style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
+        >
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Forgot Password</Text>
@@ -95,26 +103,45 @@ export default function ForgotPasswordScreen() {
         <Text style={[styles.prompt, { color: jarsPrimary }]}>
           Enter your email address and we’ll send you a reset link.
         </Text>
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel="Contact Support"
+          onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
+          style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
+        >
+          <Text style={[styles.supportLink, { color: jarsPrimary }]}>Need help? Contact support</Text>
+        </Pressable>
         <TextInput
           style={[
             styles.input,
             {
-              borderColor: jarsSecondary,
+              borderColor: focused ? jarsPrimary : jarsSecondary,
               color: jarsPrimary,
               backgroundColor: '#FFF',
             },
           ]}
           placeholder="you@example.com"
-          placeholderTextColor={jarsSecondary}
+          placeholderTextColor="#9CA3AF"
           keyboardType="email-address"
           value={email}
           onChangeText={t => {
             hapticLight();
             setEmail(t);
           }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          accessibilityLabel="Email"
+          accessibilityRole="text"
         />
         <Pressable
-          style={[styles.submitBtn, { backgroundColor: jarsPrimary }, glowStyle]}
+          accessibilityRole="button"
+          accessibilityLabel="Send Reset Link"
+          style={({ pressed }) => [
+            styles.submitBtn,
+            { backgroundColor: jarsPrimary },
+            glowStyle,
+            pressed && { transform: [{ scale: 0.95 }] },
+          ]}
           onPress={onSubmit}
         >
           <Text style={styles.submitText}>Send Reset Link</Text>
@@ -133,7 +160,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
   },
-  headerTitle: { fontSize: 20, fontWeight: '600' },
+  headerTitle: { fontSize: 24, fontWeight: '600' },
   content: { flex: 1, padding: 16 },
   prompt: {
     fontSize: 16,
@@ -158,5 +185,11 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  supportLink: {
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
 });

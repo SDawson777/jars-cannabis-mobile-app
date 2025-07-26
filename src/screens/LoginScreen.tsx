@@ -40,6 +40,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [focused, setFocused] = useState<string | null>(null);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -78,6 +79,7 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       setError(null);
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
       await signIn(email, password);
       logEvent('login_success', {});
       hapticMedium();
@@ -85,6 +87,7 @@ export default function LoginScreen() {
     } catch (err: any) {
       logEvent('login_failure', { message: err.message });
       hapticHeavy();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -95,11 +98,14 @@ export default function LoginScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.header}>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Go Back"
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             navigation.goBack();
           }}
+          style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
         >
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
@@ -109,22 +115,43 @@ export default function LoginScreen() {
 
       <View style={styles.form}>
         <TextInput
-          style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+          style={[
+            styles.input,
+            {
+              borderColor: focused === 'email' ? jarsPrimary : jarsSecondary,
+              color: jarsPrimary,
+            },
+          ]}
           placeholder="Email"
-          placeholderTextColor={jarsSecondary}
+          placeholderTextColor="#9CA3AF"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
+          onFocus={() => setFocused('email')}
+          onBlur={() => setFocused(null)}
+          accessibilityLabel="Email"
+          accessibilityRole="text"
         />
         <View style={styles.passwordRow}>
           <TextInput
-            style={[styles.input, { flex: 1, borderColor: jarsSecondary, color: jarsPrimary }]}
+            style={[
+              styles.input,
+              {
+                flex: 1,
+                borderColor: focused === 'password' ? jarsPrimary : jarsSecondary,
+                color: jarsPrimary,
+              },
+            ]}
             placeholder="Password"
-            placeholderTextColor={jarsSecondary}
+            placeholderTextColor="#9CA3AF"
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
+            onFocus={() => setFocused('password')}
+            onBlur={() => setFocused(null)}
+            accessibilityLabel="Password"
+            accessibilityRole="text"
           />
           <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
             {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
@@ -134,17 +161,27 @@ export default function LoginScreen() {
         {error && <Text style={[styles.error, { color: 'red' }]}>{error}</Text>}
 
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Forgot Password"
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             navigation.navigate('ForgotPassword');
           }}
+          style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
         >
           <Text style={[styles.link, { color: jarsPrimary }]}>Forgot Password?</Text>
         </Pressable>
 
         <Pressable
-          style={[styles.button, { backgroundColor: jarsPrimary }, glowStyle]}
+          accessibilityRole="button"
+          accessibilityLabel="Log In"
+          style={({ pressed }) => [
+            styles.button,
+            { backgroundColor: jarsPrimary },
+            glowStyle,
+            pressed && { transform: [{ scale: 0.95 }] },
+          ]}
           onPress={handleLogin}
           disabled={loading}
         >
@@ -156,17 +193,30 @@ export default function LoginScreen() {
         </Pressable>
 
         <View style={styles.footer}>
-          <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
-            By logging in you agree to our
-          </Text>
-          <Pressable
-            onPress={() => {
-              hapticLight();
-              navigation.navigate('Legal');
-            }}
-          >
-            <Text style={[styles.linkText, { color: jarsPrimary }]}>Terms & Privacy</Text>
-          </Pressable>
+          <Text style={[styles.disclaimer, { color: jarsSecondary }]}>By logging in you agree to our</Text>
+          <View style={styles.legalRow}>
+            <Pressable
+              accessibilityRole="link"
+              accessibilityLabel="Terms and Conditions"
+              onPress={() => {
+                hapticLight();
+                navigation.navigate('Legal');
+              }}
+            >
+              <Text style={[styles.linkText, { color: jarsPrimary }]}>Terms &amp; Conditions</Text>
+            </Pressable>
+            <Text style={[styles.disclaimer, { color: jarsSecondary }]}> and </Text>
+            <Pressable
+              accessibilityRole="link"
+              accessibilityLabel="Privacy Policy"
+              onPress={() => {
+                hapticLight();
+                navigation.navigate('Legal');
+              }}
+            >
+              <Text style={[styles.linkText, { color: jarsPrimary }]}>Privacy Policy</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -202,4 +252,5 @@ const styles = StyleSheet.create({
   },
   disclaimer: { fontSize: 12, textAlign: 'center', marginBottom: 4 },
   linkText: { fontSize: 12, fontWeight: '600', textDecorationLine: 'underline' },
+  legalRow: { flexDirection: 'row', alignItems: 'center' },
 });
