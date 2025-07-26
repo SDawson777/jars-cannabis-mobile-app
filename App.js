@@ -55,6 +55,7 @@ import LegalScreen from './src/screens/LegalScreen';
 import MyJarsScreen from './src/screens/MyJarsScreen';
 import JournalEntryScreen from './src/screens/JournalEntryScreen';
 import MyJarsInsightsScreen from './src/screens/MyJarsInsightsScreen';
+import EthicalAIDashboardScreen from './src/screens/EthicalAIDashboardScreen';
 
 const Stack = createNativeStackNavigator(); // no generic
 const queryClient = new QueryClient();
@@ -113,6 +114,7 @@ export default function App() {
               <Stack.Screen name="MyJars" component={MyJarsScreen} />
               <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
               <Stack.Screen name="MyJarsInsights" component={MyJarsInsightsScreen} />
+              <Stack.Screen name="EthicalAIDashboard" component={EthicalAIDashboardScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </QueryClientProvider>
