@@ -9,7 +9,8 @@ export type RootStackParamList = {
   StoreSelection: undefined;
   HomeScreen: undefined;
   ShopScreen: undefined;
-  ProductDetails: { product: any };
+  ProductList: undefined;
+  ProductDetail: { slug: string };
   CartScreen: undefined;
   Checkout: undefined;
   OrderConfirmation: undefined;
@@ -36,8 +37,9 @@ export type RootStackParamList = {
   HelpFAQ: undefined;
   ContactUs: undefined;
   EducationalGreenhouse: undefined;
-  /** Now requires a title param */
-  ArticleDetail: { title: string };
+  ArticleList: undefined;
+  /** Now requires a slug param */
+  ArticleDetail: { slug: string };
   CommunityGarden: undefined;
   ConciergeChat: undefined;
   DataTransparency: undefined;

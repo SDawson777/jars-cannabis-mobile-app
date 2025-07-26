@@ -10,6 +10,7 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -17,6 +18,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import { useArticleBySlug } from '../hooks/useArticleBySlug';
+import CMSImage from '../components/CMSImage';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,7 +32,8 @@ type ArticleRouteProp = RouteProp<RootStackParamList, 'ArticleDetail'>;
 export default function ArticleDetailScreen() {
   const navigation = useNavigation<ArticleNavProp>();
   const route = useRoute<ArticleRouteProp>();
-  const { title } = route.params;
+  const { slug } = route.params;
+  const { data, isLoading } = useArticleBySlug(slug);
 
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
@@ -46,27 +50,35 @@ export default function ArticleDetailScreen() {
     navigation.goBack();
   };
 
+  if (isLoading || !data) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: bgColor, justifyContent: 'center', alignItems: 'center' },
+        ]}
+      >
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* Header */}
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable onPress={handleBack} style={styles.iconBtn}>
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>{title}</Text>
+        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>{data.title}</Text>
         <View style={styles.iconBtn} />
       </View>
 
-      {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.articleText, { color: jarsSecondary }]}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel dui vitae risus vulputate
-          convallis. Sed quis lacus non turpis ullamcorper cursus. In hac habitasse platea dictumst.
-          Duis nec hendrerit nunc. Pellentesque habitant morbi tristique senectus et netus et
-          malesuada fames ac turpis egestas. Donec sit amet sapien sed nisi luctus ullamcorper.
-          Maecenas quis ex nec sapien tincidunt mollis. Nulla facilisi. Curabitur ultrices sem eu
-          tortor tincidunt, quis consequat metus suscipit.
-        </Text>
+        {data.mainImage && (
+          <CMSImage uri={data.mainImage.url} alt={data.mainImage.alt} style={styles.hero} />
+        )}
+        <Text style={styles.date}>{new Date(data.publishedAt).toLocaleDateString()}</Text>
+        <Text style={[styles.articleText, { color: jarsSecondary }]}>{String(data.body)}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -84,6 +96,8 @@ const styles = StyleSheet.create({
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
+  hero: { width: '100%', height: 200, borderRadius: 12, marginBottom: 12 },
+  date: { fontSize: 12, color: '#777', marginBottom: 8 },
   articleText: {
     fontSize: 15,
     lineHeight: 24,
