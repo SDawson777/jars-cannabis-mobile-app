@@ -41,6 +41,7 @@ export default function SignUpScreen() {
   const [confirm, setConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [optIn, setOptIn] = useState(false);
+  const [focused, setFocused] = useState<string | null>(null);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -94,39 +95,80 @@ export default function SignUpScreen() {
       <Text style={[styles.title, { color: jarsPrimary }]}>Create Account</Text>
 
       <TextInput
-        style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+        style={[
+          styles.input,
+          {
+            borderColor: focused === 'name' ? jarsPrimary : jarsSecondary,
+            color: jarsPrimary,
+          },
+        ]}
         placeholder="Full Name"
-        placeholderTextColor={jarsSecondary}
+        placeholderTextColor="#9CA3AF"
         value={name}
         onChangeText={setName}
+        onFocus={() => setFocused('name')}
+        onBlur={() => setFocused(null)}
+        accessibilityLabel="Full Name"
+        accessibilityRole="text"
       />
 
       <TextInput
-        style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+        style={[
+          styles.input,
+          {
+            borderColor: focused === 'email' ? jarsPrimary : jarsSecondary,
+            color: jarsPrimary,
+          },
+        ]}
         placeholder="Email"
-        placeholderTextColor={jarsSecondary}
+        placeholderTextColor="#9CA3AF"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
+        onFocus={() => setFocused('email')}
+        onBlur={() => setFocused(null)}
+        accessibilityLabel="Email"
+        accessibilityRole="text"
       />
 
       <TextInput
-        style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+        style={[
+          styles.input,
+          {
+            borderColor: focused === 'phone' ? jarsPrimary : jarsSecondary,
+            color: jarsPrimary,
+          },
+        ]}
         placeholder="Phone"
-        placeholderTextColor={jarsSecondary}
+        placeholderTextColor="#9CA3AF"
         keyboardType="phone-pad"
         value={phone}
         onChangeText={setPhone}
+        onFocus={() => setFocused('phone')}
+        onBlur={() => setFocused(null)}
+        accessibilityLabel="Phone"
+        accessibilityRole="tel"
       />
 
       <View style={styles.passwordRow}>
         <TextInput
-          style={[styles.input, { flex: 1, borderColor: jarsSecondary, color: jarsPrimary }]}
+          style={[
+            styles.input,
+            {
+              flex: 1,
+              borderColor: focused === 'password' ? jarsPrimary : jarsSecondary,
+              color: jarsPrimary,
+            },
+          ]}
           placeholder="Password"
-          placeholderTextColor={jarsSecondary}
+          placeholderTextColor="#9CA3AF"
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
+          onFocus={() => setFocused('password')}
+          onBlur={() => setFocused(null)}
+          accessibilityLabel="Password"
+          accessibilityRole="text"
         />
         <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
           {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
@@ -136,12 +178,23 @@ export default function SignUpScreen() {
 
       <View style={styles.passwordRow}>
         <TextInput
-          style={[styles.input, { flex: 1, borderColor: jarsSecondary, color: jarsPrimary }]}
+          style={[
+            styles.input,
+            {
+              flex: 1,
+              borderColor: focused === 'confirm' ? jarsPrimary : jarsSecondary,
+              color: jarsPrimary,
+            },
+          ]}
           placeholder="Confirm Password"
-          placeholderTextColor={jarsSecondary}
+          placeholderTextColor="#9CA3AF"
           secureTextEntry={!showPassword}
           value={confirm}
           onChangeText={setConfirm}
+          onFocus={() => setFocused('confirm')}
+          onBlur={() => setFocused(null)}
+          accessibilityLabel="Confirm Password"
+          accessibilityRole="text"
         />
         <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
           {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
@@ -154,34 +207,57 @@ export default function SignUpScreen() {
       </Pressable>
 
       <Pressable
-        style={[styles.button, { backgroundColor: jarsPrimary }, glowStyle]}
+        accessibilityRole="button"
+        accessibilityLabel="Sign Up"
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: jarsPrimary },
+          glowStyle,
+          pressed && { transform: [{ scale: 0.95 }] },
+        ]}
         onPress={handleSignUp}
       >
         <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>
 
       <View style={styles.policy}>
-        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
-          By creating an account you agree to our
-        </Text>
-        <Pressable
-          onPress={() => {
-            hapticLight();
-            navigation.navigate('Legal');
-          }}
-        >
-          <Text style={[styles.linkText, { color: jarsPrimary }]}>Terms & Privacy</Text>
-        </Pressable>
+        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>By creating an account you agree to our</Text>
+        <View style={styles.legalRow}>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Terms and Conditions"
+            onPress={() => {
+              hapticLight();
+              navigation.navigate('Legal');
+            }}
+          >
+            <Text style={[styles.linkText, { color: jarsPrimary }]}>Terms &amp; Conditions</Text>
+          </Pressable>
+          <Text style={[styles.disclaimer, { color: jarsSecondary }]}> and </Text>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Privacy Policy"
+            onPress={() => {
+              hapticLight();
+              navigation.navigate('Legal');
+            }}
+          >
+            <Text style={[styles.linkText, { color: jarsPrimary }]}>Privacy Policy</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: jarsSecondary }]}>Already have an account?</Text>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Log In"
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
             navigation.replace('Login');
           }}
+          style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
         >
           <Text style={[styles.linkText, { color: jarsPrimary }]}>Log In</Text>
         </Pressable>
@@ -197,7 +273,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 32,
@@ -253,5 +329,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
+  legalRow: { flexDirection: 'row', alignItems: 'center' },
   disclaimer: { fontSize: 12, textAlign: 'center', marginBottom: 4 },
 });
