@@ -10,6 +10,7 @@ import {
   TextInput,
   StyleSheet,
   Dimensions,
+  RefreshControl,
   Alert,
   LayoutAnimation,
   UIManager,
@@ -20,6 +21,9 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import { useCart } from '../hooks/useCart';
+import CartErrorBanner from '../components/CartErrorBanner';
 import {
   hapticLight,
   hapticMedium,
@@ -37,34 +41,17 @@ type CartNavProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;
 const { width } = Dimensions.get('window');
 const IMAGE_SIZE = 80;
 
-const initialCart = [
-  {
-    id: '1',
-    name: 'Rainbow Rozay',
-    price: 79.0,
-    image: require('../assets/product1.png'),
-    quantity: 1,
-  },
-  {
-    id: '2',
-    name: 'Moonwalker OG',
-    price: 65.0,
-    image: require('../assets/product2.png'),
-    quantity: 2,
-  },
-];
-
 export default function CartScreen() {
   const navigation = useNavigation<CartNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-
-  const [cart, setCart] = useState(initialCart);
+  const { cart, isLoading, error, updateCart, applyPromo, refetchCart, hasPending } = useCart();
   const [promo, setPromo] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, [cart, promoApplied]);
+  }, [cart]);
 
   // Dynamic background
   const bgColor =
@@ -90,19 +77,19 @@ export default function CartScreen() {
           }
         : {};
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discount = promoApplied ? 10 : 0;
+  const subtotal = cart?.items.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+  const discount = 0;
   const taxes = (subtotal - discount) * 0.07;
   const total = subtotal - discount + taxes;
 
   const updateQty = (id: string, delta: number) => {
+    if (!cart) return;
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setCart(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-      )
-    );
+    const item = cart.items.find(i => i.id === id);
+    if (item) {
+      updateCart({ items: [{ id, quantity: Math.max(1, item.quantity + delta) }] });
+    }
   };
 
   const removeItem = (id: string) => {
@@ -114,19 +101,17 @@ export default function CartScreen() {
         style: 'destructive',
         onPress: () => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setCart(prev => prev.filter(item => item.id !== id));
+          updateCart({ items: cart?.items.filter(it => it.id !== id) });
         },
       },
     ]);
   };
 
-  const applyPromo = () => {
-    if (promo.trim().toUpperCase() === 'JARS10') {
+  const applyPromoCode = async () => {
+    try {
+      await applyPromo(promo);
       hapticSuccess();
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setPromoApplied(true);
-      Alert.alert('Success', 'Promo code applied!');
-    } else {
+    } catch {
       hapticError();
       Alert.alert('Invalid Code', 'Please try again.');
     }
@@ -137,6 +122,19 @@ export default function CartScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('HelpFAQ');
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { padding: 16 }]}>
+        \
+        <SkeletonPlaceholder>
+          <SkeletonPlaceholder.Item width="100%" height={80} borderRadius={12} marginBottom={12} />
+          <SkeletonPlaceholder.Item width="100%" height={80} borderRadius={12} marginBottom={12} />
+          <SkeletonPlaceholder.Item width="100%" height={80} borderRadius={12} />
+        </SkeletonPlaceholder>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -158,14 +156,26 @@ export default function CartScreen() {
       </View>
 
       {/* Cart Items */}
+      {error && <CartErrorBanner onRetry={refetchCart} />}
+      {hasPending && <Text style={{ textAlign: 'center', marginBottom: 4 }}>Pending changes</Text>}
       <FlatList
-        data={cart}
+        data={cart?.items || []}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await refetchCart();
+              setRefreshing(false);
+            }}
+          />
+        }
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Image source={item.image} style={styles.image} />
+            <Image source={{ uri: item.image }} style={styles.image} />
             <View style={styles.info}>
               <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
               <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
@@ -197,7 +207,7 @@ export default function CartScreen() {
         />
         <Pressable
           style={[styles.promoBtn, { backgroundColor: jarsPrimary }, glowStyle]}
-          onPress={applyPromo}
+          onPress={applyPromoCode}
         >
           <Text style={styles.promoBtnText}>Apply</Text>
         </Pressable>
