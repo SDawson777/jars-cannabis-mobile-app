@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { LoyaltyProvider } from './src/context/LoyaltyContext';
+import { StoreProvider } from './src/context/StoreContext';
 import * as SecureStore from 'expo-secure-store';
 
 import SplashScreenWrapper from './src/screens/SplashScreenWrapper';
@@ -15,7 +16,7 @@ import AgeVerification from './src/screens/AgeVerification';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
-import StoreSelection from './src/screens/StoreSelection';
+import StoreSelection from './src/screens/StoreSelectionScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ShopScreen from './src/screens/ShopScreen';
 import ProductListScreen from './src/screens/ProductListScreen';
@@ -77,9 +78,10 @@ export default function App() {
   if (!initialRoute) return null;
 
   return (
-    <LoyaltyProvider>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
+    <StoreProvider>
+      <LoyaltyProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
           <NavigationContainer>
             <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
               <Stack.Screen name="SplashScreen" component={SplashScreenWrapper} />
@@ -137,5 +139,6 @@ export default function App() {
         </QueryClientProvider>
       </ThemeProvider>
     </LoyaltyProvider>
+  </StoreProvider>
   );
 }

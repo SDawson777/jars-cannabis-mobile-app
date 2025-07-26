@@ -16,6 +16,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -26,9 +27,13 @@ export default function AppSettingsScreen() {
   const navigation = useNavigation();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [darkMode, setDarkMode] = useState(false);
+  const [visitAlerts, setVisitAlerts] = useState(false);
+  const [personalOffers, setPersonalOffers] = useState(false);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    AsyncStorage.getItem('visitAlerts').then(v => setVisitAlerts(v === 'true'));
+    AsyncStorage.getItem('personalOffers').then(v => setPersonalOffers(v === 'true'));
   }, []);
 
   const handleBack = () => {
@@ -41,6 +46,20 @@ export default function AppSettingsScreen() {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setDarkMode(val);
+  };
+
+  const toggleVisitAlerts = (val: boolean) => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setVisitAlerts(val);
+    AsyncStorage.setItem('visitAlerts', String(val));
+  };
+
+  const togglePersonalOffers = (val: boolean) => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setPersonalOffers(val);
+    AsyncStorage.setItem('personalOffers', String(val));
   };
 
   const bgColor =
@@ -64,6 +83,28 @@ export default function AppSettingsScreen() {
           <Switch
             value={darkMode}
             onValueChange={toggleDarkMode}
+            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        {/* Store Visit Alerts */}
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Store Visit Alerts</Text>
+          <Switch
+            value={visitAlerts}
+            onValueChange={toggleVisitAlerts}
+            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        {/* Personalized Offers */}
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Personalized Offers</Text>
+          <Switch
+            value={personalOffers}
+            onValueChange={togglePersonalOffers}
             trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
             thumbColor="#FFFFFF"
           />
