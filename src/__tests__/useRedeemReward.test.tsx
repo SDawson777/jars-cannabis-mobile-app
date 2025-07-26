@@ -1,3 +1,4 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRedeemReward } from '../api/hooks/useRedeemReward';
@@ -5,7 +6,7 @@ import { phase4Client } from '../api/phase4Client';
 import { toast } from '../utils/toast';
 
 jest.mock('../api/phase4Client');
-jest.mock('../utils/toast');
+jest.mock('../utils/toast', () => ({ toast: jest.fn() }));
 
 describe('useRedeemReward', () => {
   it('invalidates loyaltyStatus on success', async () => {
