@@ -19,6 +19,8 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { TERPENES } from '../terpene_wheel/data/terpenes';
 import { hapticLight } from '../utils/haptic';
+import { useFiltersQuery } from '../hooks/useFilters';
+import useSkeletonText from '../components/useSkeletonText';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -52,6 +54,7 @@ export default function ShopScreen() {
   const navigation = useNavigation<ShopNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [products] = useState(sampleProducts);
+  const { data: filters, isLoading: filtersLoading } = useFiltersQuery();
 
   // animate on mount
   useEffect(() => {
@@ -90,6 +93,20 @@ export default function ShopScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <View style={styles.filterRow}>
+        {filtersLoading && (
+          <>
+            {useSkeletonText(60, 20)}
+            {useSkeletonText(80, 20)}
+          </>
+        )}
+        {!filtersLoading &&
+          filters?.map(f => (
+            <View key={f.id} style={[styles.filterChip, { borderColor: jarsPrimary }]}>\
+              <Text style={{ color: jarsPrimary }}>{f.label}</Text>
+            </View>
+          ))}
+      </View>
       <FlatList
         data={products}
         keyExtractor={item => item.id}
@@ -113,6 +130,15 @@ export default function ShopScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', padding: 16 },
+  filterChip: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginRight: 8,
+    marginBottom: 8,
+  },
   list: { padding: 16 },
   card: {
     width: CARD_WIDTH,

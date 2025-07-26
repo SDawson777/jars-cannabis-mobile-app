@@ -33,7 +33,7 @@ export default function ArticleDetailScreen() {
   const navigation = useNavigation<ArticleNavProp>();
   const route = useRoute<ArticleRouteProp>();
   const { slug } = route.params;
-  const { data, isLoading } = useArticleBySlug(slug);
+  const { data, isLoading, isError } = useArticleBySlug(slug);
 
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
@@ -50,7 +50,7 @@ export default function ArticleDetailScreen() {
     navigation.goBack();
   };
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <SafeAreaView
         style={[
@@ -59,6 +59,19 @@ export default function ArticleDetailScreen() {
         ]}
       >
         <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.container,
+          { backgroundColor: bgColor, justifyContent: 'center', alignItems: 'center' },
+        ]}
+      >
+        <Text>Unable to load article.</Text>
       </SafeAreaView>
     );
   }
