@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { Alert } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
 import auth from '@react-native-firebase/auth';
 import { Buffer } from 'buffer';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
@@ -70,6 +71,40 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             await clearAuth();
             Alert.alert('Session expired', 'Please log in again.');
           } else {
+            const pref = await getSecure('useBiometricAuth');
+            if (pref !== 'false') {
+              const hasHardware = await LocalAuthentication.hasHardwareAsync();
+              const enrolled = await LocalAuthentication.isEnrolledAsync();
+              if (hasHardware && enrolled) {
+                const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+                const useFace = types.includes(
+                  LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
+                );
+                const usePrint = types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT);
+                const promptMessage = useFace
+                  ? 'Unlock Jars with Face ID'
+                  : usePrint
+                    ? 'Unlock Jars with Touch ID'
+                    : 'Unlock Jars';
+                const authPromise = LocalAuthentication.authenticateAsync({
+                  promptMessage,
+                  disableDeviceFallback: true,
+                  cancelLabel: 'Cancel',
+                });
+                const result = await Promise.race([
+                  authPromise,
+                  new Promise<LocalAuthentication.LocalAuthenticationResult>(res =>
+                    setTimeout(() => res({ success: false } as any), 10000)
+                  ),
+                ]);
+                if (result.success) {
+                  setTokenState(storedToken);
+                  return;
+                }
+              } else if (!hasHardware) {
+                Alert.alert('Biometric unlock not available on this device.');
+              }
+            }
             setTokenState(storedToken);
           }
         }
