@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { useUserProfile, UserProfile } from '../api/hooks/useUserProfile';
 
 export interface User extends UserProfile {}
@@ -33,18 +34,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setToken = async (newToken: string) => {
     setTokenState(newToken);
-    await AsyncStorage.setItem('jwtToken', newToken);
+    await SecureStore.setItemAsync('jwtToken', newToken);
   };
 
   const clearAuth = async () => {
     setTokenState(null);
-    await AsyncStorage.removeItem('jwtToken');
+    await SecureStore.deleteItemAsync('jwtToken');
   };
 
   useEffect(() => {
     const loadAuth = async () => {
       try {
-        const storedToken = await AsyncStorage.getItem('jwtToken');
+        const storedToken = await SecureStore.getItemAsync('jwtToken');
         if (storedToken) setTokenState(storedToken);
       } catch (e) {
         console.warn('Failed to load auth from storage', e);
