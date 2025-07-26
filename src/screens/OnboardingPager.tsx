@@ -25,6 +25,11 @@ const slides = [
     headline: 'Best Value',
     benefitText: 'Great deals every day',
   },
+  {
+    headline: 'Safe & Seamless Access',
+    benefitText: 'Log in securely with Face ID, Touch ID, or a PIN – your privacy, protected.',
+    illustration: require('../assets/illustrations/illustration-biometrics-secure.svg'),
+  },
 ];
 
 export default function OnboardingPager() {
@@ -51,6 +56,7 @@ export default function OnboardingPager() {
             <OnboardingSlide
               headline={s.headline}
               benefitText={s.benefitText}
+              illustration={s.illustration}
               isActive={i === index}
             />
             {i === slides.length - 1 && (

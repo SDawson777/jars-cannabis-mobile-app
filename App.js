@@ -8,6 +8,7 @@ import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { LoyaltyProvider } from './src/context/LoyaltyContext';
 import { StoreProvider } from './src/context/StoreContext';
+import { SettingsProvider } from './src/context/SettingsContext';
 import * as SecureStore from 'expo-secure-store';
 
 import SplashScreenWrapper from './src/screens/SplashScreenWrapper';
@@ -83,7 +84,8 @@ export default function App() {
     <StoreProvider>
       <LoyaltyProvider>
         <ThemeProvider>
-          <QueryClientProvider client={queryClient}>
+          <SettingsProvider>
+            <QueryClientProvider client={queryClient}>
           <NavigationContainer>
             <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
               <Stack.Screen name="SplashScreen" component={SplashScreenWrapper} />
@@ -141,6 +143,7 @@ export default function App() {
             </Stack.Navigator>
           </NavigationContainer>
         </QueryClientProvider>
+          </SettingsProvider>
       </ThemeProvider>
     </LoyaltyProvider>
   </StoreProvider>
