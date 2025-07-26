@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,11 +30,15 @@ export default function AppSettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const [visitAlerts, setVisitAlerts] = useState(false);
   const [personalOffers, setPersonalOffers] = useState(false);
+  const [useBiometrics, setUseBiometrics] = useState(true);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     AsyncStorage.getItem('visitAlerts').then(v => setVisitAlerts(v === 'true'));
     AsyncStorage.getItem('personalOffers').then(v => setPersonalOffers(v === 'true'));
+    SecureStore.getItemAsync('useBiometricAuth').then(v => {
+      if (v === 'false') setUseBiometrics(false);
+    });
   }, []);
 
   const handleBack = () => {
@@ -60,6 +65,13 @@ export default function AppSettingsScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPersonalOffers(val);
     AsyncStorage.setItem('personalOffers', String(val));
+  };
+
+  const toggleBiometric = (val: boolean) => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setUseBiometrics(val);
+    SecureStore.setItemAsync('useBiometricAuth', String(val));
   };
 
   const bgColor =
@@ -105,6 +117,17 @@ export default function AppSettingsScreen() {
           <Switch
             value={personalOffers}
             onValueChange={togglePersonalOffers}
+            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        {/* Biometric Unlock */}
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Biometric Unlock</Text>
+          <Switch
+            value={useBiometrics}
+            onValueChange={toggleBiometric}
             trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
             thumbColor="#FFFFFF"
           />

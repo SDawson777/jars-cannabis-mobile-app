@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import auth from '@react-native-firebase/auth';
 import { AuthContext } from '../context/AuthContext';
+import { saveSecure } from '../utils/secureStorage';
 
 interface SignUpArgs {
   name: string;
@@ -16,6 +17,7 @@ export function useAuth() {
     const cred = await auth().signInWithEmailAndPassword(email, password);
     const t = await cred.user.getIdToken();
     await setToken(t);
+    await saveSecure('useBiometricAuth', 'true');
   };
 
   const signUp = async ({ name, email, phone, password }: SignUpArgs) => {
@@ -23,6 +25,7 @@ export function useAuth() {
     await cred.user.updateProfile({ displayName: name, phoneNumber: phone });
     const t = await cred.user.getIdToken();
     await setToken(t);
+    await saveSecure('useBiometricAuth', 'true');
   };
 
   const signOut = async () => {
