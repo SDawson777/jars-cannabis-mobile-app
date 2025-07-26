@@ -1,4 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks';
+import React from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUserProfile } from '../api/hooks/useUserProfile';
 import { phase4Client } from '../api/phase4Client';
@@ -13,16 +14,14 @@ const wrapper: any = ({ children }: any) => {
 describe('useUserProfile', () => {
   it('returns data on success', async () => {
     (phase4Client.get as jest.Mock).mockResolvedValue({ data: { name: 'Jane' } });
-    const { result, waitFor } = renderHook(() => useUserProfile(), { wrapper });
+    const { result } = renderHook(() => useUserProfile(), { wrapper });
     expect(result.current.isLoading).toBe(true);
-    await waitFor(() => result.current.isSuccess);
-    expect(result.current.data).toEqual({ name: 'Jane' });
+    await waitFor(() => expect(result.current.data).toEqual({ name: 'Jane' }));
   });
 
   it('handles error', async () => {
     (phase4Client.get as jest.Mock).mockRejectedValue(new Error('fail'));
-    const { result, waitFor } = renderHook(() => useUserProfile(), { wrapper });
-    await waitFor(() => result.current.isError);
-    expect(result.current.isError).toBe(true);
+    const { result } = renderHook(() => useUserProfile(), { wrapper });
+    await waitFor(() => expect(result.current.isError).toBe(true));
   });
 });

@@ -28,8 +28,9 @@ import {
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
-import ForYouTodayCard from '../components/ForYouTodayCard';
-import { useForYouToday } from '../hooks/useForYouToday';
+import PersonalizedCard from '../components/PersonalizedCard';
+import ConsentModal from '../components/ConsentModal';
+import { UserConsentProvider } from '../context/UserConsentContext';
 import { TERPENES } from '../terpene_wheel/data/terpenes';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -76,7 +77,6 @@ const ways = [
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { data: forYou } = useForYouToday('1', '1');
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -146,13 +146,10 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        {forYou && (
-          <ForYouTodayCard
-            data={forYou}
-            onSelectProduct={id => navigation.navigate('ProductDetails', { product: { id } })}
-            onSeeAll={() => navigation.navigate('ShopScreen')}
-          />
-        )}
+        <UserConsentProvider>
+          <ConsentModal />
+          <PersonalizedCard />
+        </UserConsentProvider>
 
         {/* Categories */}
         <View style={styles.sectionHeader}>
