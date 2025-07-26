@@ -29,6 +29,8 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import ForYouTodayCard from '../components/ForYouTodayCard';
+import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
+import OfflineNotice from '../components/OfflineNotice';
 import { useForYouToday } from '../hooks/useForYouToday';
 import { TERPENES } from '../terpene_wheel/data/terpenes';
 
@@ -76,7 +78,7 @@ const ways = [
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { data: forYou } = useForYouToday('1', '1');
+  const { data: forYou, isLoading } = useForYouToday('1', '1');
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -136,6 +138,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      <OfflineNotice />
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Hero */}
         <View style={styles.hero}>
@@ -146,7 +149,8 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        {forYou && (
+        {isLoading && <ForYouTodaySkeleton />}
+        {forYou && !isLoading && (
           <ForYouTodayCard
             data={forYou}
             onSelectProduct={id => navigation.navigate('ProductDetail', { slug: id })}
