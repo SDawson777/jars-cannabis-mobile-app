@@ -19,9 +19,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { AuthContext } from '../context/AuthContext';
-import { useMutation } from '@tanstack/react-query';
-import { phase4Client } from '../api/phase4Client';
-import { hapticLight, hapticMedium } from '../utils/haptic';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
+import { logEvent } from '../utils/analytics';
+import { useAuth } from '../hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react-native';
+import AnimatedShimmerOverlay from '../components/AnimatedShimmerOverlay';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,18 +31,15 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 type LoginNavProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
-interface AuthResponse {
-  token: string;
-  user: any;
-}
 
 export default function LoginScreen() {
   const navigation = useNavigation<LoginNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { setToken } = useContext(AuthContext);
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -68,31 +67,29 @@ export default function LoginScreen() {
           }
         : {};
 
-  const loginMutation = useMutation<AuthResponse, Error, void>({
-    mutationFn: async () => {
-      // Use phase4Client for consistency
-      const { data } = await phase4Client.post<AuthResponse>('/auth/login', {
-        email,
-        password,
-      });
-      return data;
-    },
-    onSuccess: async ({ token }) => {
-      hapticMedium();
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      await setToken(token);
-      navigation.replace('HomeScreen');
-    },
-    onError: err => {
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
       hapticLight();
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      Alert.alert('Login failed', err.message);
-    },
-  });
-
-  const handleLogin = () => loginMutation.mutate();
-
-  const isPending = loginMutation.status === 'pending';
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      await signIn(email, password);
+      logEvent('login_success', {});
+      hapticMedium();
+      navigation.replace('HomeScreen');
+    } catch (err: any) {
+      logEvent('login_failure', { message: err.message });
+      hapticHeavy();
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -120,18 +117,21 @@ export default function LoginScreen() {
           value={email}
           onChangeText={setEmail}
         />
-        <TextInput
-          style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-          placeholder="Password"
-          placeholderTextColor={jarsSecondary}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        {loginMutation.error && (
-          <Text style={[styles.error, { color: 'red' }]}>{loginMutation.error.message}</Text>
-        )}
+        <View style={styles.passwordRow}>
+          <TextInput
+            style={[styles.input, { flex: 1, borderColor: jarsSecondary, color: jarsPrimary }]}
+            placeholder="Password"
+            placeholderTextColor={jarsSecondary}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+            {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
+          </Pressable>
+          <AnimatedShimmerOverlay />
+        </View>
+        {error && <Text style={[styles.error, { color: 'red' }]}>{error}</Text>}
 
         <Pressable
           onPress={() => {
@@ -146,9 +146,9 @@ export default function LoginScreen() {
         <Pressable
           style={[styles.button, { backgroundColor: jarsPrimary }, glowStyle]}
           onPress={handleLogin}
-          disabled={isPending}
+          disabled={loading}
         >
-          {isPending ? (
+          {loading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
             <Text style={styles.buttonText}>Log In</Text>
@@ -190,6 +190,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
   },
+  passwordRow: { flexDirection: 'row', alignItems: 'center' },
+  eyeBtn: { padding: 8 },
   link: { textAlign: 'right', marginBottom: 24, fontWeight: '500' },
   button: { paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },

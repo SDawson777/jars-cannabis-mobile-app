@@ -3,9 +3,11 @@ export type RootStackParamList = {
   SplashScreen: undefined;
   Onboarding: undefined;
   AgeVerification: undefined;
+  LoginSignUpDecision: undefined;
   Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
+  OTPScreen: undefined;
   StoreSelection: undefined;
   HomeScreen: undefined;
   ShopScreen: undefined;
