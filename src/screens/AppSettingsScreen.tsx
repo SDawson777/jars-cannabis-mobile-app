@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+import { useSettings } from '../context/SettingsContext';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -30,15 +30,12 @@ export default function AppSettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const [visitAlerts, setVisitAlerts] = useState(false);
   const [personalOffers, setPersonalOffers] = useState(false);
-  const [useBiometrics, setUseBiometrics] = useState(true);
+  const { biometricEnabled, setBiometricEnabled } = useSettings();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     AsyncStorage.getItem('visitAlerts').then(v => setVisitAlerts(v === 'true'));
     AsyncStorage.getItem('personalOffers').then(v => setPersonalOffers(v === 'true'));
-    SecureStore.getItemAsync('useBiometricAuth').then(v => {
-      if (v === 'false') setUseBiometrics(false);
-    });
   }, []);
 
   const handleBack = () => {
@@ -70,8 +67,7 @@ export default function AppSettingsScreen() {
   const toggleBiometric = (val: boolean) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setUseBiometrics(val);
-    SecureStore.setItemAsync('useBiometricAuth', String(val));
+    setBiometricEnabled(val);
   };
 
   const bgColor =
@@ -122,11 +118,11 @@ export default function AppSettingsScreen() {
           />
         </View>
 
-        {/* Biometric Unlock */}
+        <Text style={[styles.section, { color: jarsSecondary }]}>Privacy &amp; Security</Text>
         <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Biometric Unlock</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Face ID / Touch ID</Text>
           <Switch
-            value={useBiometrics}
+            value={biometricEnabled}
             onValueChange={toggleBiometric}
             trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
             thumbColor="#FFFFFF"
@@ -179,4 +175,5 @@ const styles = StyleSheet.create({
   label: { fontSize: 16 },
   value: { fontSize: 16 },
   subLabel: { fontSize: 14, marginTop: 4 },
+  section: { fontSize: 14, fontWeight: '600', marginTop: 24, marginBottom: 8 },
 });
