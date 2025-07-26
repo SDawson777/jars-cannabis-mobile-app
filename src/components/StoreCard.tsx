@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 import { MapPin, Star } from 'lucide-react-native';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import type { StoreData } from '../@types/store';
@@ -8,6 +9,7 @@ interface Props {
   store: StoreData;
   distanceLabel?: string;
   isPreferred?: boolean;
+  isLoading?: boolean;
   onSelect(): void;
   onGetDirections(): void;
   onSetPreferred(): void;
@@ -18,6 +20,7 @@ export default function StoreCard({
   store,
   distanceLabel,
   isPreferred,
+  isLoading,
   onSelect,
   onGetDirections,
   onSetPreferred,
@@ -37,6 +40,15 @@ export default function StoreCard({
     hapticMedium();
     onSetPreferred();
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.card, { height: 80, justifyContent: 'center' }]}> 
+        <ShimmerPlaceholder style={{ height: 16, marginBottom: 8 }} />
+        <ShimmerPlaceholder style={{ height: 12, width: '60%' }} />
+      </View>
+    );
+  }
 
   return (
     <Pressable style={styles.card} onPress={handleSelect}>

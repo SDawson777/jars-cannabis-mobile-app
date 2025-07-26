@@ -1,0 +1,130 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, SafeAreaView, Pressable, Image, StyleSheet } from 'react-native';
+import * as Location from 'expo-location';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { phase4Client } from '../api/phase4Client';
+import StoreCard from '../components/StoreCard';
+import PermissionRationaleModal from '../components/PermissionRationaleModal';
+import LocationStatusDisplay from '../components/LocationStatusDisplay';
+import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
+import { useStore } from '../context/StoreContext';
+import { hapticMedium, hapticHeavy } from '../utils/haptic';
+import CustomAudioPlayer from '../components/CustomAudioPlayer';
+import illustration from '../assets/svg/illustration-no-nearby-stores.svg';
+
+interface ApiStore {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+type Nav = NativeStackNavigationProp<RootStackParamList, 'StoreSelection'>;
+
+export default function StoreSelectionScreen() {
+  const navigation = useNavigation<Nav>();
+  const { setPreferredStore } = useStore();
+
+  const [permission, setPermission] = useState<'granted' | 'denied' | 'undetermined'>('undetermined');
+  const [loading, setLoading] = useState(false);
+  const [stores, setStores] = useState<ApiStore[] | null>(null);
+  const [error, setError] = useState('');
+
+  const requestPermission = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    setPermission(status);
+    return status === 'granted';
+  };
+
+  const fetchStores = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const { coords } = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High, timeout: 10000 });
+      const res = await phase4Client.get(`/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`);
+      setStores(res.data?.stores || []);
+      hapticMedium();
+    } catch (e) {
+      setError('Failed to load stores');
+      hapticHeavy();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      const granted = await requestPermission();
+      if (granted) await fetchStores();
+    })();
+  }, []);
+
+  const handleSelect = (store: ApiStore) => {
+    setPreferredStore(store as any);
+    navigation.replace('HomeScreen');
+  };
+
+  if (permission === 'undetermined') {
+    return (
+      <PermissionRationaleModal
+        isVisible
+        onConfirm={() => {
+          requestPermission().then(granted => granted && fetchStores());
+        }}
+        onDeny={() => setPermission('denied')}
+      />
+    );
+  }
+
+  if (permission === 'denied') {
+    return (
+      <LocationStatusDisplay
+        status="denied"
+        onRetry={() => requestPermission().then(granted => granted && fetchStores())}
+      />
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <AnimatedPulseGlow />
+          <Text style={styles.loadingText}>Locating nearest stores…</Text>
+        </View>
+      )}
+      {!loading && stores && stores.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Image source={illustration} style={styles.illustration} />
+          <Text style={styles.emptyText}>No nearby stores</Text>
+          <CustomAudioPlayer source={require('../assets/audio/empty_state_sigh.mp3')} play />
+          <Pressable onPress={() => navigation.navigate('StoreLocator')}>
+            <Text style={styles.link}>Search All Locations</Text>
+          </Pressable>
+        </View>
+      )}
+      {!loading && stores && stores.length > 0 && (
+        <FlatList
+          data={stores}
+          keyExtractor={s => s.id}
+          renderItem={({ item }) => (
+            <StoreCard store={item as any} onSelect={() => handleSelect(item)} onGetDirections={() => {}} onSetPreferred={() => {}} />
+          )}
+        />
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { marginTop: 12, fontSize: 16 },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  illustration: { width: 200, height: 200, marginBottom: 20, resizeMode: 'contain' },
+  emptyText: { fontSize: 18, marginBottom: 12 },
+  link: { color: '#2E5D46', marginTop: 8 },
+});
