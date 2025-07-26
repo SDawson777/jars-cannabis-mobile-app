@@ -18,6 +18,7 @@ import { useStore } from '../context/StoreContext';
 import { useProductDetails } from '../hooks/useProductDetails';
 import ProductFallback from '../components/ProductFallback';
 import CMSImage from '../components/CMSImage';
+import StockAlert from '../components/StockAlert';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -30,13 +31,10 @@ export default function ProductDetailScreen() {
   const { slug } = route.params;
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const { preferredStore } = useStore();
-  const {
-    data,
-    isLoading,
-    refetch,
-    isFetching,
-    error,
-  } = useProductDetails(slug, preferredStore?.id);
+  const { data, isLoading, refetch, isFetching, error } = useProductDetails(
+    slug,
+    preferredStore?.id
+  );
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,6 +66,9 @@ export default function ProductDetailScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <CMSImage uri={product.image.url} alt={product.name} style={styles.image} />
+        {selectedVariant && variants.find(v => v.id === selectedVariant)?.stock === 0 && (
+          <StockAlert message="Sold Out" />
+        )}
         <Text style={[styles.name, { color: jarsPrimary }]}>{product.name}</Text>
         {variants.map(v => (
           <Pressable
@@ -89,6 +90,7 @@ export default function ProductDetailScreen() {
             >
               {v.stock} in stock
             </Animated.Text>
+            {v.stock > 0 && v.stock <= 5 && <StockAlert message="Low stock" />}
           </Pressable>
         ))}
         {product.effects && <Text style={styles.effects}>{product.effects.join(', ')}</Text>}
