@@ -13,9 +13,11 @@ import * as SecureStore from 'expo-secure-store';
 import SplashScreenWrapper from './src/screens/SplashScreenWrapper';
 import OnboardingPager from './src/screens/OnboardingPager';
 import AgeVerification from './src/screens/AgeVerification';
+import LoginSignUpDecisionScreen from './src/screens/LoginSignUpDecisionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import OTPScreen from './src/screens/OTPScreen';
 import StoreSelection from './src/screens/StoreSelectionScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ShopScreen from './src/screens/ShopScreen';
@@ -87,9 +89,11 @@ export default function App() {
               <Stack.Screen name="SplashScreen" component={SplashScreenWrapper} />
               <Stack.Screen name="Onboarding" component={OnboardingPager} />
               <Stack.Screen name="AgeVerification" component={AgeVerification} />
+              <Stack.Screen name="LoginSignUpDecision" component={LoginSignUpDecisionScreen} />
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
               <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+              <Stack.Screen name="OTPScreen" component={OTPScreen} />
               <Stack.Screen name="StoreSelection" component={StoreSelection} />
               <Stack.Screen name="HomeScreen" component={HomeScreen} />
               <Stack.Screen name="ShopScreen" component={ShopScreen} />

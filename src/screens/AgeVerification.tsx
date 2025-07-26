@@ -85,7 +85,7 @@ export default function AgeVerification() {
     if (is21) {
       hapticLight();
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      navigation.replace('StoreSelection');
+      navigation.replace('LoginSignUpDecision');
     } else {
       hapticHeavy();
       // Enter the under-21 path

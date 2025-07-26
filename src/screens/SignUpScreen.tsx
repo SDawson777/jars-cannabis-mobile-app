@@ -11,11 +11,15 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight, hapticMedium } from '../utils/haptic';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
+import { logEvent } from '../utils/analytics';
+import PasswordStrengthBar from '../components/PasswordStrengthBar';
+import { useAuth } from '../hooks/useAuth';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -27,10 +31,16 @@ type SignUpNavProp = NativeStackNavigationProp<RootStackParamList, 'SignUp'>;
 export default function SignUpScreen() {
   const navigation = useNavigation<SignUpNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { signUp } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [optIn, setOptIn] = useState(false);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -60,11 +70,23 @@ export default function SignUpScreen() {
           }
         : {};
 
-  const handleSignUp = () => {
-    hapticMedium();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: implement real signup logic
-    navigation.replace('HomeScreen');
+  const handleSignUp = async () => {
+    if (!email || !password || password !== confirm) {
+      hapticLight();
+      return;
+    }
+    try {
+      setLoading(true);
+      await signUp({ name, email, phone, password });
+      logEvent('signup_success', {});
+      hapticMedium();
+      navigation.navigate('OTPScreen');
+    } catch (err: any) {
+      hapticHeavy();
+      console.warn(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,12 +112,46 @@ export default function SignUpScreen() {
 
       <TextInput
         style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-        placeholder="Password"
+        placeholder="Phone"
         placeholderTextColor={jarsSecondary}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        keyboardType="phone-pad"
+        value={phone}
+        onChangeText={setPhone}
       />
+
+      <View style={styles.passwordRow}>
+        <TextInput
+          style={[styles.input, { flex: 1, borderColor: jarsSecondary, color: jarsPrimary }]}
+          placeholder="Password"
+          placeholderTextColor={jarsSecondary}
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+          {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
+        </Pressable>
+      </View>
+      <PasswordStrengthBar password={password} />
+
+      <View style={styles.passwordRow}>
+        <TextInput
+          style={[styles.input, { flex: 1, borderColor: jarsSecondary, color: jarsPrimary }]}
+          placeholder="Confirm Password"
+          placeholderTextColor={jarsSecondary}
+          secureTextEntry={!showPassword}
+          value={confirm}
+          onChangeText={setConfirm}
+        />
+        <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+          {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
+        </Pressable>
+      </View>
+
+      <Pressable style={styles.checkboxRow} onPress={() => setOptIn(!optIn)}>
+        <View style={[styles.checkbox, optIn && { backgroundColor: jarsPrimary }]} />
+        <Text style={[styles.optText, { color: jarsPrimary }]}>Email me about deals</Text>
+      </Pressable>
 
       <Pressable
         style={[styles.button, { backgroundColor: jarsPrimary }, glowStyle]}
@@ -164,6 +220,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  passwordRow: { flexDirection: 'row', alignItems: 'center' },
+  eyeBtn: { padding: 8 },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -177,6 +235,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginRight: 8,
+  },
+  optText: { fontSize: 14 },
   policy: {
     alignItems: 'center',
     marginTop: 16,
