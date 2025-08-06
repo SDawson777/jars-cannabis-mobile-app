@@ -24,7 +24,9 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
             }
           }
         }
-      } catch {}
+      } catch (err) {
+        // ignore errors from malformed URLs
+      }
     };
     const listener = ({ url }: { url: string }) => handle(url);
     Linking.addEventListener('url', listener);
