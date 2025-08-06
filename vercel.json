@@ -1,5 +1,4 @@
 {
-  "buildCommand": "./vercel-build.sh && npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "./vercel-build.sh",
   "ignoreCommand": "exit 1"
 }
