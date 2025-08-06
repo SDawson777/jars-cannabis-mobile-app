@@ -40,7 +40,9 @@ export default function StoreSelection() {
   const { colorTemp, jarsPrimary, jarsBackground } = useContext(ThemeContext);
   const { setPreferredStore } = usePreferredStore();
 
-  const [permissionStatus, setPermissionStatus] = useState<'loading' | 'granted' | 'denied'>('loading');
+  const [permissionStatus, setPermissionStatus] = useState<'loading' | 'granted' | 'denied'>(
+    'loading'
+  );
   const [isLoadingStores, setIsLoadingStores] = useState(false);
   const [stores, setStores] = useState<StoreData[]>([]);
   const [locationError, setLocationError] = useState('');

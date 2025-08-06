@@ -13,7 +13,7 @@ const StoreContext = createContext<StoreContextState>({
   setPreferredStore: () => {},
 });
 
-export const StoreProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { preferredStore, setPreferredStore, hydrate } = usePreferredStore();
   const { hydrate: hydrateId } = usePreferredStoreId();
 

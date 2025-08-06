@@ -154,7 +154,11 @@ export default function LoginScreen() {
             accessibilityRole="text"
           />
           <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
-            {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
+            {showPassword ? (
+              <EyeOff color={jarsSecondary} size={20} />
+            ) : (
+              <Eye color={jarsSecondary} size={20} />
+            )}
           </Pressable>
           <AnimatedShimmerOverlay />
         </View>
@@ -193,7 +197,9 @@ export default function LoginScreen() {
         </Pressable>
 
         <View style={styles.footer}>
-          <Text style={[styles.disclaimer, { color: jarsSecondary }]}>By logging in you agree to our</Text>
+          <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
+            By logging in you agree to our
+          </Text>
           <View style={styles.legalRow}>
             <Pressable
               accessibilityRole="link"

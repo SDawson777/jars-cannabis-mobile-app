@@ -1,5 +1,10 @@
 import React from 'react';
-import Animated, { useSharedValue, withTiming, useAnimatedStyle, withRepeat } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  withRepeat,
+} from 'react-native-reanimated';
 import { StyleSheet } from 'react-native';
 
 export default function AnimatedPulseGlow() {

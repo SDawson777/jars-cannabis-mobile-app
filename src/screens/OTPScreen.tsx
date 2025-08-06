@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TextInput, StyleSheet, Pressable, LayoutAnimation } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  LayoutAnimation,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -52,10 +60,7 @@ export default function OTPScreen() {
           <TextInput
             key={i}
             ref={ref => (inputs[i] = ref)}
-            style={[
-              styles.input,
-              { borderColor: focused === i ? '#2E5D46' : '#ccc' },
-            ]}
+            style={[styles.input, { borderColor: focused === i ? '#2E5D46' : '#ccc' }]}
             keyboardType="number-pad"
             maxLength={1}
             value={d}
@@ -70,10 +75,7 @@ export default function OTPScreen() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Verify Code"
-        style={({ pressed }) => [
-          styles.verifyBtn,
-          pressed && { transform: [{ scale: 0.95 }] },
-        ]}
+        style={({ pressed }) => [styles.verifyBtn, pressed && { transform: [{ scale: 0.95 }] }]}
         onPress={handleSubmit}
       >
         <Text style={styles.verifyText}>Verify</Text>
@@ -90,7 +92,9 @@ export default function OTPScreen() {
       ) : (
         <Text style={styles.countdown}>Resend in {timer}s</Text>
       )}
-      <Text style={styles.disclaimer}>By verifying your identity you agree to our Terms &amp; Conditions and Privacy Policy.</Text>
+      <Text style={styles.disclaimer}>
+        By verifying your identity you agree to our Terms &amp; Conditions and Privacy Policy.
+      </Text>
     </SafeAreaView>
   );
 }

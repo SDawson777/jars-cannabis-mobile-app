@@ -11,7 +11,13 @@ interface Props {
 export default function ArticlePreviewCard({ article, onPress }: Props) {
   const snippet = String(article.body).slice(0, 80);
   return (
-    <Pressable style={styles.card} onPress={() => { hapticLight(); onPress(); }}>
+    <Pressable
+      style={styles.card}
+      onPress={() => {
+        hapticLight();
+        onPress();
+      }}
+    >
       {article.isPreview && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>Preview</Text>

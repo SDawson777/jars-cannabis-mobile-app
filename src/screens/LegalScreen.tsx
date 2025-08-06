@@ -50,7 +50,10 @@ export default function LegalScreen() {
   if (isLoading) {
     return (
       <SafeAreaView
-        style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor },
+        ]}
       >
         {useSkeletonText(200, 16)}
         {useSkeletonText(260, 16)}
@@ -61,8 +64,13 @@ export default function LegalScreen() {
 
   if (isError || !data) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>\
-        <Text>Unable to load legal info.</Text>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor },
+        ]}
+      >
+        \<Text>Unable to load legal info.</Text>
       </SafeAreaView>
     );
   }

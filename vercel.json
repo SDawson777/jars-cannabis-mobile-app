@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && npm run build",
+  "buildCommand": "./vercel-build.sh && npm run build",
   "outputDirectory": "dist",
   "ignoreCommand": "exit 1"
 }

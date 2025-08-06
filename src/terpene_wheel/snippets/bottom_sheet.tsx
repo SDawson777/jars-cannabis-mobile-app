@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 /* prettier-ignore */
 
 import React from 'react';

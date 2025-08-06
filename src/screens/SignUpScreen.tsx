@@ -171,7 +171,11 @@ export default function SignUpScreen() {
           accessibilityRole="text"
         />
         <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
-          {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
+          {showPassword ? (
+            <EyeOff color={jarsSecondary} size={20} />
+          ) : (
+            <Eye color={jarsSecondary} size={20} />
+          )}
         </Pressable>
       </View>
       <PasswordStrengthBar password={password} />
@@ -197,7 +201,11 @@ export default function SignUpScreen() {
           accessibilityRole="text"
         />
         <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
-          {showPassword ? <EyeOff color={jarsSecondary} size={20} /> : <Eye color={jarsSecondary} size={20} />}
+          {showPassword ? (
+            <EyeOff color={jarsSecondary} size={20} />
+          ) : (
+            <Eye color={jarsSecondary} size={20} />
+          )}
         </Pressable>
       </View>
 
@@ -221,7 +229,9 @@ export default function SignUpScreen() {
       </Pressable>
 
       <View style={styles.policy}>
-        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>By creating an account you agree to our</Text>
+        <Text style={[styles.disclaimer, { color: jarsSecondary }]}>
+          By creating an account you agree to our
+        </Text>
         <View style={styles.legalRow}>
           <Pressable
             accessibilityRole="link"

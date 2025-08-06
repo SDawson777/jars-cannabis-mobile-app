@@ -28,7 +28,9 @@ export default function StoreSelectionScreen() {
   const navigation = useNavigation<Nav>();
   const { setPreferredStore } = useStore();
 
-  const [permission, setPermission] = useState<'granted' | 'denied' | 'undetermined'>('undetermined');
+  const [permission, setPermission] = useState<'granted' | 'denied' | 'undetermined'>(
+    'undetermined'
+  );
   const [loading, setLoading] = useState(false);
   const [stores, setStores] = useState<ApiStore[] | null>(null);
   const [error, setError] = useState('');
@@ -43,8 +45,13 @@ export default function StoreSelectionScreen() {
     setLoading(true);
     setError('');
     try {
-      const { coords } = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High, timeout: 10000 });
-      const res = await phase4Client.get(`/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`);
+      const { coords } = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+        timeout: 10000,
+      });
+      const res = await phase4Client.get(
+        `/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`
+      );
       setStores(res.data?.stores || []);
       hapticMedium();
     } catch (e) {
@@ -111,7 +118,12 @@ export default function StoreSelectionScreen() {
           data={stores}
           keyExtractor={s => s.id}
           renderItem={({ item }) => (
-            <StoreCard store={item as any} onSelect={() => handleSelect(item)} onGetDirections={() => {}} onSetPreferred={() => {}} />
+            <StoreCard
+              store={item as any}
+              onSelect={() => handleSelect(item)}
+              onGetDirections={() => {}}
+              onSetPreferred={() => {}}
+            />
           )}
         />
       )}

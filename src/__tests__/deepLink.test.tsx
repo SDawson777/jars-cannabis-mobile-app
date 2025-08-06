@@ -21,7 +21,9 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 test('deep link loads Shop with correct store', async () => {
-  const stores = [{ id: '1', name: 'Midtown', slug: 'midtown', address: '', latitude: 0, longitude: 0 }];
+  const stores = [
+    { id: '1', name: 'Midtown', slug: 'midtown', address: '', latitude: 0, longitude: 0 },
+  ];
   const wrapper = ({ children }: any) => (
     <StoreProvider>
       <NavigationContainer>{children}</NavigationContainer>

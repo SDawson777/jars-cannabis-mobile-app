@@ -13,7 +13,7 @@
     "build:web": "expo build:web",
     "vercel-build": "mkdir -p dist && echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Placeholder</title></head><body></body></html>' > dist/index.html",
     "build": "npm run vercel-build",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --check \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",

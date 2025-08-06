@@ -25,9 +25,7 @@ export function CMSPreviewProvider({ children }: { children: ReactNode }) {
   const toggle = () => setPreview(p => !p);
 
   return (
-    <CMSPreviewContext.Provider value={{ preview, toggle }}>
-      {children}
-    </CMSPreviewContext.Provider>
+    <CMSPreviewContext.Provider value={{ preview, toggle }}>{children}</CMSPreviewContext.Provider>
   );
 }
 

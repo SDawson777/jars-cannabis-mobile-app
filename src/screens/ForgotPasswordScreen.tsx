@@ -109,7 +109,9 @@ export default function ForgotPasswordScreen() {
           onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
           style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
         >
-          <Text style={[styles.supportLink, { color: jarsPrimary }]}>Need help? Contact support</Text>
+          <Text style={[styles.supportLink, { color: jarsPrimary }]}>
+            Need help? Contact support
+          </Text>
         </Pressable>
         <TextInput
           style={[

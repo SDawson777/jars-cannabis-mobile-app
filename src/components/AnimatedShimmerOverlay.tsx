@@ -16,10 +16,7 @@ export default function AnimatedShimmerOverlay() {
   }, [translateX]);
 
   return (
-    <Animated.View
-      pointerEvents="none"
-      style={[styles.overlay, { transform: [{ translateX }] }]}
-    />
+    <Animated.View pointerEvents="none" style={[styles.overlay, { transform: [{ translateX }] }]} />
   );
 }
 

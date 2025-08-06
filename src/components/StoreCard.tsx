@@ -43,7 +43,7 @@ export default function StoreCard({
 
   if (isLoading) {
     return (
-      <View style={[styles.card, { height: 80, justifyContent: 'center' }]}> 
+      <View style={[styles.card, { height: 80, justifyContent: 'center' }]}>
         <ShimmerPlaceholder style={{ height: 16, marginBottom: 8 }} />
         <ShimmerPlaceholder style={{ height: 12, width: '60%' }} />
       </View>

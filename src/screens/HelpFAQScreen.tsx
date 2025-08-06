@@ -25,7 +25,6 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-
 export default function HelpFAQScreen() {
   const navigation = useNavigation();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
@@ -55,7 +54,10 @@ export default function HelpFAQScreen() {
   if (isLoading) {
     return (
       <SafeAreaView
-        style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor },
+        ]}
       >
         <FAQSkeleton />
         <FAQSkeleton />
@@ -66,7 +68,12 @@ export default function HelpFAQScreen() {
 
   if (isError || !data) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor }]}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', backgroundColor: bgColor },
+        ]}
+      >
         <Text>Unable to load FAQ.</Text>
       </SafeAreaView>
     );

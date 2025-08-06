@@ -8,9 +8,9 @@ interface PreferredStoreState {
   hydrate: () => Promise<void>;
 }
 
-export const usePreferredStore = create<PreferredStoreState>((set) => ({
+export const usePreferredStore = create<PreferredStoreState>(set => ({
   preferredStore: undefined,
-  setPreferredStore: (store) => {
+  setPreferredStore: store => {
     set({ preferredStore: store });
     SecureStore.setItemAsync('preferredStore', JSON.stringify(store)).catch(() => {});
   },
@@ -25,4 +25,3 @@ export const usePreferredStore = create<PreferredStoreState>((set) => ({
     }
   },
 }));
-

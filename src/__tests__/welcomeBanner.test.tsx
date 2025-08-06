@@ -7,7 +7,9 @@ import { StoreProvider } from '../context/StoreContext';
 it('shows loyalty banner callouts per tier', () => {
   const tree = renderer.create(
     <StoreProvider>
-      <LoyaltyContext.Provider value={{ data: { tier: 'Gold' }, isLoading: false, isError: false, error: undefined }}>
+      <LoyaltyContext.Provider
+        value={{ data: { tier: 'Gold' }, isLoading: false, isError: false, error: undefined }}
+      >
         <WelcomeBanner />
       </LoyaltyContext.Provider>
     </StoreProvider>

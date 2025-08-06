@@ -43,7 +43,6 @@ export default function EducationalGreenhouseScreen() {
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
-
   const handleBack = () => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -76,8 +75,8 @@ export default function EducationalGreenhouseScreen() {
         </View>
       )}
       {isError && (
-        <View style={[styles.list, { alignItems: 'center' }]}>\
-          <Text>Unable to load articles.</Text>
+        <View style={[styles.list, { alignItems: 'center' }]}>
+          \<Text>Unable to load articles.</Text>
         </View>
       )}
       {!isLoading && !isError && data && (

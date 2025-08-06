@@ -17,10 +17,19 @@ export default function FAQSkeleton() {
   }, [translateX]);
 
   return (
-    <View style={styles.item}>\
-      <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ translateX }] }]}>\
-        <LinearGradient colors={['transparent', '#e0e0e0', 'transparent']} style={StyleSheet.absoluteFill} start={{x:0,y:0}} end={{x:1,y:0}} />\
-      </Animated.View>\
+    <View style={styles.item}>
+      \
+      <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ translateX }] }]}>
+        \
+        <LinearGradient
+          colors={['transparent', '#e0e0e0', 'transparent']}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        />
+        \
+      </Animated.View>
+      \
     </View>
   );
 }
