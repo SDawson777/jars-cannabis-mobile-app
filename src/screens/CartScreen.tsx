@@ -85,15 +85,20 @@ export default function CartScreen() {
 
   if (!hydrated || validating) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}
-        accessibilityLabel="Loading cart">
+      <SafeAreaView
+        style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}
+        accessibilityLabel="Loading cart"
+      >
         <ActivityIndicator />
       </SafeAreaView>
     );
   }
 
   const subtotal =
-    items.reduce((sum, item) => (item.available === false ? sum : sum + item.price * item.quantity), 0) || 0;
+    items.reduce(
+      (sum, item) => (item.available === false ? sum : sum + item.price * item.quantity),
+      0
+    ) || 0;
   const discount = 0;
   const taxes = (subtotal - discount) * 0.07;
   const total = subtotal - discount + taxes;
@@ -132,7 +137,6 @@ export default function CartScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('HelpFAQ');
   };
-
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -178,7 +182,9 @@ export default function CartScreen() {
               <Image source={{ uri: item.image }} style={styles.image} />
               <View style={styles.info}>
                 <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
-                <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
+                <Text style={[styles.price, { color: jarsSecondary }]}>
+                  ${item.price.toFixed(2)}
+                </Text>
                 <View style={styles.qtyRow}>
                   <Pressable
                     onPress={() => updateQty(item.id, -1)}

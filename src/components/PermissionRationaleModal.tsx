@@ -10,13 +10,7 @@ interface Props {
 export default function PermissionRationaleModal({ isVisible, onConfirm, onDeny }: Props) {
   if (!isVisible) return null;
   return (
-    <Modal
-      transparent
-      animationType="fade"
-      visible={isVisible}
-      accessibilityViewIsModal
-      accessible
-    >
+    <Modal transparent animationType="fade" visible={isVisible} accessibilityViewIsModal accessible>
       <View style={styles.overlay}>
         <View style={styles.container}>
           <Text allowFontScaling style={styles.text}>

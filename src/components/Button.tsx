@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Pressable,
-  Text,
-  StyleSheet,
-  Animated,
-  AccessibilityRole,
-} from 'react-native';
+import { Pressable, Text, StyleSheet, Animated, AccessibilityRole } from 'react-native';
 import { hapticLight } from '../utils/haptic';
 
 interface Props {

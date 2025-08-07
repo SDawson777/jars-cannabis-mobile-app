@@ -15,7 +15,9 @@ export function useCartValidation() {
       for (const item of items) {
         try {
           const { data } = await phase4Client.get(`/products/${item.id}`);
-          const variant = item.variantId ? data.variants.find((v: any) => v.id === item.variantId) : undefined;
+          const variant = item.variantId
+            ? data.variants.find((v: any) => v.id === item.variantId)
+            : undefined;
           if (!variant || variant.stock <= 0) {
             updated.push({ ...item, available: false });
             toast(`${item.name} is no longer available`);
