@@ -29,7 +29,7 @@ const MENU: { id: keyof RootStackParamList; label: string }[] = [
   { id: 'SavedAddresses', label: 'Saved Addresses' },
   { id: 'SavedPayments', label: 'Saved Payments' },
   { id: 'Favorites', label: 'Favorites' },
-  { id: 'OrderHistory', label: 'Order History' },
+  { id: 'OrderHistory', label: 'My Orders' },
   { id: 'AppSettings', label: 'App Settings' },
 ];
 
