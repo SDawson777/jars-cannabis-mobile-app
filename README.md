@@ -249,3 +249,13 @@ cp .env.example .env   # fill keys
 npm run dev:emulators  # Firestore/Auth/CF
 npm run dev:expo       # Expo client against local emu
 ```
+
+## Push Notifications Setup
+
+1. Add your Firebase config files:
+   - Place `google-services.json` in `android/app`.
+   - Place `GoogleService-Info.plist` in the iOS project.
+2. **iOS:** Enable Push Notifications and Background Modes (Remote notifications) in Xcode. Upload your APNs key to Firebase.
+3. **Android:** Confirm `google-services.json` is present and Firebase Messaging is referenced in `AndroidManifest.xml`.
+4. On launch the app requests notification permission and logs the FCM token. Replace the sync stub in `App.tsx` to send the token to your backend if needed.
+5. Send a test message from the Firebase console to verify foreground, background, and quit-state behavior.
