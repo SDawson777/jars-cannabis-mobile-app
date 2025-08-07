@@ -22,7 +22,7 @@ export default function SplashScreenWrapper() {
   return (
     <View style={styles.container}>
       <LottieView
-        source={require('../../assets/lottie/jars_logo_animation.json')}
+        source={require('../assets/animations/jars_logo_animation.json')}
         autoPlay
         loop={false}
         onAnimationFinish={() => {
