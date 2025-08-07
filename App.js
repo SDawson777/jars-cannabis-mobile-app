@@ -31,7 +31,7 @@ import CartScreen from './src/screens/CartScreen';
 import CheckoutScreen from './src/screens/CheckoutScreen';
 import OrderConfirmationScreen from './src/screens/OrderConfirmationScreen';
 import OrderTrackingScreen from './src/screens/OrderTrackingScreen';
-import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
+import OrderHistoryScreen from './src/screens/orders/OrderHistoryScreen';
 import OrderDetailsScreen from './src/screens/OrderDetailsScreen';
 import StoreLocatorScreen from './src/screens/StoreLocatorScreen';
 import StoreLocatorMapScreen from './src/screens/StoreLocatorMapScreen';
