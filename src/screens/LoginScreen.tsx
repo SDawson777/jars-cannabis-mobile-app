@@ -132,6 +132,7 @@ export default function LoginScreen() {
           onBlur={() => setFocused(null)}
           accessibilityLabel="Email"
           accessibilityRole="text"
+          accessibilityHint="Enter your email address"
         />
         <View style={styles.passwordRow}>
           <TextInput
@@ -152,8 +153,14 @@ export default function LoginScreen() {
             onBlur={() => setFocused(null)}
             accessibilityLabel="Password"
             accessibilityRole="text"
+            accessibilityHint="Enter your password"
           />
-          <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+          <Pressable
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Toggle password visibility"
+          >
             {showPassword ? (
               <EyeOff color={jarsSecondary} size={20} />
             ) : (
@@ -167,6 +174,7 @@ export default function LoginScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Forgot your password"
+          accessibilityHint="Navigates to password recovery"
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -180,6 +188,7 @@ export default function LoginScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Log In"
+          accessibilityHint="Submits your credentials"
           style={({ pressed }) => [
             styles.button,
             { backgroundColor: jarsPrimary },
@@ -192,7 +201,7 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text style={styles.buttonText}>Log In</Text>
+            <Text allowFontScaling style={styles.buttonText}>Log In</Text>
           )}
         </Pressable>
 

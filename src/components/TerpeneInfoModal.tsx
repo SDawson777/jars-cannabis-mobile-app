@@ -9,19 +9,44 @@ interface Props {
 
 const TerpeneInfoModal: React.FC<Props> = ({ terpene, onClose }) => {
   return (
-    <Modal visible={!!terpene} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={onClose} />
+    <Modal
+      visible={!!terpene}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+      accessibilityViewIsModal
+      accessible
+    >
+      <Pressable
+        style={styles.overlay}
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Close modal"
+        accessibilityHint="Returns to the previous screen"
+      />
       <View style={styles.content}>
         {terpene && (
           <>
-            <Text style={styles.title}>{terpene.name}</Text>
-            <Text style={styles.section}>Aromas: {terpene.aromas.join(', ')}</Text>
-            <Text style={styles.section}>Effects: {terpene.effects.join(', ')}</Text>
-            <Text style={styles.sectionSmall}>Strains: {terpene.strains.join(', ')}</Text>
+            <Text allowFontScaling style={styles.title}>{terpene.name}</Text>
+            <Text allowFontScaling style={styles.section}>
+              Aromas: {terpene.aromas.join(', ')}
+            </Text>
+            <Text allowFontScaling style={styles.section}>
+              Effects: {terpene.effects.join(', ')}
+            </Text>
+            <Text allowFontScaling style={styles.sectionSmall}>
+              Strains: {terpene.strains.join(', ')}
+            </Text>
           </>
         )}
-        <Pressable onPress={onClose} style={styles.closeButton}>
-          <Text style={styles.closeText}>Close</Text>
+        <Pressable
+          onPress={onClose}
+          style={styles.closeButton}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          accessibilityHint="Closes the modal"
+        >
+          <Text allowFontScaling style={styles.closeText}>Close</Text>
         </Pressable>
       </View>
     </Modal>
