@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import SplashScreenWrapper from '../src/screens/SplashScreenWrapper';
-import AgeVerification from '../src/screens/AgeVerification';
+import AgeVerification from '../src/screens/onboarding/AgeVerificationScreen';
 import * as SecureStore from 'expo-secure-store';
 import { NavigationContainer } from '@react-navigation/native';
 

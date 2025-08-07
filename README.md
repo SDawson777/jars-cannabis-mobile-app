@@ -265,6 +265,13 @@ Contact for licensing, transfer, or deployment help!
 - Apple Pay will activate when a valid merchant ID is added.
 - You must enable the Apple Pay entitlement in Xcode and App Store Connect.
 
+## App Store Prep Checklist
+
+- Ensure privacy policy and terms links resolve correctly.
+- Provide a support URL and compliance details in `assets/app-store-info.md`.
+- Capture final screenshots in `assets/screenshots/` before submission.
+- When answering Apple's cannabis questionnaire, include your state license number and confirm sales occur only where legal.
+
 ## Local Dev Quick-start
 
 ```

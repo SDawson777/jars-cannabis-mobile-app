@@ -31,6 +31,7 @@ const MENU: { id: keyof RootStackParamList; label: string }[] = [
   { id: 'Favorites', label: 'Favorites' },
   { id: 'OrderHistory', label: 'My Orders' },
   { id: 'AppSettings', label: 'App Settings' },
+  { id: 'Legal', label: 'Legal' },
 ];
 
 export default function ProfileScreen() {
