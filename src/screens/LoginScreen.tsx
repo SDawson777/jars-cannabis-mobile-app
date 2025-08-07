@@ -201,7 +201,9 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text allowFontScaling style={styles.buttonText}>Log In</Text>
+            <Text allowFontScaling style={styles.buttonText}>
+              Log In
+            </Text>
           )}
         </Pressable>
 

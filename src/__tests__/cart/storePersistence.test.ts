@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCartStore, hydrateCartStore } from '../../../stores/useCartStore';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
 describe('cart store persistence', () => {
@@ -18,7 +18,10 @@ describe('cart store persistence', () => {
     jest.resetModules();
     const AsyncStorage2 = require('@react-native-async-storage/async-storage');
     if (stored) await AsyncStorage2.setItem('cart', stored);
-    const { useCartStore: rehydratedStore, hydrateCartStore: rehydrate } = require('../../../stores/useCartStore');
+    const {
+      useCartStore: rehydratedStore,
+      hydrateCartStore: rehydrate,
+    } = require('../../../stores/useCartStore');
     await rehydrate();
     expect(rehydratedStore.getState().items).toEqual([
       { id: '1', name: 'Test', price: 10, quantity: 2, available: true },

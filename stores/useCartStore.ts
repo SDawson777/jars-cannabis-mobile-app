@@ -28,7 +28,7 @@ export const useCartStore = create<CartState>()(
         if (existing) {
           set({
             items: get().items.map(i =>
-              i === existing ? { ...i, quantity: i.quantity + item.quantity } : i,
+              i === existing ? { ...i, quantity: i.quantity + item.quantity } : i
             ),
           });
         } else {
@@ -45,8 +45,8 @@ export const useCartStore = create<CartState>()(
       version: 1,
       storage: createJSONStorage(() => AsyncStorage),
       migrate: persisted => persisted as CartState,
-    },
-  ),
+    }
+  )
 );
 
 export const hydrateCartStore = () => useCartStore.persist.rehydrate();

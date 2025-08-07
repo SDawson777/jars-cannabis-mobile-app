@@ -27,7 +27,9 @@ const TerpeneInfoModal: React.FC<Props> = ({ terpene, onClose }) => {
       <View style={styles.content}>
         {terpene && (
           <>
-            <Text allowFontScaling style={styles.title}>{terpene.name}</Text>
+            <Text allowFontScaling style={styles.title}>
+              {terpene.name}
+            </Text>
             <Text allowFontScaling style={styles.section}>
               Aromas: {terpene.aromas.join(', ')}
             </Text>
@@ -46,7 +48,9 @@ const TerpeneInfoModal: React.FC<Props> = ({ terpene, onClose }) => {
           accessibilityLabel="Close"
           accessibilityHint="Closes the modal"
         >
-          <Text allowFontScaling style={styles.closeText}>Close</Text>
+          <Text allowFontScaling style={styles.closeText}>
+            Close
+          </Text>
         </Pressable>
       </View>
     </Modal>
