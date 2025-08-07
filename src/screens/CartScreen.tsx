@@ -10,20 +10,19 @@ import {
   TextInput,
   StyleSheet,
   Dimensions,
-  RefreshControl,
   Alert,
   LayoutAnimation,
   UIManager,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { ChevronLeft, Trash2, HelpCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import { useCart } from '../hooks/useCart';
-import CartErrorBanner from '../components/CartErrorBanner';
+import { useCartStore, hydrateCartStore } from '../../stores/useCartStore';
+import { useCartValidation } from '../hooks/useCartValidation';
 import {
   hapticLight,
   hapticMedium,
@@ -44,14 +43,21 @@ const IMAGE_SIZE = 80;
 export default function CartScreen() {
   const navigation = useNavigation<CartNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { cart, isLoading, error, updateCart, applyPromo, refetchCart, hasPending } = useCart();
+  const items = useCartStore(state => state.items);
+  const updateQuantity = useCartStore(state => state.updateQuantity);
+  const removeItemFromStore = useCartStore(state => state.removeItem);
   const [promo, setPromo] = useState('');
 
-  const [refreshing, setRefreshing] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const { validating } = useCartValidation();
+
+  useEffect(() => {
+    hydrateCartStore().then(() => setHydrated(true));
+  }, []);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, [cart]);
+  }, [items]);
 
   // Dynamic background
   const bgColor =
@@ -77,18 +83,27 @@ export default function CartScreen() {
           }
         : {};
 
-  const subtotal = cart?.items.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+  if (!hydrated || validating) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}
+        accessibilityLabel="Loading cart">
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  const subtotal =
+    items.reduce((sum, item) => (item.available === false ? sum : sum + item.price * item.quantity), 0) || 0;
   const discount = 0;
   const taxes = (subtotal - discount) * 0.07;
   const total = subtotal - discount + taxes;
 
   const updateQty = (id: string, delta: number) => {
-    if (!cart) return;
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    const item = cart.items.find(i => i.id === id);
+    const item = items.find(i => i.id === id);
     if (item) {
-      updateCart({ items: [{ id, quantity: Math.max(1, item.quantity + delta) }] });
+      updateQuantity(id, Math.max(1, item.quantity + delta));
     }
   };
 
@@ -101,20 +116,15 @@ export default function CartScreen() {
         style: 'destructive',
         onPress: () => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          updateCart({ items: cart?.items.filter(it => it.id !== id) });
+          removeItemFromStore(id);
         },
       },
     ]);
   };
 
   const applyPromoCode = async () => {
-    try {
-      await applyPromo(promo);
-      hapticSuccess();
-    } catch {
-      hapticError();
-      Alert.alert('Invalid Code', 'Please try again.');
-    }
+    hapticError();
+    Alert.alert('Promo codes are unavailable offline.');
   };
 
   const goToHelp = () => {
@@ -123,18 +133,6 @@ export default function CartScreen() {
     navigation.navigate('HelpFAQ');
   };
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={[styles.container, { padding: 16 }]}>
-        \
-        <SkeletonPlaceholder>
-          <SkeletonPlaceholder.Item width="100%" height={80} borderRadius={12} marginBottom={12} />
-          <SkeletonPlaceholder.Item width="100%" height={80} borderRadius={12} marginBottom={12} />
-          <SkeletonPlaceholder.Item width="100%" height={80} borderRadius={12} />
-        </SkeletonPlaceholder>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -156,44 +154,59 @@ export default function CartScreen() {
       </View>
 
       {/* Cart Items */}
-      {error && <CartErrorBanner onRetry={refetchCart} />}
-      {hasPending && <Text style={{ textAlign: 'center', marginBottom: 4 }}>Pending changes</Text>}
       <FlatList
-        data={cart?.items || []}
+        data={items}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={async () => {
-              setRefreshing(true);
-              await refetchCart();
-              setRefreshing(false);
-            }}
-          />
-        }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={{ uri: item.image }} style={styles.image} />
-            <View style={styles.info}>
-              <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
-              <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
-              <View style={styles.qtyRow}>
-                <Pressable onPress={() => updateQty(item.id, -1)} style={styles.qtyBtn}>
-                  <Text style={styles.qtyBtnText}>−</Text>
-                </Pressable>
-                <Text style={styles.qty}>{item.quantity}</Text>
-                <Pressable onPress={() => updateQty(item.id, 1)} style={styles.qtyBtn}>
-                  <Text style={styles.qtyBtnText}>+</Text>
-                </Pressable>
-                <Pressable onPress={() => removeItem(item.id)} style={styles.remove}>
-                  <Trash2 color={jarsPrimary} size={20} />
+        renderItem={({ item }) =>
+          item.available === false ? (
+            <View style={styles.card} accessibilityLabel={`${item.name} unavailable`}>
+              <View style={styles.info}>
+                <Text style={[styles.name, { color: jarsPrimary }]}>Item unavailable</Text>
+                <Pressable
+                  onPress={() => removeItem(item.id)}
+                  accessibilityLabel={`Remove ${item.name} from cart`}
+                  style={[styles.qtyBtn, { marginTop: 8 }]}
+                >
+                  <Text style={styles.qtyBtnText}>Remove</Text>
                 </Pressable>
               </View>
             </View>
-          </View>
-        )}
+          ) : (
+            <View style={styles.card}>
+              <Image source={{ uri: item.image }} style={styles.image} />
+              <View style={styles.info}>
+                <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
+                <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
+                <View style={styles.qtyRow}>
+                  <Pressable
+                    onPress={() => updateQty(item.id, -1)}
+                    style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                    accessibilityLabel={`Decrease quantity of ${item.name}`}
+                  >
+                    <Text style={styles.qtyBtnText}>−</Text>
+                  </Pressable>
+                  <Text style={[styles.qty, { color: jarsPrimary }]}>{item.quantity}</Text>
+                  <Pressable
+                    onPress={() => updateQty(item.id, 1)}
+                    style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                    accessibilityLabel={`Increase quantity of ${item.name}`}
+                  >
+                    <Text style={styles.qtyBtnText}>+</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => removeItem(item.id)}
+                    style={styles.remove}
+                    accessibilityLabel={`Remove ${item.name} from cart`}
+                  >
+                    <Trash2 color={jarsPrimary} size={20} />
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          )
+        }
       />
 
       {/* Promo Code */}
