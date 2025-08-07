@@ -1,8 +1,10 @@
 // src/App.js
 import React, { useEffect, useState } from 'react';
+import { Alert, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import messaging from '@react-native-firebase/messaging';
 // normal import (no `import type`)
 import { RootStackParamList } from './src/navigation/types';
 import { ThemeProvider } from './src/context/ThemeContext';
@@ -13,6 +15,15 @@ import { CMSPreviewProvider } from './src/context/CMSPreviewContext';
 import OfflineNotice from './src/components/OfflineNotice';
 import * as SecureStore from 'expo-secure-store';
 import { StripeProvider } from '@stripe/stripe-react-native';
+
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Message handled in the background!', remoteMessage);
+});
+
+const syncTokenToBackend = async (token: string) => {
+  // TODO: Sync token with backend if needed
+  console.log('Sync token to backend:', token);
+};
 
 import SplashScreenWrapper from './src/screens/SplashScreenWrapper';
 import OnboardingPager from './src/screens/OnboardingPager';
@@ -72,6 +83,7 @@ const queryClient = new QueryClient();
 
 export default function App() {
   const [initialRoute, setInitialRoute] = useState('SplashScreen');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     const checkFlag = async () => {
@@ -79,6 +91,49 @@ export default function App() {
       setInitialRoute(flag ? 'AgeVerification' : 'SplashScreen');
     };
     checkFlag();
+  }, []);
+
+  useEffect(() => {
+    const initMessaging = async () => {
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        const token = await messaging().getToken();
+        console.log('FCM Token:', token);
+        await syncTokenToBackend(token);
+      } else {
+        setNotificationsEnabled(false);
+        Alert.alert('Notifications Disabled', 'Push notifications are turned off.', [
+          { text: 'OK', accessibilityLabel: 'notifications-disabled-ok' },
+        ]);
+      }
+
+      const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+        const { title, body } = remoteMessage.notification || {};
+        Alert.alert(title || 'Notification', body, [
+          { text: 'OK', accessibilityLabel: 'close-notification-alert' },
+        ]);
+      });
+
+      const unsubscribeOnNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
+        console.log('Notification opened app:', remoteMessage.notification);
+      });
+
+      const initialMessage = await messaging().getInitialNotification();
+      if (initialMessage) {
+        console.log('App opened from quit state:', initialMessage.notification);
+      }
+
+      return () => {
+        unsubscribeOnMessage();
+        unsubscribeOnNotificationOpened();
+      };
+    };
+
+    initMessaging();
   }, []);
 
   if (!initialRoute) return null;
@@ -95,6 +150,15 @@ export default function App() {
               <CMSPreviewProvider>
                 <QueryClientProvider client={queryClient}>
                   <OfflineNotice />
+                  {!notificationsEnabled && (
+                    <View
+                      accessible
+                      accessibilityLabel="notifications-disabled"
+                      style={{ padding: 8 }}
+                    >
+                      <Text>Push notifications are disabled.</Text>
+                    </View>
+                  )}
                   <NavigationContainer>
                     <Stack.Navigator
                       initialRouteName={initialRoute}
