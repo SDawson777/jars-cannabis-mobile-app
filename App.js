@@ -19,7 +19,7 @@ import AgeVerification from './src/screens/AgeVerification';
 import LoginSignUpDecisionScreen from './src/screens/LoginSignUpDecisionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
-import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import OTPScreen from './src/screens/OTPScreen';
 import StoreSelection from './src/screens/StoreSelectionScreen';
 import HomeScreen from './src/screens/HomeScreen';

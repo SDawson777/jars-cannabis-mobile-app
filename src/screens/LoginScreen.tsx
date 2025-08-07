@@ -166,15 +166,15 @@ export default function LoginScreen() {
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Forgot Password"
+          accessibilityLabel="Forgot your password"
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            navigation.navigate('ForgotPassword');
+            navigation.push('ForgotPassword');
           }}
           style={({ pressed }) => pressed && { transform: [{ scale: 0.95 }] }}
         >
-          <Text style={[styles.link, { color: jarsPrimary }]}>Forgot Password?</Text>
+          <Text style={[styles.link, { color: jarsPrimary }]}>Forgot your password?</Text>
         </Pressable>
 
         <Pressable
