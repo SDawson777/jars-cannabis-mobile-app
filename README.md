@@ -1,6 +1,6 @@
 # Jars Cannabis Mobile App
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions)
+[![CI](https://github.com/SDAWSON777/jars-cannabis-mobile-app/actions/workflows/ci.yml/badge.svg)](https://github.com/SDAWSON777/jars-cannabis-mobile-app/actions)
 
 A premium React Native mobile app for Jars Cannabis, designed to deliver an award-winning, legally compliant, and highly personalized cannabis shopping experience.
 
