@@ -230,6 +230,18 @@ This project is plug-and-play for cannabis retail: just add your branding, API k
 
 Contact for licensing, transfer, or deployment help!
 
+## How to Enable Apple Pay After Acquisition
+
+1. Enable Apple Pay in your Apple Developer account and create a Merchant ID.
+2. Replace `STRIPE_PUBLISHABLE_KEY` and `STRIPE_MERCHANT_ID` in your `.env` with production values.
+3. Add the Merchant ID to the Xcode project and enable the Apple Pay entitlement in both Xcode and App Store Connect.
+4. Rebuild and submit the app. Apple Pay activates automatically once the merchant ID is configured.
+
+### App Store Notes
+
+- Apple Pay will activate when a valid merchant ID is added.
+- You must enable the Apple Pay entitlement in Xcode and App Store Connect.
+
 ## Local Dev Quick-start
 
 ```
