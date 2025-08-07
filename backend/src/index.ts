@@ -6,6 +6,7 @@ import './firebaseAdmin';
 import express, { Request, Response, NextFunction } from 'express';
 import { phase4Router } from './routes/phase4';
 import { authRouter } from './routes/auth';
+import { stripeRouter } from './routes/stripe';
 import SentryInit from './utils/sentry'; // triggers Sentry.init()
 
 const app = express();
@@ -18,6 +19,7 @@ app.get('/', (_req, res) => {
 
 app.use('/', authRouter);
 app.use('/', phase4Router);
+app.use('/', stripeRouter);
 
 // Type-safe Sentry error handler (always after all routes)
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

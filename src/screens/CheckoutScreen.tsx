@@ -19,6 +19,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
+import { toast } from '../utils/toast';
+import { useStripe, isPlatformPaySupported } from '@stripe/stripe-react-native';
+import { fetchPaymentSheetParams } from '../api/stripe';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -41,6 +44,7 @@ export default function CheckoutScreen() {
   const [email, setEmail] = useState('');
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   // animate on any state change
   useEffect(() => {
@@ -81,7 +85,46 @@ export default function CheckoutScreen() {
     navigation.navigate('HelpFAQ');
   };
 
-  const onNext = () => {
+  const openPaymentSheet = async () => {
+    try {
+      const params = await fetchPaymentSheetParams();
+      const walletSupported = await isPlatformPaySupported();
+      const { error: initError } = await initPaymentSheet({
+        merchantDisplayName: 'Jars Cannabis',
+        customerId: params.customer,
+        customerEphemeralKeySecret: params.ephemeralKey,
+        paymentIntentClientSecret: params.paymentIntent,
+        applePay: walletSupported
+          ? {
+              merchantIdentifier: process.env.STRIPE_MERCHANT_ID || 'merchant.com.placeholder',
+              merchantCountryCode: 'US',
+            }
+          : undefined,
+        googlePay: walletSupported
+          ? {
+              merchantCountryCode: 'US',
+              testEnv: true,
+            }
+          : undefined,
+      });
+      if (initError) {
+        toast('Payment initialization failed');
+        return false;
+      }
+      const { error } = await presentPaymentSheet();
+      if (error) {
+        toast('Payment failed');
+        return false;
+      }
+      toast('Payment successful');
+      return true;
+    } catch (e) {
+      toast('Payment failed');
+      return false;
+    }
+  };
+
+  const onNext = async () => {
     if (step === 0 && method === 'delivery' && !address.trim()) {
       hapticHeavy();
       return Alert.alert('Error', 'Please enter delivery address.');
@@ -99,8 +142,16 @@ export default function CheckoutScreen() {
       hapticMedium();
       setStep(step + 1);
     } else {
-      hapticMedium();
-      navigation.navigate('OrderConfirmation');
+      if (payment === 'online') {
+        const success = await openPaymentSheet();
+        if (success) {
+          hapticMedium();
+          navigation.navigate('OrderConfirmation');
+        }
+      } else {
+        hapticMedium();
+        navigation.navigate('OrderConfirmation');
+      }
     }
   };
 
@@ -314,6 +365,7 @@ export default function CheckoutScreen() {
         ]}
         onPress={onNext}
         disabled={nextDisabled}
+        accessibilityLabel={step < steps.length - 1 ? 'Continue to next step' : 'Place order'}
       >
         <Text style={styles.nextBtnText}>
           {step < steps.length - 1 ? 'Continue' : 'Place Order'}
