@@ -1,4 +1,5 @@
 // src/App.js
+import * as Sentry from '@sentry/react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -15,6 +16,15 @@ import { CMSPreviewProvider } from './src/context/CMSPreviewContext';
 import OfflineNotice from './src/components/OfflineNotice';
 import * as SecureStore from 'expo-secure-store';
 import { StripeProvider } from '@stripe/stripe-react-native';
+import ErrorBoundary from './src/components/ErrorBoundary';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  enableAutoSessionTracking: true,
+  enableNative: true,
+  tracesSampleRate: 1.0,
+  environment: __DEV__ ? 'development' : 'production',
+});
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
@@ -81,7 +91,7 @@ import EthicalAIDashboardScreen from './src/screens/EthicalAIDashboardScreen';
 const Stack = createNativeStackNavigator(); // no generic
 const queryClient = new QueryClient();
 
-export default function App() {
+function App() {
   const [initialRoute, setInitialRoute] = useState('SplashScreen');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -139,16 +149,19 @@ export default function App() {
   if (!initialRoute) return null;
 
   return (
-    <StripeProvider
-      publishableKey={process.env.STRIPE_PUBLISHABLE_KEY || ''}
-      merchantIdentifier={process.env.STRIPE_MERCHANT_ID || 'merchant.com.placeholder'}
-    >
-      <StoreProvider>
-        <LoyaltyProvider>
-          <ThemeProvider>
-            <SettingsProvider>
-              <CMSPreviewProvider>
-                <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
+      <StripeProvider
+        publishableKey={process.env.STRIPE_PUBLISHABLE_KEY || ''}
+        merchantIdentifier={
+          process.env.STRIPE_MERCHANT_ID || 'merchant.com.placeholder'
+        }
+      >
+        <StoreProvider>
+          <LoyaltyProvider>
+            <ThemeProvider>
+              <SettingsProvider>
+                <CMSPreviewProvider>
+                  <QueryClientProvider client={queryClient}>
                   <OfflineNotice />
                   {!notificationsEnabled && (
                     <View
@@ -238,7 +251,10 @@ export default function App() {
             </SettingsProvider>
           </ThemeProvider>
         </LoyaltyProvider>
-      </StoreProvider>
-    </StripeProvider>
+        </StoreProvider>
+      </StripeProvider>
+    </ErrorBoundary>
   );
 }
+
+export default Sentry.wrap(App);

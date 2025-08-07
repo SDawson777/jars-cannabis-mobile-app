@@ -140,6 +140,18 @@ Frontend (/.env):
 
 EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
 
+## Sentry Setup
+
+The app is preconfigured with Sentry for crash and error reporting. To use your own
+Sentry project:
+
+1. Copy `.env.example` to `.env`.
+2. Replace the `SENTRY_DSN` value with the DSN from your Sentry project.
+3. Rebuild or restart the app.
+
+With the DSN set, runtime errors and unhandled exceptions will appear in your
+Sentry dashboard under that project.
+
 ## Design Assets
 
 Certain icons, audio cues and Lottie animations are required under `src/assets`.
