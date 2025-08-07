@@ -178,6 +178,15 @@ GitHub Actions: runs tests/lints for every PR
 
 Sentry: error monitoring (just set your DSN in .env)
 
+## Compliance
+
+### Accessibility
+
+- Interactive elements include screen reader labels, roles, and helpful hints.
+- Modals are marked as accessible and announce themselves to assistive technologies.
+- Text supports dynamic font scaling for better readability.
+- Color choices follow WCAG 2.1 AA contrast guidelines.
+
 📦 Project Structure
 
 jars-cannabis-mobile-app/
