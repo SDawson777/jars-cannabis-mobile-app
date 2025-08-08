@@ -4,8 +4,22 @@ dotenv.config(); // <-- MUST be called first!
 import * as Sentry from '@sentry/node';
 import './firebaseAdmin';
 import express, { Request, Response, NextFunction } from 'express';
-import { phase4Router } from './routes/phase4';
 import { authRouter } from './routes/auth';
+import { profileRouter } from './routes/profile';
+import { productsRouter } from './routes/products';
+import { storesRouter } from './routes/stores';
+import { cartRouter } from './routes/cart';
+import { ordersRouter } from './routes/orders';
+import { contentRouter } from './routes/content';
+import { recommendationsRouter } from './routes/recommendations';
+import { loyaltyRouter } from './routes/loyalty';
+import { greenhouseRouter } from './routes/greenhouse';
+import { journalRouter } from './routes/journal';
+import { awardsRouter } from './routes/awards';
+import { dataRouter } from './routes/data';
+import { accessibilityRouter } from './routes/accessibility';
+import { conciergeRouter } from './routes/concierge';
+import { arRouter } from './routes/ar';
 import { stripeRouter } from './routes/stripe';
 import SentryInit from './utils/sentry'; // triggers Sentry.init()
 
@@ -17,9 +31,23 @@ app.get('/', (_req, res) => {
   res.json({ status: 'healthy' });
 });
 
-app.use('/', authRouter);
-app.use('/', phase4Router);
-app.use('/', stripeRouter);
+app.use('/api/v1', authRouter);
+app.use('/api/v1', profileRouter);
+app.use('/api/v1', productsRouter);
+app.use('/api/v1', storesRouter);
+app.use('/api/v1', cartRouter);
+app.use('/api/v1', ordersRouter);
+app.use('/api/v1', contentRouter);
+app.use('/api/v1', recommendationsRouter);
+app.use('/api/v1', loyaltyRouter);
+app.use('/api/v1', greenhouseRouter);
+app.use('/api/v1', journalRouter);
+app.use('/api/v1', awardsRouter);
+app.use('/api/v1', dataRouter);
+app.use('/api/v1', accessibilityRouter);
+app.use('/api/v1', conciergeRouter);
+app.use('/api/v1', arRouter);
+app.use('/api/v1', stripeRouter);
 
 // Type-safe Sentry error handler (always after all routes)
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

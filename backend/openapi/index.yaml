@@ -1,0 +1,326 @@
+openapi: 3.0.3
+info:
+  title: Jars Mobile App API
+  version: 1.0.0
+servers:
+  - url: https://jars-cannabis-mobile-app-production.up.railway.app/api/v1
+    description: Production API
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      summary: Login with email and password
+      responses:
+        '200':
+          description: OK
+  /auth/logout:
+    post:
+      summary: Logout current user
+      responses:
+        '200':
+          description: OK
+  /auth/forgot-password:
+    post:
+      summary: Start password reset flow
+      responses:
+        '200':
+          description: OK
+  /profile:
+    get:
+      summary: Get current user profile
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update current user profile
+      responses:
+        '200':
+          description: OK
+  /profile/preferences:
+    get:
+      summary: Get profile preferences
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update profile preferences
+      responses:
+        '200':
+          description: OK
+  /products:
+    get:
+      summary: List products
+      responses:
+        '200':
+          description: OK
+  /products/{id}:
+    get:
+      summary: Get product detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "{{productId}}"
+      responses:
+        '200':
+          description: OK
+  /products/{id}/reviews:
+    get:
+      summary: List product reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "{{productId}}"
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create product review
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "{{productId}}"
+      responses:
+        '201':
+          description: Created
+  /stores:
+    get:
+      summary: List stores
+      responses:
+        '200':
+          description: OK
+  /stores/{id}:
+    get:
+      summary: Get store detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "{{storeId}}"
+      responses:
+        '200':
+          description: OK
+  /cart:
+    get:
+      summary: Get cart contents
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Add item to cart
+      responses:
+        '201':
+          description: Created
+  /cart/{itemId}:
+    put:
+      summary: Update cart item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          example: "{{itemId}}"
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Remove cart item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+          example: "{{itemId}}"
+      responses:
+        '204':
+          description: Deleted
+  /orders:
+    post:
+      summary: Create order
+      responses:
+        '201':
+          description: Created
+    get:
+      summary: List orders
+      responses:
+        '200':
+          description: OK
+  /orders/{id}:
+    get:
+      summary: Get order detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "{{orderId}}"
+      responses:
+        '200':
+          description: OK
+  /content/faq:
+    get:
+      summary: Get FAQ content
+      responses:
+        '200':
+          description: OK
+  /content/legal:
+    get:
+      summary: Get legal content
+      responses:
+        '200':
+          description: OK
+  /recommendations/for-you:
+    get:
+      summary: Personalized recommendations
+      responses:
+        '200':
+          description: OK
+  /recommendations/related/{productId}:
+    get:
+      summary: Related product recommendations
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          example: "{{productId}}"
+      responses:
+        '200':
+          description: OK
+  /loyalty/status:
+    get:
+      summary: Get loyalty status
+      responses:
+        '200':
+          description: OK
+  /loyalty/badges:
+    get:
+      summary: List loyalty badges
+      responses:
+        '200':
+          description: OK
+  /greenhouse/articles:
+    get:
+      summary: List greenhouse articles
+      responses:
+        '200':
+          description: OK
+  /greenhouse/articles/{slug}:
+    get:
+      summary: Get greenhouse article
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+          example: "{{articleSlug}}"
+      responses:
+        '200':
+          description: OK
+  /greenhouse/articles/{slug}/complete:
+    post:
+      summary: Mark greenhouse article complete
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+          example: "{{articleSlug}}"
+      responses:
+        '200':
+          description: OK
+  /journal/entries:
+    get:
+      summary: List journal entries
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create journal entry
+      responses:
+        '201':
+          description: Created
+  /journal/entries/{id}:
+    put:
+      summary: Update journal entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "{{entryId}}"
+      responses:
+        '200':
+          description: OK
+  /awards/status:
+    get:
+      summary: List earned awards
+      responses:
+        '200':
+          description: OK
+  /data/export:
+    post:
+      summary: Request user data export
+      responses:
+        '200':
+          description: OK
+  /accessibility:
+    get:
+      summary: Get accessibility preferences
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update accessibility preferences
+      responses:
+        '200':
+          description: OK
+  /concierge/chat:
+    post:
+      summary: Concierge chat (not implemented)
+      responses:
+        '501':
+          description: Not implemented
+  /ar/models/{productId}:
+    get:
+      summary: Get AR model for product (not implemented)
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+          example: "{{productId}}"
+      responses:
+        '501':
+          description: Not implemented

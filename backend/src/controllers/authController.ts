@@ -33,3 +33,27 @@ export async function login(req: Request, res: Response) {
 
   res.json({ token });
 }
+
+/**
+ * POST /auth/register
+ * Simple placeholder registration endpoint.
+ */
+export async function register(_req: Request, res: Response) {
+  res.json({ message: 'register endpoint' });
+}
+
+/**
+ * POST /auth/logout
+ * Placeholder logout endpoint.
+ */
+export async function logout(_req: Request, res: Response) {
+  res.json({ message: 'logout endpoint' });
+}
+
+/**
+ * POST /auth/forgot-password
+ * Placeholder forgot password handler.
+ */
+export async function forgotPassword(_req: Request, res: Response) {
+  res.json({ message: 'forgot-password endpoint' });
+}
