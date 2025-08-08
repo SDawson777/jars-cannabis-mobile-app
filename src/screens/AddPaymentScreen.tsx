@@ -1,39 +1,56 @@
-// src/screens/AddPaymentScreen.tsx
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TextInput,
   Pressable,
-  Alert,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { addPaymentMethod } from '../clients/paymentClient';
+import { toast } from '../utils/toast';
+import { useQueryClient } from '@tanstack/react-query';
+import type { RootStackParamList } from '../navigation/types';
 
-// Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 type AddPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'AddPayment'>;
+type FormData = { cardNumber: string; name: string; expiry: string; cvv: string };
+
+const schema = yup.object({
+  cardNumber: yup.string().required('Card number is required'),
+  name: yup.string().required('Name is required'),
+  expiry: yup.string().required('Expiry is required'),
+  cvv: yup.string().required('CVV is required'),
+});
 
 export default function AddPaymentScreen() {
   const navigation = useNavigation<AddPaymentNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const queryClient = useQueryClient();
 
-  const [cardNumber, setCardNumber] = useState('');
-  const [name, setName] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm<FormData>({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+  });
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -67,69 +84,115 @@ export default function AddPaymentScreen() {
     navigation.goBack();
   };
 
-  const onSave = () => {
-    if (!cardNumber.trim() || !name.trim() || !expiry.trim() || !cvv.trim()) {
-      hapticLight();
-      return Alert.alert('Error', 'Please fill in all fields.');
-    }
+  const onSubmit = async (data: FormData) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: integrate saving logic
-    Alert.alert('Payment Added', 'Your new payment method has been saved.');
-    navigation.goBack();
+    try {
+      await addPaymentMethod(data);
+      toast('Payment method added');
+      navigation.goBack();
+      queryClient.invalidateQueries({ queryKey: ['paymentMethods'] });
+    } catch {
+      toast('Unable to save payment method. Please try again.');
+    }
   };
 
   const fields = [
     {
+      name: 'cardNumber',
       label: 'Card Number',
-      value: cardNumber,
-      setter: setCardNumber,
       keyboard: 'numeric',
       secure: false,
+      hint: 'Enter your card number',
     },
-    { label: 'Name on Card', value: name, setter: setName, keyboard: 'default', secure: false },
     {
-      label: 'Expiry (MM/YY)',
-      value: expiry,
-      setter: setExpiry,
+      name: 'name',
+      label: 'Name on Card',
       keyboard: 'default',
       secure: false,
+      hint: 'Enter the name on the card',
     },
-    { label: 'CVV', value: cvv, setter: setCvv, keyboard: 'numeric', secure: true },
-  ];
+    {
+      name: 'expiry',
+      label: 'Expiry (MM/YY)',
+      keyboard: 'default',
+      secure: false,
+      hint: 'Enter expiration date in MM/YY format',
+    },
+    {
+      name: 'cvv',
+      label: 'CVV',
+      keyboard: 'numeric',
+      secure: true,
+      hint: 'Enter the security code',
+    },
+  ] as const;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
-        <Pressable onPress={handleBack} style={styles.iconBtn}>
+        <Pressable
+          onPress={handleBack}
+          style={styles.iconBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          accessibilityHint="Return to previous screen"
+        >
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Add Payment</Text>
         <View style={styles.iconBtn} />
       </View>
       <View style={styles.form}>
-        {fields.map(({ label, value, setter, keyboard, secure }) => (
-          <View key={label}>
-            <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
-            <TextInput
-              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-              placeholder={label}
-              placeholderTextColor={jarsSecondary}
-              keyboardType={keyboard as any}
-              secureTextEntry={secure}
-              value={value}
-              onChangeText={t => {
-                hapticLight();
-                setter(t);
-              }}
+        {fields.map(f => (
+          <View key={f.name} style={styles.field}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{f.label}</Text>
+            <Controller
+              control={control}
+              name={f.name}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+                  placeholder={f.label}
+                  placeholderTextColor={jarsSecondary}
+                  keyboardType={f.keyboard as any}
+                  secureTextEntry={f.secure}
+                  onBlur={onBlur}
+                  value={value}
+                  onChangeText={t => {
+                    hapticLight();
+                    onChange(t);
+                  }}
+                  accessibilityLabel={f.label}
+                  accessibilityHint={f.hint}
+                />
+              )}
             />
+            {errors[f.name] && (
+              <Text style={styles.error} accessibilityRole="alert">
+                {errors[f.name]?.message}
+              </Text>
+            )}
           </View>
         ))}
         <Pressable
-          style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
-          onPress={onSave}
+          style={[
+            styles.saveBtn,
+            { backgroundColor: jarsPrimary },
+            glowStyle,
+            (!isValid || isSubmitting) && { opacity: 0.5 },
+          ]}
+          onPress={handleSubmit(onSubmit)}
+          disabled={!isValid || isSubmitting}
+          accessibilityRole="button"
+          accessibilityLabel="Save payment method"
+          accessibilityHint="Saves this payment method to your account"
         >
-          <Text style={styles.saveText}>Save Payment</Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.saveText}>Save Payment</Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
@@ -148,7 +211,8 @@ const styles = StyleSheet.create({
   iconBtn: { width: 24, alignItems: 'center' },
   headerTitle: { fontSize: 20, fontWeight: '600' },
   form: { padding: 16 },
-  label: { fontSize: 14, marginTop: 16, marginBottom: 4 },
+  field: { marginBottom: 12 },
+  label: { fontSize: 14, marginBottom: 4 },
   input: {
     backgroundColor: '#FFF',
     borderRadius: 12,
@@ -156,6 +220,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
   },
+  error: { color: 'red', marginTop: 4 },
   saveBtn: {
     marginTop: 32,
     paddingVertical: 14,
