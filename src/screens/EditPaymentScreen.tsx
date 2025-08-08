@@ -1,5 +1,4 @@
-// src/screens/EditPaymentScreen.tsx
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,36 +6,61 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
-  Alert,
   LayoutAnimation,
   UIManager,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { updatePaymentMethod } from '../clients/paymentClient';
+import { toast } from '../utils/toast';
+import { useQueryClient } from '@tanstack/react-query';
+import type { RootStackParamList } from '../navigation/types';
 
-// Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 type EditPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'EditPayment'>;
 type EditPaymentRouteProp = RouteProp<RootStackParamList, 'EditPayment'>;
+type FormData = { cardNumber: string; name: string; expiry: string; cvv: string };
+
+const schema = yup.object({
+  cardNumber: yup.string().required('Card number is required'),
+  name: yup.string().required('Name is required'),
+  expiry: yup.string().required('Expiry is required'),
+  cvv: yup.string().required('CVV is required'),
+});
 
 export default function EditPaymentScreen() {
   const navigation = useNavigation<EditPaymentNavProp>();
   const route = useRoute<EditPaymentRouteProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const queryClient = useQueryClient();
 
   const pm = route.params?.payment || {};
-  const [cardNumber, setCardNumber] = useState(pm.cardNumber || '');
-  const [name, setName] = useState(pm.name || '');
-  const [expiry, setExpiry] = useState(pm.expiry || '');
-  const [cvv, setCvv] = useState(pm.cvv || '');
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm<FormData>({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+    defaultValues: {
+      cardNumber: pm.cardNumber || '',
+      name: pm.name || '',
+      expiry: pm.expiry || '',
+      cvv: pm.cvv || '',
+    },
+  });
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -70,53 +94,60 @@ export default function EditPaymentScreen() {
     navigation.goBack();
   };
 
-  const onSave = () => {
-    if (!cardNumber.trim() || !name.trim() || !expiry.trim() || !cvv.trim()) {
-      hapticLight();
-      return Alert.alert('Error', 'Please fill in all fields.');
-    }
+  const onSubmit = async (data: FormData) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: persist updated payment
-    Alert.alert('Payment Updated', 'Your payment method has been updated.');
-    navigation.goBack();
+    try {
+      await updatePaymentMethod(pm.id, data);
+      toast('Payment method updated');
+      navigation.goBack();
+      queryClient.invalidateQueries({ queryKey: ['paymentMethods'] });
+    } catch {
+      toast('Unable to save payment method. Please try again.');
+    }
   };
 
   const fields = [
     {
+      name: 'cardNumber',
       label: 'Card Number',
-      value: cardNumber,
-      setter: setCardNumber,
       keyboard: 'numeric',
       secure: false,
+      hint: 'Edit your card number',
     },
     {
+      name: 'name',
       label: 'Name on Card',
-      value: name,
-      setter: setName,
       keyboard: 'default',
       secure: false,
+      hint: 'Edit the name on the card',
     },
     {
+      name: 'expiry',
       label: 'Expiry (MM/YY)',
-      value: expiry,
-      setter: setExpiry,
       keyboard: 'default',
       secure: false,
+      hint: 'Edit expiration date in MM/YY format',
     },
     {
+      name: 'cvv',
       label: 'CVV',
-      value: cvv,
-      setter: setCvv,
       keyboard: 'numeric',
       secure: true,
+      hint: 'Edit the security code',
     },
-  ];
+  ] as const;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
-        <Pressable onPress={handleBack} style={styles.iconBtn}>
+        <Pressable
+          onPress={handleBack}
+          style={styles.iconBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          accessibilityHint="Return to previous screen"
+        >
           <ChevronLeft color={jarsPrimary} size={24} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: jarsPrimary }]}>Edit Payment</Text>
@@ -124,29 +155,55 @@ export default function EditPaymentScreen() {
       </View>
 
       <View style={styles.form}>
-        {fields.map(({ label, value, setter, keyboard, secure }) => (
-          <View key={label} style={styles.field}>
-            <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
-            <TextInput
-              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-              placeholder={label}
-              placeholderTextColor={jarsSecondary}
-              keyboardType={keyboard as any}
-              secureTextEntry={secure}
-              value={value}
-              onChangeText={t => {
-                hapticLight();
-                setter(t);
-              }}
+        {fields.map(f => (
+          <View key={f.name} style={styles.field}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{f.label}</Text>
+            <Controller
+              control={control}
+              name={f.name}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+                  placeholder={f.label}
+                  placeholderTextColor={jarsSecondary}
+                  keyboardType={f.keyboard as any}
+                  secureTextEntry={f.secure}
+                  onBlur={onBlur}
+                  value={value}
+                  onChangeText={t => {
+                    hapticLight();
+                    onChange(t);
+                  }}
+                  accessibilityLabel={f.label}
+                  accessibilityHint={f.hint}
+                />
+              )}
             />
+            {errors[f.name] && (
+              <Text style={styles.error} accessibilityRole="alert">
+                {errors[f.name]?.message}
+              </Text>
+            )}
           </View>
         ))}
-
         <Pressable
-          style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
-          onPress={onSave}
+          style={[
+            styles.saveBtn,
+            { backgroundColor: jarsPrimary },
+            glowStyle,
+            (!isValid || isSubmitting) && { opacity: 0.5 },
+          ]}
+          onPress={handleSubmit(onSubmit)}
+          disabled={!isValid || isSubmitting}
+          accessibilityRole="button"
+          accessibilityLabel="Save changes"
+          accessibilityHint="Saves your updated payment method"
         >
-          <Text style={styles.saveText}>Save Changes</Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.saveText}>Save Changes</Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
@@ -177,6 +234,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
   },
+  error: { color: 'red', marginTop: 4 },
   saveBtn: {
     marginTop: 32,
     paddingVertical: 14,
