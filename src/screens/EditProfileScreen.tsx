@@ -1,13 +1,13 @@
 // src/screens/EditProfileScreen.tsx
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TextInput,
   Pressable,
+  ActivityIndicator,
   StyleSheet,
-  Alert,
   LayoutAnimation,
   UIManager,
   Platform,
@@ -18,6 +18,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { profileSchema, ProfileFormValues } from './account/profileSchema';
+import { useUpdateUserProfile } from '../api/hooks/useUpdateUserProfile';
+import { toast } from '../utils/toast';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -32,9 +37,19 @@ export default function EditProfileScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const profile = route.params?.profile ?? {};
-  const [name, setName] = useState(profile.name ?? '');
-  const [email, setEmail] = useState(profile.email ?? '');
-  const [phone, setPhone] = useState(profile.phone ?? '');
+  const {
+    control,
+    handleSubmit,
+  } = useForm<ProfileFormValues>({
+    resolver: yupResolver(profileSchema),
+    defaultValues: {
+      name: profile.name,
+      email: profile.email,
+      phone: profile.phone,
+    },
+  });
+  const updateProfile = useUpdateUserProfile();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -68,15 +83,19 @@ export default function EditProfileScreen() {
     navigation.goBack();
   };
 
-  const onSave = () => {
-    if (!name.trim() || !email.trim()) {
-      return Alert.alert('Error', 'Name and email cannot be empty.');
-    }
+  const onSave = async (values: ProfileFormValues) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: persist changes
-    Alert.alert('Profile Updated', 'Your profile has been saved.');
-    navigation.goBack();
+    try {
+      setLoading(true);
+      await updateProfile.mutateAsync(values);
+      toast('Profile updated');
+      navigation.goBack();
+    } catch (e: any) {
+      toast(e.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,31 +110,49 @@ export default function EditProfileScreen() {
 
       <View style={styles.form}>
         {[
-          { label: 'Full Name', value: name, setter: setName, keyboard: 'default' },
-          { label: 'Email Address', value: email, setter: setEmail, keyboard: 'email-address' },
-          { label: 'Phone Number', value: phone, setter: setPhone, keyboard: 'phone-pad' },
-        ].map(({ label, value, setter, keyboard }) => (
-          <View key={label}>
-            <Text style={[styles.label, { color: jarsSecondary }]}>{label}</Text>
-            <TextInput
-              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-              placeholder={label}
-              placeholderTextColor={jarsSecondary}
-              keyboardType={keyboard as any}
-              value={value}
-              onChangeText={t => {
-                hapticLight();
-                setter(t);
-              }}
+          { name: 'name', placeholder: 'Full Name', keyboard: 'default' },
+          { name: 'email', placeholder: 'Email Address', keyboard: 'email-address' },
+          { name: 'phone', placeholder: 'Phone Number', keyboard: 'phone-pad' },
+        ].map(({ name, placeholder, keyboard }) => (
+          <View key={name}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{placeholder}</Text>
+            <Controller
+              control={control}
+              name={name as keyof ProfileFormValues}
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <TextInput
+                    style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+                    placeholder={placeholder}
+                    placeholderTextColor={jarsSecondary}
+                    keyboardType={keyboard as any}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={t => {
+                      hapticLight();
+                      onChange(t);
+                    }}
+                    accessibilityLabel={placeholder}
+                    accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
+                  />
+                  {error && <Text style={styles.error}>{error.message}</Text>}
+                </>
+              )}
             />
           </View>
         ))}
 
         <Pressable
           style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
-          onPress={onSave}
+          onPress={handleSubmit(onSave)}
+          accessibilityLabel="Save profile"
+          accessibilityHint="Saves profile information"
         >
-          <Text style={styles.saveText}>Save Profile</Text>
+          {loading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.saveText}>Save Profile</Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
@@ -157,5 +194,9 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  error: {
+    color: 'red',
+    marginTop: 4,
   },
 });

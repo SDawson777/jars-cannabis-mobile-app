@@ -1,13 +1,13 @@
 // src/screens/EditAddressScreen.tsx
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TextInput,
   Pressable,
+  ActivityIndicator,
   StyleSheet,
-  Alert,
   LayoutAnimation,
   UIManager,
   Platform,
@@ -16,6 +16,11 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { addressSchema, AddressFormValues } from './account/addressSchema';
+import { phase4Client } from '../api/phase4Client';
+import { toast } from '../utils/toast';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,11 +34,20 @@ export default function EditAddressScreen() {
 
   // Existing address passed via params
   const addr = (route.params as any)?.address || {};
-  const [label, setLabel] = useState(addr.label || '');
-  const [line1, setLine1] = useState(addr.line1 || '');
-  const [city, setCity] = useState(addr.city || '');
-  const [stateField, setStateField] = useState(addr.state || '');
-  const [zip, setZip] = useState(addr.zip || '');
+  const {
+    control,
+    handleSubmit,
+  } = useForm<AddressFormValues>({
+    resolver: yupResolver(addressSchema),
+    defaultValues: {
+      label: addr.label,
+      line1: addr.line1,
+      city: addr.city,
+      state: addr.state,
+      zip: addr.zip,
+    },
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -48,12 +62,19 @@ export default function EditAddressScreen() {
     navigation.goBack();
   };
 
-  const onSave = () => {
+  const onSave = async (values: AddressFormValues) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: persist updated address via API/Context
-    Alert.alert('Address Updated', 'Your address changes have been saved.');
-    navigation.goBack();
+    try {
+      setLoading(true);
+      await phase4Client.put(`/addresses/${addr.id}`, values);
+      toast('Address saved');
+      navigation.goBack();
+    } catch (e: any) {
+      toast(e.message || 'Failed to save address');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,69 +90,52 @@ export default function EditAddressScreen() {
 
       {/* Form */}
       <View style={styles.form}>
-        <Text style={[styles.label, { color: jarsPrimary }]}>Label</Text>
-        <TextInput
-          style={[styles.input, { borderColor: jarsSecondary }]}
-          value={label}
-          onChangeText={t => {
-            hapticLight();
-            setLabel(t);
-          }}
-          placeholder="Home, Work, etc."
-          placeholderTextColor={jarsSecondary}
-        />
+        {[
+          { name: 'label', placeholder: 'Label' },
+          { name: 'line1', placeholder: 'Street Address' },
+          { name: 'city', placeholder: 'City' },
+          { name: 'state', placeholder: 'State' },
+          { name: 'zip', placeholder: 'ZIP Code', keyboard: 'numeric' },
+        ].map(({ name, placeholder, keyboard }) => (
+          <View key={name}>
+            <Text style={[styles.label, { color: jarsPrimary }]}>{placeholder}</Text>
+            <Controller
+              control={control}
+              name={name as keyof AddressFormValues}
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <TextInput
+                    style={[styles.input, { borderColor: jarsSecondary }]}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={t => {
+                      hapticLight();
+                      onChange(t);
+                    }}
+                    placeholder={placeholder}
+                    placeholderTextColor={jarsSecondary}
+                    keyboardType={keyboard as any}
+                    accessibilityLabel={placeholder}
+                    accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
+                  />
+                  {error && <Text style={styles.error}>{error.message}</Text>}
+                </>
+              )}
+            />
+          </View>
+        ))}
 
-        <Text style={[styles.label, { color: jarsPrimary }]}>Street Address</Text>
-        <TextInput
-          style={[styles.input, { borderColor: jarsSecondary }]}
-          value={line1}
-          onChangeText={t => {
-            hapticLight();
-            setLine1(t);
-          }}
-          placeholder="123 Main St"
-          placeholderTextColor={jarsSecondary}
-        />
-
-        <Text style={[styles.label, { color: jarsPrimary }]}>City</Text>
-        <TextInput
-          style={[styles.input, { borderColor: jarsSecondary }]}
-          value={city}
-          onChangeText={t => {
-            hapticLight();
-            setCity(t);
-          }}
-          placeholder="City"
-          placeholderTextColor={jarsSecondary}
-        />
-
-        <Text style={[styles.label, { color: jarsPrimary }]}>State</Text>
-        <TextInput
-          style={[styles.input, { borderColor: jarsSecondary }]}
-          value={stateField}
-          onChangeText={t => {
-            hapticLight();
-            setStateField(t);
-          }}
-          placeholder="State"
-          placeholderTextColor={jarsSecondary}
-        />
-
-        <Text style={[styles.label, { color: jarsPrimary }]}>ZIP Code</Text>
-        <TextInput
-          style={[styles.input, { borderColor: jarsSecondary }]}
-          value={zip}
-          onChangeText={t => {
-            hapticLight();
-            setZip(t);
-          }}
-          placeholder="ZIP"
-          keyboardType="numeric"
-          placeholderTextColor={jarsSecondary}
-        />
-
-        <Pressable style={[styles.saveBtn, { backgroundColor: jarsPrimary }]} onPress={onSave}>
-          <Text style={styles.saveText}>Save Changes</Text>
+        <Pressable
+          style={[styles.saveBtn, { backgroundColor: jarsPrimary }]}
+          onPress={handleSubmit(onSave)}
+          accessibilityLabel="Save address"
+          accessibilityHint="Saves this address"
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.saveText}>Save Changes</Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
@@ -173,5 +177,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  error: {
+    color: 'red',
+    marginTop: 4,
   },
 });

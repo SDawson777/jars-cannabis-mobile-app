@@ -6,7 +6,7 @@ import {
   Text,
   TextInput,
   Pressable,
-  Alert,
+  ActivityIndicator,
   StyleSheet,
   LayoutAnimation,
   UIManager,
@@ -18,6 +18,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { addressSchema, AddressFormValues } from './account/addressSchema';
+import { phase4Client } from '../api/phase4Client';
+import { toast } from '../utils/toast';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -30,11 +35,10 @@ export default function AddAddressScreen() {
   const navigation = useNavigation<AddAddressNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
-  const [label, setLabel] = useState('');
-  const [line1, setLine1] = useState('');
-  const [city, setCity] = useState('');
-  const [stateField, setStateField] = useState('');
-  const [zip, setZip] = useState('');
+  const { control, handleSubmit } = useForm<AddressFormValues>({
+    resolver: yupResolver(addressSchema),
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -68,16 +72,19 @@ export default function AddAddressScreen() {
     navigation.goBack();
   };
 
-  const onSave = () => {
-    if (!label.trim() || !line1.trim() || !city.trim()) {
-      hapticLight();
-      return Alert.alert('Error', 'Please fill in all required fields.');
-    }
+  const onSave = async (values: AddressFormValues) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    // TODO: integrate actual save logic
-    Alert.alert('Address Added', 'Your new address has been saved.');
-    navigation.goBack();
+    try {
+      setLoading(true);
+      await phase4Client.post('/addresses', values);
+      toast('Address saved');
+      navigation.goBack();
+    } catch (e: any) {
+      toast(e.message || 'Failed to save address');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,33 +98,51 @@ export default function AddAddressScreen() {
       </View>
       <View style={styles.form}>
         {[
-          { label: 'Label (Home, Work)', value: label, setter: setLabel },
-          { label: 'Street Address', value: line1, setter: setLine1 },
-          { label: 'City', value: city, setter: setCity },
-          { label: 'State', value: stateField, setter: setStateField },
-          { label: 'ZIP Code', value: zip, setter: setZip, keyboard: 'numeric' },
-        ].map(({ label: lbl, value, setter, keyboard }) => (
-          <View key={lbl}>
-            <Text style={[styles.label, { color: jarsSecondary }]}>{lbl}</Text>
-            <TextInput
-              style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-              placeholder={lbl}
-              placeholderTextColor={jarsSecondary}
-              keyboardType={keyboard as any}
-              value={value}
-              onChangeText={t => {
-                hapticLight();
-                setter(t);
-              }}
+          { name: 'label', placeholder: 'Label (Home, Work)' },
+          { name: 'line1', placeholder: 'Street Address' },
+          { name: 'city', placeholder: 'City' },
+          { name: 'state', placeholder: 'State' },
+          { name: 'zip', placeholder: 'ZIP Code', keyboard: 'numeric' },
+        ].map(({ name, placeholder, keyboard }) => (
+          <View key={name}>
+            <Text style={[styles.label, { color: jarsSecondary }]}>{placeholder}</Text>
+            <Controller
+              control={control}
+              name={name as keyof AddressFormValues}
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <>
+                  <TextInput
+                    style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+                    placeholder={placeholder}
+                    placeholderTextColor={jarsSecondary}
+                    keyboardType={keyboard as any}
+                    accessibilityLabel={placeholder}
+                    accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={text => {
+                      hapticLight();
+                      onChange(text);
+                    }}
+                  />
+                  {error && <Text style={styles.error}>{error.message}</Text>}
+                </>
+              )}
             />
           </View>
         ))}
 
         <Pressable
           style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
-          onPress={onSave}
+          onPress={handleSubmit(onSave)}
+          accessibilityLabel="Save address"
+          accessibilityHint="Saves this address"
         >
-          <Text style={styles.saveText}>Save Address</Text>
+          {loading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.saveText}>Save Address</Text>
+          )}
         </Pressable>
       </View>
     </SafeAreaView>
@@ -158,5 +183,9 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  error: {
+    color: 'red',
+    marginTop: 4,
   },
 });

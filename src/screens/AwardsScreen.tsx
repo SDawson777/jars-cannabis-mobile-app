@@ -22,6 +22,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { toast } from '../utils/toast';
 import { trackEvent } from '../utils/analytics';
 import { useRedeemReward } from '../api/hooks/useRedeemReward';
 import { ChevronLeft, Settings } from 'lucide-react-native';
@@ -119,10 +120,18 @@ export default function AwardsScreen() {
   const redeemMutation = useRedeemReward();
 
   const redeemReward = (reward: (typeof REWARDS)[0]) => {
+    if (user.points < reward.points) {
+      hapticLight();
+      toast('Not enough points');
+      return;
+    }
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     trackEvent('award_item_tap', { id: reward.id });
-    redeemMutation.mutate({ id: reward.id, points: reward.points });
+    redeemMutation.mutate(
+      { id: reward.id, points: reward.points },
+      { onSuccess: () => toast('Reward redeemed') }
+    );
   };
 
   const openFaq = () => {
