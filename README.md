@@ -63,9 +63,12 @@ Fast local setup and test
 git clone https://github.com/YOUR-ORG/jars-cannabis-mobile-app.git
 cd jars-cannabis-mobile-app
 
-2. Install root dependencies
+2. Install Node and dependencies
 
-npm install
+nvm install # install Node version from .nvmrc
+nvm use
+chmod +x setup.sh
+./setup.sh
 
 3. Setup the backend
 
