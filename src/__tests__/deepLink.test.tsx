@@ -1,7 +1,16 @@
 import React from 'react';
-import { renderHook, waitFor } from '@testing-library/react';
-import { Linking } from 'react-native';
+import { renderHook, waitFor, act } from '@testing-library/react';
+
+jest.mock('react-native', () => ({
+  Linking: {
+    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+    removeEventListener: jest.fn(),
+    getInitialURL: jest.fn(() => Promise.resolve('jars://app/shop?store=midtown')),
+  },
+}));
+
 import useDeepLinkHandler from '../hooks/useDeepLinkHandler';
+import { makeStore } from './testUtils';
 
 const setPreferredStore = jest.fn();
 jest.mock('../context/StoreContext', () => ({
@@ -9,14 +18,6 @@ jest.mock('../context/StoreContext', () => ({
   StoreProvider: ({ children }: any) => <>{children}</>,
 }));
 import { NavigationContainer } from '@react-navigation/native';
-
-jest.mock('react-native', () => ({
-  Linking: {
-    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-    removeEventListener: jest.fn(),
-    getInitialURL: jest.fn(() => Promise.resolve('jars://shop?store=midtown')),
-  },
-}));
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
   setItemAsync: jest.fn(() => Promise.resolve()),
@@ -30,11 +31,10 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 test('deep link loads Shop with correct store', async () => {
-  const stores = [
-    { id: '1', name: 'Midtown', slug: 'midtown', address: '', latitude: 0, longitude: 0 },
-  ];
+  const stores = [makeStore()];
   const wrapper = ({ children }: any) => <NavigationContainer>{children}</NavigationContainer>;
-
-  renderHook(() => useDeepLinkHandler(stores), { wrapper });
+  await act(async () => {
+    renderHook(() => useDeepLinkHandler(stores), { wrapper });
+  });
   await waitFor(() => expect(setPreferredStore).toHaveBeenCalled());
 });

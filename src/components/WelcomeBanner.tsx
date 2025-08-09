@@ -14,7 +14,7 @@ export default function WelcomeBanner() {
   if (loyaltyTier === 'Gold') {
     message = 'Gold Tier Perk: Double Points This Week';
   } else if (promo && preferredStore?.name) {
-    message = `${preferredStore.name} Exclusive: $10 Off Pickup Orders`;
+    message = `${preferredStore.name} Exclusive: ${promo}`;
   }
 
   return (
