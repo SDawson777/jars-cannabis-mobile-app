@@ -79,6 +79,7 @@ module.exports = [
       '.eslintrc.js',
       'jest.config.js',
       'eslint.config.js',
+      'package-lock.json',
     ],
   },
 ];
