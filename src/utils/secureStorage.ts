@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 export async function saveSecure(key: string, value: string) {
   try {
     await SecureStore.setItemAsync(key, value);
-  } catch (err) {
+  } catch {
     await AsyncStorage.setItem(key, value);
   }
 }

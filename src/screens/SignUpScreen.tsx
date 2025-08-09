@@ -147,7 +147,6 @@ export default function SignUpScreen() {
         onFocus={() => setFocused('phone')}
         onBlur={() => setFocused(null)}
         accessibilityLabel="Phone"
-        accessibilityRole="tel"
       />
 
       <View style={styles.passwordRow}>

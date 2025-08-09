@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface PreferredStoreState {
   preferredStoreId?: string;
-  setPreferredStoreId: (id: string) => void;
+  setPreferredStoreId: (_id: string) => void;
   hydrate: () => Promise<void>;
 }
 

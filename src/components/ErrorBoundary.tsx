@@ -17,7 +17,7 @@ export default class ErrorBoundary extends React.Component<React.PropsWithChildr
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    Sentry.captureException(error, { extra: errorInfo });
+    Sentry.captureException(error, { extra: errorInfo as any });
   }
 
   render() {
