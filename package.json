@@ -30,7 +30,8 @@
     "integrate-terpene-assets": "mkdir -p assets/terpene-wheel && cp Terpene_Wheel_Code_Kit.zip assets/terpene-wheel && unzip -o assets/terpene-wheel/Terpene_Wheel_Code_Kit.zip -d assets/terpene-wheel",
     "scaffold:award-redemption": "ts-node scripts/setupAwardRedemption.ts",
     "test:award-redemption": "jest tests/awards.redeem.test.ts --runInBand",
-    "prisma-gen": "npx prisma generate --schema=backend/prisma/schema.prisma || npx prisma generate --schema=backend/prisma/schema.prisma --skip-download"
+    "prisma-gen": "npx prisma generate --schema=backend/prisma/schema.prisma || npx prisma generate --schema=backend/prisma/schema.prisma --skip-download",
+    "smoke": "newman run qa/collection.json -e qa/env.staging.json --reporters cli,junit --reporter-junit-export ./reports/newman-smoke.xml"
   },
   "lint-staged": {
     "{*,src/**,!src/terpene_wheel/snippets/**}/*.{js,jsx,ts,tsx}": [
@@ -149,6 +150,7 @@
     "jest-expo": "^53.0.9",
     "jsonc-eslint-parser": "^2.4.0",
     "lint-staged": "^13.2.3",
+    "newman": "^6.2.1",
     "prettier": "^3.6.2",
     "react-dom": "^19.1.0",
     "react-test-renderer": "^19.1.1",

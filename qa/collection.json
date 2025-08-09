@@ -1,0 +1,18 @@
+{
+  "info": {
+    "name": "JARS – All Requests",
+    "_postman_id": "b342b4d4-1234-5678-9123-abcdefabcdef",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Gemini Symbols",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/v1/symbols"
+      },
+      "response": []
+    }
+  ]
+}
