@@ -29,8 +29,8 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
       }
     };
     const listener = ({ url }: { url: string }) => handle(url);
-    Linking.addEventListener('url', listener);
+    const subscription = Linking.addEventListener('url', listener);
     Linking.getInitialURL().then(u => u && handle(u));
-    return () => Linking.removeEventListener('url', listener);
+    return () => subscription.remove();
   }, [stores, navigation, setPreferredStore]);
 }

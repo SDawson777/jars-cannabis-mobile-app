@@ -36,7 +36,8 @@ export function useProducts(storeId?: string, filter?: string) {
         throw err;
       }
     },
-    getNextPageParam: (lastPage, pages) =>
+    getNextPageParam: (lastPage: CMSProduct[], pages: CMSProduct[][]) =>
       lastPage.length === PAGE_SIZE ? pages.length + 1 : undefined,
-  });
+    initialPageParam: 1,
+  } as any);
 }

@@ -17,18 +17,16 @@
       "@server/*": ["server/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "backend/src/**/*",
-    "backend/src/routes/phase4.ts",
-    "server/**/*",
-    "functions/src/**/*"
-  ],
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     "babel.config.js",
     "metro.config.js",
     "jest.config.js",
-    "src/terpene_wheel/snippets"
+    "src/terpene_wheel/snippets",
+    "src/screens/**/*",
+    "backend",
+    "server",
+    "functions"
   ]
 }

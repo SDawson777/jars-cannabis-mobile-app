@@ -1,5 +1,5 @@
-import { Analytics } from 'aws-amplify';
+import { record } from '@aws-amplify/analytics';
 
 export function logEvent(name: string, data: Record<string, any>) {
-  Analytics.record({ name, attributes: data });
+  record({ name, attributes: data });
 }

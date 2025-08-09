@@ -13,10 +13,10 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  addItem: (item: CartItem) => void;
-  updateQuantity: (id: string, quantity: number) => void;
-  removeItem: (id: string) => void;
-  setItems: (items: CartItem[]) => void;
+  addItem: (_item: CartItem) => void;
+  updateQuantity: (_id: string, _quantity: number) => void;
+  removeItem: (_id: string) => void;
+  setItems: (_items: CartItem[]) => void;
 }
 
 export const useCartStore = create<CartState>()(

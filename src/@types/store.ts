@@ -15,20 +15,21 @@ export interface StoreData {
   latitude: number;
   longitude: number;
   address: string;
-  city: string;
-  state: string;
-  zip: string;
-  phone: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  phone?: string;
   websiteUrl?: string;
-  openNow: boolean;
-  todayHours: string;
-  weeklyHours: { day: string; open: string; close: string; note?: string }[];
-  amenities: StoreAmenity[];
+  openNow?: boolean;
+  todayHours?: string;
+  weeklyHours?: { day: string; open: string; close: string; note?: string }[];
+  amenities?: StoreAmenity[];
   dealsActive?: boolean;
   inventorySummary?: string;
   rating?: number;
   reviewCount?: number;
   heroImageUrl?: string;
+  promo?: string;
 }
 
 export interface StoreReview {

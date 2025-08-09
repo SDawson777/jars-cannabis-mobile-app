@@ -65,7 +65,7 @@ export function useCart() {
       }
       return { prev };
     },
-    onError: (err, vars, ctx) => {
+    onError: (err, vars, ctx: any) => {
       if (ctx?.prev) queryClient.setQueryData(['cart'], ctx.prev);
     },
     onSuccess: data => {

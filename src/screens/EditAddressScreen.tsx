@@ -34,10 +34,7 @@ export default function EditAddressScreen() {
 
   // Existing address passed via params
   const addr = (route.params as any)?.address || {};
-  const {
-    control,
-    handleSubmit,
-  } = useForm<AddressFormValues>({
+  const { control, handleSubmit } = useForm<AddressFormValues>({
     resolver: yupResolver(addressSchema),
     defaultValues: {
       label: addr.label,

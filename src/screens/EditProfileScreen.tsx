@@ -37,10 +37,7 @@ export default function EditProfileScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const profile = route.params?.profile ?? {};
-  const {
-    control,
-    handleSubmit,
-  } = useForm<ProfileFormValues>({
+  const { control, handleSubmit } = useForm<ProfileFormValues>({
     resolver: yupResolver(profileSchema),
     defaultValues: {
       name: profile.name,
