@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,5 +30,55 @@ jobs:
           fi
       - run: npm ci
       - run: npm run lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm i -g npm@$(node -p "require('./package.json').engines.npm")
+      - name: Verify Node.js and npm versions
+        run: |
+          EXPECTED_NODE="v$(cat .nvmrc)"
+          ACTUAL_NODE="$(node -v)"
+          if [ "$ACTUAL_NODE" != "$EXPECTED_NODE" ]; then
+            echo "Node version mismatch: expected $EXPECTED_NODE but got $ACTUAL_NODE"
+            exit 1
+          fi
+          EXPECTED_NPM=$(node -p "require('./package.json').engines.npm")
+          ACTUAL_NPM="$(npm -v)"
+          if [ "$ACTUAL_NPM" != "$EXPECTED_NPM" ]; then
+            echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
+            exit 1
+          fi
+      - run: npm ci
       - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm i -g npm@$(node -p "require('./package.json').engines.npm")
+      - name: Verify Node.js and npm versions
+        run: |
+          EXPECTED_NODE="v$(cat .nvmrc)"
+          ACTUAL_NODE="$(node -v)"
+          if [ "$ACTUAL_NODE" != "$EXPECTED_NODE" ]; then
+            echo "Node version mismatch: expected $EXPECTED_NODE but got $ACTUAL_NODE"
+            exit 1
+          fi
+          EXPECTED_NPM=$(node -p "require('./package.json').engines.npm")
+          ACTUAL_NPM="$(npm -v)"
+          if [ "$ACTUAL_NPM" != "$EXPECTED_NPM" ]; then
+            echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
+            exit 1
+          fi
+      - run: npm ci
       - run: npm test
