@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config(); // <-- MUST be called first!
 
+// Ensure TS path aliases resolve at runtime after tsc build
+import 'tsconfig-paths/register';
+
 import * as Sentry from '@sentry/node';
 import './firebaseAdmin';
 import express, { Request, Response, NextFunction } from 'express';
