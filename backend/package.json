@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec \"ts-node --project tsconfig.json src/index.ts\"",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-    "start": "node dist/index.js",
+    "start": "node start-prod.js",
     "mock": "prism mock openapi.yml --port 4000"
   },
   "keywords": [],
