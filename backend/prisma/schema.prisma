@@ -7,8 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"          // you can switch to postgres/mysql later
-  url      = "file:./dev.db"   // local SQLite file
+  provider = "postgresql"         
+  url      = env("DATABASE_URL") 
 }
 
 /// A user of the JARS app
