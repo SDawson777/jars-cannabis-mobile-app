@@ -24,6 +24,9 @@ import { accessibilityRouter } from './routes/accessibility';
 import { conciergeRouter } from './routes/concierge';
 import { arRouter } from './routes/ar';
 import { stripeRouter } from './routes/stripe';
+import { reviewsRouter } from './routes/reviews';
+import { preferencesRouter } from './routes/preferences';
+import { webhookRouter } from './routes/webhooks';
 import SentryInit from './utils/sentry'; // triggers Sentry.init()
 
 const app = express();
@@ -51,6 +54,9 @@ app.use('/api/v1', accessibilityRouter);
 app.use('/api/v1', conciergeRouter);
 app.use('/api/v1', arRouter);
 app.use('/api/v1', stripeRouter);
+app.use('/api/v1/products', reviewsRouter);
+app.use('/api/v1/profile', preferencesRouter);
+app.use('/api/v1/webhook', webhookRouter);
 
 // Type-safe Sentry error handler (always after all routes)
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

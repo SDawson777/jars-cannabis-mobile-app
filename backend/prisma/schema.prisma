@@ -24,6 +24,12 @@ model User {
   awards        Award[]
   dataExports   DataExport[]
   accessibility AccessibilitySetting?
+  reviews       Review[]
+  loyaltyStatus LoyaltyStatus?
+  loyaltyBadges LoyaltyBadge[]
+  journalEntries JournalEntry[]
+  preferences   UserPreference?
+  events        UserEvent[]
 }
 
 /// Earned badges and awards
@@ -56,4 +62,84 @@ model AccessibilitySetting {
   textSize          String
   colorContrast     String
   animationsEnabled Boolean
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  rating    Int
+  text      String?
+  createdAt DateTime @default(now())
+}
+
+model LoyaltyStatus {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id])
+  points Int    @default(0)
+  tier   String @default("Bronze")
+}
+
+model LoyaltyBadge {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  name     String
+  earnedAt DateTime @default(now())
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  rating    Int?
+  notes     String?
+  tags      String[]
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model UserPreference {
+  userId          String  @id
+  user            User    @relation(fields: [userId], references: [id])
+  reducedMotion   Boolean @default(false)
+  dyslexiaFont    Boolean @default(false)
+  highContrast    Boolean @default(false)
+  personalization Boolean @default(true)
+}
+
+model UserEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // view | favorite | purchase | journal
+  productId String?
+  brand     String?
+  strainType String?
+  terpenes  String[]
+  tags      String[]
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  storeId         String?
+  name            String
+  description     String?
+  brand           String?
+  strainType      String?
+  terpenes        String[]
+  price           Float?
+  purchasesLast30d Int     @default(0)
+  reviews         Review[]
+  journal         JournalEntry[]
+}
+
+model Article {
+  id    String @id @default(cuid())
+  title String
+  body  String
 }
