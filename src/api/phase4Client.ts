@@ -27,7 +27,9 @@ function createPhase4Client(): AxiosInstance {
 export const phase4Client = createPhase4Client();
 
 export async function getForYou(storeId?: string) {
-  const res = await phase4Client.get(`/recommendations/for-you${storeId ? `?storeId=${storeId}` : ''}`);
+  const res = await phase4Client.get(
+    `/recommendations/for-you${storeId ? `?storeId=${storeId}` : ''}`
+  );
   return res.data;
 }
 

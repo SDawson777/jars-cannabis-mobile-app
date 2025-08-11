@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
 
-export default function ReviewForm({ onSubmit }: { onSubmit: (x: { rating: number; text?: string }) => void }) {
+export default function ReviewForm({
+  onSubmit,
+}: {
+  onSubmit: (x: { rating: number; text?: string }) => void;
+}) {
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
   return (
@@ -12,12 +16,7 @@ export default function ReviewForm({ onSubmit }: { onSubmit: (x: { rating: numbe
         value={String(rating)}
         onChangeText={v => setRating(Number(v) || 0)}
       />
-      <TextInput
-        accessibilityLabel="Review text"
-        multiline
-        value={text}
-        onChangeText={setText}
-      />
+      <TextInput accessibilityLabel="Review text" multiline value={text} onChangeText={setText} />
       <Button title="Submit Review" onPress={() => onSubmit({ rating, text })} />
     </View>
   );
