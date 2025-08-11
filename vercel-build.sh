@@ -1,16 +1,30 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# Install deps with legacy-peer-deps to bypass peer conflicts
-npm install --legacy-peer-deps
+# Skip husky/prepare in CI
+export HUSKY=0
+export CI=${CI:-true}
+export VERCEL=${VERCEL:-true}
 
-# Regenerate Prisma client, fallback to skip if download fails
-npx prisma generate --schema=backend/prisma/schema.prisma || \
-npx prisma generate --schema=backend/prisma/schema.prisma --skip-download
+echo "⏬ Installing deps (ignoring lifecycle scripts to avoid husky in CI)…"
+if [ -f package-lock.json ]; then
+  npm ci --ignore-scripts || npm install --ignore-scripts --legacy-peer-deps
+else
+  npm install --ignore-scripts --legacy-peer-deps
+fi
 
-# Fix lint & format errors before build
+# Prisma client (only if your monorepo has backend/prisma/schema.prisma)
+if [ -f "backend/prisma/schema.prisma" ]; then
+  echo "🧬 Generating Prisma client…"
+  npx prisma generate --schema=backend/prisma/schema.prisma \
+  || npx prisma generate --schema=backend/prisma/schema.prisma --skip-download \
+  || echo "⚠️ Prisma generate skipped (no engine download available)"
+fi
+
+echo "🧹 Lint/format (non-blocking)…"
 npm run lint --if-present || true
 npm run format --if-present || true
 
-# Run production build
+echo "🏗️ Building…"
 npm run build
+echo "✅ Build complete."
