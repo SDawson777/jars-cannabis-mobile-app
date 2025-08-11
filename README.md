@@ -292,3 +292,14 @@ npm run dev:expo       # Expo client against local emu
 3. **Android:** Confirm `google-services.json` is present and Firebase Messaging is referenced in `AndroidManifest.xml`.
 4. On launch the app requests notification permission and logs the FCM token. Replace the sync stub in `App.tsx` to send the token to your backend if needed.
 5. Send a test message from the Firebase console to verify foreground, background, and quit-state behavior.
+
+## New Endpoints (Launch)
+- Recommendations: `GET /recommendations/for-you`, `GET /recommendations/related/:productId`
+- Reviews: `POST /products/:id/reviews`
+- Loyalty: `GET /loyalty/status`, `GET /loyalty/badges`
+- Concierge: `POST /concierge/chat`
+- Journal: `GET/POST/PUT /journal/entries*`
+- AR: `GET /ar/models/:productId`
+- Preferences: `GET/PUT /profile/preferences`
+- Awards: `GET /awards/status`
+- Webhooks: `POST /webhook/stripe` (order status notifications)

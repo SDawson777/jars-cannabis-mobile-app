@@ -29,6 +29,8 @@ jobs:
             exit 1
           fi
       - run: npm ci
+      - name: Prisma Generate
+        run: npm run --prefix backend generate
       - run: npm run lint
 
   typecheck:
