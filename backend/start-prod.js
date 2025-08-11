@@ -1,7 +1,6 @@
 /**
  * Minimal launcher for the compiled backend.
  * Tries backend/dist/server/index.js, then backend/dist/index.js.
- * Keeps process alive as long as the HTTP server runs.
  */
 const fs = require('fs');
 const path = require('path');
@@ -15,9 +14,11 @@ for (const p of candidates) {
   if (fs.existsSync(p)) {
     console.log('[start] launching', p);
     require(p);
+    process.once('uncaughtException', e => console.error('[start] uncaught:', e));
+    process.once('unhandledRejection', e => console.error('[start] unhandled:', e));
     return;
   }
 }
 
-console.error('[start] No backend entry found in dist/. Did you run `npm run build:backend`?');
+console.error('[start] No backend entry found in dist/. Did you run `npm run build`?');
 process.exit(1);
