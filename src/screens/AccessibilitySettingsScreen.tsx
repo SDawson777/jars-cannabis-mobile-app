@@ -18,7 +18,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
-import { phase4Client } from '../api/phase4Client';
+import { getPrefs, updatePrefs } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
@@ -28,10 +28,10 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 type AccessibilityPrefs = {
-  userId: string;
-  textSize: 'small' | 'medium' | 'large';
-  colorContrast: 'normal' | 'high';
-  animationsEnabled: boolean;
+  reducedMotion: boolean;
+  dyslexiaFont: boolean;
+  highContrast: boolean;
+  personalization: boolean;
 };
 
 type AccessibilityNavProp = NativeStackNavigationProp<RootStackParamList, 'AccessibilitySettings'>;
@@ -50,10 +50,8 @@ export default function AccessibilitySettingsScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await phase4Client.get<AccessibilityPrefs>('/accessibility-settings', {
-          params: { userId: 'user-123' },
-        });
-        setPrefs(res.data);
+        const data = await getPrefs();
+        setPrefs(data);
       } catch (e) {
         setError((e as Error).message);
       } finally {
@@ -69,8 +67,8 @@ export default function AccessibilitySettingsScreen() {
     setLoading(true);
     setError(null);
     try {
-      const res = await phase4Client.patch<AccessibilityPrefs>('/accessibility-settings', prefs);
-      setPrefs(res.data);
+      const updated = await updatePrefs(prefs);
+      setPrefs(updated);
       hapticLight();
     } catch (e) {
       setError((e as Error).message);
@@ -111,11 +109,8 @@ export default function AccessibilitySettingsScreen() {
             onPress={() => {
               setLoading(true);
               setError(null);
-              phase4Client
-                .get<AccessibilityPrefs>('/accessibility-settings', {
-                  params: { userId: 'user-123' },
-                })
-                .then(res => setPrefs(res.data))
+              getPrefs()
+                .then(setPrefs)
                 .catch(err => setError(err.message))
                 .finally(() => setLoading(false));
             }}
@@ -142,10 +137,10 @@ export default function AccessibilitySettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.row}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Large Text</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Dyslexia-friendly Font</Text>
           <Switch
-            value={prefs.textSize === 'large'}
-            onValueChange={() => handleToggle('textSize')}
+            value={prefs.dyslexiaFont}
+            onValueChange={() => handleToggle('dyslexiaFont')}
             trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
@@ -153,17 +148,17 @@ export default function AccessibilitySettingsScreen() {
         <View style={styles.row}>
           <Text style={[styles.label, { color: jarsPrimary }]}>High Contrast</Text>
           <Switch
-            value={prefs.colorContrast === 'high'}
-            onValueChange={() => handleToggle('colorContrast')}
+            value={prefs.highContrast}
+            onValueChange={() => handleToggle('highContrast')}
             trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
 
         <View style={styles.row}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Animations</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Reduce Motion</Text>
           <Switch
-            value={prefs.animationsEnabled}
-            onValueChange={() => handleToggle('animationsEnabled')}
+            value={prefs.reducedMotion}
+            onValueChange={() => handleToggle('reducedMotion')}
             trackColor={{ true: jarsPrimary, false: '#ccc' }}
           />
         </View>
