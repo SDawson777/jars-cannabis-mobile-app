@@ -1,16 +1,14 @@
-import * as admin from 'firebase-admin';
+// backend/src/firebaseAdmin.ts
+import admin from 'firebase-admin';
 
-if (admin.apps.length === 0) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-    storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
-  });
+export function initFirebase() {
+  if (admin.apps.length) return admin.app();
+  const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+  if (!b64) throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 missing');
+  const json = Buffer.from(b64, 'base64').toString('utf8');
+  const svc  = JSON.parse(json);
+  if (typeof svc.private_key !== 'string' || !svc.private_key.includes('BEGIN PRIVATE KEY')) {
+    throw new Error('service account JSON missing valid private_key');
+  }
+  return admin.initializeApp({ credential: admin.credential.cert(svc as admin.ServiceAccount) });
 }
-
-export default admin;
-export const auth = admin.auth();
-export const db = admin.firestore();

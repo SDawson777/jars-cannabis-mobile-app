@@ -5,7 +5,9 @@ dotenv.config(); // <-- MUST be called first!
 import 'tsconfig-paths/register';
 
 import * as Sentry from '@sentry/node';
-import './firebaseAdmin';
+import { initFirebase } from './firebaseAdmin';
+try { initFirebase(); console.log('Firebase Admin initialized'); }
+catch (e) { console.error('Firebase init skipped:', (e as Error).message); }
 import express, { Request, Response, NextFunction } from 'express';
 import { authRouter } from './routes/auth';
 import { profileRouter } from './routes/profile';
