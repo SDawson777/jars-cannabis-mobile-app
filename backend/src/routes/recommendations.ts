@@ -1,15 +1,25 @@
 import { Router } from 'express';
-import { authOptional } from '../util/auth';
-import { forYou } from '../modules/recommendations/service';
 import { prisma } from '../prismaClient';
 
 export const recommendationsRouter = Router();
 
-recommendationsRouter.get('/recommendations/for-you', authOptional, async (req, res) => {
-  const userId = (req as any).user?.id;
-  const storeId = (req.query.storeId as string) || undefined;
-  const data = await forYou(userId, storeId);
-  res.json({ items: data });
+// Simple "for you": popular products, optionally scoped to store
+recommendationsRouter.get('/recommendations/for-you', async (req, res, next) => {
+  try {
+    const { storeId, limit = '24' } = req.query as any;
+    const take = Math.min(100, parseInt(limit || '24', 10));
+    let items = await prisma.product.findMany({
+      orderBy: { purchasesLast30d: 'desc' },
+      take,
+      include: { variants: true }
+    });
+    if (storeId) {
+      const stocked = await prisma.storeProduct.findMany({ where: { storeId: String(storeId) } });
+      const inStock = new Set(stocked.map(s => s.productId));
+      items = items.sort((a, b) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
+    }
+    res.json({ items });
+  } catch (err) { next(err); }
 });
 
 // "Related": same brand/category
@@ -22,23 +32,11 @@ recommendationsRouter.get('/recommendations/related/:productId', async (req, res
     const items = await prisma.product.findMany({
       where: {
         id: { not: base.id },
-        OR: [{ brand: base.brand ?? undefined }, { category: base.category }],
+        OR: [{ brand: base.brand ?? undefined }, { category: base.category }]
       },
-      take: Math.min(20, parseInt(limit || '8')),
-      orderBy: { purchasesLast30d: 'desc' },
-// Simple "for you": popular products, optionally scoped to store
-recommendationsRouter.get('/recommendations/for-you', async (req, res, next) => {
-  try {
-    const { storeId, limit = '24' } = req.query as any;
-    const take = Math.min(100, parseInt(limit || '24'));
-    const where = storeId ? { storeId: String(storeId) } : undefined;
-    const items = await prisma.product.findMany({
-      where,
-      orderBy: { purchasesLast30d: 'desc' },
-      take
+      take: Math.min(20, parseInt(limit || '8', 10)),
+      orderBy: { purchasesLast30d: 'desc' }
     });
     res.json({ items });
-  } catch (err) {
-    next(err);
-  }
+  } catch (err) { next(err); }
 });
