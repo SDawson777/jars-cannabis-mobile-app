@@ -1,145 +1,352 @@
-// prisma/schema.prisma
-
 generator client {
-  provider = "prisma-client-js"
-  // keep prisma client in backend node_modules
-  output   = "../node_modules/.prisma/client"
-  binaryTargets = ["native", "rhel-openssl-1.1.x", "debian-openssl-1.1.x"]
+provider = "prisma-client-js"
+output = "../node_modules/.prisma/client"
+binaryTargets = ["native", "rhel-openssl-1.1.x", "debian-openssl-1.1.x"]
 }
 
 datasource db {
-  provider = "postgresql"         
-  url      = env("DATABASE_URL") 
+provider = "postgresql"
+url = env("DATABASE_URL")
 }
 
-/// A user of the JARS app
+enum OrderStatus {
+CREATED
+CONFIRMED
+READY
+COMPLETED
+CANCELLED
+}
+
+enum PaymentMethod {
+pay_at_pickup
+card
+}
+
+enum ProductCategory {
+Flower
+PreRoll
+Edibles
+Vape
+Concentrate
+Beverage
+Tincture
+Topical
+Gear
+Other
+}
+
+enum StrainType {
+Sativa
+Indica
+Hybrid
+CBD
+None
+}
+
+enum ContentType {
+legal
+faq
+}
+
 model User {
-  id            String                @id @default(uuid())
-  email         String                @unique
-  passwordHash  String
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
+id String @id @default(uuid())
+email String @unique
+passwordHash String
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  // Relations
-  awards        Award[]
-  dataExports   DataExport[]
-  accessibility AccessibilitySetting?
-  reviews       Review[]
-  loyaltyStatus LoyaltyStatus?
-  loyaltyBadges LoyaltyBadge[]
-  journalEntries JournalEntry[]
-  preferences   UserPreference?
-  events        UserEvent[]
+awards Award[]
+dataExports DataExport[]
+accessibility AccessibilitySetting?
+reviews Review[]
+loyaltyStatus LoyaltyStatus?
+loyaltyBadges LoyaltyBadge[]
+journalEntries JournalEntry[]
+preferences UserPreference?
+events UserEvent[]
+carts Cart[]
+orders Order[]
+
+@@index([email])
 }
 
-/// Earned badges and awards
-model Award {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  title       String
-  description String
-  status     String      @default("PENDING")
-  redeemedAt DateTime?
-  iconUrl     String
-  earnedDate  DateTime
-}
+model Store {
+id String @id @default(uuid())
+name String
+slug String @unique
+address1 String?
+address2 String?
+city String?
+state String?
+postalCode String?
+country String? @default("US")
+latitude Decimal? @db.Decimal(9, 6)
+longitude Decimal? @db.Decimal(9, 6)
+phone String?
+hours Json?
+isActive Boolean @default(true)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-/// Data‐export jobs for transparency
-model DataExport {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  status      String
-  downloadUrl String?
-  createdAt   DateTime @default(now())
-}
+products StoreProduct[]
+orders Order[]
 
-/// Per‐user accessibility preferences
-model AccessibilitySetting {
-  userId            String  @id
-  user              User    @relation(fields: [userId], references: [id])
-  textSize          String
-  colorContrast     String
-  animationsEnabled Boolean
-}
-
-model Review {
-  id        String   @id @default(cuid())
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  rating    Int
-  text      String?
-  createdAt DateTime @default(now())
-}
-
-model LoyaltyStatus {
-  userId String @id
-  user   User   @relation(fields: [userId], references: [id])
-  points Int    @default(0)
-  tier   String @default("Bronze")
-}
-
-model LoyaltyBadge {
-  id       String @id @default(cuid())
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
-  name     String
-  earnedAt DateTime @default(now())
-}
-
-model JournalEntry {
-  id        String   @id @default(cuid())
-  userId    String
-  productId String
-  rating    Int?
-  notes     String?
-  tags      String[]
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
-}
-
-model UserPreference {
-  userId          String  @id
-  user            User    @relation(fields: [userId], references: [id])
-  reducedMotion   Boolean @default(false)
-  dyslexiaFont    Boolean @default(false)
-  highContrast    Boolean @default(false)
-  personalization Boolean @default(true)
-}
-
-model UserEvent {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String   // view | favorite | purchase | journal
-  productId String?
-  brand     String?
-  strainType String?
-  terpenes  String[]
-  tags      String[]
-  createdAt DateTime @default(now())
+@@index([isActive])
+@@index([city, state])
+@@index([latitude, longitude])
 }
 
 model Product {
-  id              String   @id @default(cuid())
-  storeId         String?
-  name            String
-  description     String?
-  brand           String?
-  strainType      String?
-  terpenes        String[]
-  price           Float?
-  purchasesLast30d Int     @default(0)
-  reviews         Review[]
-  journal         JournalEntry[]
+id String @id @default(cuid())
+name String
+slug String @unique
+description String?
+brand String?
+category ProductCategory @default(Other)
+strainType StrainType @default(None)
+terpenes String[] @default([])
+defaultPrice Float?
+thcPercent Float?
+cbdPercent Float?
+purchasesLast30d Int @default(0)
+
+variants ProductVariant[]
+reviews Review[]
+journal JournalEntry[]
+stores StoreProduct[]
+
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+
+@@index([brand])
+@@index([category])
+@@index([strainType])
+@@index([name])
 }
 
-model Article {
-  id    String @id @default(cuid())
-  title String
-  body  String
+model ProductVariant {
+id String @id @default(cuid())
+productId String
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+name String?
+sku String? @unique
+price Float?
+thcPercent Float?
+cbdPercent Float?
+active Boolean @default(true)
+
+@@index([productId])
+}
+
+model StoreProduct {
+id String @id @default(cuid())
+storeId String
+productId String
+variantId String?
+price Float?
+stock Int?
+active Boolean @default(true)
+
+store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+@@unique([storeId, productId, variantId])
+@@index([storeId])
+@@index([productId])
+}
+
+model Review {
+id String @id @default(cuid())
+productId String
+userId String
+rating Int
+text String?
+createdAt DateTime @default(now())
+
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+@@index([productId])
+@@index([userId])
+@@index([rating])
+}
+
+model Cart {
+id String @id @default(cuid())
+userId String
+storeId String?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+store Store? @relation(fields: [storeId], references: [id], onDelete: SetNull)
+items CartItem[]
+
+@@index([userId])
+}
+
+model CartItem {
+id String @id @default(cuid())
+cartId String
+productId String
+variantId String?
+quantity Int @default(1)
+unitPrice Float?
+addedAt DateTime @default(now())
+
+cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+@@index([cartId])
+@@index([productId])
+}
+
+model Order {
+id String @id @default(cuid())
+userId String
+storeId String
+status OrderStatus @default(CREATED)
+paymentMethod PaymentMethod @default(pay_at_pickup)
+notes String?
+contactName String?
+contactPhone String?
+contactEmail String?
+subtotal Float?
+tax Float?
+total Float?
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
+items OrderItem[]
+
+@@index([userId])
+@@index([storeId])
+@@index([status])
+}
+
+model OrderItem {
+id String @id @default(cuid())
+orderId String
+productId String
+variantId String?
+quantity Int @default(1)
+unitPrice Float?
+lineTotal Float?
+
+order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+@@index([orderId])
+}
+
+model ContentPage {
+id String @id @default(cuid())
+type ContentType
+locale String @default("en-US")
+slug String
+title String
+body String
+published Boolean @default(true)
+updatedAt DateTime @updatedAt
+createdAt DateTime @default(now())
+
+@@unique([type, locale, slug])
+@@index([type, locale])
+}
+
+model Award {
+id String @id @default(uuid())
+userId String
+title String
+description String
+status String @default("PENDING")
+redeemedAt DateTime?
+iconUrl String?
+earnedDate DateTime @default(now())
+
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+@@index([userId])
+@@index([status])
+}
+
+model LoyaltyStatus {
+userId String @id
+points Int @default(0)
+tier String @default("Bronze")
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyBadge {
+id String @id @default(cuid())
+userId String
+name String
+earnedAt DateTime @default(now())
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+@@index([userId])
+}
+
+model AccessibilitySetting {
+userId String @id
+textSize String @default("medium")
+colorContrast String @default("normal")
+animationsEnabled Boolean @default(true)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserPreference {
+userId String @id
+reducedMotion Boolean @default(false)
+dyslexiaFont Boolean @default(false)
+highContrast Boolean @default(false)
+personalization Boolean @default(true)
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DataExport {
+id String @id @default(uuid())
+userId String
+status String @default("pending")
+downloadUrl String?
+createdAt DateTime @default(now())
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+@@index([userId])
+@@index([status])
+}
+
+model UserEvent {
+id String @id @default(cuid())
+userId String
+type String
+productId String?
+brand String?
+strainType String?
+terpenes String[] @default([])
+tags String[] @default([])
+createdAt DateTime @default(now())
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+@@index([userId, type, createdAt])
+}
+
+model JournalEntry {
+id String @id @default(cuid())
+userId String
+productId String
+rating Int?
+notes String?
+tags String[] @default([])
+createdAt DateTime @default(now())
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+@@index([userId])
+@@index([productId])
 }
