@@ -1,18 +1,21 @@
 import { Router } from 'express';
-import { authOptional } from '../util/auth';
-import { forYou, relatedTo } from '../modules/recommendations/service';
+import { prisma } from '../prismaClient';
 
 export const recommendationsRouter = Router();
 
-recommendationsRouter.get('/recommendations/for-you', authOptional, async (req, res) => {
-  const userId = (req as any).user?.id;
-  const storeId = (req.query.storeId as string) || undefined;
-  const data = await forYou(userId, storeId);
-  res.json({ items: data });
-});
-
-recommendationsRouter.get('/recommendations/related/:productId', async (req, res) => {
-  const storeId = (req.query.storeId as string) || undefined;
-  const data = await relatedTo(req.params.productId, storeId);
-  res.json({ items: data });
+// Simple "for you": popular products, optionally scoped to store
+recommendationsRouter.get('/recommendations/for-you', async (req, res, next) => {
+  try {
+    const { storeId, limit = '24' } = req.query as any;
+    const take = Math.min(100, parseInt(limit || '24'));
+    const where = storeId ? { storeId: String(storeId) } : undefined;
+    const items = await prisma.product.findMany({
+      where,
+      orderBy: { purchasesLast30d: 'desc' },
+      take
+    });
+    res.json({ items });
+  } catch (err) {
+    next(err);
+  }
 });
