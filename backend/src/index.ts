@@ -9,6 +9,8 @@ import { initFirebase } from './firebaseAdmin';
 try { initFirebase(); console.log('Firebase Admin initialized'); }
 catch (e) { console.error('Firebase init skipped:', (e as Error).message); }
 import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
 import { authRouter } from './routes/auth';
 import { profileRouter } from './routes/profile';
 import { productsRouter } from './routes/products';
@@ -33,10 +35,17 @@ import SentryInit from './utils/sentry'; // triggers Sentry.init()
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+app.use(helmet());
+app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || '*' }));
 
 app.get('/', (_req, res) => {
   res.json({ status: 'healthy' });
+});
+
+app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
+app.get('/sentry-debug', (_req, _res) => {
+  throw new Error('Sentry test error!');
 });
 
 app.use('/api/v1', authRouter);
@@ -64,12 +73,6 @@ app.use('/api/v1/webhook', webhookRouter);
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   Sentry.captureException(err);
   res.status(500).json({ error: 'Internal server error' });
-});
-
-app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
-
-app.get('/sentry-debug', (_req, _res) => {
-  throw new Error('Sentry test error!');
 });
 
 const port = process.env.PORT || 8080;
