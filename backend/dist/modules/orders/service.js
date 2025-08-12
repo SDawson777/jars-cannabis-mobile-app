@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateOrderStatus = void 0;
 const prismaClient_1 = require("../../prismaClient");
-const firebaseAdmin_1 = require("../../firebaseAdmin");
+const firebaseAdmin_1 = require("@server/firebaseAdmin");
 const admin = (0, firebaseAdmin_1.getAdmin)();
 async function updateOrderStatus(orderId, status) {
     const order = await prismaClient_1.prisma.order?.update({

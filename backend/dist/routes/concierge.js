@@ -1,52 +1,52 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.conciergeRouter = void 0;
 const express_1 = require("express");
-const auth_1 = require("../util/auth");
-const prismaClient_1 = require("../prismaClient");
-const openai_1 = __importDefault(require("openai"));
 exports.conciergeRouter = (0, express_1.Router)();
-const openai = new openai_1.default({ apiKey: process.env.OPENAI_API_KEY });
-exports.conciergeRouter.post('/concierge/chat', auth_1.authOptional, async (req, res) => {
-    const { message, history = [] } = req.body;
-    const q = (message || '').toString().slice(0, 512);
-    const products = await prismaClient_1.prisma.product.findMany({
-        where: {
-            OR: [
-                { name: { contains: q, mode: 'insensitive' } },
-                { description: { contains: q, mode: 'insensitive' } },
-            ],
-        },
-        take: 5,
-    });
-    const articles = await prismaClient_1.prisma.article.findMany({
-        where: {
-            OR: [
-                { title: { contains: q, mode: 'insensitive' } },
-                { body: { contains: q, mode: 'insensitive' } },
-            ],
-        },
-        take: 3,
-    });
-    const context = [
-        `Approved Product Snippets:\n${products.map(p => `- ${p.name} (${p.strainType}) ${p.price}`).join('\n')}`,
-        `Educational Articles:\n${articles.map(a => `- ${a.title}`).join('\n')}`,
-    ].join('\n\n');
-    const sys = "You are Jars Concierge, a friendly, compliant assistant. Do not give medical advice. Suggest products from context only. Offer to add to cart by returning {action:'add_to_cart', productId} when confident.";
-    const resp = await openai.chat.completions.create({
+// Simple chat endpoint backed by OpenAI
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+exports.conciergeRouter.post('/concierge/chat', async (req, res) => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    const { message, history = [] } = req.body || {};
+    if (!apiKey)
+        return res.status(503).json({ error: 'OPENAI_API_KEY not set' });
+    if (!message)
+        return res.status(400).json({ error: 'message required' });
+    const { default: OpenAI } = await Promise.resolve().then(() => __importStar(require('openai')));
+    const client = new OpenAI({ apiKey });
+    const msgs = [
+        { role: 'system', content: 'You are a helpful budtender. Keep answers concise and safe.' },
+        ...history,
+        { role: 'user', content: String(message) },
+    ];
+    const r = await client.chat.completions.create({
         model: 'gpt-4o-mini',
-        messages: [
-            { role: 'system', content: sys },
-            ...history,
-            { role: 'user', content: `User message: ${message}\n\nCONTEXT:\n${context}` },
-        ],
+        messages: msgs,
         temperature: 0.4,
     });
-    res.json({
-        reply: resp.choices[0]?.message?.content ?? 'Sorry, I did not catch that.',
-        grounding: { products, articles },
-    });
+    const reply = r.choices?.[0]?.message?.content ?? 'Sorry, I had trouble answering that.';
+    res.json({ reply });
 });

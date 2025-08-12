@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.phase4Router = void 0;
 // backend/src/routes/phase4.ts
 const express_1 = require("express");
-const firebaseAdmin_1 = require("../firebaseAdmin");
+const firebaseAdmin_1 = require("@server/firebaseAdmin");
 const db = (0, firebaseAdmin_1.getFirestore)();
 exports.phase4Router = (0, express_1.Router)();
 // ——————————————
