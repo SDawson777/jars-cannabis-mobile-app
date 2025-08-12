@@ -68,7 +68,7 @@ app.get('/sentry-debug', (_req, _res) => {
   throw new Error('Sentry test error!');
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(`🚀 Backend listening on http://localhost:${port}`);
 });
