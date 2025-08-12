@@ -1,5 +1,5 @@
 import { prisma } from '../../prismaClient';
-import admin from '../../bootstrap/firebase-admin';
+import { admin } from '@server/firebaseAdmin';
 
 export async function updateOrderStatus(orderId: string, status: string) {
   const order = await (prisma as any).order?.update({
@@ -7,6 +7,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
     data: { status },
     include: { user: true },
   });
+
   if (order?.user?.fcmToken) {
     await admin.messaging().send({
       token: order.user.fcmToken,
@@ -16,5 +17,6 @@ export async function updateOrderStatus(orderId: string, status: string) {
       },
     });
   }
+
   return order;
 }

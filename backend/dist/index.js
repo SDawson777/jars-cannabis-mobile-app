@@ -31,7 +31,14 @@ dotenv_1.default.config(); // <-- MUST be called first!
 // Ensure TS path aliases resolve at runtime after tsc build
 require("tsconfig-paths/register");
 const Sentry = __importStar(require("@sentry/node"));
-require("./firebaseAdmin");
+const firebaseAdmin_1 = require("./firebaseAdmin");
+try {
+    (0, firebaseAdmin_1.initFirebase)();
+    console.log('Firebase Admin initialized');
+}
+catch (e) {
+    console.error('Firebase init skipped:', e.message);
+}
 const express_1 = __importDefault(require("express"));
 const auth_1 = require("./routes/auth");
 const profile_1 = require("./routes/profile");
@@ -83,10 +90,11 @@ app.use((err, req, res, next) => {
     Sentry.captureException(err);
     res.status(500).json({ error: 'Internal server error' });
 });
+app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
 app.get('/sentry-debug', (_req, _res) => {
     throw new Error('Sentry test error!');
 });
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`🚀 Backend listening on http://localhost:${port}`);
 });

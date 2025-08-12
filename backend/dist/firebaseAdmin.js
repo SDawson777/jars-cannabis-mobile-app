@@ -1,40 +1,51 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = exports.auth = void 0;
-const admin = __importStar(require("firebase-admin"));
-if (admin.apps.length === 0) {
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        }),
-        storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
-    });
+exports.db = exports.admin = exports.getFirestore = exports.initFirebase = void 0;
+// backend/src/firebaseAdmin.ts
+const firebase_admin_1 = __importDefault(require("firebase-admin"));
+exports.admin = firebase_admin_1.default;
+let app = null;
+function serviceAccountFromEnv() {
+    const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+    if (!b64)
+        throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 missing');
+    const json = Buffer.from(b64, 'base64').toString('utf8');
+    const svc = JSON.parse(json);
+    if (typeof svc.private_key !== 'string' || !svc.private_key.includes('BEGIN PRIVATE KEY')) {
+        throw new Error('service account JSON missing valid private_key');
+    }
+    return svc;
 }
-exports.default = admin;
-exports.auth = admin.auth();
-exports.db = admin.firestore();
+function initFirebase() {
+    if (app)
+        return app;
+    if (firebase_admin_1.default.apps.length) {
+        app = firebase_admin_1.default.app();
+        return app;
+    }
+    const cred = firebase_admin_1.default.credential.cert(serviceAccountFromEnv());
+    app = firebase_admin_1.default.initializeApp({ credential: cred });
+    return app;
+}
+exports.initFirebase = initFirebase;
+function getFirestore() {
+    if (!firebase_admin_1.default.apps.length)
+        initFirebase();
+    return firebase_admin_1.default.firestore();
+}
+exports.getFirestore = getFirestore;
+// Keep a convenient named export for compatibility
+exports.db = (() => {
+    try {
+        return getFirestore();
+    }
+    catch {
+        return undefined;
+    }
+})();
+// Default export so `import firebaseAdmin from './firebaseAdmin'` works
+const firebaseAdmin = { admin: firebase_admin_1.default, initFirebase, getFirestore, db: exports.db };
+exports.default = firebaseAdmin;

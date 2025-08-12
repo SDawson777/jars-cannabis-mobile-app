@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
-import admin from '../firebaseAdmin';
+import { admin } from '@server/firebaseAdmin';
 
 export const webhookRouter = Router();
 

@@ -1,20 +1,17 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.phase4Router = void 0;
 // backend/src/routes/phase4.ts
 const express_1 = require("express");
-const firebaseAdmin_1 = __importDefault(require("../firebaseAdmin"));
-const firebaseAdmin_2 = require("../firebaseAdmin");
+const firebaseAdmin_1 = require("../firebaseAdmin");
+const db = (0, firebaseAdmin_1.getFirestore)();
 exports.phase4Router = (0, express_1.Router)();
 // ——————————————
 // Awards (already in place)
 // ——————————————
 exports.phase4Router.get('/awards', async (_req, res) => {
     try {
-        const snapshot = await firebaseAdmin_2.db.collection('awards').get();
+        const snapshot = await db.collection('awards').get();
         const awards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         return res.json(awards);
     }
@@ -34,11 +31,11 @@ exports.phase4Router.post('/data-transparency/export', async (req, res) => {
     }
     try {
         // Create a new export record with auto-ID
-        const docRef = firebaseAdmin_2.db.collection('exports').doc();
+        const docRef = db.collection('exports').doc();
         await docRef.set({
             userId,
             status: 'pending',
-            createdAt: firebaseAdmin_1.default.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebaseAdmin_1.admin.firestore.FieldValue.serverTimestamp(),
         });
         return res.json({
             exportId: docRef.id,
@@ -57,7 +54,7 @@ exports.phase4Router.post('/data-transparency/export', async (req, res) => {
 exports.phase4Router.get('/data-transparency/export/:exportId', async (req, res) => {
     const { exportId } = req.params;
     try {
-        const docRef = firebaseAdmin_2.db.collection('exports').doc(exportId);
+        const docRef = db.collection('exports').doc(exportId);
         const snap = await docRef.get();
         if (!snap.exists) {
             return res.status(404).json({ message: 'Export not found' });
@@ -82,7 +79,7 @@ exports.phase4Router.get('/accessibility-settings', async (req, res) => {
         return res.status(400).json({ message: 'Missing userId query parameter' });
     }
     try {
-        const doc = await firebaseAdmin_2.db.collection('accessibilityPrefs').doc(userId).get();
+        const doc = await db.collection('accessibilityPrefs').doc(userId).get();
         if (!doc.exists) {
             return res.status(404).json({ message: 'No settings found for user' });
         }
@@ -112,11 +109,11 @@ exports.phase4Router.patch('/accessibility-settings', async (req, res) => {
         return res.status(400).json({ message: 'No valid fields to update' });
     }
     try {
-        const docRef = firebaseAdmin_2.db.collection('accessibilityPrefs').doc(userId);
+        const docRef = db.collection('accessibilityPrefs').doc(userId);
         await docRef.set({
             ...updates,
             /* server timestamp */
-            updatedAt: firebaseAdmin_1.default.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebaseAdmin_1.admin.firestore.FieldValue.serverTimestamp(),
         }, { merge: true });
         const updated = await docRef.get();
         return res.json(updated.data());

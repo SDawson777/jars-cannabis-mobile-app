@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webhookRouter = void 0;
 const express_1 = require("express");
 const prismaClient_1 = require("../prismaClient");
-const firebaseAdmin_1 = __importDefault(require("../firebaseAdmin"));
+const firebaseAdmin_1 = require("../firebaseAdmin");
 exports.webhookRouter = (0, express_1.Router)();
 exports.webhookRouter.post('/stripe', async (req, res) => {
     const event = req.body;
@@ -18,7 +15,7 @@ exports.webhookRouter.post('/stripe', async (req, res) => {
                 include: { user: true },
             });
             if (order?.user?.fcmToken) {
-                await firebaseAdmin_1.default.messaging().send({
+                await firebaseAdmin_1.admin.messaging().send({
                     token: order.user.fcmToken,
                     notification: {
                         title: 'Order Update',

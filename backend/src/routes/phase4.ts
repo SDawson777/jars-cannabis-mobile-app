@@ -1,8 +1,8 @@
 // backend/src/routes/phase4.ts
 import { Router } from 'express';
-import admin from '@server/firebaseAdmin';
-import { db } from '../firebaseAdmin';
+import { admin, getFirestore } from '@server/firebaseAdmin';
 
+const db = getFirestore();
 export const phase4Router = Router();
 
 // ——————————————

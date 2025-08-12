@@ -66,6 +66,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
+
 app.get('/sentry-debug', (_req, _res) => {
   throw new Error('Sentry test error!');
 });
