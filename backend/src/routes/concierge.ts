@@ -1,49 +1,30 @@
 import { Router } from 'express';
-import { authOptional } from '../util/auth';
-import { prisma } from '../prismaClient';
-import OpenAI from 'openai';
 
 export const conciergeRouter = Router();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-conciergeRouter.post('/concierge/chat', authOptional, async (req, res) => {
-  const { message, history = [] } = req.body as { message: string; history?: any[] };
-  const q = (message || '').toString().slice(0, 512);
-  const products = await prisma.product.findMany({
-    where: {
-      OR: [
-        { name: { contains: q, mode: 'insensitive' } },
-        { description: { contains: q, mode: 'insensitive' } },
-      ],
-    },
-    take: 5,
-  });
-  const articles = await prisma.article.findMany({
-    where: {
-      OR: [
-        { title: { contains: q, mode: 'insensitive' } },
-        { body: { contains: q, mode: 'insensitive' } },
-      ],
-    },
-    take: 3,
-  });
-  const context = [
-    `Approved Product Snippets:\n${products.map(p => `- ${p.name} (${p.strainType}) ${p.price}`).join('\n')}`,
-    `Educational Articles:\n${articles.map(a => `- ${a.title}`).join('\n')}`,
-  ].join('\n\n');
-  const sys =
-    "You are Jars Concierge, a friendly, compliant assistant. Do not give medical advice. Suggest products from context only. Offer to add to cart by returning {action:'add_to_cart', productId} when confident.";
-  const resp = await openai.chat.completions.create({
+// Simple chat endpoint backed by OpenAI
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+conciergeRouter.post('/concierge/chat', async (req, res) => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  const { message, history = [] } = req.body || {};
+  if (!apiKey) return res.status(503).json({ error: 'OPENAI_API_KEY not set' });
+  if (!message) return res.status(400).json({ error: 'message required' });
+
+  const { default: OpenAI } = await import('openai');
+  const client = new OpenAI({ apiKey });
+
+  const msgs = [
+    { role: 'system', content: 'You are a helpful budtender. Keep answers concise and safe.' },
+    ...history,
+    { role: 'user', content: String(message) },
+  ] as any[];
+
+  const r = await client.chat.completions.create({
     model: 'gpt-4o-mini',
-    messages: [
-      { role: 'system', content: sys },
-      ...(history as any[]),
-      { role: 'user', content: `User message: ${message}\n\nCONTEXT:\n${context}` },
-    ],
+    messages: msgs,
     temperature: 0.4,
   });
-  res.json({
-    reply: resp.choices[0]?.message?.content ?? 'Sorry, I did not catch that.',
-    grounding: { products, articles },
-  });
+
+  const reply = (r as any).choices?.[0]?.message?.content ?? 'Sorry, I had trouble answering that.';
+  res.json({ reply });
 });
