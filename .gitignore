@@ -28,3 +28,6 @@ firestore-debug.log
 Terpene_Wheel_Code_Kit.zip
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
+
+service-account.json
+firebase_sa.b64
