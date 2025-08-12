@@ -1,3 +1,5 @@
+export { initFirebase } from '../firebaseAdmin';
+
 import * as admin from 'firebase-admin';
 
 let app: admin.app.App | null = null;

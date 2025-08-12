@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config(); // <-- MUST be called first!
 
@@ -13,35 +15,31 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { authRouter } from './routes/auth';
 import { profileRouter } from './routes/profile';
-import { productsRouter } from './routes/products';
 import { storesRouter } from './routes/stores';
+import { productsRouter } from './routes/products';
 import { cartRouter } from './routes/cart';
 import { ordersRouter } from './routes/orders';
 import { contentRouter } from './routes/content';
-import { recommendationsRouter } from './routes/recommendations';
 import { loyaltyRouter } from './routes/loyalty';
-import { greenhouseRouter } from './routes/greenhouse';
 import { journalRouter } from './routes/journal';
-import { awardsRouter } from './routes/awards';
+import { recommendationsRouter } from './routes/recommendations';
 import { dataRouter } from './routes/data';
-import { accessibilityRouter } from './routes/accessibility';
 import { conciergeRouter } from './routes/concierge';
 import { arRouter } from './routes/ar';
-import { stripeRouter } from './routes/stripe';
-import { reviewsRouter } from './routes/reviews';
-import { preferencesRouter } from './routes/preferences';
-import { webhookRouter } from './routes/webhooks';
-import SentryInit from './utils/sentry'; // triggers Sentry.init()
+import { initFirebase } from './bootstrap/firebase-admin';
 
 const app = express();
+app.use(express.json({ limit: '1mb' }));
+app.use(helmet());
+app.use(cors({ origin: (process.env.CORS_ORIGIN?.split(',') as any) || '*' }));
+
+app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
 
 app.use(express.json({ limit: '1mb' }));
 app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || '*' }));
 
-app.get('/', (_req, res) => {
-  res.json({ status: 'healthy' });
-});
+try { initFirebase(); } catch (e) { console.log('Firebase init skipped:', (e as any)?.message); }
 
 app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
 app.get('/sentry-debug', (_req, _res) => {
@@ -50,20 +48,23 @@ app.get('/sentry-debug', (_req, _res) => {
 
 app.use('/api/v1', authRouter);
 app.use('/api/v1', profileRouter);
-app.use('/api/v1', productsRouter);
 app.use('/api/v1', storesRouter);
+app.use('/api/v1', productsRouter);
 app.use('/api/v1', cartRouter);
 app.use('/api/v1', ordersRouter);
 app.use('/api/v1', contentRouter);
-app.use('/api/v1', recommendationsRouter);
 app.use('/api/v1', loyaltyRouter);
-app.use('/api/v1', greenhouseRouter);
 app.use('/api/v1', journalRouter);
-app.use('/api/v1', awardsRouter);
+app.use('/api/v1', recommendationsRouter);
 app.use('/api/v1', dataRouter);
-app.use('/api/v1', accessibilityRouter);
 app.use('/api/v1', conciergeRouter);
 app.use('/api/v1', arRouter);
+
+// Global error handler so nothing crashes
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error('Unhandled error:', err?.code || err?.message || err);
+  res.status(500).json({ error: 'Internal Server Error' });
+
 app.use('/api/v1', stripeRouter);
 app.use('/api/v1/products', reviewsRouter);
 app.use('/api/v1/profile', preferencesRouter);
@@ -76,6 +77,4 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`🚀 Backend listening on http://localhost:${port}`);
-});
+app.listen(port, () => console.log(`🚀 Backend listening on http://localhost:${port}`));
