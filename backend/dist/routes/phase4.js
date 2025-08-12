@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.phase4Router = void 0;
 // backend/src/routes/phase4.ts
 const express_1 = require("express");
-const firebaseAdmin_1 = __importDefault(require("@server/firebaseAdmin"));
+const firebaseAdmin_1 = __importDefault(require("../firebaseAdmin"));
 const firebaseAdmin_2 = require("../firebaseAdmin");
 exports.phase4Router = (0, express_1.Router)();
 // ——————————————

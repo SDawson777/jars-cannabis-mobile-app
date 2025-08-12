@@ -2,24 +2,30 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.journalRouter = void 0;
 const express_1 = require("express");
+const auth_1 = require("../util/auth");
+const prismaClient_1 = require("../prismaClient");
 exports.journalRouter = (0, express_1.Router)();
-let entries = [];
-// GET /journal/entries
-exports.journalRouter.get('/journal/entries', (_req, res) => {
-    res.json(entries);
+exports.journalRouter.get('/journal/entries', auth_1.authRequired, async (req, res) => {
+    const items = await prismaClient_1.prisma.journalEntry.findMany({
+        where: { userId: req.user.id },
+        orderBy: { createdAt: 'desc' },
+    });
+    res.json({ items });
 });
-// POST /journal/entries
-exports.journalRouter.post('/journal/entries', (req, res) => {
-    const entry = { id: String(entries.length + 1), ...req.body };
-    entries.push(entry);
-    res.status(201).json(entry);
+exports.journalRouter.post('/journal/entries', auth_1.authRequired, async (req, res) => {
+    const { productId, rating, notes, tags = [] } = req.body;
+    const created = await prismaClient_1.prisma.journalEntry.create({
+        data: { userId: req.user.id, productId, rating, notes, tags },
+    });
+    await prismaClient_1.prisma.userEvent.create({
+        data: { userId: req.user.id, type: 'journal', productId, tags },
+    });
+    res.status(201).json(created);
 });
-// PUT /journal/entries/:id
-exports.journalRouter.put('/journal/entries/:id', (req, res) => {
-    const { id } = req.params;
-    const idx = entries.findIndex(e => e.id === id);
-    if (idx === -1)
-        return res.status(404).json({ message: 'Entry not found' });
-    entries[idx] = { ...entries[idx], ...req.body };
-    res.json(entries[idx]);
+exports.journalRouter.put('/journal/entries/:id', auth_1.authRequired, async (req, res) => {
+    const updated = await prismaClient_1.prisma.journalEntry.update({
+        where: { id: req.params.id },
+        data: req.body,
+    });
+    res.json(updated);
 });

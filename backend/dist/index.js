@@ -50,6 +50,9 @@ const accessibility_1 = require("./routes/accessibility");
 const concierge_1 = require("./routes/concierge");
 const ar_1 = require("./routes/ar");
 const stripe_1 = require("./routes/stripe");
+const reviews_1 = require("./routes/reviews");
+const preferences_1 = require("./routes/preferences");
+const webhooks_1 = require("./routes/webhooks");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.get('/', (_req, res) => {
@@ -72,6 +75,9 @@ app.use('/api/v1', accessibility_1.accessibilityRouter);
 app.use('/api/v1', concierge_1.conciergeRouter);
 app.use('/api/v1', ar_1.arRouter);
 app.use('/api/v1', stripe_1.stripeRouter);
+app.use('/api/v1/products', reviews_1.reviewsRouter);
+app.use('/api/v1/profile', preferences_1.preferencesRouter);
+app.use('/api/v1/webhook', webhooks_1.webhookRouter);
 // Type-safe Sentry error handler (always after all routes)
 app.use((err, req, res, next) => {
     Sentry.captureException(err);
