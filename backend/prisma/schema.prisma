@@ -336,6 +336,33 @@ user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 @@index([userId, type, createdAt])
 }
 
+model Product {
+  id              String   @id @default(cuid())
+  storeId         String?
+  name            String
+  description     String?
+  brand           String?
+  strainType      String?
+  terpenes        String[]
+  price           Float?
+  purchasesLast30d Int     @default(0)
+  reviews         Review[]
+  journal         JournalEntry[]
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  body        String
+  category    String?
+  locale      String   @default("en-US")
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, locale, isPublished])
+
 model JournalEntry {
 id String @id @default(cuid())
 userId String
