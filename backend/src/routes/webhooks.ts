@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
-import { admin } from '@server/firebaseAdmin';
+import { getAdmin } from '@server/firebaseAdmin';
 
 export const webhookRouter = Router();
+const admin = getAdmin();
 
 webhookRouter.post('/stripe', async (req, res) => {
   const event = req.body;

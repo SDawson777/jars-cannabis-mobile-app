@@ -5,6 +5,7 @@ const express_1 = require("express");
 const prismaClient_1 = require("../prismaClient");
 const firebaseAdmin_1 = require("../firebaseAdmin");
 exports.webhookRouter = (0, express_1.Router)();
+const admin = (0, firebaseAdmin_1.getAdmin)();
 exports.webhookRouter.post('/stripe', async (req, res) => {
     const event = req.body;
     try {
@@ -15,7 +16,7 @@ exports.webhookRouter.post('/stripe', async (req, res) => {
                 include: { user: true },
             });
             if (order?.user?.fcmToken) {
-                await firebaseAdmin_1.admin.messaging().send({
+                await admin.messaging().send({
                     token: order.user.fcmToken,
                     notification: {
                         title: 'Order Update',

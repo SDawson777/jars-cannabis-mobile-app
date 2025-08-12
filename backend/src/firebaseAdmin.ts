@@ -16,6 +16,7 @@ function serviceAccountFromEnv(): admin.ServiceAccount {
   return svc as admin.ServiceAccount;
 }
 
+/** Initialize Firebase Admin exactly once. */
 export function initFirebase(): admin.app.App {
   if (app) return app;
   if (admin.apps.length) {
@@ -27,18 +28,23 @@ export function initFirebase(): admin.app.App {
   return app;
 }
 
-export function getFirestore(): FirebaseFirestore.Firestore {
+/** Ensure initialized and return the admin namespace (for messaging(), auth(), etc). */
+export function getAdmin(): typeof admin {
   if (!admin.apps.length) initFirebase();
-  return admin.firestore();
+  return admin;
 }
 
+/** Ensure initialized and return Firestore. */
+export function getFirestore(): FirebaseFirestore.Firestore {
+  return getAdmin().firestore();
+}
+
+/** Re-export admin for convenience. */
 export { admin };
 
-// Keep a convenient named export for compatibility
-export const db = (() => {
-  try { return getFirestore(); } catch { return undefined as unknown as FirebaseFirestore.Firestore; }
-})();
+/** Convenience export for existing code that expects `db`. */
+export const db: FirebaseFirestore.Firestore = getFirestore();
 
-// Default export so `import firebaseAdmin from '@server/firebaseAdmin'` works
-const firebaseAdmin = { admin, initFirebase, getFirestore, db };
+/** Default export keeps old imports working. */
+const firebaseAdmin = { admin, initFirebase, getAdmin, getFirestore, db };
 export default firebaseAdmin;

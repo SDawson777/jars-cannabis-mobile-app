@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = exports.admin = exports.getFirestore = exports.initFirebase = void 0;
+exports.db = exports.admin = exports.getFirestore = exports.getAdmin = exports.initFirebase = void 0;
 // backend/src/firebaseAdmin.ts
 const firebase_admin_1 = __importDefault(require("firebase-admin"));
 exports.admin = firebase_admin_1.default;
@@ -19,6 +19,7 @@ function serviceAccountFromEnv() {
     }
     return svc;
 }
+/** Initialize Firebase Admin exactly once. */
 function initFirebase() {
     if (app)
         return app;
@@ -31,21 +32,20 @@ function initFirebase() {
     return app;
 }
 exports.initFirebase = initFirebase;
-function getFirestore() {
+/** Ensure initialized and return the admin namespace (for messaging(), auth(), etc). */
+function getAdmin() {
     if (!firebase_admin_1.default.apps.length)
         initFirebase();
-    return firebase_admin_1.default.firestore();
+    return firebase_admin_1.default;
+}
+exports.getAdmin = getAdmin;
+/** Ensure initialized and return Firestore. */
+function getFirestore() {
+    return getAdmin().firestore();
 }
 exports.getFirestore = getFirestore;
-// Keep a convenient named export for compatibility
-exports.db = (() => {
-    try {
-        return getFirestore();
-    }
-    catch {
-        return undefined;
-    }
-})();
-// Default export so `import firebaseAdmin from './firebaseAdmin'` works
-const firebaseAdmin = { admin: firebase_admin_1.default, initFirebase, getFirestore, db: exports.db };
+/** Convenience export for existing code that expects `db`. */
+exports.db = getFirestore();
+/** Default export keeps old imports working. */
+const firebaseAdmin = { admin: firebase_admin_1.default, initFirebase, getAdmin, getFirestore, db: exports.db };
 exports.default = firebaseAdmin;
