@@ -14,7 +14,8 @@
     "mock": "prism mock openapi.yml --port 4000",
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -33,7 +34,9 @@
     "openai": "^4.0.0",
     "prisma": "^4.16.2",
     "stripe": "^14.0.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
