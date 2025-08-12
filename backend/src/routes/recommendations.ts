@@ -26,6 +26,16 @@ recommendationsRouter.get('/recommendations/related/:productId', async (req, res
       },
       take: Math.min(20, parseInt(limit || '8')),
       orderBy: { purchasesLast30d: 'desc' },
+// Simple "for you": popular products, optionally scoped to store
+recommendationsRouter.get('/recommendations/for-you', async (req, res, next) => {
+  try {
+    const { storeId, limit = '24' } = req.query as any;
+    const take = Math.min(100, parseInt(limit || '24'));
+    const where = storeId ? { storeId: String(storeId) } : undefined;
+    const items = await prisma.product.findMany({
+      where,
+      orderBy: { purchasesLast30d: 'desc' },
+      take
     });
     res.json({ items });
   } catch (err) {

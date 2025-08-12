@@ -1,16 +1,35 @@
 import { Router } from 'express';
+import { prisma } from '../prismaClient';
+import { requireAuth } from '../middleware/auth';
 
 export const profileRouter = Router();
 
-let profile = { id: 'user-1', name: 'Demo User' };
-
-// GET /profile
-profileRouter.get('/profile', (_req, res) => {
-  res.json(profile);
+profileRouter.get('/profile', requireAuth, async (req, res) => {
+const uid = (req as any).user.userId as string;
+const user = await prisma.user.findUnique({ where: { id: uid } });
+if (!user) return res.status(404).json({ error: 'User not found' });
+return res.json({ id: user.id, email: user.email, createdAt: user.createdAt });
 });
 
-// PUT /profile
-profileRouter.put('/profile', (req, res) => {
-  profile = { ...profile, ...req.body };
-  res.json(profile);
+profileRouter.put('/profile', requireAuth, async (req, res) => {
+const uid = (req as any).user.userId as string;
+await prisma.user.update({ where: { id: uid }, data: {} });
+return res.json({ ok: true });
+});
+
+profileRouter.get('/profile/preferences', requireAuth, async (req, res) => {
+const uid = (req as any).user.userId as string;
+const prefs = await prisma.userPreference.findUnique({ where: { userId: uid } });
+return res.json(prefs || { reducedMotion: false, dyslexiaFont: false, highContrast: false, personalization: true });
+});
+
+profileRouter.put('/profile/preferences', requireAuth, async (req, res) => {
+const uid = (req as any).user.userId as string;
+const data = req.body || {};
+const up = await prisma.userPreference.upsert({
+where: { userId: uid },
+create: { userId: uid, ...data },
+update: data,
+});
+return res.json(up);
 });
