@@ -10,12 +10,16 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ThemeContext } from '../context/ThemeContext';
+import { LoyaltyContext } from '../context/LoyaltyContext';
 import { hapticLight } from '../utils/haptic';
 import PointsProgressBar from '../components/PointsProgressBar';
+import { phase4Client } from '../api/phase4Client';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -25,6 +29,17 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 export default function LoyaltyProgramDetailsScreen() {
   const navigation = useNavigation();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { data: loyalty } = useContext(LoyaltyContext);
+  const queryClient = useQueryClient();
+
+  const redeemMutation = useMutation({
+    mutationFn: async () => {
+      await phase4Client.post('/loyalty/redeem');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
+    },
+  });
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -32,6 +47,9 @@ export default function LoyaltyProgramDetailsScreen() {
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
+  const points = loyalty?.points ?? 0;
+  const target = 140;
+  const pointsAway = Math.max(0, target - points);
 
   const handleBack = () => {
     hapticLight();
@@ -52,21 +70,31 @@ export default function LoyaltyProgramDetailsScreen() {
 
       {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.points, { color: jarsPrimary }]}>120 points</Text>
-        <Text style={[styles.description, { color: jarsPrimary }]}>
-          You’re only 20 points away from your next reward!
-        </Text>
-        <PointsProgressBar current={120} target={140} />
+        <Text style={[styles.points, { color: jarsPrimary }]}>{points} points</Text>
+        <Text style={[styles.description, { color: jarsPrimary }]}>You’re only {pointsAway} points away from your next reward!</Text>
+        <PointsProgressBar current={points} target={target} />
         <Pressable
           style={[styles.button, { backgroundColor: jarsSecondary }]}
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            // TODO: Redeem logic
+            redeemMutation.reset();
+            redeemMutation.mutate();
           }}
+          disabled={redeemMutation.isPending}
         >
-          <Text style={styles.buttonText}>Redeem Reward</Text>
+          {redeemMutation.isPending ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.buttonText}>Redeem Reward</Text>
+          )}
         </Pressable>
+        {redeemMutation.isSuccess && (
+          <Text style={styles.successText}>Reward redeemed!</Text>
+        )}
+        {redeemMutation.isError && (
+          <Text style={styles.errorText}>Failed to redeem reward.</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -105,5 +133,15 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  successText: {
+    marginTop: 12,
+    color: '#0A0',
+    fontSize: 16,
+  },
+  errorText: {
+    marginTop: 12,
+    color: '#A00',
+    fontSize: 16,
   },
 });
