@@ -17,6 +17,12 @@
       "backgroundColor": "#F9F9F9",
       "image": "./assets/splash/jars_splash_static.png",
       "resizeMode": "contain"
-    }
+    },
+    "plugins": [
+      "react-native-reanimated",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      "@stripe/stripe-react-native"
+    ]
   }
 }
