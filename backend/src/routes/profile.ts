@@ -17,6 +17,19 @@ await prisma.user.update({ where: { id: uid }, data: {} });
 return res.json({ ok: true });
 });
 
+profileRouter.post('/profile/push-token', requireAuth, async (req, res) => {
+const uid = (req as any).user.userId as string;
+const { token } = req.body || {};
+if (!token) return res.status(400).json({ error: 'Missing token' });
+try {
+await prisma.user.update({ where: { id: uid }, data: { fcmToken: token } });
+return res.json({ ok: true });
+} catch (err) {
+console.error('Error saving fcm token:', err);
+return res.status(500).json({ error: 'Failed to save token' });
+}
+});
+
 profileRouter.get('/profile/preferences', requireAuth, async (req, res) => {
 const uid = (req as any).user.userId as string;
 const prefs = await prisma.userPreference.findUnique({ where: { userId: uid } });
