@@ -283,6 +283,15 @@ npm run dev:emulators  # Firestore/Auth/CF
 npm run dev:expo       # Expo client against local emu
 ```
 
+## Custom Dev Client
+
+Generate native projects and build a custom development client:
+
+```bash
+npx expo prebuild
+npx expo run:android   # or npx expo run:ios
+```
+
 ## Push Notifications Setup
 
 1. Add your Firebase config files:
@@ -294,6 +303,7 @@ npm run dev:expo       # Expo client against local emu
 5. Send a test message from the Firebase console to verify foreground, background, and quit-state behavior.
 
 ## New Endpoints (Launch)
+
 - Recommendations: `GET /recommendations/for-you`, `GET /recommendations/related/:productId`
 - Reviews: `POST /products/:id/reviews`
 - Loyalty: `GET /loyalty/status`, `GET /loyalty/badges`
