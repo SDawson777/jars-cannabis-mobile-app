@@ -15,7 +15,8 @@
     },
     "splash": {
       "backgroundColor": "#F9F9F9",
-      "image": "./assets/splash/jars_splash_static.png"
+      "image": "./assets/splash/jars_splash_static.png",
+      "resizeMode": "contain"
     }
   }
 }
