@@ -15,6 +15,7 @@ import { recommendationsRouter } from './routes/recommendations';
 import { dataRouter } from './routes/data';
 import { conciergeRouter } from './routes/concierge';
 import { arRouter } from './routes/ar';
+import { qaRouter } from './routes/qa';
 import { initFirebase } from './bootstrap/firebase-admin';
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/v1', recommendationsRouter);
 app.use('/api/v1', dataRouter);
 app.use('/api/v1', conciergeRouter);
 app.use('/api/v1', arRouter);
+if (process.env.DEBUG_DIAG === '1') app.use('/api/v1', qaRouter);
 
 // Global error handler so nothing crashes
 app.use((err: any, _req: any, res: any, _next: any) => {
