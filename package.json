@@ -17,7 +17,7 @@
     "build": "npm run build:backend",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
-    "format": "prettier --check \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",
+    "format": "prettier --write .",
     "format:fix": "prettier --write \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",
     "check-assets": "npx ts-node --esm scripts/checkAssets.ts",
     "firebase:check": "ts-node scripts/verifyFirebaseSetup.ts",
@@ -33,7 +33,8 @@
     "scaffold:award-redemption": "ts-node scripts/setupAwardRedemption.ts",
     "test:award-redemption": "jest tests/awards.redeem.test.ts --runInBand",
     "prisma-gen": "npx prisma generate --schema=backend/prisma/schema.prisma || npx prisma generate --schema=backend/prisma/schema.prisma --skip-download",
-    "smoke": "newman run qa/collection.json -e qa/env.staging.json --reporters cli,junit --reporter-junit-export ./reports/newman-smoke.xml"
+    "smoke": "newman run qa/collection.json -e qa/env.staging.json --reporters cli,junit --reporter-junit-export ./reports/newman-smoke.xml",
+    "format:check": "prettier --check ."
   },
   "lint-staged": {
     "{*,src/**,!src/terpene_wheel/snippets/**}/*.{js,jsx,ts,tsx}": [
@@ -153,7 +154,7 @@
     "jsonc-eslint-parser": "^2.4.0",
     "lint-staged": "^13.2.3",
     "newman": "^6.2.1",
-    "prettier": "^3.6.2",
+    "prettier": "^3.3.3",
     "react-dom": "^19.1.0",
     "react-test-renderer": "^19.1.1",
     "supertest": "^7.1.3",
