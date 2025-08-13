@@ -18,6 +18,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSettings } from '../context/SettingsContext';
+import { t } from '../utils/i18n';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -30,7 +31,7 @@ export default function AppSettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const [visitAlerts, setVisitAlerts] = useState(false);
   const [personalOffers, setPersonalOffers] = useState(false);
-  const { biometricEnabled, setBiometricEnabled } = useSettings();
+  const { biometricEnabled, setBiometricEnabled, locale } = useSettings();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -129,17 +130,19 @@ export default function AppSettingsScreen() {
           />
         </View>
 
-        {/* Language (placeholder) */}
+        {/* Language */}
         <Pressable
           style={[styles.row, { borderBottomColor: jarsSecondary }]}
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            // TODO: language picker
+            navigation.navigate('LanguageSelection');
           }}
         >
-          <Text style={[styles.label, { color: jarsPrimary }]}>Language</Text>
-          <Text style={[styles.value, { color: jarsSecondary }]}>English</Text>
+          <Text style={[styles.label, { color: jarsPrimary }]}>{t('language')}</Text>
+          <Text style={[styles.value, { color: jarsSecondary }]}>
+            {locale === 'es' ? t('spanish') : t('english')}
+          </Text>
         </Pressable>
 
         {/* About App */}

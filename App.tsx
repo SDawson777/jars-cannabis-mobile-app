@@ -111,6 +111,7 @@ import MyJarsScreen from './src/screens/MyJarsScreen';
 import JournalEntryScreen from './src/screens/JournalEntryScreen';
 import MyJarsInsightsScreen from './src/screens/MyJarsInsightsScreen';
 import EthicalAIDashboardScreen from './src/screens/EthicalAIDashboardScreen';
+import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
 
 const Stack = createNativeStackNavigator(); // no generic
 const queryClient = new QueryClient();
@@ -254,6 +255,7 @@ function App() {
                         <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
                         <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
                         <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
+                        <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} />
                         <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
                         <Stack.Screen name="ContactUs" component={ContactUsScreen} />
                         <Stack.Screen
