@@ -17,6 +17,7 @@ import OfflineNotice from './src/components/OfflineNotice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import ErrorBoundary from './src/components/ErrorBoundary';
+import { getAuthToken } from './src/utils/auth';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -30,9 +31,32 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
 });
 
-const syncTokenToBackend = async (token: string) => {
-  // TODO: Sync token with backend if needed
-  console.log('Sync token to backend:', token);
+const TOKEN_SYNC_KEY = 'pendingFcmToken';
+
+const syncTokenToBackend = async (token: string, attempt = 0): Promise<void> => {
+  const baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+  try {
+    const authToken = await getAuthToken();
+    const res = await fetch(`${baseUrl}/profile/push-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
+      body: JSON.stringify({ token }),
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    await AsyncStorage.removeItem(TOKEN_SYNC_KEY);
+  } catch (err) {
+    console.error('Sync token to backend failed:', err);
+    await AsyncStorage.setItem(TOKEN_SYNC_KEY, token);
+    const delay = Math.min(2 ** attempt * 1000, 60000);
+    setTimeout(() => {
+      syncTokenToBackend(token, attempt + 1);
+    }, delay);
+  }
 };
 
 import SplashScreenWrapper from './src/screens/SplashScreenWrapper';
@@ -101,6 +125,16 @@ function App() {
       setInitialRoute(verified === 'true' ? 'SplashScreen' : 'AgeVerification');
     };
     checkFlag();
+  }, []);
+
+  useEffect(() => {
+    const resendPending = async () => {
+      const pending = await AsyncStorage.getItem(TOKEN_SYNC_KEY);
+      if (pending) {
+        await syncTokenToBackend(pending);
+      }
+    };
+    resendPending();
   }, []);
 
   useEffect(() => {
