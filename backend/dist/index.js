@@ -20,6 +20,7 @@ const recommendations_1 = require("./routes/recommendations");
 const data_1 = require("./routes/data");
 const concierge_1 = require("./routes/concierge");
 const ar_1 = require("./routes/ar");
+const home_1 = require("./routes/home");
 const firebase_admin_1 = require("./bootstrap/firebase-admin");
 const app = (0, express_1.default)();
 app.use(express_1.default.json({ limit: '1mb' }));
@@ -45,6 +46,7 @@ app.use('/api/v1', recommendations_1.recommendationsRouter);
 app.use('/api/v1', data_1.dataRouter);
 app.use('/api/v1', concierge_1.conciergeRouter);
 app.use('/api/v1', ar_1.arRouter);
+app.use('/api/v1', home_1.homeRouter);
 // Global error handler so nothing crashes
 app.use((err, _req, res, _next) => {
     console.error('Unhandled error:', err?.code || err?.message || err);

@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.tsx
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -32,7 +32,7 @@ import ForYouTodayCard from '../components/ForYouTodayCard';
 import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
 import OfflineNotice from '../components/OfflineNotice';
 import { useForYouToday } from '../hooks/useForYouToday';
-import { TERPENES } from '../terpene_wheel/data/terpenes';
+import { phase4Client } from '../api/phase4Client';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -40,48 +40,84 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
 
-const categories = [
-  { id: 'flower', label: 'Flower', emoji: '🌿' },
-  { id: 'vapes', label: 'Vapes', emoji: '💨' },
-  { id: 'edibles', label: 'Edibles', emoji: '🍪' },
-  { id: 'pre-rolls', label: 'Pre-rolls', emoji: '🚬' },
-  { id: 'concentrates', label: 'Concentrates', emoji: '🛢️' },
-  { id: 'gear', label: 'Gear', emoji: '🧰' },
-];
-
-const featured = [
-  {
-    id: '1',
-    name: 'Rainbow Rozay',
-    price: 79.0,
-    image: require('../assets/product1.png'),
-    description: 'A flavorful hybrid with fruity notes.',
-    terpenes: TERPENES,
-  },
-  {
-    id: '2',
-    name: 'Moonwalker OG',
-    price: 65.0,
-    image: require('../assets/product2.png'),
-    description: 'Potent indica leaning strain for relaxation.',
-    terpenes: TERPENES,
-  },
-];
-
-const ways = [
-  { id: 'deals', label: 'Shop Deals' },
-  { id: 'popular', label: 'Shop Popular' },
-  { id: 'effects', label: 'Shop Effects' },
-  { id: 'deli', label: 'Shop The Deli' },
-];
+type Category = { id: string; label: string; emoji: string };
+type FeaturedProduct = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  description: string;
+};
+type Way = { id: string; label: string };
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const { data: forYou, isLoading } = useForYouToday('1', '1');
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [featured, setFeatured] = useState<FeaturedProduct[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [ways, setWays] = useState<Way[]>([]);
+  const [waysLoading, setWaysLoading] = useState(true);
+
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    phase4Client
+      .get<Category[]>('/home/categories')
+      .then(res => {
+        if (mounted) setCategories(res.data || []);
+      })
+      .catch(() => {
+        if (mounted) setCategories([]);
+      })
+      .finally(() => {
+        if (mounted) setCategoriesLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    phase4Client
+      .get<FeaturedProduct[]>('/home/featured')
+      .then(res => {
+        if (mounted) setFeatured(res.data || []);
+      })
+      .catch(() => {
+        if (mounted) setFeatured([]);
+      })
+      .finally(() => {
+        if (mounted) setFeaturedLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    phase4Client
+      .get<Way[]>('/home/ways')
+      .then(res => {
+        if (mounted) setWays(res.data || []);
+      })
+      .catch(() => {
+        if (mounted) setWays([]);
+      })
+      .finally(() => {
+        if (mounted) setWaysLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const bgColor =
@@ -165,20 +201,35 @@ export default function HomeScreen() {
             <Text style={[styles.seeMore, { color: jarsPrimary }]}>See More</Text>
           </Pressable>
         </View>
-        <View style={styles.categoryGrid}>
-          {categories.map(cat => (
-            <Pressable
-              key={cat.id}
-              onPress={() => navigation.navigate('ShopScreen')}
-              style={styles.categoryCard}
-            >
-              <View style={styles.categoryIcon}>
-                <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+        {categoriesLoading ? (
+          <View style={styles.categoryGrid}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <View key={i} style={styles.categoryCard}>
+                <View style={[styles.categoryIcon, { backgroundColor: '#E0E0E0' }]} />
+                <View
+                  style={{ width: 40, height: 10, backgroundColor: '#E0E0E0', borderRadius: 4 }}
+                />
               </View>
-              <Text style={styles.categoryLabel}>{cat.label}</Text>
-            </Pressable>
-          ))}
-        </View>
+            ))}
+          </View>
+        ) : categories.length > 0 ? (
+          <View style={styles.categoryGrid}>
+            {categories.map(cat => (
+              <Pressable
+                key={cat.id}
+                onPress={() => navigation.navigate('ShopScreen')}
+                style={styles.categoryCard}
+              >
+                <View style={styles.categoryIcon}>
+                  <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+                </View>
+                <Text style={styles.categoryLabel}>{cat.label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.emptyText}>No categories available.</Text>
+        )}
 
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
@@ -187,21 +238,35 @@ export default function HomeScreen() {
             <Text style={[styles.seeMore, { color: jarsPrimary }]}>Shop All</Text>
           </Pressable>
         </View>
-        <View style={styles.productGrid}>
-          {featured.map(item => (
-            <Pressable
-              key={item.id}
-              style={[styles.productCard, { borderColor: jarsPrimary }]}
-              onPress={() => navigation.navigate('ProductDetail', { slug: item.id })}
-            >
-              <Image source={item.image} style={styles.productImage} />
-              <Text style={[styles.productName, { color: jarsPrimary }]}>{item.name}</Text>
-              <Text style={[styles.productPrice, { color: jarsSecondary }]}>
-                ${item.price.toFixed(2)}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        {featuredLoading ? (
+          <View style={styles.productGrid}>
+            {Array.from({ length: 2 }).map((_, i) => (
+              <View key={i} style={[styles.productCard, { backgroundColor: '#E0E0E0' }]} />
+            ))}
+          </View>
+        ) : featured.length > 0 ? (
+          <View style={styles.productGrid}>
+            {featured.map(item => (
+              <Pressable
+                key={item.id}
+                style={[styles.productCard, { borderColor: jarsPrimary }]}
+                onPress={() => navigation.navigate('ProductDetail', { slug: item.id })}
+              >
+                {item.image ? (
+                  <Image source={{ uri: item.image }} style={styles.productImage} />
+                ) : (
+                  <View style={[styles.productImage, { backgroundColor: '#E0E0E0' }]} />
+                )}
+                <Text style={[styles.productName, { color: jarsPrimary }]}>{item.name}</Text>
+                <Text style={[styles.productPrice, { color: jarsSecondary }]}>
+                  ${item.price.toFixed(2)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.emptyText}>No featured products.</Text>
+        )}
 
         {/* Your Weed Your Way */}
         <View style={styles.sectionHeader}>
@@ -210,18 +275,33 @@ export default function HomeScreen() {
             <Text style={[styles.seeMore, { color: jarsPrimary }]}>See More</Text>
           </Pressable>
         </View>
-        <View style={styles.waysGrid}>
-          {ways.map(w => (
-            <Pressable
-              key={w.id}
-              onPress={() => navigation.navigate('ShopScreen')}
-              style={styles.wayCard}
-            >
-              <View style={styles.wayImage} />
-              <Text style={styles.wayLabel}>{w.label}</Text>
-            </Pressable>
-          ))}
-        </View>
+        {waysLoading ? (
+          <View style={styles.waysGrid}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <View key={i} style={styles.wayCard}>
+                <View style={[styles.wayImage, { backgroundColor: '#E0E0E0' }]} />
+                <View
+                  style={{ width: 80, height: 12, backgroundColor: '#E0E0E0', borderRadius: 4 }}
+                />
+              </View>
+            ))}
+          </View>
+        ) : ways.length > 0 ? (
+          <View style={styles.waysGrid}>
+            {ways.map(w => (
+              <Pressable
+                key={w.id}
+                onPress={() => navigation.navigate('ShopScreen')}
+                style={styles.wayCard}
+              >
+                <View style={styles.wayImage} />
+                <Text style={styles.wayLabel}>{w.label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.emptyText}>No ways to shop.</Text>
+        )}
       </ScrollView>
 
       {/* Bottom Navigation */}
@@ -359,6 +439,7 @@ const styles = StyleSheet.create({
   },
   wayImage: { width: 96, height: 96, backgroundColor: '#EEE', borderRadius: 12, marginBottom: 8 },
   wayLabel: { fontSize: 14, fontWeight: '500' },
+  emptyText: { textAlign: 'center', color: '#666', marginTop: 12 },
   bottomNav: {
     position: 'absolute',
     bottom: 0,
