@@ -1,8 +1,9 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { getAuthToken } from '../utils/auth';
 import type { OrdersResponse } from '../types/order';
+import { API_BASE_URL } from '../utils/apiConfig';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = API_BASE_URL;
 
 function createOrderClient(): AxiosInstance {
   const client = axios.create({

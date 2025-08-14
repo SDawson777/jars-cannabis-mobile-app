@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import { getAuthToken } from './src/utils/auth';
+import { API_BASE_URL } from './src/utils/apiConfig';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -34,7 +35,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 const TOKEN_SYNC_KEY = 'pendingFcmToken';
 
 const syncTokenToBackend = async (token: string, attempt = 0): Promise<void> => {
-  const baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+  const baseUrl = API_BASE_URL;
   try {
     const authToken = await getAuthToken();
     const res = await fetch(`${baseUrl}/profile/push-token`, {

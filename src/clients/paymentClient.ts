@@ -1,6 +1,7 @@
 import { getAuthToken } from '../utils/auth';
+import { API_BASE_URL } from '../utils/apiConfig';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = API_BASE_URL;
 
 export interface PaymentPayload {
   cardNumber: string;
