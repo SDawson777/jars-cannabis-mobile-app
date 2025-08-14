@@ -95,3 +95,8 @@ export async function getAwardsStatus() {
   const res = await phase4Client.get('/awards/status');
   return res.data;
 }
+
+export async function getStash() {
+  const res = await phase4Client.get('/stash');
+  return res.data;
+}

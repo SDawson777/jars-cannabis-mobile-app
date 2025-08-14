@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, FlatList, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BarChart } from 'lucide-react-native';
@@ -8,23 +8,18 @@ import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import type { StashItem } from '../@types/jars';
-
-const SAMPLE_ITEMS: StashItem[] = [
-  {
-    id: '1',
-    name: 'Blue Dream',
-    strainType: 'Hybrid',
-    purchaseDate: '2025-07-20',
-    status: 'in_stock',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { getStash } from '../api/phase4Client';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList, 'MyJars'>;
 
 export default function MyJarsScreen() {
   const navigation = useNavigation<NavProp>();
   const { jarsPrimary } = useContext(ThemeContext);
-  const [items] = useState(SAMPLE_ITEMS);
+  const { data, isLoading } = useQuery<StashItem[]>({
+    queryKey: ['stash'],
+    queryFn: getStash,
+  });
 
   const openInsights = () => {
     hapticLight();
@@ -36,6 +31,14 @@ export default function MyJarsScreen() {
     navigation.navigate('JournalEntry', { item });
   };
 
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -45,11 +48,11 @@ export default function MyJarsScreen() {
         </Pressable>
       </View>
       <FlatList
-        data={items}
+        data={data ?? []}
         keyExtractor={i => i.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <StashItemCard item={item} onJournal={() => openJournal(item)} onReorder={() => {}} />
+          <StashItemCard item={item} onJournal={() => openJournal(item)} />
         )}
         ListEmptyComponent={
           <View style={styles.empty}>
