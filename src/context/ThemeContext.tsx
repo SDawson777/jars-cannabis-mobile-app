@@ -3,8 +3,7 @@ import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
 import * as Location from 'expo-location';
 import { getLocales } from 'expo-localization';
-
-const OPEN_WEATHER_KEY = 'aa7128228c09cea5b92b508cf1a200bc';
+import { EXPO_PUBLIC_OPENWEATHER_KEY } from '@env';
 
 // Tuned threshold constants
 const COOL_THRESHOLD_METRIC = 12; // °C below which we consider it 'cool'
@@ -57,6 +56,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         // start with time-based
         let temp: ColorTemp = computeTimeTemp();
 
+        // Abort early if no API key provided
+        if (!EXPO_PUBLIC_OPENWEATHER_KEY) {
+          console.warn(
+            'OpenWeather API key missing or invalid; using time-based theme.'
+          );
+          setColorTemp(temp);
+          return;
+        }
+
         // 2. Pull measurementSystem from first locale entry
         const { measurementSystem } = getLocales()[0];
         // measurementSystem is 'metric' | 'us' | 'uk' | null
@@ -73,9 +81,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const url =
             `https://api.openweathermap.org/data/2.5/weather` +
             `?lat=${latitude}&lon=${longitude}` +
-            `&appid=${OPEN_WEATHER_KEY}` +
+            `&appid=${EXPO_PUBLIC_OPENWEATHER_KEY}` +
             `&units=${units}`;
           const resp = await fetch(url);
+          if (!resp.ok) {
+            console.warn(
+              `OpenWeather request failed with status ${resp.status}; using time-based theme.`
+            );
+            setColorTemp(temp);
+            return;
+          }
           const data = await resp.json();
           const current = data.main?.temp as number | undefined;
           const clouds = data.clouds?.all as number | undefined; // percent
