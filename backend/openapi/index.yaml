@@ -3,7 +3,7 @@ info:
   title: Jars Mobile App API
   version: 1.0.0
 servers:
-  - url: https://jars-cannabis-mobile-app-production.up.railway.app/api/v1
+  - url: https://api.example.com/api/v1
     description: Production API
 components:
   securitySchemes:
