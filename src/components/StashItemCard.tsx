@@ -7,7 +7,7 @@ import type { StashItem } from '../@types/jars';
 interface Props {
   item: StashItem;
   onJournal(): void;
-  onReorder(): void;
+  onReorder?(): void;
 }
 
 export default function StashItemCard({ item, onJournal, onReorder }: Props) {
@@ -16,8 +16,10 @@ export default function StashItemCard({ item, onJournal, onReorder }: Props) {
     onJournal();
   };
   const handleReorder = () => {
-    hapticLight();
-    onReorder();
+    if (onReorder) {
+      hapticLight();
+      onReorder();
+    }
   };
 
   return (
@@ -33,10 +35,12 @@ export default function StashItemCard({ item, onJournal, onReorder }: Props) {
           <BookOpen size={16} color="#2E5D46" />
           <Text style={styles.btnText}>Journal</Text>
         </Pressable>
-        <Pressable style={styles.btn} onPress={handleReorder}>
-          <ShoppingCart size={16} color="#2E5D46" />
-          <Text style={styles.btnText}>Reorder</Text>
-        </Pressable>
+        {onReorder && (
+          <Pressable style={styles.btn} onPress={handleReorder}>
+            <ShoppingCart size={16} color="#2E5D46" />
+            <Text style={styles.btnText}>Reorder</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );
