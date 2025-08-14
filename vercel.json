@@ -3,6 +3,9 @@
   "version": 2,
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist",
+  "env": {
+    "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+  },
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
