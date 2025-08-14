@@ -19,6 +19,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { conciergeChat } from '../api/phase4Client';
 
 interface Message {
   id: string;
@@ -44,6 +45,8 @@ export default function ConciergeChatScreen() {
     { id: '1', text: 'Hi, how can I assist you today?', sender: 'bot' },
   ]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const listRef = useRef<FlatList<Message>>(null);
 
   useEffect(() => {
@@ -54,8 +57,8 @@ export default function ConciergeChatScreen() {
     listRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticMedium();
     const userMsg: Message = {
@@ -63,19 +66,37 @@ export default function ConciergeChatScreen() {
       text: input,
       sender: 'user',
     };
+    const history = messages.map(m => ({
+      role: m.sender === 'user' ? 'user' : 'assistant',
+      content: m.text,
+    }));
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    setTimeout(() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setLoading(true);
+    setError('');
+    try {
+      const res = await conciergeChat({ message: userMsg.text, history });
       setMessages(prev => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
-          text: 'Let me look that up for you…',
+          text: res.reply,
           sender: 'bot',
         },
       ]);
-    }, 1000);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          text: 'Failed to fetch response.',
+          sender: 'bot',
+        },
+      ]);
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -128,6 +149,11 @@ export default function ConciergeChatScreen() {
           )}
         />
 
+        {loading && (
+          <Text style={[styles.statusText, { color: jarsSecondary }]}>Bot is typing...</Text>
+        )}
+        {error ? <Text style={[styles.error, { color: 'red' }]}>{error}</Text> : null}
+
         {/* Input */}
         <View
           style={[
@@ -146,8 +172,12 @@ export default function ConciergeChatScreen() {
             }}
           />
           <Pressable
-            style={[styles.sendButton, { backgroundColor: jarsPrimary }]}
+            style={[
+              styles.sendButton,
+              { backgroundColor: jarsPrimary, opacity: loading ? 0.5 : 1 },
+            ]}
             onPress={sendMessage}
+            disabled={loading}
           >
             <Send size={20} color="#FFFFFF" />
           </Pressable>
@@ -201,4 +231,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  statusText: { textAlign: 'center', marginBottom: 8 },
+  error: { textAlign: 'center', marginBottom: 8 },
 });

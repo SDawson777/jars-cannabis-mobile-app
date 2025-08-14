@@ -1,5 +1,5 @@
 // src/screens/CommunityGardenScreen.tsx
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -18,6 +18,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import { phase4Client } from '../api/phase4Client';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -25,33 +26,36 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 type CommunityNavProp = NativeStackNavigationProp<RootStackParamList, 'CommunityGarden'>;
 
-const posts = [
-  {
-    id: '1',
-    user: 'JaneDoe',
-    time: '2h ago',
-    text: 'Just tried the Rainbow Rozay—so uplifting! 🌈✨',
-  },
-  {
-    id: '2',
-    user: 'GreenThumb',
-    time: '5h ago',
-    text: 'Loving the new terpene profile guide.',
-  },
-  {
-    id: '3',
-    user: 'PeacefulPete',
-    time: '1d ago',
-    text: 'Who else is excited for the Educational Greenhouse updates?',
-  },
-];
+interface Post {
+  id: string;
+  user: string;
+  time: string;
+  text: string;
+}
 
 export default function CommunityGardenScreen() {
   const navigation = useNavigation<CommunityNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await phase4Client.get('/community/posts');
+      setPosts(res.data?.posts || res.data || []);
+    } catch {
+      setError('Failed to load posts');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    void fetchPosts();
   }, []);
 
   const bgColor =
@@ -80,28 +84,35 @@ export default function CommunityGardenScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {posts.map(post => (
-          <Pressable
-            key={post.id}
-            style={[styles.postCard, { backgroundColor: jarsBackground }]}
-            onPress={handlePostPress}
-            android_ripple={{ color: `${jarsSecondary}20` }}
-          >
-            <View style={styles.postHeader}>
-              <Image
-                source={{
-                  uri: `https://placehold.co/40x40?text=${post.user[0]}`,
-                }}
-                style={styles.avatar}
-              />
-              <View>
-                <Text style={[styles.username, { color: jarsPrimary }]}>{post.user}</Text>
-                <Text style={[styles.time, { color: jarsSecondary }]}>{post.time}</Text>
+        {loading && (
+          <Text style={[styles.statusText, { color: jarsSecondary }]}>Loading posts...</Text>
+        )}
+        {!loading && error ? (
+          <Text style={[styles.statusText, { color: 'red' }]}>{error}</Text>
+        ) : (
+          posts.map(post => (
+            <Pressable
+              key={post.id}
+              style={[styles.postCard, { backgroundColor: jarsBackground }]}
+              onPress={handlePostPress}
+              android_ripple={{ color: `${jarsSecondary}20` }}
+            >
+              <View style={styles.postHeader}>
+                <Image
+                  source={{
+                    uri: `https://placehold.co/40x40?text=${post.user[0]}`,
+                  }}
+                  style={styles.avatar}
+                />
+                <View>
+                  <Text style={[styles.username, { color: jarsPrimary }]}>{post.user}</Text>
+                  <Text style={[styles.time, { color: jarsSecondary }]}>{post.time}</Text>
+                </View>
               </View>
-            </View>
-            <Text style={[styles.postText, { color: jarsPrimary }]}>{post.text}</Text>
-          </Pressable>
-        ))}
+              <Text style={[styles.postText, { color: jarsPrimary }]}>{post.text}</Text>
+            </Pressable>
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -141,4 +152,5 @@ const styles = StyleSheet.create({
   username: { fontSize: 16, fontWeight: '600' },
   time: { fontSize: 12, marginTop: 2 },
   postText: { fontSize: 15, lineHeight: 22 },
+  statusText: { textAlign: 'center', marginTop: 16 },
 });
