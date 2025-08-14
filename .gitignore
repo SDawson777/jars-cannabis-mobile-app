@@ -32,3 +32,6 @@ backend/prisma/dev.db-journal
 service-account.json
 firebase_sa.b64
 assets/splash/jars_splash_static.png
+
+# Firebase Android config
+apps/android/google-services.json

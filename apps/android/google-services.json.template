@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "168461890531",
-    "project_id": "jars-mobile-app",
-    "storage_bucket": "jars-mobile-app.firebasestorage.app"
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_STORAGE_BUCKET"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:168461890531:android:365e036354ea48c9d0a6d6",
+        "mobilesdk_app_id": "YOUR_APP_ID",
         "android_client_info": {
           "package_name": "com.jars.dev.android"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBMfT2AAjc7nGgmT5YmCu6gvwm71hRT8fI"
+          "current_key": "YOUR_API_KEY"
         }
       ],
       "services": {
