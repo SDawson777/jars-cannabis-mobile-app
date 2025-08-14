@@ -296,7 +296,11 @@ npx expo run:android   # or npx expo run:ios
 
 1. Add your Firebase config files:
    - Place `google-services.json` in `android/app`.
-   - Place `GoogleService-Info.plist` in the iOS project.
+   - Place `GoogleService-Info.plist` in the iOS project. The repo contains a
+     placeholder with dummy keys; download the real file from the Firebase
+     console (Project settings → *General* → *Your apps*) or request it from a
+     maintainer and keep it out of version control. If a real key was
+     previously committed, rotate it in the Firebase console.
 2. **iOS:** Enable Push Notifications and Background Modes (Remote notifications) in Xcode. Upload your APNs key to Firebase.
 3. **Android:** Confirm `google-services.json` is present and Firebase Messaging is referenced in `AndroidManifest.xml`.
 4. On launch the app requests notification permission and logs the FCM token. Replace the sync stub in `App.tsx` to send the token to your backend if needed.
