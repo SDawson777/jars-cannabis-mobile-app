@@ -41,7 +41,7 @@ it('shows default message when no promo', async () => {
   await act(async () => {
     tree = renderer.create(
       <LoyaltyContext.Provider
-        value={{ data: null, isLoading: false, isError: false, error: undefined }}
+        value={{ data: undefined, isLoading: false, isError: false, error: null }}
       >
         <WelcomeBanner />
       </LoyaltyContext.Provider>
@@ -58,7 +58,7 @@ it('shows store promo when available', async () => {
   await act(async () => {
     tree = renderer.create(
       <LoyaltyContext.Provider
-        value={{ data: null, isLoading: false, isError: false, error: undefined }}
+        value={{ data: undefined, isLoading: false, isError: false, error: null }}
       >
         <WelcomeBanner />
       </LoyaltyContext.Provider>
@@ -73,7 +73,12 @@ it('shows loyalty banner callouts per tier', async () => {
   await act(async () => {
     tree = renderer.create(
       <LoyaltyContext.Provider
-        value={{ data: { tier: 'Gold' }, isLoading: false, isError: false, error: undefined }}
+        value={{
+          data: { points: 0, level: 'Gold' },
+          isLoading: false,
+          isError: false,
+          error: null,
+        }}
       >
         <WelcomeBanner />
       </LoyaltyContext.Provider>

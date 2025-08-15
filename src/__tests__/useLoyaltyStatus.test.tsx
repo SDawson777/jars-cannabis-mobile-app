@@ -6,17 +6,19 @@ import { phase4Client } from '../api/phase4Client';
 
 jest.mock('../api/phase4Client');
 
-const wrapper: any = ({ children }: any) => {
+const wrapper = ({ children }: { children: React.ReactNode }) => {
   const client = new QueryClient();
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 };
 
 describe('useLoyaltyStatus', () => {
   it('returns data on success', async () => {
-    (phase4Client.get as jest.Mock).mockResolvedValue({ data: { points: 10 } });
+    (phase4Client.get as jest.Mock).mockResolvedValue({
+      data: { points: 10, level: 'Bronze' },
+    });
     const { result } = renderHook(() => useLoyaltyStatus(), { wrapper });
     expect(result.current.isLoading).toBe(true);
-    await waitFor(() => expect(result.current.data).toEqual({ points: 10 }));
+    await waitFor(() => expect(result.current.data).toEqual({ points: 10, level: 'Bronze' }));
   });
 
   it('handles error', async () => {
