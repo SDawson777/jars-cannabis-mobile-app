@@ -1,10 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCartStore, hydrateCartStore } from '../../../stores/useCartStore';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
-);
-
 describe('cart store persistence', () => {
   beforeEach(async () => {
     await AsyncStorage.clear();
