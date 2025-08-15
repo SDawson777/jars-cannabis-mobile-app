@@ -136,7 +136,8 @@ export default function AppSettingsScreen() {
           onPress={() => {
             hapticLight();
             LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            navigation.navigate('LanguageSelection');
+            // typed navigation
+            navigation.navigate('LanguageSelection' as never);
           }}
         >
           <Text style={[styles.label, { color: jarsPrimary }]}>{t('language')}</Text>

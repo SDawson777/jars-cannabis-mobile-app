@@ -59,7 +59,9 @@ export default function OTPScreen() {
         {code.map((d, i) => (
           <TextInput
             key={i}
-            ref={ref => (inputs[i] = ref)}
+            ref={ref => {
+              inputs[i] = ref;
+            }}
             style={[styles.input, { borderColor: focused === i ? '#2E5D46' : '#ccc' }]}
             keyboardType="number-pad"
             maxLength={1}

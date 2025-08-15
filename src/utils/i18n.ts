@@ -21,7 +21,13 @@ export const setLocale = (locale: string) => {
   currentLocale = locale;
 };
 
-export const t = (key: keyof typeof translations['en']) => {
-  const locale = translations[currentLocale] ? currentLocale : 'en';
-  return translations[locale][key] || key;
+export const t = (key: keyof (typeof translations)['en']) => {
+  type Strings = {
+    language: string;
+    english: string;
+    spanish: string;
+    selectLanguage: string;
+  };
+  const locale = (translations as Record<string, Strings>)[currentLocale] ? currentLocale : 'en';
+  return (translations as Record<string, Strings>)[locale][key as keyof Strings] || key;
 };

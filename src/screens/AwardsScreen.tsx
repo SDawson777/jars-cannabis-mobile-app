@@ -23,7 +23,7 @@ import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
-import { trackEvent } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics'; // ensure exported in utils/analytics
 import { useRedeemReward } from '../api/hooks/useRedeemReward';
 import { ChevronLeft, Settings } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';

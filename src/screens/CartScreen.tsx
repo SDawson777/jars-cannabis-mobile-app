@@ -52,7 +52,7 @@ export default function CartScreen() {
   const { validating } = useCartValidation();
 
   useEffect(() => {
-    hydrateCartStore().then(() => setHydrated(true));
+    Promise.resolve(hydrateCartStore()).then(() => setHydrated(true));
   }, []);
 
   useEffect(() => {
@@ -179,7 +179,10 @@ export default function CartScreen() {
             </View>
           ) : (
             <View style={styles.card}>
-              <Image source={{ uri: item.image }} style={styles.image} />
+              <Image
+                source={{ uri: (item as any).image ?? (item as any).imageUrl }}
+                style={styles.image}
+              />
               <View style={styles.info}>
                 <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
                 <Text style={[styles.price, { color: jarsSecondary }]}>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react';
+import { waitFor } from '@testing-library/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -17,8 +18,8 @@ describe('useCart', () => {
     const wrapper = ({ children }: any) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
-    const { result, waitFor } = renderHook(() => useCart(), { wrapper });
-    await waitFor(() => result.current.cart !== undefined);
+    const { result } = renderHook(() => useCart(), { wrapper });
+    await waitFor(() => expect(result.current.cart).toBeDefined());
     expect(result.current.cart).toEqual({ items: [], total: 0 });
   });
 });

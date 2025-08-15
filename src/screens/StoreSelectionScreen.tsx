@@ -12,7 +12,7 @@ import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
 import { useStore } from '../context/StoreContext';
 import { hapticMedium, hapticHeavy } from '../utils/haptic';
 import CustomAudioPlayer from '../components/CustomAudioPlayer';
-import illustration from '../assets/svg/illustration-no-nearby-stores.svg';
+import Illustration from '../assets/svg/illustration-no-nearby-stores.svg';
 
 interface ApiStore {
   id: string;
@@ -47,7 +47,7 @@ export default function StoreSelectionScreen() {
     try {
       const { coords } = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
-        timeout: 10000,
+        // timeout removed - implement manually if needed
       });
       const res = await phase4Client.get(
         `/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`
@@ -79,7 +79,9 @@ export default function StoreSelectionScreen() {
       <PermissionRationaleModal
         isVisible
         onConfirm={() => {
-          requestPermission().then(granted => granted && fetchStores());
+          requestPermission().then(granted => {
+            if (granted) fetchStores();
+          });
         }}
         onDeny={() => setPermission('denied')}
       />
@@ -90,7 +92,11 @@ export default function StoreSelectionScreen() {
     return (
       <LocationStatusDisplay
         status="denied"
-        onRetry={() => requestPermission().then(granted => granted && fetchStores())}
+        onRetry={() =>
+          requestPermission().then(granted => {
+            if (granted) fetchStores();
+          })
+        }
       />
     );
   }
@@ -105,7 +111,7 @@ export default function StoreSelectionScreen() {
       )}
       {!loading && stores && stores.length === 0 && (
         <View style={styles.emptyContainer}>
-          <Image source={illustration} style={styles.illustration} />
+          <Image source={Illustration} style={styles.illustration} />
           <Text style={styles.emptyText}>No nearby stores</Text>
           <CustomAudioPlayer source={require('../assets/audio/empty_state_sigh.mp3')} play />
           <Pressable onPress={() => navigation.navigate('StoreLocator')}>

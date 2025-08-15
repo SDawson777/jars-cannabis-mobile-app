@@ -91,7 +91,9 @@ export default function ShopScreen() {
   const handleProduct = (product: CMSProduct) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('ProductDetail', { slug: product.id });
+    navigation.navigate('ProductDetail', {
+      slug: (product as any)._id ?? (product as any).id ?? (product as any).slug,
+    });
   };
 
   return (
@@ -120,7 +122,7 @@ export default function ShopScreen() {
       ) : (
         <FlatList
           data={products}
-          keyExtractor={item => item._id || item.id}
+          keyExtractor={item => (item as any)._id ?? (item as any).id ?? (item as any).slug}
           numColumns={2}
           contentContainerStyle={styles.list}
           onEndReached={() => hasNextPage && fetchNextPage()}

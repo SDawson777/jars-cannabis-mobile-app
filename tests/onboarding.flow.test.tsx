@@ -4,6 +4,7 @@ import SplashScreenWrapper from '../src/screens/SplashScreenWrapper';
 import AgeVerification from '../src/screens/onboarding/AgeVerificationScreen';
 import * as SecureStore from 'expo-secure-store';
 import { NavigationContainer } from '@react-navigation/native';
+import LottieView from 'lottie-react-native';
 
 jest.mock('expo-secure-store');
 jest.mock('react-native-sound', () => jest.fn());
@@ -16,7 +17,7 @@ it('marks onboarding complete on splash finish', () => {
     </NavigationContainer>
   );
   act(() => {
-    tree.root.findByType('LottieView').props.onAnimationFinish();
+    tree.root.findByType(LottieView).props.onAnimationFinish();
   });
   expect(SecureStore.setItemAsync).toHaveBeenCalledWith('onboardingComplete', 'true');
 });

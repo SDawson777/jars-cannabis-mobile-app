@@ -8,10 +8,13 @@ import { PRIVACY_EXPORT_FORM } from '../constants/links';
 
 export default function PrivacyIntelligenceScreen() {
   const [enabled, setEnabled] = usePersonalization();
-  const { data } = useAuth();
+  const { currentUser } = useAuth();
 
   const handleDownload = async () => {
-    const url = PRIVACY_EXPORT_FORM.replace('{{EMAIL}}', encodeURIComponent(data?.email ?? ''));
+    const url = PRIVACY_EXPORT_FORM.replace(
+      '{{EMAIL}}',
+      encodeURIComponent(currentUser?.email ?? '')
+    );
     await WebBrowser.openBrowserAsync(url);
   };
 

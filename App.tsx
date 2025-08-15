@@ -153,14 +153,14 @@ function App() {
       } else {
         setNotificationsEnabled(false);
         Alert.alert('Notifications Disabled', 'Push notifications are turned off.', [
-          { text: 'OK', accessibilityLabel: 'notifications-disabled-ok' },
+          { text: 'OK' },
         ]);
       }
 
       const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
         const { title, body } = remoteMessage.notification || {};
         Alert.alert(title || 'Notification', body, [
-          { text: 'OK', accessibilityLabel: 'close-notification-alert' },
+          { text: 'OK' },
         ]);
       });
 
