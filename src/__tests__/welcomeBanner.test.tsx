@@ -1,13 +1,22 @@
+/* eslint-env jest, node */
+/* eslint-disable no-undef */
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import WelcomeBanner from '../components/WelcomeBanner';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { makeStore } from './testUtils';
 
-let preferredStore = makeStore();
-jest.mock('../context/StoreContext', () => ({
-  useStore: () => ({ preferredStore, setPreferredStore: jest.fn() }),
-}));
+jest.mock('../context/StoreContext', () => {
+  let preferredStore = makeStore();
+  const setPreferredStore = jest.fn();
+  return {
+    useStore: () => ({ preferredStore, setPreferredStore }),
+    __setPreferredStore: (store: any) => {
+      preferredStore = store;
+    },
+    setPreferredStore,
+  };
+});
 
 jest.mock('react-native', () => ({
   View: ({ children }: any) => <div>{children}</div>,
@@ -20,12 +29,14 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(() => Promise.resolve()),
 }));
 
+const { __setPreferredStore, setPreferredStore } = require('../context/StoreContext') as any;
+
 beforeEach(() => {
-  preferredStore = makeStore();
+  __setPreferredStore(makeStore());
+  setPreferredStore.mockReset();
 });
 
 it('shows default message when no promo', async () => {
-  preferredStore.promo = undefined;
   let tree: renderer.ReactTestRenderer | undefined;
   await act(async () => {
     tree = renderer.create(
@@ -41,7 +52,8 @@ it('shows default message when no promo', async () => {
 });
 
 it('shows store promo when available', async () => {
-  preferredStore = makeStore({ promo: '$10 Off Pickup Orders' });
+  const store = makeStore({ promo: '$10 Off Pickup Orders' });
+  __setPreferredStore(store);
   let tree: renderer.ReactTestRenderer | undefined;
   await act(async () => {
     tree = renderer.create(
@@ -53,7 +65,7 @@ it('shows store promo when available', async () => {
     );
   });
   const span = tree!.root.findByType('span');
-  expect(span.children[0]).toBe(`${preferredStore.name} Exclusive: ${preferredStore.promo}`);
+  expect(span.children[0]).toBe(`${store.name} Exclusive: ${store.promo}`);
 });
 
 it('shows loyalty banner callouts per tier', async () => {
