@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es2020",
     "module": "esnext",
     "lib": ["esnext", "dom"],
-    "jsx": "react-native",
+    "jsx": "react-jsx",
     "allowJs": true,
     "noEmit": true,
     "strict": true,
@@ -12,12 +12,13 @@
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "types": ["jest", "react", "react-native"],
     "baseUrl": ".",
     "paths": {
       "@server/*": ["server/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src", "app", "**/*.ts", "**/*.tsx"],
   "exclude": [
     "node_modules",
     "babel.config.js",
