@@ -19,7 +19,6 @@
       "resizeMode": "contain"
     },
     "plugins": [
-      "react-native-reanimated",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
       "@stripe/stripe-react-native"
