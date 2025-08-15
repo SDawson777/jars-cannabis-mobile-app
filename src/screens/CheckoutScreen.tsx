@@ -96,7 +96,6 @@ export default function CheckoutScreen() {
         paymentIntentClientSecret: params.paymentIntent,
         applePay: walletSupported
           ? {
-              merchantIdentifier: process.env.STRIPE_MERCHANT_ID || 'merchant.com.placeholder',
               merchantCountryCode: 'US',
             }
           : undefined,

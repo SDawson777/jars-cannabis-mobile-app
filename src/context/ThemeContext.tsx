@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
 import * as Location from 'expo-location';
 import { getLocales } from 'expo-localization';
-import { EXPO_PUBLIC_OPENWEATHER_KEY } from '@env';
+const EXPO_PUBLIC_OPENWEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_KEY as string;
 
 // Tuned threshold constants
 const COOL_THRESHOLD_METRIC = 12; // °C below which we consider it 'cool'
@@ -58,9 +58,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
         // Abort early if no API key provided
         if (!EXPO_PUBLIC_OPENWEATHER_KEY) {
-          console.warn(
-            'OpenWeather API key missing or invalid; using time-based theme.'
-          );
+          console.warn('OpenWeather API key missing or invalid; using time-based theme.');
           setColorTemp(temp);
           return;
         }

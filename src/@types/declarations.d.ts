@@ -9,3 +9,9 @@ declare function require(moduleName: string): any;
 declare module '*.png';
 declare module '*.jpg';
 declare module '*.jpeg';
+declare module '*.svg';
+declare module '@testing-library/react-native';
+declare module 'detox';
+declare module '@testing-library/react' {
+  export const waitFor: any;
+}

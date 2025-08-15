@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Pressable,
 } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { BounceIn } from 'react-native-reanimated';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/types';
 import { ThemeContext } from '../context/ThemeContext';
@@ -83,11 +83,7 @@ export default function ProductDetailScreen() {
           >
             <Text style={{ color: jarsPrimary }}>{v.name}</Text>
             <Text style={{ color: jarsSecondary }}>${v.price.toFixed(2)}</Text>
-            <Animated.Text
-              style={styles.stock}
-              key={`${v.id}-${v.stock}`}
-              entering={Animated.bounceIn}
-            >
+            <Animated.Text style={styles.stock} key={`${v.id}-${v.stock}`} entering={BounceIn}>
               {v.stock} in stock
             </Animated.Text>
             {v.stock > 0 && v.stock <= 5 && <StockAlert message="Low stock" />}

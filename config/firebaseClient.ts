@@ -1,13 +1,12 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import {
-  EXPO_PUBLIC_FIREBASE_API_KEY as apiKey,
-  EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN as authDomain,
-  EXPO_PUBLIC_FIREBASE_PROJECT_ID as projectId,
-  EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET as storageBucket,
-  EXPO_PUBLIC_FIREBASE_SENDER_ID as messagingSenderId,
-  EXPO_PUBLIC_FIREBASE_APP_ID as appId,
-  EXPO_PUBLIC_FIREBASE_MEASUREMENTID as measurementId,
-} from '@env';
+// import { API_KEY } from '@env';
+const apiKey = process.env.EXPO_PUBLIC_FIREBASE_API_KEY as string;
+const authDomain = process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN as string;
+const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID as string;
+const storageBucket = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET as string;
+const messagingSenderId = process.env.EXPO_PUBLIC_FIREBASE_SENDER_ID as string;
+const appId = process.env.EXPO_PUBLIC_FIREBASE_APP_ID as string;
+const measurementId = process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENTID as string;
 
 let app: FirebaseApp;
 

@@ -38,7 +38,7 @@ export default function EditProfileScreen() {
 
   const profile = route.params?.profile ?? {};
   const { control, handleSubmit } = useForm<ProfileFormValues>({
-    resolver: yupResolver(profileSchema),
+    resolver: yupResolver(profileSchema as any),
     defaultValues: {
       name: profile.name,
       email: profile.email,
@@ -141,7 +141,7 @@ export default function EditProfileScreen() {
 
         <Pressable
           style={[styles.saveBtn, { backgroundColor: jarsPrimary }, glowStyle]}
-          onPress={handleSubmit(onSave)}
+          onPress={handleSubmit(onSave as any)}
           accessibilityLabel="Save profile"
           accessibilityHint="Saves profile information"
         >
