@@ -25,5 +25,30 @@ jest.mock('react-native-reanimated', () => {
   return Reanimated;
 });
 
-// If your code uses expo-constants or other Expo libs, you can add light mocks here:
-// jest.mock('expo-constants', () => ({ default: { manifest: {} } }));
+// --- Native/Expo module mocks for Jest ---
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
+jest.mock('expo-haptics', () => ({
+  selectionAsync: jest.fn(),
+  impactAsync: jest.fn(),
+  notificationAsync: jest.fn(),
+  ImpactFeedbackStyle: { Light: 'Light', Medium: 'Medium', Heavy: 'Heavy' },
+  NotificationFeedbackType: { Success: 'Success', Warning: 'Warning', Error: 'Error' },
+}));
+
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn(async () => null),
+  setItemAsync: jest.fn(async () => {}),
+  deleteItemAsync: jest.fn(async () => {}),
+}));
+
+jest.mock('react-native-haptic-feedback', () => ({
+  __esModule: true,
+  default: { trigger: jest.fn() },
+}));
+
+jest.mock('@aws-amplify/analytics', () => ({
+  record: jest.fn(),
+}));

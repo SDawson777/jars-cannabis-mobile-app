@@ -1,12 +1,13 @@
+/* eslint-disable */
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import WelcomeBanner from '../components/WelcomeBanner';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { makeStore } from './testUtils';
 
-let preferredStore = makeStore();
+let mockPreferredStore = makeStore();
 jest.mock('../context/StoreContext', () => ({
-  useStore: () => ({ preferredStore, setPreferredStore: jest.fn() }),
+  useStore: () => ({ preferredStore: mockPreferredStore, setPreferredStore: jest.fn() }),
 }));
 
 jest.mock('react-native', () => ({
@@ -21,11 +22,11 @@ jest.mock('expo-secure-store', () => ({
 }));
 
 beforeEach(() => {
-  preferredStore = makeStore();
+  mockPreferredStore = makeStore();
 });
 
 it('shows default message when no promo', async () => {
-  preferredStore.promo = undefined;
+  mockPreferredStore.promo = undefined;
   let tree: renderer.ReactTestRenderer | undefined;
   await act(async () => {
     tree = renderer.create(
@@ -41,7 +42,7 @@ it('shows default message when no promo', async () => {
 });
 
 it('shows store promo when available', async () => {
-  preferredStore = makeStore({ promo: '$10 Off Pickup Orders' });
+  mockPreferredStore = makeStore({ promo: '$10 Off Pickup Orders' });
   let tree: renderer.ReactTestRenderer | undefined;
   await act(async () => {
     tree = renderer.create(
@@ -53,7 +54,9 @@ it('shows store promo when available', async () => {
     );
   });
   const span = tree!.root.findByType('span');
-  expect(span.children[0]).toBe(`${preferredStore.name} Exclusive: ${preferredStore.promo}`);
+  expect(span.children[0]).toBe(
+    `${mockPreferredStore.name} Exclusive: ${mockPreferredStore.promo}`
+  );
 });
 
 it('shows loyalty banner callouts per tier', async () => {

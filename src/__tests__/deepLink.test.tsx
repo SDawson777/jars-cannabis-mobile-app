@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react-native';
 
@@ -12,9 +13,9 @@ jest.mock('react-native', () => ({
 import useDeepLinkHandler from '../hooks/useDeepLinkHandler';
 import { makeStore } from './testUtils';
 
-const setPreferredStore = jest.fn();
+const mockSetPreferredStore = jest.fn();
 jest.mock('../context/StoreContext', () => ({
-  useStore: () => ({ setPreferredStore }),
+  useStore: () => ({ setPreferredStore: mockSetPreferredStore }),
   StoreProvider: ({ children }: any) => <>{children}</>,
 }));
 import { NavigationContainer } from '@react-navigation/native';
@@ -24,10 +25,10 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(() => Promise.resolve()),
 }));
 
-const navigate = jest.fn();
+const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
-  useNavigation: () => ({ navigate }),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }));
 
 test('deep link loads Shop with correct store', async () => {
@@ -36,5 +37,5 @@ test('deep link loads Shop with correct store', async () => {
   await act(async () => {
     renderHook(() => useDeepLinkHandler(stores), { wrapper });
   });
-  await waitFor(() => expect(setPreferredStore).toHaveBeenCalled());
+  await waitFor(() => expect(mockSetPreferredStore).toHaveBeenCalled());
 });

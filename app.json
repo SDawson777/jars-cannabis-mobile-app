@@ -22,7 +22,7 @@
       "react-native-reanimated",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
-      "@stripe/stripe-react-native"
+      ["@stripe/stripe-react-native", {}]
     ]
   }
 }
