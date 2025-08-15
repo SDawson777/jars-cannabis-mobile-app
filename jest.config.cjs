@@ -19,6 +19,9 @@ module.exports = {
   moduleNameMapper: {
     '\\.(svg)$': '<rootDir>/tests/__mocks__/svgMock.js',
     '\\.(png|jpg|jpeg|gif|webp)$': '<rootDir>/tests/__mocks__/svgMock.js',
+    '^expo$': '<rootDir>/tests/__mocks__/expo.js',
+    '^expo-linking$': '<rootDir>/tests/__mocks__/expo-linking.js',
+    '^expo-constants$': '<rootDir>/tests/__mocks__/expo-constants.js',
   },
   // Make sure TS/TSX are handled through Babel (via jest-expo preset)
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
