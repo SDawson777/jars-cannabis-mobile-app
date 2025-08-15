@@ -1,18 +1,18 @@
 import React, { createContext, ReactNode } from 'react';
-import { useLoyaltyStatus } from '../api/hooks/useLoyaltyStatus';
+import { useLoyaltyStatus, type LoyaltyStatus } from '../api/hooks/useLoyaltyStatus';
 
 interface LoyaltyContextValue {
-  data: any;
+  data: LoyaltyStatus | undefined;
   isLoading: boolean;
   isError: boolean;
-  error: unknown;
+  error: Error | null;
 }
 
 export const LoyaltyContext = createContext<LoyaltyContextValue>({
   data: undefined,
   isLoading: false,
   isError: false,
-  error: undefined,
+  error: null,
 });
 
 export function LoyaltyProvider({ children }: { children: ReactNode }) {

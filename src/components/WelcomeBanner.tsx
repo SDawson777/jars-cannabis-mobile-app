@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native'; // eslint-disable-line import/no-extraneous-dependencies
 import { useContext } from 'react';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { useStore } from '../context/StoreContext';
@@ -7,11 +7,11 @@ import { useStore } from '../context/StoreContext';
 export default function WelcomeBanner() {
   const { data } = useContext(LoyaltyContext);
   const { preferredStore } = useStore();
-  const loyaltyTier = data?.tier;
+  const loyaltyLevel = data?.level;
   const promo = preferredStore?.promo;
 
   let message = 'Welcome!';
-  if (loyaltyTier === 'Gold') {
+  if (loyaltyLevel === 'Gold') {
     message = 'Gold Tier Perk: Double Points This Week';
   } else if (promo && preferredStore?.name) {
     message = `${preferredStore.name} Exclusive: ${promo}`;
