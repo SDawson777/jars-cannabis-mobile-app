@@ -11,6 +11,9 @@ jest.mock('../src/api/phase4Client');
 const queryClient = new QueryClient();
 
 describe('useCart', () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+  });
   it('returns cached cart when offline', async () => {
     (NetInfo.fetch as jest.Mock).mockResolvedValue({ isConnected: false });
     await AsyncStorage.setItem('cart', JSON.stringify({ items: [], total: 0 }));
