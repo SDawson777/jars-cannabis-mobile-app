@@ -3,15 +3,9 @@ import { logEvent } from '../utils/analytics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 jest.mock('../utils/analytics');
-jest.mock('@react-native-async-storage/async-storage', () => {
-  let stored: Record<string, string | null> = {};
-  return {
-    getItem: jest.fn(key => Promise.resolve(stored[key] ?? null)),
-    setItem: jest.fn((key, value) => {
-      stored[key] = value;
-      return Promise.resolve();
-    }),
-  };
+
+beforeEach(async () => {
+  await AsyncStorage.clear();
 });
 
 test('proximity alerts log once per day', async () => {
