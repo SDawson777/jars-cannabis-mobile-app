@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react-native';
 
 jest.mock('react-native', () => ({
   Linking: {
