@@ -5,8 +5,10 @@ import renderer, { act } from 'react-test-renderer';
 import WelcomeBanner from '../components/WelcomeBanner';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { makeStore } from './testUtils';
+import * as SecureStore from 'expo-secure-store';
 
 jest.mock('../context/StoreContext', () => {
+  const { makeStore } = require('./testUtils');
   let preferredStore = makeStore();
   const setPreferredStore = jest.fn();
   return {
@@ -23,17 +25,15 @@ jest.mock('react-native', () => ({
   Text: ({ children }: any) => <span>{children}</span>,
   StyleSheet: { create: () => ({}) },
 }));
-jest.mock('expo-secure-store', () => ({
-  getItemAsync: jest.fn(() => Promise.resolve(null)),
-  setItemAsync: jest.fn(() => Promise.resolve()),
-  deleteItemAsync: jest.fn(() => Promise.resolve()),
-}));
 
 const { __setPreferredStore, setPreferredStore } = require('../context/StoreContext') as any;
 
 beforeEach(() => {
   __setPreferredStore(makeStore());
   setPreferredStore.mockReset();
+  SecureStore.getItemAsync.mockResolvedValue(null);
+  SecureStore.setItemAsync.mockResolvedValue(undefined);
+  SecureStore.deleteItemAsync.mockResolvedValue(undefined);
 });
 
 it('shows default message when no promo', async () => {

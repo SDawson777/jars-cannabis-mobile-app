@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react-native';
+import * as SecureStore from 'expo-secure-store';
 
 jest.mock('react-native', () => ({
   Linking: {
@@ -22,21 +23,21 @@ jest.mock('../context/StoreContext', () => {
 import useDeepLinkHandler from '../hooks/useDeepLinkHandler';
 import { makeStore } from './testUtils';
 import { NavigationContainer } from '@react-navigation/native';
-jest.mock('expo-secure-store', () => ({
-  getItemAsync: jest.fn(() => Promise.resolve(null)),
-  setItemAsync: jest.fn(() => Promise.resolve()),
-  deleteItemAsync: jest.fn(() => Promise.resolve()),
-}));
 
 const { setPreferredStore } = require('../context/StoreContext') as any;
-const navigate = jest.fn();
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useNavigation: () => ({ navigate }),
-}));
+jest.mock('@react-navigation/native', () => {
+  const actual = jest.requireActual('@react-navigation/native');
+  return {
+    ...actual,
+    useNavigation: () => ({ navigate: jest.fn() }),
+  };
+});
 
 beforeEach(() => {
   setPreferredStore.mockReset();
+  SecureStore.getItemAsync.mockResolvedValue(null);
+  SecureStore.setItemAsync.mockResolvedValue(undefined);
+  SecureStore.deleteItemAsync.mockResolvedValue(undefined);
 });
 
 test('deep link loads Shop with correct store', async () => {
