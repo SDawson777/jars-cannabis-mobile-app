@@ -12,7 +12,9 @@ const candidates = [
 
 for (const p of candidates) {
   if (fs.existsSync(p)) {
-    console.log('[start] launching', p);
+    if (process.env.DEBUG === 'true') {
+      console.debug('[start] launching', p);
+    }
     require(p);
     process.once('uncaughtException', e => console.error('[start] uncaught:', e));
     process.once('unhandledRejection', e => console.error('[start] unhandled:', e));

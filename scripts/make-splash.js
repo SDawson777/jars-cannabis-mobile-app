@@ -6,4 +6,6 @@ fs.mkdirSync(dir, { recursive: true });
 const b64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottQAAAABJRU5ErkJggg==';
 fs.writeFileSync(path.join(dir, 'jars_splash_static.png'), Buffer.from(b64, 'base64'));
-console.log('✓ wrote assets/splash/jars_splash_static.png');
+if (process.env.DEBUG === 'true') {
+  console.debug('✓ wrote assets/splash/jars_splash_static.png');
+}

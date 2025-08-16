@@ -73,7 +73,9 @@ update: { title: 'FAQ', body: 'Frequently asked questions...' },
 create: { type: ContentType.faq, locale: 'en-US', slug: 'general', title: 'FAQ', body: 'Frequently asked questions...' },
 });
 
-console.log('Seed done');
+  if (process.env.DEBUG === 'true') {
+    console.debug('Seed done');
+  }
 }
 
 main().finally(() => prisma.$disconnect());

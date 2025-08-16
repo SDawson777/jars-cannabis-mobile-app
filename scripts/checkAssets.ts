@@ -22,5 +22,7 @@ if (missing.length) {
   console.error('\nAdd the files above to /assets before shipping.\n');
   process.exit(1);
 } else {
-  console.log('\u2705  All spec assets are present. Good to go!');
+  if (process.env.DEBUG === 'true') {
+    console.debug('\u2705  All spec assets are present. Good to go!');
+  }
 }

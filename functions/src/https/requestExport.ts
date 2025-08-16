@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions';
+import { logger } from '../logger';
 
 export const requestExport = functions.https.onRequest(async (req, res) => {
   const uid = req.query.uid as string;
-  console.log('Export requested for', uid);
+  logger.debug('Export requested for', uid);
   res.json({ status: 'started' });
 });

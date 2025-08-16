@@ -28,8 +28,15 @@ Sentry.init({
   environment: __DEV__ ? 'development' : 'production',
 });
 
+const DEBUG = process.env.EXPO_PUBLIC_DEBUG === 'true';
+const debugLog = (...args: any[]) => {
+  if (DEBUG) {
+    console.debug(...args);
+  }
+};
+
 messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('Message handled in the background!', remoteMessage);
+  debugLog('Message handled in the background!', remoteMessage);
 });
 
 const TOKEN_SYNC_KEY = 'pendingFcmToken';
@@ -148,7 +155,7 @@ function App() {
 
       if (enabled) {
         const token = await messaging().getToken();
-        console.log('FCM Token:', token);
+        debugLog('FCM Token:', token);
         await syncTokenToBackend(token);
       } else {
         setNotificationsEnabled(false);
@@ -165,12 +172,12 @@ function App() {
       });
 
       const unsubscribeOnNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
-        console.log('Notification opened app:', remoteMessage.notification);
+        debugLog('Notification opened app:', remoteMessage.notification);
       });
 
       const initialMessage = await messaging().getInitialNotification();
       if (initialMessage) {
-        console.log('App opened from quit state:', initialMessage.notification);
+        debugLog('App opened from quit state:', initialMessage.notification);
       }
 
       return () => {

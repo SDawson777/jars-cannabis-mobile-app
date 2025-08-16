@@ -25,4 +25,6 @@ execSync('firebase firestore:rules:test', { stdio: 'inherit' });
 // 4. Emulators smoke-test
 execSync('npm run test:e2e:firebase', { stdio: 'inherit' });
 
-console.log('✅ Firebase setup looks solid.');
+if (process.env.DEBUG === 'true') {
+  console.debug('✅ Firebase setup looks solid.');
+}
