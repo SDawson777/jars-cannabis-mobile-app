@@ -8,6 +8,9 @@ yarn.lock
 # Expo
 .expo/
 .expo-shared/
+web-build/
+android/
+ios/
 
 # macOS
 .DS_Store
