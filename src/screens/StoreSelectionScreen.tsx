@@ -12,7 +12,7 @@ import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
 import { useStore } from '../context/StoreContext';
 import { hapticMedium, hapticHeavy } from '../utils/haptic';
 import CustomAudioPlayer from '../components/CustomAudioPlayer';
-import Illustration from '../assets/svg/illustration-no-nearby-stores.svg';
+import Illustration from '../../assets/svg/illustration-no-nearby-stores.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onProximityAlert } from '../../tasks/locationWatcher';
 
@@ -154,7 +154,7 @@ export default function StoreSelectionScreen() {
         <View style={styles.emptyContainer}>
           <Image source={Illustration} style={styles.illustration} />
           <Text style={styles.emptyText}>No nearby stores</Text>
-          <CustomAudioPlayer source={require('../assets/audio/empty_state_sigh.mp3')} play />
+          <CustomAudioPlayer source={require('../../assets/audio/empty_state_sigh.mp3')} play />
           <Pressable onPress={() => navigation.navigate('StoreLocator')}>
             <Text style={styles.link}>Search All Locations</Text>
           </Pressable>

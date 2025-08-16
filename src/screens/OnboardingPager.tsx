@@ -28,7 +28,7 @@ const slides = [
   {
     headline: 'Safe & Seamless Access',
     benefitText: 'Log in securely with Face ID, Touch ID, or a PIN – your privacy, protected.',
-    illustration: require('../assets/illustrations/illustration-biometrics-secure.svg'),
+    illustration: require('../../assets/illustrations/illustration-biometrics-secure.svg'),
   },
 ];
 
