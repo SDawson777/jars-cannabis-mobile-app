@@ -4,12 +4,12 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist",
   "env": {
-    "EXPO_PUBLIC_API_BASE_URL": "https://api.example.com"
+    "EXPO_PUBLIC_API_BASE_URL": "https://api.jarscannabis.com"
   },
   "rewrites": [
     {
       "source": "/api/v1/(.*)",
-      "destination": "https://api.example.com/api/v1/$1"
+      "destination": "https://api.jarscannabis.com/api/v1/$1"
     }
   ]
 }
