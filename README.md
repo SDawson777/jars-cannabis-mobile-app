@@ -115,35 +115,33 @@ Add env vars (SENTRY_DSN, etc.)
 
 Deploy
 
-Vercel (Frontend only)
+### Vercel (Frontend only)
 
-Deploy Expo web or static frontend (does not run Express backend).
+Deploy the Expo web or static frontend. This does not run the Express backend—just connect the repository and use Vercel's default build settings.
 
-Just connect repo, use default build settings.
+#### Environment Variables
 
-⚙️ Environment Variables
+Backend (`backend/.env`; see `backend/.env.example` for defaults):
 
-Backend (/backend/.env – see /backend/.env.example for defaults):
-
+```env
 # Sentry DSN (error monitoring)
-
 SENTRY_DSN=your-sentry-dsn
 
 # Node environment
-
 NODE_ENV=development
 
 # Port (optional, defaults to 3000)
-
 PORT=3000
 
 # Database (optional, if using Prisma/Postgres)
-
 DATABASE_URL=your-postgres-url
+```
 
-Frontend (/.env):
+Frontend (`.env`):
 
+```env
 EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
+```
 
 ## Sentry Setup
 
@@ -194,23 +192,21 @@ Sentry: error monitoring (just set your DSN in .env)
 
 📦 Project Structure
 
+```plaintext
 jars-cannabis-mobile-app/
-backend/ # Node.js/Express/Prisma backend
-src/
-.env.example
-...
-src/ # React Native app source
-screens/
-context/
-navigation/
-...
-App.js # Expo/React Native entry
-package.json
-README.md
+├─ backend/            # Node.js/Express/Prisma backend
+├─ src/                # React Native app source
+│  ├─ screens/
+│  ├─ context/
+│  └─ navigation/
+├─ App.js              # Expo/React Native entry
+├─ package.json
+└─ README.md
+```
 
 🙋 FAQ
 
-Where do I set my Sentry DSN?Add to /backend/.env as SENTRY_DSN=...
+Where do I set my Sentry DSN? Add to `backend/.env` as `SENTRY_DSN=<your-sentry-dsn>`.
 
 How do I deploy the backend?See Backend Deployment (Cloud) above.
 
