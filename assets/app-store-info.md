@@ -6,7 +6,7 @@
 
 ## Support URL
 
-- https://example.com/support
+- https://help.jarsapp.com
 
 ## Compliance Info
 
@@ -14,4 +14,4 @@
 
 ## License Number
 
-- TBD
+- AU-R-000239
