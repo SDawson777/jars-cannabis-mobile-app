@@ -319,3 +319,11 @@ npx expo run:android   # or npx expo run:ios
 - Preferences: `GET/PUT /profile/preferences`
 - Awards: `GET /awards/status`
 - Webhooks: `POST /webhook/stripe` (order status notifications)
+
+## Contributing
+
+We welcome improvements and bug fixes. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow, coding standards, and test instructions.
+
+## Code of Conduct
+
+Please read and follow our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) to help us maintain a respectful community.
