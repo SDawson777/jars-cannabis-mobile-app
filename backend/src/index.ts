@@ -18,6 +18,7 @@ import { arRouter } from './routes/ar';
 import { qaRouter } from './routes/qa';
 import { homeRouter } from './routes/home';
 import { initFirebase } from './bootstrap/firebase-admin';
+import { logger } from './utils/logger';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -27,7 +28,7 @@ app.use(cors({ origin: (process.env.CORS_ORIGIN?.split(',') as any) || '*' }));
 app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
 
 try { initFirebase(); } catch (e) {
-  console.log('Firebase init skipped:', (e as any)?.message);
+  logger.debug('Firebase init skipped:', (e as any)?.message);
 }
 
 app.use('/api/v1', authRouter);
@@ -53,4 +54,4 @@ app.use((err: any, _req: any, res: any, _next: any) => {
 });
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`🚀 Backend listening on http://localhost:${port}`));
+app.listen(port, () => logger.debug(`🚀 Backend listening on http://localhost:${port}`));
