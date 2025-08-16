@@ -1,8 +1,10 @@
+/* eslint-env node */
+/* eslint-disable no-undef */
 import { expectedAssets } from './expectedAssets';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
-const ASSETS_DIR = join(__dirname, '..', 'src', 'assets');
+const ASSETS_DIR = join(__dirname, '..', 'assets');
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap(name => {
