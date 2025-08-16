@@ -220,6 +220,8 @@ How do I add environment variables in production?Use your platform’s UI (Railw
 
 🤝 Buyer Information & Support
 
+See [docs/buyer-setup.md](docs/buyer-setup.md) for configuring credentials and running production builds.
+
 Licensing & Transfer:
 
 You receive full ownership and source code on sale/transfer.
@@ -298,7 +300,7 @@ npx expo run:android   # or npx expo run:ios
    - Place `google-services.json` in `android/app`.
    - Place `GoogleService-Info.plist` in the iOS project. The repo contains a
      placeholder with dummy keys; download the real file from the Firebase
-     console (Project settings → *General* → *Your apps*) or request it from a
+     console (Project settings → _General_ → _Your apps_) or request it from a
      maintainer and keep it out of version control. If a real key was
      previously committed, rotate it in the Firebase console.
 2. **iOS:** Enable Push Notifications and Background Modes (Remote notifications) in Xcode. Upload your APNs key to Firebase.
