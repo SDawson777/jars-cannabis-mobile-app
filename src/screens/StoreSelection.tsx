@@ -1,5 +1,6 @@
 // src/screens/StoreSelection.tsx
 import React, { useEffect, useContext, useState } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   SafeAreaView,
   Text,
@@ -13,7 +14,6 @@ import {
   Image,
 } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
-import { ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
@@ -59,14 +59,14 @@ export default function StoreSelection() {
       setIsLoadingStores(true);
       const { coords } = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
-        timeout: 10000,
       });
-      const res = await fetch(
+      const res = await globalThis.fetch(
         `/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`
       );
       const json = await res.json();
       setStores(json?.stores || []);
     } catch (e) {
+      globalThis.console.error(e);
       setLocationError('Could not fetch stores');
     } finally {
       setIsLoadingStores(false);
