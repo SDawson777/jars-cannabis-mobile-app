@@ -13,6 +13,8 @@ import { useStore } from '../context/StoreContext';
 import { hapticMedium, hapticHeavy } from '../utils/haptic';
 import CustomAudioPlayer from '../components/CustomAudioPlayer';
 import Illustration from '../assets/svg/illustration-no-nearby-stores.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { onProximityAlert } from '../../tasks/locationWatcher';
 
 interface ApiStore {
   id: string;
@@ -21,6 +23,29 @@ interface ApiStore {
   latitude: number;
   longitude: number;
 }
+
+const PROXIMITY_RADIUS_METERS = 100;
+
+const toRad = (value: number) => (value * Math.PI) / 180;
+
+const getDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+) => {
+  const R = 6371e3;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'StoreSelection'>;
 
@@ -52,8 +77,24 @@ export default function StoreSelectionScreen() {
       const res = await phase4Client.get(
         `/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`
       );
-      setStores(res.data?.stores || []);
+      const fetchedStores: ApiStore[] = res.data?.stores || [];
+      setStores(fetchedStores);
       hapticMedium();
+
+      const alertsEnabled = (await AsyncStorage.getItem('visitAlerts')) === 'true';
+      if (alertsEnabled) {
+        for (const s of fetchedStores) {
+          const distance = getDistance(
+            coords.latitude,
+            coords.longitude,
+            s.latitude,
+            s.longitude
+          );
+          if (distance <= PROXIMITY_RADIUS_METERS) {
+            await onProximityAlert(s.id, distance);
+          }
+        }
+      }
     } catch (e) {
       setError('Failed to load stores');
       hapticHeavy();
