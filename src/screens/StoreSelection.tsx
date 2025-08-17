@@ -1,6 +1,5 @@
 // src/screens/StoreSelection.tsx
 import React, { useEffect, useContext, useState } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   SafeAreaView,
   Text,
