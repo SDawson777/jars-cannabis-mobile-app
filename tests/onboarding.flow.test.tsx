@@ -1,10 +1,11 @@
+import { NavigationContainer } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
+import LottieView from 'lottie-react-native';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
+
 import SplashScreenWrapper from '../src/screens/SplashScreenWrapper';
 import AgeVerification from '../src/screens/onboarding/AgeVerificationScreen';
-import * as SecureStore from 'expo-secure-store';
-import { NavigationContainer } from '@react-navigation/native';
-import LottieView from 'lottie-react-native';
 
 jest.mock('react-native-sound', () => jest.fn());
 

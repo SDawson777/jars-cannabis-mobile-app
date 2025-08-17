@@ -1,8 +1,9 @@
-import React from 'react';
-import { renderHook, waitFor } from '@testing-library/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react-native';
+import React from 'react';
+
 import { useCart } from '../src/hooks/useCart';
 
 jest.mock('@react-native-community/netinfo');
