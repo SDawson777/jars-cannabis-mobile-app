@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native'; // eslint-disable-line import/no-extraneous-dependencies
+import { View, Text, StyleSheet } from 'react-native';
 import { useContext } from 'react';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { useStore } from '../context/StoreContext';
