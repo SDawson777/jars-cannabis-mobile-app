@@ -7,6 +7,7 @@ const reactNative = require('eslint-plugin-react-native');
 const importPlugin = require('eslint-plugin-import');
 const jest = require('eslint-plugin-jest');
 const testingLibrary = require('eslint-plugin-testing-library');
+const globals = require('globals');
 
 module.exports = [
   js.configs.recommended,
@@ -61,15 +62,8 @@ module.exports = [
     },
     languageOptions: {
       globals: {
-        jest: 'readonly',
-        describe: 'readonly',
-        test: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
+        ...globals.jest,
+        ...globals.node,
       },
     },
     rules: {
