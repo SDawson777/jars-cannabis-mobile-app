@@ -21,9 +21,9 @@ if [ -f "backend/prisma/schema.prisma" ]; then
   || echo "⚠️ Prisma generate skipped (no engine download available)"
 fi
 
-echo "🧹 Lint/format (non-blocking)…"
-npm run lint --if-present || true
-npm run format --if-present || true
+echo "🧹 Lint/format…"
+npm run lint --if-present
+npm run format --if-present
 
 echo "🏗️ Building…"
 npm run build
