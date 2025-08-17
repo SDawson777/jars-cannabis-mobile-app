@@ -1,5 +1,4 @@
 /* eslint-env jest, node */
-/* eslint-disable no-undef */
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
