@@ -1,23 +1,25 @@
 import 'dotenv/config';
-import express from 'express';
+
 import cors from 'cors';
+import express from 'express';
 import helmet from 'helmet';
-import { authRouter } from './routes/auth';
-import { profileRouter } from './routes/profile';
-import { storesRouter } from './routes/stores';
-import { productsRouter } from './routes/products';
-import { cartRouter } from './routes/cart';
-import { ordersRouter } from './routes/orders';
-import { contentRouter } from './routes/content';
-import { loyaltyRouter } from './routes/loyalty';
-import { journalRouter } from './routes/journal';
-import { recommendationsRouter } from './routes/recommendations';
-import { dataRouter } from './routes/data';
-import { conciergeRouter } from './routes/concierge';
-import { arRouter } from './routes/ar';
-import { qaRouter } from './routes/qa';
-import { homeRouter } from './routes/home';
+
 import { initFirebase } from './bootstrap/firebase-admin';
+import { arRouter } from './routes/ar';
+import { authRouter } from './routes/auth';
+import { cartRouter } from './routes/cart';
+import { conciergeRouter } from './routes/concierge';
+import { contentRouter } from './routes/content';
+import { dataRouter } from './routes/data';
+import { homeRouter } from './routes/home';
+import { journalRouter } from './routes/journal';
+import { loyaltyRouter } from './routes/loyalty';
+import { ordersRouter } from './routes/orders';
+import { productsRouter } from './routes/products';
+import { profileRouter } from './routes/profile';
+import { qaRouter } from './routes/qa';
+import { recommendationsRouter } from './routes/recommendations';
+import { storesRouter } from './routes/stores';
 import { logger } from './utils/logger';
 
 const app = express();
