@@ -1,13 +1,28 @@
 // src/App.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import messaging from '@react-native-firebase/messaging';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as Sentry from '@sentry/react-native';
-import { StripeProvider } from '@stripe/stripe-react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, Text, View, Platform } from 'react-native';
+
+// Sentry dynamic import to avoid issues on web
+let Sentry: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  Sentry = require('@sentry/react-native');
+} catch (_e) {
+  Sentry = { init: () => {}, wrap: (Comp: any) => Comp };
+}
+
+// Stripe Provider: use real provider on native, no-op wrapper on web
+let StripeProviderComp: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  StripeProviderComp = require('@stripe/stripe-react-native').StripeProvider;
+} catch (_e) {
+  StripeProviderComp = ({ children }: any) => <>{children}</>;
+}
 
 import ErrorBoundary from './src/components/ErrorBoundary';
 import OfflineNotice from './src/components/OfflineNotice';
@@ -88,9 +103,15 @@ const debugLog = (...args: any[]) => {
   }
 };
 
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  debugLog('Message handled in the background!', remoteMessage);
-});
+// Firebase Messaging: only initialize on native platforms
+const isWeb = Platform.OS === 'web';
+if (!isWeb) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const messaging = require('@react-native-firebase/messaging').default;
+  messaging().setBackgroundMessageHandler(async (remoteMessage: any) => {
+    debugLog('Message handled in the background!', remoteMessage);
+  });
+}
 
 const TOKEN_SYNC_KEY = 'pendingFcmToken';
 
@@ -148,7 +169,14 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (isWeb) {
+      setNotificationsEnabled(false);
+      return;
+    }
+
     const initMessaging = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const messaging = require('@react-native-firebase/messaging').default;
       const authStatus = await messaging().requestPermission();
       const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -165,14 +193,14 @@ function App() {
         ]);
       }
 
-      const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+      const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage: any) => {
         const { title, body } = remoteMessage.notification || {};
         Alert.alert(title || 'Notification', body, [
           { text: 'OK' },
         ]);
       });
 
-      const unsubscribeOnNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
+      const unsubscribeOnNotificationOpened = messaging().onNotificationOpenedApp((remoteMessage: any) => {
         debugLog('Notification opened app:', remoteMessage.notification);
       });
 
@@ -194,7 +222,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <StripeProvider
+      <StripeProviderComp
         publishableKey={process.env.STRIPE_PUBLISHABLE_KEY || ''}
         merchantIdentifier={process.env.STRIPE_MERCHANT_ID || 'merchant.com.placeholder'}
       >
@@ -301,7 +329,7 @@ function App() {
             </ThemeProvider>
           </LoyaltyProvider>
         </StoreProvider>
-      </StripeProvider>
+      </StripeProviderComp>
     </ErrorBoundary>
   );
 }

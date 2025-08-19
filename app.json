@@ -18,10 +18,6 @@
       "image": "./assets/splash/jars_splash_static.png",
       "resizeMode": "contain"
     },
-    "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/messaging",
-      "@stripe/stripe-react-native"
-    ]
+    "plugins": []
   }
 }
