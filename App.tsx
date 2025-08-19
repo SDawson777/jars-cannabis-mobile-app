@@ -41,6 +41,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import JournalEntryScreen from './src/screens/JournalEntryScreen';
 import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
 import LoginScreen from './src/screens/LoginScreen';
+import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginSignUpDecisionScreen from './src/screens/LoginSignUpDecisionScreen';
 import LoyaltyProgramDetailsScreen from './src/screens/LoyaltyProgramDetailsScreen';
 import MyJarsInsightsScreen from './src/screens/MyJarsInsightsScreen';
@@ -119,11 +120,13 @@ const syncTokenToBackend = async (token: string, attempt = 0): Promise<void> => 
   }
 };
 
-const Stack = createNativeStackNavigator(); // no generic
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const queryClient = new QueryClient();
 
 function App() {
-  const [initialRoute, setInitialRoute] = useState('SplashScreen');
+  const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | undefined>(
+    undefined
+  );
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
