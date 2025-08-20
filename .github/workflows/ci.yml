@@ -8,8 +8,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -28,7 +28,7 @@ jobs:
             echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
             exit 1
           fi
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - name: Prisma Generate
         run: npm run --prefix backend generate
       - run: npm run lint
@@ -36,8 +36,8 @@ jobs:
   typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -56,14 +56,14 @@ jobs:
             echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
             exit 1
           fi
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run typecheck
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -82,5 +82,5 @@ jobs:
             echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
             exit 1
           fi
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm test

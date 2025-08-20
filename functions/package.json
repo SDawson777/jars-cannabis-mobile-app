@@ -1,7 +1,8 @@
 {
   "name": "functions",
   "engines": {
-    "node": "18"
+    "node": ">=18 <=22",
+    "npm": ">=9"
   },
   "main": "lib/index.js",
   "scripts": {

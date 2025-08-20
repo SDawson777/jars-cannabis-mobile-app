@@ -4,7 +4,8 @@
   "description": "Express + Firestore backend for JARS Phase 4",
   "main": "dist/index.js",
   "engines": {
-    "node": ">=18 <=22"
+    "node": ">=18 <=22",
+    "npm": ">=9"
   },
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec \"ts-node --project tsconfig.json src/index.ts\"",
