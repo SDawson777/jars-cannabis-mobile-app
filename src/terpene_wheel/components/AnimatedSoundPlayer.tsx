@@ -1,5 +1,5 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Audio } from 'expo-av';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 export interface AnimatedSoundPlayerHandle {
   play: () => Promise<void>;

@@ -1,10 +1,12 @@
 /* eslint-env jest, node */
+import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
+
 import WelcomeBanner from '../components/WelcomeBanner';
 import { LoyaltyContext } from '../context/LoyaltyContext';
+
 import { makeStore } from './testUtils';
-import * as SecureStore from 'expo-secure-store';
 
 jest.mock('../context/StoreContext', () => {
   const { makeStore } = require('./testUtils');

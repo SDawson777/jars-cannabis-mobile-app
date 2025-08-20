@@ -1,4 +1,6 @@
 // src/screens/SplashScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useContext, useRef } from 'react';
 import {
   SafeAreaView,
@@ -9,10 +11,9 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android

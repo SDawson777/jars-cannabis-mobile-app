@@ -1,5 +1,6 @@
 // Custom Expo Webpack config to alias native modules to web shims for demo.
 const path = require('path');
+
 const createExpoWebpackConfigAsync = require('@expo/webpack-config');
 
 module.exports = async function (env, argv) {

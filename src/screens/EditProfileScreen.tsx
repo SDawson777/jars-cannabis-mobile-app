@@ -1,5 +1,10 @@
 // src/screens/EditProfileScreen.tsx
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -12,17 +17,14 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight, hapticMedium } from '../utils/haptic';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { profileSchema, ProfileFormValues } from './account/profileSchema';
+
 import { useUpdateUserProfile } from '../api/hooks/useUpdateUserProfile';
+import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
+
+import { profileSchema, ProfileFormValues } from './account/profileSchema';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

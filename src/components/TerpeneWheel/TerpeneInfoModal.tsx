@@ -1,6 +1,7 @@
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+
 import type { TerpeneInfo } from '../../terpene_wheel/data/terpenes';
 
 interface Props {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Pressable, Text, StyleSheet, TextInput } from 'react-native';
 
 interface Props {
-  onNext: (method: { type: 'pickup' | 'delivery'; address?: string }) => void;
+  onNext: (_method: { type: 'pickup' | 'delivery'; address?: string }) => void;
 }
 
 export default function DeliveryMethodScreen({ onNext }: Props) {

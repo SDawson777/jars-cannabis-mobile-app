@@ -1,4 +1,7 @@
 // src/screens/SignUpScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -11,15 +14,13 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Eye, EyeOff } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
-import { logEvent } from '../utils/analytics';
+
 import PasswordStrengthBar from '../components/PasswordStrengthBar';
+import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
+import type { RootStackParamList } from '../navigation/types';
+import { logEvent } from '../utils/analytics';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -32,7 +33,7 @@ export default function SignUpScreen() {
   const navigation = useNavigation<SignUpNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const { signUp } = useAuth();
-  const [loading, setLoading] = useState(false);
+
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -77,7 +78,6 @@ export default function SignUpScreen() {
       return;
     }
     try {
-      setLoading(true);
       await signUp({ name, email, phone, password });
       logEvent('signup_success', {});
       hapticMedium();
@@ -85,8 +85,6 @@ export default function SignUpScreen() {
     } catch (err: any) {
       hapticHeavy();
       console.warn(err);
-    } finally {
-      setLoading(false);
     }
   };
 

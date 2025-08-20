@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import ProductCardMini from './ProductCardMini';
+
 import type { ForYouTodayPayload } from '../@types/personalization';
+
+import ProductCardMini from './ProductCardMini';
 
 interface Props {
   data: ForYouTodayPayload;
-  onSelectProduct: (id: string) => void;
+  onSelectProduct: (_id: string) => void;
   onSeeAll?: () => void;
 }
 

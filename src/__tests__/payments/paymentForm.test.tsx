@@ -1,8 +1,9 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AddPaymentScreen from '../../screens/AddPaymentScreen';
+
 import { addPaymentMethod } from '../../clients/paymentClient';
+import AddPaymentScreen from '../../screens/AddPaymentScreen';
 import { toast } from '../../utils/toast';
 
 jest.mock('react-native', () => {

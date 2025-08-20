@@ -1,4 +1,5 @@
 import type { FAQItem } from '../types/cmsExtra';
+
 import { useCMSContent } from './useCMSContent';
 
 export function useFAQQuery() {

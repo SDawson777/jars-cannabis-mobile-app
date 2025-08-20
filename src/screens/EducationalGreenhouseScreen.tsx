@@ -1,4 +1,7 @@
 // src/screens/EducationalGreenhouseScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -11,17 +14,15 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft, ChevronRight } from 'lucide-react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight } from '../utils/haptic';
-import { useArticlesQuery } from '../hooks/useArticles';
+
 import ArticlePreviewCard from '../components/ArticlePreviewCard';
 import ArticleSkeletonCard from '../components/ArticleSkeletonCard';
 import PreviewBadge from '../components/PreviewBadge';
 import { useCMSPreview } from '../context/CMSPreviewContext';
+import { ThemeContext } from '../context/ThemeContext';
+import { useArticlesQuery } from '../hooks/useArticles';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

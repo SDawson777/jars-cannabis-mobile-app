@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+
 import { ThemeContext } from '../../context/ThemeContext';
 import type { TerpeneInfo } from '../data/terpenes';
 
@@ -10,7 +11,7 @@ interface Props {
 }
 
 export const TerpeneInfoModal: React.FC<Props> = ({ terpene, visible, onClose }) => {
-  const { jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { jarsPrimary, jarsBackground } = useContext(ThemeContext);
 
   if (!terpene) return null;
 

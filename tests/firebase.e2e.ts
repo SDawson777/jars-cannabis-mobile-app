@@ -1,8 +1,9 @@
-import admin from '../server/firebaseAdmin';
+import axios from 'axios';
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator, doc, setDoc, getDoc } from 'firebase/firestore';
-import axios from 'axios';
+
+import admin from '../server/firebaseAdmin';
 
 declare const process: { env: Record<string, string> };
 

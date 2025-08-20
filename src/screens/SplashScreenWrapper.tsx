@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import LottieView from 'lottie-react-native';
-import HapticFeedback from 'react-native-haptic-feedback';
-import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as SecureStore from 'expo-secure-store';
+import LottieView from 'lottie-react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import HapticFeedback from 'react-native-haptic-feedback';
+
 import type { RootStackParamList } from '../navigation/types';
 
 export default function SplashScreenWrapper() {

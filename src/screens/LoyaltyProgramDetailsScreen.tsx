@@ -1,4 +1,7 @@
 // src/screens/LoyaltyProgramDetailsScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useContext, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -12,14 +15,12 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ThemeContext } from '../context/ThemeContext';
-import { LoyaltyContext } from '../context/LoyaltyContext';
-import { hapticLight } from '../utils/haptic';
-import PointsProgressBar from '../components/PointsProgressBar';
+
 import { phase4Client } from '../api/phase4Client';
+import PointsProgressBar from '../components/PointsProgressBar';
+import { LoyaltyContext } from '../context/LoyaltyContext';
+import { ThemeContext } from '../context/ThemeContext';
+import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

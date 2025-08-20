@@ -1,12 +1,14 @@
-import React, { useContext, useState } from 'react';
-import { SafeAreaView, View, Text, Pressable, StyleSheet, Modal, ScrollView } from 'react-native';
-import { ThemeContext } from '../../context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../navigation/types';
-import LegalDisclaimerModal from '../../components/LegalDisclaimerModal';
-import { hapticLight } from '../../utils/haptic';
 import { ChevronLeft } from 'lucide-react-native';
+import React, { useContext, useState } from 'react';
+import { SafeAreaView, View, Text, Pressable, StyleSheet, Modal, ScrollView } from 'react-native';
+
+import LegalDisclaimerModal from '../../components/LegalDisclaimerModal';
+import { ThemeContext } from '../../context/ThemeContext';
+import type { RootStackParamList } from '../../navigation/types';
+import { hapticLight } from '../../utils/haptic';
+
 
 type NavProp = NativeStackNavigationProp<RootStackParamList, 'Legal'>;
 

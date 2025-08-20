@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { phase4Client } from '../phase4Client';
+
 import { toast } from '../../utils/toast';
+import { phase4Client } from '../phase4Client';
 
 export interface PrivacyPreferences {
   highContrast: boolean;

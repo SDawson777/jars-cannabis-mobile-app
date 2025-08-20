@@ -1,18 +1,19 @@
-import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
+import { create } from 'zustand';
+
 import type { StoreData } from '../@types/store';
 
 interface PreferredStoreState {
   preferredStore?: StoreData;
-  setPreferredStore: (store: StoreData) => void;
+  setPreferredStore: (_store: StoreData) => void;
   hydrate: () => Promise<void>;
 }
 
 export const usePreferredStore = create<PreferredStoreState>(set => ({
   preferredStore: undefined,
-  setPreferredStore: store => {
-    set({ preferredStore: store });
-    SecureStore.setItemAsync('preferredStore', JSON.stringify(store)).catch(() => {});
+  setPreferredStore: _store => {
+    set({ preferredStore: _store });
+    SecureStore.setItemAsync('preferredStore', JSON.stringify(_store)).catch(() => {});
   },
   hydrate: async () => {
     try {

@@ -1,4 +1,16 @@
 // src/screens/HomeScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  MapPin,
+  ChevronDown,
+  Search,
+  Heart,
+  ShoppingCart,
+  User,
+  Home,
+  Menu,
+} from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
@@ -13,26 +25,15 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import {
-  MapPin,
-  ChevronDown,
-  Search,
-  Heart,
-  ShoppingCart,
-  User,
-  Home,
-  Menu,
-} from 'lucide-react-native';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight } from '../utils/haptic';
+
+import { phase4Client } from '../api/phase4Client';
 import ForYouTodayCard from '../components/ForYouTodayCard';
 import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
 import OfflineNotice from '../components/OfflineNotice';
+import { ThemeContext } from '../context/ThemeContext';
 import { useForYouToday } from '../hooks/useForYouToday';
-import { phase4Client } from '../api/phase4Client';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticLight } from '../utils/haptic';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

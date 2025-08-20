@@ -1,9 +1,10 @@
+import { MapPin, Star } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
-import { MapPin, Star } from 'lucide-react-native';
-import { hapticLight, hapticMedium } from '../utils/haptic';
+
 import type { StoreData } from '../@types/store';
+import { hapticLight, hapticMedium } from '../utils/haptic';
 
 interface Props {
   store: StoreData;

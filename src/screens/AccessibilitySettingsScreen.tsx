@@ -1,4 +1,7 @@
 // src/screens/AccessibilitySettingsScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -14,12 +17,10 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { getPrefs, updatePrefs } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android

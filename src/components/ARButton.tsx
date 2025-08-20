@@ -1,5 +1,6 @@
-import { Button } from 'react-native';
 import * as Linking from 'expo-linking';
+import { Button } from 'react-native';
+
 import { API_BASE_URL } from '../utils/apiConfig';
 
 export default function ARButton({ productId }: { productId: string }) {

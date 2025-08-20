@@ -1,6 +1,7 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import { useInfiniteQuery } from '@tanstack/react-query';
+
 import { phase4Client } from '../api/phase4Client';
 import type { CMSProduct } from '../types/cms';
 

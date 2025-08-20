@@ -1,4 +1,5 @@
 // src/hooks/usePulse.ts
+import { useCallback } from 'react';
 import {
   useSharedValue,
   useAnimatedStyle,
@@ -6,7 +7,6 @@ import {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { useCallback } from 'react';
 
 /**
  * Hook for a one-time “pulse” animation (scale up then back down).
@@ -25,7 +25,7 @@ export function usePulse(duration: number = 150, maxScale: number = 1.1) {
       withTiming(maxScale, { duration, easing: Easing.inOut(Easing.ease) }),
       withTiming(1, { duration, easing: Easing.inOut(Easing.ease) })
     );
-  }, [duration, maxScale]);
+  }, [duration, maxScale, scale]);
 
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Sound from 'react-native-sound';
 
 export default function CustomAudioPlayer({ source, play }: { source: string; play: boolean }) {

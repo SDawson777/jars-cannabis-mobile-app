@@ -1,6 +1,6 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 jest.mock('react-native', () => {
   const React = require('react');
   return {
@@ -42,8 +42,8 @@ jest.mock('../context/ThemeContext', () => {
   };
 });
 
-import OrderHistoryScreen from '../screens/orders/OrderHistoryScreen';
 import * as orderClient from '../clients/orderClient';
+import OrderHistoryScreen from '../screens/orders/OrderHistoryScreen';
 
 jest.mock('../clients/orderClient');
 jest.mock('../utils/haptic', () => ({

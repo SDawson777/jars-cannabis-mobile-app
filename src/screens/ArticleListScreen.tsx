@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -10,13 +12,12 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
 import { useEducationalArticles } from '../hooks/useEducationalArticles';
-import { hapticLight } from '../utils/haptic';
+import type { RootStackParamList } from '../navigation/types';
 import type { CMSArticle } from '../types/cms';
+import { hapticLight } from '../utils/haptic';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

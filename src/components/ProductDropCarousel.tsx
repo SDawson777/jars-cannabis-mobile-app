@@ -1,12 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
-import CMSImage from './CMSImage';
+
 import { CMSDrop } from '../types/cms';
 import { hapticLight } from '../utils/haptic';
 
+import CMSImage from './CMSImage';
+
 interface Props {
   drops: CMSDrop[];
-  onPress?: (drop: CMSDrop) => void;
+  onPress?: (_drop: CMSDrop) => void;
 }
 
 export default function ProductDropCarousel({ drops, onPress }: Props) {

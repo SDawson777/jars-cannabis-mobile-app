@@ -1,4 +1,7 @@
 // src/screens/AppSettingsScreen.tsx
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useState, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -12,12 +15,10 @@ import {
   LayoutAnimation,
   UIManager,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
+
+import { useSettings } from '../context/SettingsContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSettings } from '../context/SettingsContext';
 import { t } from '../utils/i18n';
 
 // Enable LayoutAnimation on Android

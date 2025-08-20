@@ -1,14 +1,17 @@
-import React, { useContext } from 'react';
-import { SafeAreaView, View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { ThemeContext } from '../../context/ThemeContext';
+import { SafeAreaView, View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
+
 import { requestPasswordReset } from '../../clients/authClient';
-import { toast } from '../../utils/toast';
-import { forgotPasswordSchema } from './forgotPasswordSchema';
+import { ThemeContext } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../navigation/types';
+import { toast } from '../../utils/toast';
+
+import { forgotPasswordSchema } from './forgotPasswordSchema';
+
 
 type FormData = { email: string };
 

@@ -1,6 +1,6 @@
+import { Formik } from 'formik';
 import React from 'react';
 import {
-  View,
   TextInput,
   StyleSheet,
   Pressable,
@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 export const contactInfoSchema = Yup.object().shape({

@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect } from 'react';
+
+import { usePreferredStoreId } from '../../store/usePreferredStore';
 import type { StoreData } from '../@types/store';
 import { usePreferredStore } from '../state/store';
-import { usePreferredStoreId } from '../../store/usePreferredStore';
 
 interface StoreContextState {
   preferredStore?: StoreData;
-  setPreferredStore(store: StoreData): void;
+  setPreferredStore(_store: StoreData): void;
 }
 
 const StoreContext = createContext<StoreContextState>({

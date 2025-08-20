@@ -1,11 +1,12 @@
-import React, { useContext } from 'react';
-import { SafeAreaView, View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ChevronLeft } from 'lucide-react-native';
-import { ThemeContext } from '../context/ThemeContext';
+import React, { useContext } from 'react';
+import { SafeAreaView, View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
+
 import { useDataCategories } from '../api/hooks/useDataCategories';
 import { usePrivacyPreferences } from '../api/hooks/usePrivacyPreferences';
 import DataCategoryItem from '../components/DataCategoryItem';
+import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 
 export default function EthicalAIDashboardScreen() {

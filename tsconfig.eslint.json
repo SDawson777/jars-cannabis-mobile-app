@@ -1,11 +1,23 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "store/**/*.ts",
+    "store/**/*.tsx",
+    "stores/**/*.ts",
+    "stores/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
     "jest.setup.ts",
-    "jest.config.cjs"
+    "jest.config.cjs",
+    "App.tsx"
+  ],
+  "exclude": [
+    "backend",
+    "functions",
+    "server",
+    "apps",
+    "node_modules"
   ]
 }

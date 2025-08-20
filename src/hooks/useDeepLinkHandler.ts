@@ -1,6 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { Linking } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+
 import type { StoreData } from '../@types/store';
 import { useStore } from '../context/StoreContext';
 
@@ -24,7 +25,7 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
             }
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // ignore errors from malformed URLs
       }
     };

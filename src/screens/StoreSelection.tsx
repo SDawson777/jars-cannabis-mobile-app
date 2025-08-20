@@ -1,4 +1,8 @@
 // src/screens/StoreSelection.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as Location from 'expo-location';
+import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
@@ -12,19 +16,16 @@ import {
   View,
   Image,
 } from 'react-native';
-import { ThemeContext } from '../context/ThemeContext';
-import { useNavigation } from '@react-navigation/native';
-import * as Location from 'expo-location';
-import * as SecureStore from 'expo-secure-store';
-import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
-import StoreCard from '../components/StoreCard';
-import PermissionRationaleModal from '../components/PermissionRationaleModal';
-import LocationStatusDisplay from '../components/LocationStatusDisplay';
-import EmptyStateSVG from '../assets/svg/illustration-no-nearby-stores.svg';
-import { usePreferredStore } from '../state/store';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import type { StoreData } from '../@types/store';
+import EmptyStateSVG from '../assets/svg/illustration-no-nearby-stores.svg';
+import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
+import LocationStatusDisplay from '../components/LocationStatusDisplay';
+import PermissionRationaleModal from '../components/PermissionRationaleModal';
+import StoreCard from '../components/StoreCard';
+import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
+import { usePreferredStore } from '../state/store';
 import { hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android

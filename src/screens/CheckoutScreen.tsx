@@ -1,4 +1,8 @@
 // src/screens/CheckoutScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useStripe, isPlatformPaySupported } from '@stripe/stripe-react-native';
+import { ChevronLeft, HelpCircle } from 'lucide-react-native';
 import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
@@ -13,15 +17,14 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft, HelpCircle } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
+import { fetchPaymentSheetParams } from '../api/stripe';
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { toast } from '../utils/toast';
-import { useStripe, isPlatformPaySupported } from '@stripe/stripe-react-native';
-import { fetchPaymentSheetParams } from '../api/stripe';
+
+
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -117,7 +120,7 @@ export default function CheckoutScreen() {
       }
       toast('Payment successful');
       return true;
-    } catch (e) {
+    } catch (_e) {
       toast('Payment failed');
       return false;
     }

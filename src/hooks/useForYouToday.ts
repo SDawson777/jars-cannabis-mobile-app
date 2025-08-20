@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { phase4Client } from '../api/phase4Client';
+import { useQuery } from '@tanstack/react-query';
+
 import type { ForYouTodayPayload } from '../@types/personalization';
+import { phase4Client } from '../api/phase4Client';
 
 export function useForYouToday(userId: string | undefined, storeId: string | undefined) {
   return useQuery<ForYouTodayPayload>({

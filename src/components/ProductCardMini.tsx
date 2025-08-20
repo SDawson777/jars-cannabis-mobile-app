@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
-import { hapticLight } from '../utils/haptic';
+import { Text, Image, Pressable, StyleSheet } from 'react-native';
+
 import type { ForYouTodayItem } from '../@types/personalization';
+import { hapticLight } from '../utils/haptic';
 
 interface Props {
   item: ForYouTodayItem;

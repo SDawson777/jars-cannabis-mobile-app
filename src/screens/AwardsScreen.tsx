@@ -1,4 +1,8 @@
 // src/screens/AwardsScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronLeft, Settings } from 'lucide-react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   SafeAreaView,
@@ -17,18 +21,16 @@ import {
   Animated,
   ListRenderItemInfo,
 } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
 import ConfettiCannon from 'react-native-confetti-cannon';
+
+import { useRedeemReward } from '../api/hooks/useRedeemReward';
 import { phase4Client } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
+import { trackEvent } from '../utils/analytics'; // ensure exported in utils/analytics
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
-import { trackEvent } from '../utils/analytics'; // ensure exported in utils/analytics
-import { useRedeemReward } from '../api/hooks/useRedeemReward';
-import { ChevronLeft, Settings } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 
 // Define Award type
 interface Award {
@@ -89,7 +91,7 @@ export default function AwardsScreen() {
     );
     anim.start();
     return () => anim.stop();
-  }, []);
+  }, [pulse]);
 
   // Animate progress bar and trigger confetti on new awards
   useEffect(() => {
@@ -103,7 +105,7 @@ export default function AwardsScreen() {
       confettiRef.current?.start();
     }
     prevAwardsCount.current = awards.length;
-  }, [user.progress, awards.length]);
+  }, [user.progress, awards.length, progressAnim]);
 
   const handleBack = () => {
     hapticLight();

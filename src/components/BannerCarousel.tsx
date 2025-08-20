@@ -1,12 +1,14 @@
 import React, { useRef, useEffect } from 'react';
-import { ScrollView, View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
-import CMSImage from './CMSImage';
+import { ScrollView, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+
 import { CMSBanner } from '../types/cms';
 import { hapticLight } from '../utils/haptic';
 
+import CMSImage from './CMSImage';
+
 interface Props {
   banners: CMSBanner[];
-  onPress?: (banner: CMSBanner) => void;
+  onPress?: (_banner: CMSBanner) => void;
 }
 
 export default function BannerCarousel({ banners, onPress }: Props) {

@@ -1,6 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { onProximityAlert } from '../../tasks/locationWatcher';
 import { logEvent } from '../utils/analytics';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 jest.mock('../utils/analytics');
 

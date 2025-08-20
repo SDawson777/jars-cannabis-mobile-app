@@ -34,7 +34,7 @@ export default function ScreenTransition({ children, duration = 300 }: ScreenTra
         withTiming(0, { duration: duration * 0.5, easing: Easing.in(Easing.ease) })
       );
     };
-  }, [duration]);
+  }, [duration, opacity]);
 
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value,

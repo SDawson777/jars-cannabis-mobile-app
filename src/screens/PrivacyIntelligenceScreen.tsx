@@ -1,10 +1,11 @@
 // src/screens/PrivacyIntelligenceScreen.tsx
+import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import { ScrollView, View, Text, Switch, Button, StyleSheet } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
+
+import { PRIVACY_EXPORT_FORM } from '../constants/links';
 import { useAuth } from '../hooks/useAuth';
 import { usePersonalization } from '../hooks/usePersonalization';
-import { PRIVACY_EXPORT_FORM } from '../constants/links';
 
 export default function PrivacyIntelligenceScreen() {
   const [enabled, setEnabled] = usePersonalization();
