@@ -1,6 +1,7 @@
+import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import request from 'supertest';
-import { PrismaClient } from '@prisma/client';
+
 import { redeemAward } from '../backend/src/controllers/awardsController';
 
 declare const expect: jest.Expect;

@@ -12,7 +12,7 @@ const globals = require('globals');
 module.exports = [
   js.configs.recommended,
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
+    files: ['src/**/*.{ts,tsx,js,jsx}', 'store/**/*.{ts,tsx,js,jsx}', 'stores/**/*.{ts,tsx,js,jsx}', 'tests/**/*.{ts,tsx,js,jsx}', 'jest.setup.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -21,6 +21,23 @@ module.exports = [
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: { jsx: true }
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021,
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        __DEV__: 'readonly'
       }
     },
     plugins: {
@@ -72,6 +89,19 @@ module.exports = [
     }
   },
   {
+    files: ['**/*.js', '**/*.cjs', '**/*.mjs', 'scripts/**/*.ts', 'config/**/*.ts', 'webpack.config.js', 'tailwind.config.js', 'babel.config.js', 'App.tsx', 'config/firebaseClient.ts', 'scripts/checkAssets.ts', 'tasks/locationWatcher.ts', 'tests/firebase.e2e.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+    },
+    rules: {
+      'no-undef': 'off',
+      '@typescript-eslint/no-unused-vars': 'off'
+    }
+  },
+  {
     ignores: [
       'dist/',
       'build/',
@@ -92,7 +122,11 @@ module.exports = [
       'android/',
       'ios/DerivedData/',
       'assets/splash/',
-      'src/terpene_wheel/snippets/'
+      'src/terpene_wheel/snippets/',
+      'backend/',
+      'functions/',
+      'server/',
+      'apps/'
     ]
   }
 ];

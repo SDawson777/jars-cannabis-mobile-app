@@ -1,7 +1,8 @@
 /* eslint-env jest, node */
-import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { renderHook, waitFor, act } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
+import React from 'react';
 
 jest.mock('react-native', () => ({
   Linking: {
@@ -20,8 +21,8 @@ jest.mock('../context/StoreContext', () => {
   };
 });
 import useDeepLinkHandler from '../hooks/useDeepLinkHandler';
+
 import { makeStore } from './testUtils';
-import { NavigationContainer } from '@react-navigation/native';
 
 const { setPreferredStore } = require('../context/StoreContext') as any;
 jest.mock('@react-navigation/native', () => {

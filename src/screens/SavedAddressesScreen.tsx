@@ -1,4 +1,7 @@
 // src/screens/SavedAddressesScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Plus, ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
@@ -11,11 +14,9 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Plus, ChevronRight } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
@@ -40,7 +41,7 @@ const initial: Address[] = [
 export default function SavedAddressesScreen() {
   const navigation = useNavigation<SavedAddressesNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [addresses, setAddresses] = useState<Address[]>(initial);
+  const [addresses] = useState<Address[]>(initial);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

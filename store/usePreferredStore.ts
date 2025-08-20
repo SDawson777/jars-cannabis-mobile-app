@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
 
 interface PreferredStoreState {
   preferredStoreId?: string;
@@ -9,9 +9,9 @@ interface PreferredStoreState {
 
 export const usePreferredStoreId = create<PreferredStoreState>(set => ({
   preferredStoreId: undefined,
-  setPreferredStoreId: id => {
-    set({ preferredStoreId: id });
-    AsyncStorage.setItem('preferredStoreId', id).catch(() => {});
+  setPreferredStoreId: _id => {
+    set({ preferredStoreId: _id });
+    AsyncStorage.setItem('preferredStoreId', _id).catch(() => {});
   },
   hydrate: async () => {
     try {

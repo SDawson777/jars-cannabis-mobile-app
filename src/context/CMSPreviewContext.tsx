@@ -1,5 +1,5 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import * as Linking from 'expo-linking';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface CMSPreviewValue {
   preview: boolean;

@@ -1,4 +1,6 @@
 // src/screens/ShopScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -14,19 +16,18 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight, hapticMedium } from '../utils/haptic';
-import { toast } from '../utils/toast';
-import { useFiltersQuery } from '../hooks/useFilters';
-import useSkeletonText from '../components/useSkeletonText';
-import { useProducts } from '../hooks/useProducts';
-import ProductCardSkeleton from '../components/ProductCardSkeleton';
+
 import CMSImage from '../components/CMSImage';
 import OfflineNotice from '../components/OfflineNotice';
+import ProductCardSkeleton from '../components/ProductCardSkeleton';
+import useSkeletonText from '../components/useSkeletonText';
+import { ThemeContext } from '../context/ThemeContext';
+import { useFiltersQuery } from '../hooks/useFilters';
+import { useProducts } from '../hooks/useProducts';
+import type { RootStackParamList } from '../navigation/types';
 import type { CMSProduct } from '../types/cms';
+import { hapticLight, hapticMedium } from '../utils/haptic';
+import { toast } from '../utils/toast';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

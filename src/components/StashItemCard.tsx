@@ -1,8 +1,9 @@
+import { BookOpen, ShoppingCart } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
-import { BookOpen, ShoppingCart } from 'lucide-react-native';
-import { hapticLight } from '../utils/haptic';
+
 import type { StashItem } from '../@types/jars';
+import { hapticLight } from '../utils/haptic';
 
 interface Props {
   item: StashItem;

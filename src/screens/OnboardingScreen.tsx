@@ -1,4 +1,7 @@
 // src/screens/OnboardingScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronRight } from 'lucide-react-native';
 import React, { useContext, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -10,11 +13,9 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronRight } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android

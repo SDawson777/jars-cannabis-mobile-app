@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, SafeAreaView, Pressable, Image, StyleSheet } from 'react-native';
-import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-import { phase4Client } from '../api/phase4Client';
-import StoreCard from '../components/StoreCard';
-import PermissionRationaleModal from '../components/PermissionRationaleModal';
-import LocationStatusDisplay from '../components/LocationStatusDisplay';
-import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
-import { useStore } from '../context/StoreContext';
-import { hapticMedium, hapticHeavy } from '../utils/haptic';
-import CustomAudioPlayer from '../components/CustomAudioPlayer';
+import * as Location from 'expo-location';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, SafeAreaView, Pressable, Image, StyleSheet } from 'react-native';
+
 import Illustration from '../../assets/svg/illustration-no-nearby-stores.svg';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onProximityAlert } from '../../tasks/locationWatcher';
+import { phase4Client } from '../api/phase4Client';
+import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
+import CustomAudioPlayer from '../components/CustomAudioPlayer';
+import LocationStatusDisplay from '../components/LocationStatusDisplay';
+import PermissionRationaleModal from '../components/PermissionRationaleModal';
+import StoreCard from '../components/StoreCard';
+import { useStore } from '../context/StoreContext';
+import { RootStackParamList } from '../navigation/types';
+import { hapticMedium, hapticHeavy } from '../utils/haptic';
+
+
 
 interface ApiStore {
   id: string;
@@ -58,7 +61,7 @@ export default function StoreSelectionScreen() {
   );
   const [loading, setLoading] = useState(false);
   const [stores, setStores] = useState<ApiStore[] | null>(null);
-  const [error, setError] = useState('');
+
 
   const requestPermission = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -68,7 +71,6 @@ export default function StoreSelectionScreen() {
 
   const fetchStores = async () => {
     setLoading(true);
-    setError('');
     try {
       const { coords } = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
@@ -95,8 +97,7 @@ export default function StoreSelectionScreen() {
           }
         }
       }
-    } catch (e) {
-      setError('Failed to load stores');
+    } catch (_e) {
       hapticHeavy();
     } finally {
       setLoading(false);

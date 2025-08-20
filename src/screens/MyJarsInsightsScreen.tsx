@@ -1,7 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
 import Svg, { Rect } from 'react-native-svg';
+
 import { getJournal } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 

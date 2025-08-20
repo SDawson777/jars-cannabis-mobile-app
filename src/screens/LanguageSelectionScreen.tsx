@@ -1,9 +1,10 @@
+import { useNavigation } from '@react-navigation/native';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useContext } from 'react';
 import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { ThemeContext } from '../context/ThemeContext';
+
 import { useSettings } from '../context/SettingsContext';
+import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import { t } from '../utils/i18n';
 

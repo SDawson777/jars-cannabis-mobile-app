@@ -1,12 +1,13 @@
-import React, { useContext } from 'react';
-import { SafeAreaView, View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useContext } from 'react';
+import { SafeAreaView, Text, StyleSheet } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import { RootStackParamList } from '../navigation/types';
-import Button from '../components/Button';
+
 import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
+import Button from '../components/Button';
 import { ThemeContext } from '../context/ThemeContext';
+import { RootStackParamList } from '../navigation/types';
 import { hapticMedium } from '../utils/haptic';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList, 'LoginSignUpDecision'>;

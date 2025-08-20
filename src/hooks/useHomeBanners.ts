@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { cmsClient } from '../api/cmsClient';
 import type { CMSBanner } from '../types/cms';
 

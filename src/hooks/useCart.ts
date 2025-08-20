@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+
 import { phase4Client } from '../api/phase4Client';
+
 import { useOfflineCartQueue } from './useOfflineCartQueue';
 
 export interface CartItem {

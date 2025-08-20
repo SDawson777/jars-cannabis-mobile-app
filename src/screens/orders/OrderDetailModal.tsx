@@ -1,6 +1,7 @@
+import { X } from 'lucide-react-native';
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { X } from 'lucide-react-native';
+
 import type { Order } from '../../types/order';
 
 interface Props {

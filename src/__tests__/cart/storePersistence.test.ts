@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCartStore, hydrateCartStore } from '../../../stores/useCartStore';
+
+import { useCartStore } from '../../../stores/useCartStore';
 
 describe('cart store persistence', () => {
   beforeEach(async () => {

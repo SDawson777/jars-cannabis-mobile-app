@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MapPin, List } from 'lucide-react-native';
-import { hapticLight } from '../utils/haptic';
-import type { RootStackParamList } from '../navigation/types';
+import React, { useState } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+
+interface Region {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
 import type { StoreData } from '../@types/store';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticLight } from '../utils/haptic';
 
 const STORES: StoreData[] = [
   {

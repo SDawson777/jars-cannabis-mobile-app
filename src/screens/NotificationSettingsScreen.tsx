@@ -1,4 +1,6 @@
 // src/screens/NotificationSettingsScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useState, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -12,8 +14,7 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
+
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 

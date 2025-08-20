@@ -1,5 +1,5 @@
-import { getAuthToken } from '../utils/auth';
 import { API_BASE_URL } from '../utils/apiConfig';
+import { getAuthToken } from '../utils/auth';
 
 const BASE_URL = API_BASE_URL;
 

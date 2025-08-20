@@ -1,3 +1,4 @@
+import { useRoute, RouteProp } from '@react-navigation/native';
 import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
@@ -11,14 +12,14 @@ import {
   Pressable,
 } from 'react-native';
 import Animated, { BounceIn } from 'react-native-reanimated';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { useStore } from '../context/StoreContext';
-import { useProductDetails } from '../hooks/useProductDetails';
-import ProductFallback from '../components/ProductFallback';
+
 import CMSImage from '../components/CMSImage';
+import ProductFallback from '../components/ProductFallback';
 import StockAlert from '../components/StockAlert';
+import { useStore } from '../context/StoreContext';
+import { ThemeContext } from '../context/ThemeContext';
+import { useProductDetails } from '../hooks/useProductDetails';
+import type { RootStackParamList } from '../navigation/types';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

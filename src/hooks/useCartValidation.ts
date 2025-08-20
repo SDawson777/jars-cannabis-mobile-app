@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+
+import { useCartStore, CartItem } from '../../stores/useCartStore';
 import { phase4Client } from '../api/phase4Client';
 import { toast } from '../utils/toast';
-import { useCartStore, CartItem } from '../../stores/useCartStore';
 
 export function useCartValidation() {
   const items = useCartStore(state => state.items);
@@ -41,7 +42,7 @@ export function useCartValidation() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [items, setItems]);
 
   return { validating };
 }

@@ -1,17 +1,19 @@
+import { Buffer } from 'buffer';
+
+import auth from '@react-native-firebase/auth';
+import * as LocalAuthentication from 'expo-local-authentication';
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { Alert } from 'react-native';
-import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
-import * as LocalAuthentication from 'expo-local-authentication';
-import auth from '@react-native-firebase/auth';
-import { Buffer } from 'buffer';
-import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
+
 import { useUserProfile, UserProfile } from '../api/hooks/useUserProfile';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
+import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 
 export interface User extends UserProfile {}
 
 interface AuthContextType {
   token: string | null;
-  setToken: (token: string) => Promise<void>;
+  setToken: (_token: string) => Promise<void>;
   clearAuth: () => Promise<void>;
   data: UserProfile | undefined;
   isLoading: boolean;

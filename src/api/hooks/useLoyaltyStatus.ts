@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { phase4Client } from '../phase4Client';
 
 export interface LoyaltyStatus {

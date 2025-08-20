@@ -1,4 +1,7 @@
 // src/screens/CartScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft, Trash2, HelpCircle } from 'lucide-react-native';
 import React, { useState, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -9,25 +12,21 @@ import {
   Pressable,
   TextInput,
   StyleSheet,
-  Dimensions,
   Alert,
   LayoutAnimation,
   UIManager,
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { ChevronLeft, Trash2, HelpCircle } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
+
 import { useCartStore, hydrateCartStore } from '../../stores/useCartStore';
+import { ThemeContext } from '../context/ThemeContext';
 import { useCartValidation } from '../hooks/useCartValidation';
+import type { RootStackParamList } from '../navigation/types';
 import {
   hapticLight,
   hapticMedium,
   hapticHeavy,
-  hapticSuccess,
   hapticError,
 } from '../utils/haptic';
 
@@ -37,7 +36,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 type CartNavProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;
 
-const { width } = Dimensions.get('window');
+
 const IMAGE_SIZE = 80;
 
 export default function CartScreen() {

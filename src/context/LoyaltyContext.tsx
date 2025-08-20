@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode } from 'react';
+
 import { useLoyaltyStatus, type LoyaltyStatus } from '../api/hooks/useLoyaltyStatus';
 
 interface LoyaltyContextValue {

@@ -1,4 +1,7 @@
 // src/screens/StoreDetailsScreen.tsx
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft, Phone, Clock } from 'lucide-react-native';
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -12,11 +15,9 @@ import {
   Platform,
   Linking,
 } from 'react-native';
-import { ChevronLeft, Phone, Clock } from 'lucide-react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

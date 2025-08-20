@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../navigation/types';
-import { ThemeContext } from '../../context/ThemeContext';
+import React, { useContext, useEffect, useState } from 'react';
+import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
+
 import LegalDisclaimerModal from '../../components/LegalDisclaimerModal';
+import { ThemeContext } from '../../context/ThemeContext';
+import type { RootStackParamList } from '../../navigation/types';
 import { hapticLight } from '../../utils/haptic';
 
 interface NavProp extends NativeStackNavigationProp<RootStackParamList, 'AgeVerification'> {}

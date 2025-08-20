@@ -1,13 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
 import Slider from '@react-native-community/slider';
 import type { RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React from 'react';
+import { View, Text, StyleSheet, TextInput } from 'react-native';
+
+import { addJournal } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
-import { addJournal } from '../api/phase4Client';
 
 const LABELS = ['Relaxation', 'Focus', 'Pain Relief', 'Creativity', 'Sleep'];
 
@@ -28,10 +29,7 @@ export default function JournalEntryScreen() {
     setValues(v => ({ ...v, [label]: val }));
   };
 
-  const goBack = () => {
-    hapticLight();
-    navigation.goBack();
-  };
+
 
   const saveEntry = async () => {
     hapticLight();
@@ -44,7 +42,7 @@ export default function JournalEntryScreen() {
         notes,
         tags: LABELS.filter(l => values[l] > 0),
       });
-    } catch (e) {
+    } catch (_e) {
       // ignore
     }
     navigation.goBack();

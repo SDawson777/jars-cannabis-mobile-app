@@ -1,4 +1,8 @@
 // src/screens/LoginScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft } from 'lucide-react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState, useContext, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -7,23 +11,20 @@ import {
   TextInput,
   Pressable,
   ActivityIndicator,
-  Alert,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { AuthContext } from '../context/AuthContext';
-import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
-import { logEvent } from '../utils/analytics';
-import { useAuth } from '../hooks/useAuth';
-import { Eye, EyeOff } from 'lucide-react-native';
+
 import AnimatedShimmerOverlay from '../components/AnimatedShimmerOverlay';
+import { ThemeContext } from '../context/ThemeContext';
+import { useAuth } from '../hooks/useAuth';
+import type { RootStackParamList } from '../navigation/types';
+import { logEvent } from '../utils/analytics';
+import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
+
+
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

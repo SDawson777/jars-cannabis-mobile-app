@@ -27,6 +27,7 @@
     "src/terpene_wheel/snippets",
     "backend",
     "server",
-    "functions"
+    "functions",
+    "apps"
   ]
 }

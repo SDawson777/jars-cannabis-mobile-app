@@ -1,14 +1,15 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { saveSecure, getSecure } from '../utils/secureStorage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { setLocale as setI18nLocale } from '../utils/i18n';
+import { saveSecure, getSecure } from '../utils/secureStorage';
 
 interface SettingsContextState {
   biometricEnabled: boolean;
-  setBiometricEnabled: (value: boolean) => Promise<void>;
+  setBiometricEnabled: (_value: boolean) => Promise<void>;
   locale: string;
-  setLocale: (value: string) => Promise<void>;
+  setLocale: (_value: string) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextState>({

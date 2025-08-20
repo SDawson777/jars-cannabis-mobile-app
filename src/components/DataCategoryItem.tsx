@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+
 import type { DataCategory } from '../api/hooks/useDataCategories';
 
 export default function DataCategoryItem({ category }: { category: DataCategory }) {

@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import PagerView from 'react-native-pager-view';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+import * as Speech from 'expo-speech';
+import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { AccessibilityInfo } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
-import OnboardingSlide from '../components/OnboardingSlide';
-import PaginationDots from '../components/PaginationDots';
+import PagerView from 'react-native-pager-view';
+
 import AnimatedBackgroundGradient from '../components/AnimatedBackgroundGradient';
 import CustomAudioPlayer from '../components/CustomAudioPlayer';
-import { AccessibilityInfo } from 'react-native';
-import * as Speech from 'expo-speech';
+import OnboardingSlide from '../components/OnboardingSlide';
+import PaginationDots from '../components/PaginationDots';
+import type { RootStackParamList } from '../navigation/types';
+
 
 const slides = [
   {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Pressable, Text } from 'react-native';
 
 interface Props {
-  onPay: (info: { card: string }) => void;
+  onPay: (_info: { card: string }) => void;
 }
 
 export default function PaymentScreen({ onPay }: Props) {

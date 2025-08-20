@@ -1,8 +1,9 @@
 /* eslint-env node */
 /* eslint-disable no-undef */
-import { expectedAssets } from './expectedAssets';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
+
+import { expectedAssets } from './expectedAssets';
 
 const ASSETS_DIR = join(__dirname, '..', 'assets');
 

@@ -1,9 +1,11 @@
 // src/screens/ProfileScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   FlatList,
-  View,
   Text,
   Pressable,
   StyleSheet,
@@ -11,11 +13,9 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronRight } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

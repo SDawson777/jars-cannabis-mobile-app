@@ -1,4 +1,6 @@
 // src/screens/HelpFAQScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useState, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -11,14 +13,13 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight } from '../utils/haptic';
-import { useFAQQuery } from '../hooks/useFAQ';
+
 import FAQSkeleton from '../components/FAQSkeleton';
 import PreviewBadge from '../components/PreviewBadge';
 import { useCMSPreview } from '../context/CMSPreviewContext';
+import { ThemeContext } from '../context/ThemeContext';
+import { useFAQQuery } from '../hooks/useFAQ';
+import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

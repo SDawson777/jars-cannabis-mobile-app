@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { logEvent } from '../src/utils/analytics';
 
 export async function onProximityAlert(store_id: string, distance: number) {

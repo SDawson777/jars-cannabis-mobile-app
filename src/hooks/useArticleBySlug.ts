@@ -1,6 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { useQuery } from '@tanstack/react-query';
+
 import { cmsClient } from '../api/cmsClient';
+import { useCMSPreview } from '../context/CMSPreviewContext';
 import type { CMSArticle } from '../types/cms';
 
 async function fetchArticle(slug: string, preview: boolean) {
@@ -17,9 +20,6 @@ async function fetchArticle(slug: string, preview: boolean) {
     throw err;
   }
 }
-
-import NetInfo from '@react-native-community/netinfo';
-import { useCMSPreview } from '../context/CMSPreviewContext';
 
 export function useArticleBySlug(slug: string) {
   const { preview } = useCMSPreview();

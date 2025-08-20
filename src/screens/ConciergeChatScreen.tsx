@@ -1,4 +1,7 @@
 // src/screens/ConciergeChatScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Send } from 'lucide-react-native';
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -13,13 +16,11 @@ import {
   LayoutAnimation,
   UIManager,
 } from 'react-native';
-import { Send } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight, hapticMedium } from '../utils/haptic';
+
 import { conciergeChat } from '../api/phase4Client';
+import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticLight, hapticMedium } from '../utils/haptic';
 
 interface Message {
   id: string;

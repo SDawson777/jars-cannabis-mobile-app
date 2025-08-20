@@ -1,17 +1,17 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
   withRepeat,
 } from 'react-native-reanimated';
-import { StyleSheet } from 'react-native';
 
 export default function AnimatedPulseGlow() {
   const scale = useSharedValue(1);
   React.useEffect(() => {
     scale.value = withRepeat(withTiming(1.5, { duration: 1000 }), -1, true);
-  }, []);
+  }, [scale]);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
     opacity: 2 - scale.value,

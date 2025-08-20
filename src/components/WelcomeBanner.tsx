@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { useContext } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { useStore } from '../context/StoreContext';
 

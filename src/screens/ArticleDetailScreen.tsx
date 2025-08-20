@@ -1,4 +1,7 @@
 // src/screens/ArticleDetailScreen.tsx
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useContext, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -12,14 +15,12 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { ChevronLeft } from 'lucide-react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
-import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight } from '../utils/haptic';
-import { useArticleBySlug } from '../hooks/useArticleBySlug';
+
 import CMSImage from '../components/CMSImage';
+import { ThemeContext } from '../context/ThemeContext';
+import { useArticleBySlug } from '../hooks/useArticleBySlug';
+import type { RootStackParamList } from '../navigation/types';
+import { hapticLight } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
@@ -6,14 +8,12 @@ import {
   TextInput,
   StyleSheet,
   Pressable,
-  LayoutAnimation,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
-import { logEvent } from '../utils/analytics';
+
 import { useAuth } from '../hooks/useAuth';
+import { RootStackParamList } from '../navigation/types';
+import { logEvent } from '../utils/analytics';
+import { hapticMedium, hapticHeavy } from '../utils/haptic';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList, 'OTPScreen'>;
 
@@ -47,7 +47,7 @@ export default function OTPScreen() {
       logEvent('otp_verified', {});
       hapticMedium();
       navigation.replace('HomeScreen');
-    } catch (err) {
+    } catch (_err) {
       hapticHeavy();
     }
   };

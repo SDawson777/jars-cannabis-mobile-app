@@ -1,3 +1,4 @@
+import { useInfiniteQuery } from '@tanstack/react-query';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
@@ -8,15 +9,17 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { ThemeContext } from '../../context/ThemeContext';
+
 import { fetchOrders } from '../../clients/orderClient';
-import type { Order, OrdersResponse } from '../../types/order';
 import OrderCard from '../../components/OrderCard';
-import OrderDetailModal from './OrderDetailModal';
-import { toast } from '../../utils/toast';
-import { hapticLight, hapticMedium } from '../../utils/haptic';
 import useSkeletonText from '../../components/useSkeletonText';
+import { ThemeContext } from '../../context/ThemeContext';
+import type { Order, OrdersResponse } from '../../types/order';
+import { hapticLight, hapticMedium } from '../../utils/haptic';
+import { toast } from '../../utils/toast';
+
+import OrderDetailModal from './OrderDetailModal';
+
 
 export default function OrderHistoryScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);

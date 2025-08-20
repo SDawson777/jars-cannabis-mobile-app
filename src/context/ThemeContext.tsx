@@ -1,8 +1,8 @@
 // src/context/ThemeContext.tsx
+import { getLocales } from 'expo-localization';
+import * as Location from 'expo-location';
 import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
-import * as Location from 'expo-location';
-import { getLocales } from 'expo-localization';
 const EXPO_PUBLIC_OPENWEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_KEY as string;
 
 // Tuned threshold constants

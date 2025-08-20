@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { phase4Client } from '../phase4Client';
+
 import { toast } from '../../utils/toast';
+import { phase4Client } from '../phase4Client';
 
 async function updateProfile(payload: any) {
   const res = await phase4Client.put('/profile', payload);

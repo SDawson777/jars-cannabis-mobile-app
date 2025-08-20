@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { useEffect, useState } from 'react';
+
 import { phase4Client } from '../api/phase4Client';
 
 interface CartAction {

@@ -1,9 +1,11 @@
 // src/screens/SavedPaymentsScreen.tsx
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Plus, ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import {
   SafeAreaView,
   FlatList,
-  View,
   Text,
   Pressable,
   StyleSheet,
@@ -11,11 +13,9 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
-import { Plus, ChevronRight } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+
 import { ThemeContext } from '../context/ThemeContext';
+import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
@@ -38,7 +38,7 @@ const initialMethods: PaymentMethod[] = [
 export default function SavedPaymentsScreen() {
   const navigation = useNavigation<SavedPaymentsNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [methods, setMethods] = useState<PaymentMethod[]>(initialMethods);
+  const [methods] = useState<PaymentMethod[]>(initialMethods);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

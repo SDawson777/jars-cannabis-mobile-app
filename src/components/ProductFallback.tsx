@@ -1,6 +1,6 @@
+import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import * as Haptics from 'expo-haptics';
 
 interface Props {
   onRetry: () => void;

@@ -1,22 +1,168 @@
 {
   "auditReportVersion": 2,
-  "vulnerabilities": {},
+  "vulnerabilities": {
+    "@expo/image-utils": {
+      "name": "@expo/image-utils",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "semver"
+      ],
+      "effects": [
+        "expo-pwa"
+      ],
+      "range": "<=0.0.1-canary-20240109-93608d8 || 0.3.10-alpha.0 - 0.4.2",
+      "nodes": [
+        "node_modules/expo-pwa/node_modules/@expo/image-utils"
+      ],
+      "fixAvailable": {
+        "name": "@expo/webpack-config",
+        "version": "18.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "@expo/webpack-config": {
+      "name": "@expo/webpack-config",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "expo-pwa",
+        "webpack-dev-server"
+      ],
+      "effects": [],
+      "range": ">=0.12.53-alpha.0",
+      "nodes": [
+        "node_modules/@expo/webpack-config"
+      ],
+      "fixAvailable": {
+        "name": "@expo/webpack-config",
+        "version": "18.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "expo-pwa": {
+      "name": "expo-pwa",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@expo/image-utils"
+      ],
+      "effects": [
+        "@expo/webpack-config"
+      ],
+      "range": ">=0.0.59-alpha.0",
+      "nodes": [
+        "node_modules/expo-pwa"
+      ],
+      "fixAvailable": {
+        "name": "@expo/webpack-config",
+        "version": "18.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "semver": {
+      "name": "semver",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1101088,
+          "name": "semver",
+          "dependency": "semver",
+          "title": "semver vulnerable to Regular Expression Denial of Service",
+          "url": "https://github.com/advisories/GHSA-c2qf-rxjj-qqgw",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=7.0.0 <7.5.2"
+        }
+      ],
+      "effects": [
+        "@expo/image-utils"
+      ],
+      "range": "7.0.0 - 7.5.1",
+      "nodes": [
+        "node_modules/expo-pwa/node_modules/semver"
+      ],
+      "fixAvailable": {
+        "name": "@expo/webpack-config",
+        "version": "18.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "webpack-dev-server": {
+      "name": "webpack-dev-server",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1105256,
+          "name": "webpack-dev-server",
+          "dependency": "webpack-dev-server",
+          "title": "webpack-dev-server users' source code may be stolen when they access a malicious web site with non-Chromium based browser",
+          "url": "https://github.com/advisories/GHSA-9jgg-88mc-972h",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-346"
+          ],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N"
+          },
+          "range": "<=5.2.0"
+        },
+        {
+          "source": 1105257,
+          "name": "webpack-dev-server",
+          "dependency": "webpack-dev-server",
+          "title": "webpack-dev-server users' source code may be stolen when they access a malicious web site",
+          "url": "https://github.com/advisories/GHSA-4v9v-hfq4-rm2v",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-749"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+          },
+          "range": "<=5.2.0"
+        }
+      ],
+      "effects": [
+        "@expo/webpack-config"
+      ],
+      "range": "<=5.2.0",
+      "nodes": [
+        "node_modules/webpack-dev-server"
+      ],
+      "fixAvailable": {
+        "name": "@expo/webpack-config",
+        "version": "18.0.0",
+        "isSemVerMajor": true
+      }
+    }
+  },
   "metadata": {
     "vulnerabilities": {
       "info": 0,
       "low": 0,
-      "moderate": 0,
-      "high": 0,
+      "moderate": 1,
+      "high": 4,
       "critical": 0,
-      "total": 0
+      "total": 5
     },
     "dependencies": {
-      "prod": 1293,
-      "dev": 1089,
+      "prod": 1786,
+      "dev": 1069,
       "optional": 108,
-      "peer": 211,
+      "peer": 0,
       "peerOptional": 0,
-      "total": 2581
+      "total": 2889
     }
   }
 }

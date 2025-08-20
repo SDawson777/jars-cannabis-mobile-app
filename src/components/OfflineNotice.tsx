@@ -1,6 +1,6 @@
+import { useNetInfo } from '@react-native-community/netinfo';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useNetInfo } from '@react-native-community/netinfo';
 
 export default function OfflineNotice() {
   const netInfo = useNetInfo();

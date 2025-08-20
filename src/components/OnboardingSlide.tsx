@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
+
 import AnimatedPulseGlow from './AnimatedPulseGlow';
 
 interface Props {

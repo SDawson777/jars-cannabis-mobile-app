@@ -16,21 +16,23 @@ jest.mock('expo-secure-store', () => ({
 // Built-in matchers for RTL (prefer new entry; fallback to deprecated jest-native)
 try {
   // RTL v12.4+ exposes this
-  // eslint-disable-next-line import/no-extraneous-dependencies
+   
   require('@testing-library/react-native/extend-expect');
 } catch {
   try {
-    // eslint-disable-next-line import/no-extraneous-dependencies
+     
     require('@testing-library/jest-native/extend-expect');
   } catch {
-    // no-op; tests can still run without extended matchers
-  }
+  // no-op; tests can still run without extended matchers
+}
 }
 
 // Silence useNativeDriver warnings & Animated native helper
 try {
   jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-} catch {}
+} catch {
+  // no-op
+}
 
 // Reanimated mock (v3-compatible)
 jest.mock('react-native-reanimated', () => {

@@ -1,6 +1,6 @@
+import * as Sentry from '@sentry/react-native';
 import React from 'react';
 import { View, Text } from 'react-native';
-import * as Sentry from '@sentry/react-native';
 
 interface State {
   hasError: boolean;

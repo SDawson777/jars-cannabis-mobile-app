@@ -1,8 +1,9 @@
+import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { Dimensions, Pressable } from 'react-native';
-import Svg, { Circle, Line, Text as SvgText, Path } from 'react-native-svg';
 import Animated, { useSharedValue, withTiming, useAnimatedProps } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import Svg, { Circle, Line, Text as SvgText, Path } from 'react-native-svg';
+
 import { TERPENES, TerpeneInfo } from '../data/terpenes';
 
 const { width } = Dimensions.get('window');

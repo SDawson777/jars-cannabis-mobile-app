@@ -1,4 +1,5 @@
 import type { CMSArticle } from '../types/cms';
+
 import { useCMSContent } from './useCMSContent';
 
 export function useArticlesQuery() {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, View, Text, StyleSheet } from 'react-native';
+
 import type { Order } from '../types/order';
 
 interface Props {
