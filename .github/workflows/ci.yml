@@ -28,7 +28,7 @@ jobs:
             echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
             exit 1
           fi
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - name: Prisma Generate
         run: npm run --prefix backend generate
       - run: npm run lint
@@ -56,7 +56,7 @@ jobs:
             echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
             exit 1
           fi
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run typecheck
 
   test:
@@ -82,5 +82,5 @@ jobs:
             echo "npm version mismatch: expected $EXPECTED_NPM but got $ACTUAL_NPM"
             exit 1
           fi
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm test
