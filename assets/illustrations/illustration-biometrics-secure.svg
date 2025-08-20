@@ -1,4 +1,106 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="48" fill="#E5F5EA" stroke="#2E5D46" stroke-width="4"/>
-  <path d="M50 30a15 15 0 0 1 15 15v5a5 5 0 0 1-10 0v-5a5 5 0 0 0-10 0v10a5 5 0 0 1-10 0v-10a15 15 0 0 1 15-15z" fill="#2E5D46"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="390" height="520" viewBox="0 0 390 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Onboarding – Biometrics &amp; Security</title>
+  <desc id="desc">Bobbing phone with fingerprint scan and a pulsing shield badge to communicate secure biometric sign-in.</desc>
+
+  <!-- Headline -->
+  <text x="195" y="64" text-anchor="middle"
+        font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"
+        font-size="22" font-weight="700" fill="#333">
+    Biometrics &amp; Security
+    <animate attributeName="opacity" values="0;1" dur="0.35s" fill="freeze"/>
+  </text>
+  <text x="195" y="88" text-anchor="middle"
+        font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"
+        font-size="13" fill="#777">
+    Fast sign-in with fingerprint or Face ID—fully secured.
+    <animate attributeName="opacity" values="0;1" dur="0.35s" begin="0.1s" fill="freeze"/>
+  </text>
+
+  <!-- Scene (centered at 195, 292) -->
+  <g transform="translate(195,292)">
+    <!-- Floating shadow -->
+    <ellipse cx="0" cy="128" rx="70" ry="14" fill="#000" opacity="0.18">
+      <animate attributeName="opacity" values="0.12;0.18;0.12" dur="2.6s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="scale" values="1;0.92;1" dur="2.6s" repeatCount="indefinite"/>
+    </ellipse>
+
+    <!-- Phone (bobbing) -->
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+                        values="0 0; 0 -8; 0 0" dur="2.6s" repeatCount="indefinite"/>
+
+      <!-- Phone body -->
+      <rect x="-90" y="-120" width="180" height="260" rx="28" fill="#fff" stroke="#E0E0E0" stroke-width="1.5"/>
+      <rect x="-26" y="-115" width="52" height="8" rx="4" fill="#EAEAEA"/>
+      <rect x="-68" y="-90" width="136" height="16" rx="8" fill="#F4F4F4"/>
+
+      <!-- Biometric card -->
+      <g>
+        <rect x="-76" y="-56" width="152" height="116" rx="12" fill="#F6FAEF" stroke="#DDEAD0"/>
+
+        <!-- Fingerprint (stylized arcs) -->
+        <g transform="translate(0,-18)" stroke="#2F2F2F" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M0,-36c-22,0-40,18-40,40"/>
+          <path d="M0,-28c-18,0-32,14-32,32"/>
+          <path d="M0,-20c-14,0-24,10-24,24"/>
+          <path d="M0,-12c-10,0-16,6-16,16"/>
+          <path d="M0,-4c-6,0-8,4-8,8"/>
+          <path d="M0,-36c22,0,40,18,40,40"/>
+          <path d="M0,-28c18,0,32,14,32,32"/>
+          <path d="M0,-20c14,0,24,10,24,24"/>
+          <path d="M0,-12c10,0,16,6,16,16"/>
+          <path d="M0,-4c6,0,8,4,8,8"/>
+        </g>
+
+        <!-- Radar/pulse rings -->
+        <g transform="translate(0,14)" stroke="#8CD24C" fill="none" opacity=".55">
+          <circle r="6">
+            <animate attributeName="r" values="6;68" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".55;0" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="2;0.6" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+          <circle r="6">
+            <animate attributeName="r" values="6;68" dur="2.2s" begin=".5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".55;0" dur="2.2s" begin=".5s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-width" values="2;0.6" dur="2.2s" begin=".5s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+
+        <!-- Scan window + sweeping line -->
+        <clipPath id="scanClip">
+          <rect x="-48" y="-12" width="96" height="54" rx="8"/>
+        </clipPath>
+        <g clip-path="url(#scanClip)">
+          <rect x="-48" y="-12" width="96" height="54" rx="8" fill="#8CD24C" opacity=".06"/>
+          <rect id="scanLine" x="-48" y="-12" width="96" height="8" fill="#8CD24C" opacity=".22">
+            <animate attributeName="y" values="-12;34;-12" dur="2.2s" repeatCount="indefinite"/>
+          </rect>
+        </g>
+
+        <!-- Status -->
+        <text x="0" y="74" text-anchor="middle"
+              font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"
+              font-size="12" font-weight="600" fill="#2F2F2F" opacity=".8">
+          Scanning…
+          <animate attributeName="opacity" values=".6;1;.6" dur="1.8s" repeatCount="indefinite"/>
+        </text>
+      </g>
+
+      <!-- CTA -->
+      <g transform="translate(0,88)">
+        <rect x="-68" y="-18" width="136" height="36" rx="18" fill="#8CD24C"/>
+        <text x="0" y="4" text-anchor="middle"
+              font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"
+              font-size="14" font-weight="700" fill="#fff">Enable Biometrics</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Shield badge (top-right, pulsing) -->
+  <g transform="translate(318,70)">
+    <path d="M0,-14 l14,6 v12 c0,10 -7,18 -14,22 c-7,-4 -14,-12 -14,-22 v-12 l14,-6 z" fill="#8CD24C"/>
+    <path d="M-5,2 l3,3 7,-7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <animateTransform attributeName="transform" type="scale" values="1;1.06;1" dur="2s" repeatCount="indefinite"/>
+  </g>
 </svg>

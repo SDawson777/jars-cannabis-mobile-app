@@ -1,1 +1,96 @@
-<svg></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="360" height="260" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">No Nearby Stores</title>
+  <desc id="desc">A map pin gently bobs while radar rings expand and fade, with a message indicating no nearby store locations.</desc>
+
+  <defs>
+    <linearGradient id="pinGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8CD24C"/>
+      <stop offset="100%" stop-color="#6ab62f"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity="0.18"/>
+    </filter>
+
+    <path id="pinPath" d="M0,-34
+      C-18,-34 -32,-20 -32, -2
+      C-32, 12 -21, 27 -5, 43
+      C-3, 45 -1, 47 0, 48
+      C1, 47 3, 45 5, 43
+      C21, 27 32, 12 32, -2
+      C32,-20 18,-34 0,-34 Z" />
+  </defs>
+
+  <style>
+    .stroke { stroke: #333333; }
+    .muted  { stroke: #BDBDBD; }
+    .text   { fill: #333333; }
+
+    @keyframes pulse {
+      0%   { r: 4;   opacity: .35; stroke-width: 2; }
+      80%  { r: 80;  opacity: 0;   stroke-width: 0.4; }
+      100% { r: 80;  opacity: 0;   stroke-width: 0.4; }
+    }
+    @keyframes bob {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-6px); }
+    }
+    @keyframes floatShadow {
+      0%,100% { transform: scale(1); opacity: .22; }
+      50%     { transform: scale(0.92); opacity: .12; }
+    }
+    @keyframes dash {
+      0%   { stroke-dashoffset: 180; opacity: .5; }
+      60%  { stroke-dashoffset: 0;   opacity: 1; }
+      100% { stroke-dashoffset: 0;   opacity: 1; }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+
+  <!-- Grouped icon + text for alignment -->
+  <g transform="translate(180,110)" text-anchor="middle">
+
+    <!-- Radar pulses -->
+    <circle r="4" fill="#8CD24C" opacity=".4">
+      <animate attributeName="r" values="4;80" dur="2.2s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values=".35;0" dur="2.2s" repeatCount="indefinite" />
+    </circle>
+    <circle r="4" fill="none" stroke="#8CD24C" stroke-width="2" opacity=".35"
+            style="animation: pulse 2.2s .7s linear infinite"></circle>
+    <circle r="4" fill="none" stroke="#8CD24C" stroke-width="2" opacity=".35"
+            style="animation: pulse 2.2s 1.4s linear infinite"></circle>
+
+    <!-- Dashed locator ring -->
+    <circle r="52" fill="none" class="muted" stroke-width="2.2" stroke-dasharray="8 8"
+            style="animation: dash 1.6s ease-out 1 forwards"></circle>
+
+    <!-- Pin shadow -->
+    <ellipse cx="0" cy="54" rx="22" ry="7" fill="#000" opacity=".18"
+             style="animation: floatShadow 2.4s ease-in-out infinite"></ellipse>
+
+    <!-- Map pin -->
+    <g style="animation: bob 2.4s ease-in-out infinite" filter="url(#shadow)">
+      <use href="#pinPath" fill="url(#pinGrad)" class="stroke" stroke-width="1.5"/>
+      <circle cx="0" cy="-12" r="7.5" fill="#F9F9F9" class="stroke" stroke-width="1"/>
+    </g>
+
+    <!-- Text below icon -->
+    <g style="animation: fadeIn .8s ease .4s both" transform="translate(0,95)">
+      <text class="text" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="700">
+        No Nearby Stores
+      </text>
+      <text class="text" opacity=".7" y="22"
+            font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="12">
+        Try a different location or widen your search radius.
+      </text>
+    </g>
+  </g>
+</svg>

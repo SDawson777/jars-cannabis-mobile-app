@@ -1,1 +1,145 @@
-<svg></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="390" height="520" viewBox="0 0 390 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Onboarding – Personalized</title>
+  <desc id="desc">Animated phone with personalized recommendation cards, chips, and a pulsing avatar badge to convey tailored shopping.</desc>
+
+  <!-- ===== THEME ===== -->
+  <defs>
+    <linearGradient id="g-ui" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8CD24C"/>
+      <stop offset="100%" stop-color="#6AB62F"/>
+    </linearGradient>
+    <linearGradient id="g-card" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F6FAEF"/>
+      <stop offset="100%" stop-color="#ECF6DC"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.16"/>
+    </filter>
+    <filter id="tinyShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+
+    <!-- Icons -->
+    <symbol id="icon-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4.2" fill="#fff"/>
+      <path d="M4 20a8 8 0 0 1 16 0" fill="#fff"/>
+    </symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24">
+      <path d="M12 2l2.5 6.6 7 .6-5.3 4.4 1.7 6.8L12 16.8 6.1 20.4 7.8 13.6 2.5 9.2l7-.6L12 2z" fill="url(#g-ui)"/>
+    </symbol>
+    <symbol id="spark" viewBox="0 0 20 20">
+      <path d="M10 0l1.6 4.2L16 6l-4.4 1.8L10 12 8.4 7.8 4 6l4.4-1.8L10 0z" fill="#8CD24C"/>
+    </symbol>
+  </defs>
+
+  <style>
+    .text { fill:#333 }
+    .muted { fill:#777; opacity:.75 }
+    .ui { fill:url(#g-ui) }
+
+    /* ===== Animations ===== */
+    @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+    @keyframes floatShadow { 0%,100% { transform: scale(1); opacity:.18 } 50% { transform: scale(.9); opacity:.10 } }
+    @keyframes slideInL { 0% { opacity:0; transform: translateX(-24px) } 100% { opacity:1; transform: translateX(0) } }
+    @keyframes slideInR { 0% { opacity:0; transform: translateX(24px) } 100% { opacity:1; transform: translateX(0) } }
+    @keyframes chip { 0% { opacity:0; transform: translateY(8px) scale(.96) } 100% { opacity:1; transform: translateY(0) scale(1) } }
+    @keyframes pulseBadge { 0% { transform: scale(1) } 50% { transform: scale(1.06) } 100% { transform: scale(1) } }
+    @keyframes sparkle { 0% { opacity:0; transform: scale(.8) rotate(0deg) } 50% { opacity:1; transform: scale(1) rotate(18deg) } 100% { opacity:0; transform: scale(.8) rotate(0deg) } }
+    @keyframes fadeUp { 0% { opacity:0; transform: translateY(6px) } 100% { opacity:1; transform: translateY(0) } }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+
+  <!-- ===== HEADLINE (exact centered) ===== -->
+  <text x="195" y="64" class="text" text-anchor="middle"
+        font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-weight="700" font-size="22" style="animation:fadeUp .6s ease .1s both">
+    Personalized For You
+  </text>
+  <text x="195" y="88" class="muted" text-anchor="middle"
+        font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="13" style="animation:fadeUp .6s ease .2s both">
+    Smart picks based on what you like.
+  </text>
+
+  <!-- ===== PHONE BLOCK (centered) ===== -->
+  <g transform="translate(195,292)" text-anchor="middle">
+    <!-- phone shadow -->
+    <ellipse cx="0" cy="128" rx="70" ry="14" fill="#000" opacity=".18"
+             style="animation:floatShadow 2.6s ease-in-out infinite"></ellipse>
+
+    <!-- phone -->
+    <g filter="url(#softShadow)" style="animation:bob 2.6s ease-in-out infinite">
+      <!-- body -->
+      <rect x="-90" y="-120" width="180" height="260" rx="28" fill="#fff" stroke="#E6E6E6" stroke-width="1.5"/>
+      <!-- notch -->
+      <rect x="-26" y="-115" width="52" height="8" rx="4" fill="#EAEAEA"/>
+      <!-- header pill -->
+      <rect x="-68" y="-90" width="136" height="16" rx="8" fill="#F4F4F4"/>
+
+      <!-- Chips row -->
+      <g transform="translate(-76,-64)">
+        <g style="animation:chip .45s ease .25s both">
+          <rect x="0" y="0" width="74" height="22" rx="11" fill="#F1F7E7"/>
+          <circle cx="12" cy="11" r="5" fill="#D7EAC2"/>
+          <text x="28" y="14" font-size="10" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" fill="#333">Calming</text>
+        </g>
+        <g transform="translate(84,0)" style="animation:chip .45s ease .35s both">
+          <rect x="0" y="0" width="84" height="22" rx="11" fill="#F1F7E7"/>
+          <circle cx="12" cy="11" r="5" fill="#D7EAC2"/>
+          <text x="28" y="14" font-size="10" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" fill="#333">Focus</text>
+        </g>
+      </g>
+
+      <!-- For You card A -->
+      <g style="animation:slideInL .7s ease .15s both">
+        <rect x="-76" y="-30" width="152" height="62" rx="12" fill="url(#g-card)" filter="url(#tinyShadow)"/>
+        <use href="#icon-star" x="-62" y="-16" width="20" height="20"/>
+        <rect x="-36" y="-14" width="90" height="10" rx="5" fill="#D7EAC2"/>
+        <rect x="-36" y="2" width="64" height="8" rx="4" fill="#E6F4DA"/>
+        <!-- shimmer: lightweight inline -->
+        <rect x="-76" y="-30" width="60" height="62" fill="#ffffff" opacity=".16" transform="skewX(-20)">
+          <animate attributeName="x" from="-60" to="160" dur="1.6s" repeatCount="indefinite" />
+        </rect>
+      </g>
+
+      <!-- For You card B -->
+      <g style="animation:slideInR .7s ease .30s both">
+        <rect x="-76" y="38" width="152" height="62" rx="12" fill="url(#g-card)" filter="url(#tinyShadow)"/>
+        <use href="#icon-star" x="-62" y="52" width="20" height="20"/>
+        <rect x="-36" y="54" width="104" height="10" rx="5" fill="#D7EAC2"/>
+        <rect x="-36" y="70" width="72" height="8" rx="4" fill="#E6F4DA"/>
+        <!-- shimmer -->
+        <rect x="-76" y="38" width="60" height="62" fill="#ffffff" opacity=".16" transform="skewX(-20)">
+          <animate attributeName="x" from="-60" to="160" dur="1.6s" begin=".2s" repeatCount="indefinite" />
+        </rect>
+      </g>
+
+      <!-- CTA -->
+      <g transform="translate(0,92)" text-anchor="middle">
+        <rect x="-68" y="-18" width="136" height="36" rx="18" class="ui"/>
+        <text x="0" y="4" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#fff">See My Matches</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ===== AVATAR BADGE ===== -->
+  <g transform="translate(318,70)" filter="url(#tinyShadow)" style="animation:pulseBadge 2s ease-in-out .4s infinite">
+    <circle cx="0" cy="0" r="16" class="ui"/>
+    <circle cx="0" cy="0" r="12" fill="#333"/>
+    <use href="#icon-user" x="-12" y="-12" width="24" height="24"/>
+  </g>
+
+  <!-- ===== SPARKLES ===== -->
+  <g opacity=".95">
+    <use href="#spark" x="58"  y="112" width="12" height="12" style="animation:sparkle 2.4s ease .2s infinite"/>
+    <use href="#spark" x="328" y="98"  width="10" height="10" style="animation:sparkle 2.1s ease .6s infinite"/>
+    <use href="#spark" x="332" y="370" width="12" height="12" style="animation:sparkle 2.6s ease .1s infinite"/>
+    <use href="#spark" x="44"  y="404" width="10" height="10" style="animation:sparkle 1.9s ease .9s infinite"/>
+  </g>
+</svg>
