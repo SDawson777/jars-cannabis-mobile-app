@@ -9,15 +9,13 @@
     "stores/**/*.tsx",
     "tests/**/*.ts",
     "tests/**/*.tsx",
+    "tests/**/*.js",
+    "config/**/*.ts",
+    "scripts/**/*.ts",
+    "tasks/**/*.ts",
     "jest.setup.ts",
     "jest.config.cjs",
     "App.tsx"
   ],
-  "exclude": [
-    "backend",
-    "functions",
-    "server",
-    "apps",
-    "node_modules"
-  ]
+  "exclude": ["backend", "functions", "server", "apps", "node_modules"]
 }

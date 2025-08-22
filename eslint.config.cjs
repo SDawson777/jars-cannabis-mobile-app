@@ -12,7 +12,17 @@ const globals = require('globals');
 module.exports = [
   js.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx,js,jsx}', 'store/**/*.{ts,tsx,js,jsx}', 'stores/**/*.{ts,tsx,js,jsx}', 'tests/**/*.{ts,tsx,js,jsx}', 'jest.setup.ts'],
+    files: [
+      'src/**/*.{ts,tsx,js,jsx}',
+      'store/**/*.{ts,tsx,js,jsx}',
+      'stores/**/*.{ts,tsx,js,jsx}',
+      'tests/**/*.{ts,tsx,js,jsx}',
+      'config/**/*.{ts,tsx}',
+      'scripts/**/*.{ts,tsx}',
+      'tasks/**/*.{ts,tsx}',
+      'App.tsx',
+      'jest.setup.ts'
+    ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -50,7 +60,12 @@ module.exports = [
       'testing-library': testingLibrary
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }],
+      'no-unused-vars': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       'react/prop-types': 'off',
@@ -64,7 +79,9 @@ module.exports = [
           '**/__tests__/**',
           'jest*.{cjs,js,ts}',
           'jest.setup.ts',
-          'tests/**'
+          'tests/**',
+          'scripts/**',
+          'config/**'
         ]
       }],
       'react-native/no-inline-styles': 'off',
@@ -86,6 +103,24 @@ module.exports = [
     rules: {
       'testing-library/no-unnecessary-act': 'off',
       'testing-library/no-await-sync-events': 'off'
+    }
+  },
+  {
+    files: ['tests/**/*.js', 'tests/__mocks__/**/*.js'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module'
+      },
+      globals: {
+        ...globals.node,
+        ...globals.jest
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-undef': 'off'
     }
   },
   {
