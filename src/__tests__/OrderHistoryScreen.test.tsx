@@ -70,7 +70,7 @@ describe('OrderHistoryScreen', () => {
       ],
     });
 
-    const client = new QueryClient();
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     let tree: renderer.ReactTestRenderer | undefined;
     await act(async () => {
       tree = renderer.create(
@@ -78,8 +78,10 @@ describe('OrderHistoryScreen', () => {
           <OrderHistoryScreen />
         </QueryClientProvider>
       );
+      // give async effects (react-query) a couple ticks to settle
+      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
-    await act(async () => {});
 
     const texts = tree!.root
       .findAllByType('Text' as any)

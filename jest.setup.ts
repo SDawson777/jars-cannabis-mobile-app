@@ -42,5 +42,16 @@ jest.mock('react-native-reanimated', () => {
   return Reanimated;
 });
 
+// Polyfill TextEncoder/TextDecoder for Node environment used in Jest
+if (typeof (global as any).TextEncoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  (global as any).TextEncoder = TextEncoder;
+  (global as any).TextDecoder = TextDecoder;
+}
+
+// Mock Prisma client during unit tests to avoid requiring `prisma generate` for CI/local dev
+// Prisma mock is provided via a manual JS mock under `tests/__mocks__/@prisma/client.js`
+// This ensures imports of `@prisma/client` at module-eval time resolve to the mock.
+
 // If your code uses expo-constants or other Expo libs, you can add light mocks here:
 // jest.mock('expo-constants', () => ({ default: { manifest: {} } }));

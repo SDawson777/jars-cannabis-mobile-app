@@ -1,5 +1,4 @@
 /* eslint-env node */
-/* eslint-disable no-undef */
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 

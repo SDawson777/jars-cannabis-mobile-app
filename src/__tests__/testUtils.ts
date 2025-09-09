@@ -13,3 +13,9 @@ export const makeStore = (overrides: Partial<StoreData> = {}): StoreData => ({
   phone: '555-555-5555',
   ...overrides,
 });
+
+// Minimal smoke test so this file is treated as a test suite by Jest
+test('makeStore returns an object with id', () => {
+  const s = makeStore();
+  expect(s.id).toBe('1');
+});

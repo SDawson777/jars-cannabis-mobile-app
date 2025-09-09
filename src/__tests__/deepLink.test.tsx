@@ -1,16 +1,8 @@
 /* eslint-env jest, node */
-import { NavigationContainer } from '@react-navigation/native';
-import { renderHook, waitFor, act } from '@testing-library/react-native';
+import { renderHook, waitFor } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
-
-jest.mock('react-native', () => ({
-  Linking: {
-    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-    removeEventListener: jest.fn(),
-    getInitialURL: jest.fn(() => Promise.resolve('jars://app/shop?store=midtown')),
-  },
-}));
+import { Linking } from 'react-native';
 
 jest.mock('../context/StoreContext', () => {
   const setPreferredStore = jest.fn();
@@ -38,13 +30,18 @@ beforeEach(() => {
   SecureStore.getItemAsync.mockResolvedValue(null);
   SecureStore.setItemAsync.mockResolvedValue(undefined);
   SecureStore.deleteItemAsync.mockResolvedValue(undefined);
+  // Ensure Linking functions on the global mock are set for this test
+  (Linking as any).addEventListener = jest.fn((_type, _cb) => ({ remove: jest.fn() }));
+  (Linking as any).getInitialURL = jest.fn(() => Promise.resolve('jars://app/shop?store=midtown'));
 });
 
 test('deep link loads Shop with correct store', async () => {
   const stores = [makeStore()];
-  const wrapper = ({ children }: any) => <NavigationContainer>{children}</NavigationContainer>;
-  await act(async () => {
-    renderHook(() => useDeepLinkHandler(stores), { wrapper });
-  });
+  // Use a simple fragment wrapper to avoid mock/import ordering issues with
+  // NavigationContainer in the test environment. The hook only needs a mounted
+  // React tree for effects to run.
+  const wrapper = ({ children }: any) => <>{children}</>;
+  // renderHook internally wraps renders with act; no outer act required here
+  renderHook(() => useDeepLinkHandler(stores), { wrapper });
   await waitFor(() => expect(setPreferredStore).toHaveBeenCalled());
 });
