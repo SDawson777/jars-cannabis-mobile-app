@@ -1,0 +1,20 @@
+# Only upload the demo web app to Vercel
+# Ignore everything by default, then allow the apps/demo-web folder
+*
+!apps/
+apps/*
+!apps/demo-web/
+!apps/demo-web/**
+
+# Ignore heavy native and server folders if present
+android/
+ios/
+backend/
+functions/
+packages/
+node_modules/
+.git/
+.vscode/
+
+# Keep dotfiles that Vercel might need
+!.vercelignore

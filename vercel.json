@@ -1,15 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "npm run vercel-build",
-  "outputDirectory": "dist",
-  "env": {
-    "EXPO_PUBLIC_API_BASE_URL": "https://api.jarscannabis.com"
-  },
+  "buildCommand": "npm run build --workspace=apps/demo-web",
+  "outputDirectory": "apps/demo-web/out",
   "rewrites": [
     {
-      "source": "/api/v1/(.*)",
-      "destination": "https://api.jarscannabis.com/api/v1/$1"
+      "source": "/api/v1/:match*",
+      "destination": "https://api.jarscannabis.com/api/v1/:match*"
+    },
+    {
+      "source": "/:match*",
+      "destination": "apps/demo-web/:match*"
     }
   ]
 }
