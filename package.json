@@ -207,14 +207,14 @@
   },
   "overrides": {
     "micromatch": "^4.0.8",
-    "metro": "0.83.1",
-    "metro-config": "0.83.1",
-    "metro-core": "0.83.1",
-    "metro-runtime": "0.83.1",
-    "metro-resolver": "0.83.1",
-    "metro-source-map": "0.83.1",
-    "metro-cache": "0.83.1",
-    "metro-minify-terser": "0.83.1",
+    "metro": "~0.80.4",
+    "metro-config": "~0.80.4",
+    "metro-core": "~0.80.4",
+    "metro-runtime": "~0.80.4",
+    "metro-resolver": "~0.80.4",
+    "metro-source-map": "~0.80.4",
+    "metro-cache": "~0.80.4",
+    "metro-minify-terser": "~0.80.4",
     "glob": "^9.3.5",
     "rimraf": "^5.0.5",
     "@faker-js/faker": "^8.4.1",
@@ -231,6 +231,7 @@
     },
     "react-native-skeleton-placeholder": {
       "@react-native-masked-view/masked-view": "^0.2.8"
-    }
+    },
+    "@expo/config-plugins": "^7.9.2"
   }
 }
