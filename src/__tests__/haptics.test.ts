@@ -1,11 +1,11 @@
-import haptics from '../lib/haptics';
-
 // Mock react-native-haptic-feedback
 jest.mock('react-native-haptic-feedback', () => ({
   trigger: jest.fn(),
 }));
 
 import Haptic from 'react-native-haptic-feedback';
+
+import haptics from '../lib/haptics';
 
 describe('Haptics Wrapper', () => {
   beforeEach(() => {

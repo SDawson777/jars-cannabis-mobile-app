@@ -1,5 +1,5 @@
-import { hapticLight, hapticMedium, hapticHeavy, hapticSuccess, hapticWarning, hapticError } from '../utils/haptic';
 import haptics from '../lib/haptics';
+import { hapticLight, hapticMedium, hapticHeavy, hapticSuccess, hapticWarning, hapticError } from '../utils/haptic';
 
 // Mock the underlying haptics library
 jest.mock('../lib/haptics', () => ({

@@ -1,4 +1,17 @@
 // src/navigation/types.ts
+
+// Navigation stack type definitions for the modular navigation structure
+export type RootNavigatorParamList = {
+  OnboardingFlow: undefined;
+  AuthFlow: undefined;
+  HomeScreen: undefined;
+  ShopFlow: undefined;
+  CheckoutFlow: undefined;
+  AccountFlow: undefined;
+  ContentFlow: undefined;
+};
+
+// Legacy type maintained for backward compatibility
 export type RootStackParamList = {
   SplashScreen: undefined;
   Onboarding: undefined;

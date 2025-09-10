@@ -1,4 +1,5 @@
 import { linking } from '../navigation';
+import logger from '../lib/logger';
 
 export interface ParsedRoute {
   routeName: string;
@@ -38,7 +39,7 @@ export function parseDeepLink(url: string): ParsedRoute | null {
     
     return null;
   } catch (error) {
-    console.warn('Failed to parse deep link:', url, error);
+    logger.warn('Failed to parse deep link', { url }, error);
     return null;
   }
 }

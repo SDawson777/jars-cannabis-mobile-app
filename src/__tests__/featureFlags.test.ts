@@ -1,5 +1,6 @@
-import { getFeatureFlags, isFeatureEnabled, useFeatureFlags, useFeatureFlag } from '../utils/featureFlags';
 import { renderHook } from '@testing-library/react-native';
+
+import { getFeatureFlags, isFeatureEnabled, useFeatureFlags, useFeatureFlag } from '../utils/featureFlags';
 
 describe('Feature Flags', () => {
   describe('getFeatureFlags', () => {

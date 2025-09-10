@@ -1,8 +1,10 @@
 // Analytics implementation - fallback when @aws-amplify/analytics is not available
+import logger from '../lib/logger';
+
 export function logEvent(name: string, data: Record<string, any>) {
-  // In development, log to console
+  // In development, log to console via logger
   if (__DEV__) {
-    console.log(`Analytics Event: ${name}`, data);
+    logger.log(`Analytics Event: ${name}`, data);
   }
   // In production, this would integrate with your analytics service
 }
