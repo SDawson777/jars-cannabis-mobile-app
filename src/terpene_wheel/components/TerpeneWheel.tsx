@@ -1,9 +1,9 @@
-import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { Dimensions, Pressable } from 'react-native';
 import Animated, { useSharedValue, withTiming, useAnimatedProps } from 'react-native-reanimated';
 import Svg, { Circle, Line, Text as SvgText, Path } from 'react-native-svg';
 
+import haptics from '../../lib/haptics';
 import { TERPENES, TerpeneInfo } from '../data/terpenes';
 
 const { width } = Dimensions.get('window');
@@ -108,7 +108,7 @@ const TerpeneSegment: React.FC<{
 
   const handlePress = () => {
     highlight.value = 1;
-    Haptics.selectionAsync();
+    haptics.selection();
     triggerWave();
     onSelect(info);
     setTimeout(() => {
