@@ -65,7 +65,7 @@ import StoreDetailsScreen from './src/screens/StoreDetailsScreen';
 import StoreLocatorListScreen from './src/screens/StoreLocatorListScreen';
 import StoreLocatorMapScreen from './src/screens/StoreLocatorMapScreen';
 import StoreLocatorScreen from './src/screens/StoreLocatorScreen';
-import StoreSelection from './src/screens/StoreSelectionScreen';
+import StoreSelectionScreen from './src/screens/StoreSelectionScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import AgeVerificationScreen from './src/screens/onboarding/AgeVerificationScreen';
 import OrderHistoryScreen from './src/screens/orders/OrderHistoryScreen';
@@ -230,7 +230,7 @@ function App() {
                         <Stack.Screen name="SignUp" component={SignUpScreen} />
                         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
                         <Stack.Screen name="OTPScreen" component={OTPScreen} />
-                        <Stack.Screen name="StoreSelection" component={StoreSelection} />
+                        <Stack.Screen name="StoreSelection" component={StoreSelectionScreen} />
                         <Stack.Screen name="HomeScreen" component={HomeScreen} />
                         <Stack.Screen name="ShopScreen" component={ShopScreen} />
                         <Stack.Screen name="ProductList" component={ProductListScreen} />
