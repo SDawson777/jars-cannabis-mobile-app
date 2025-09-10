@@ -89,7 +89,7 @@ module.exports = [
     }
   },
   {
-    files: ['**/*.test.*', '**/__tests__/**', 'jest.setup.ts'],
+    files: ['**/*.test.*', '**/__tests__/**', 'jest.setup.ts', 'e2e/**/*.spec.*', 'e2e/**/*.test.*'],
     plugins: {
       jest,
       'testing-library': testingLibrary
