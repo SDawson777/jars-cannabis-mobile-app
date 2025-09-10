@@ -76,3 +76,6 @@ export const linking = {
     },
   },
 };
+
+// Export RootNavigator
+export { default as RootNavigator } from './RootNavigator';

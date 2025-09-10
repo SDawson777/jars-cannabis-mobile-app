@@ -8,8 +8,8 @@ import {
   Easing,
 } from 'react-native-reanimated';
 
-import { hapticLight } from '../utils/haptic';
 import { useFeatureFlag } from '../utils/featureFlags';
+import { hapticLight } from '../utils/haptic';
 
 /**
  * Hook for a one-time "pulse" animation (scale up then back down).

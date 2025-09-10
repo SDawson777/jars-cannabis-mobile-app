@@ -1,7 +1,8 @@
 import { renderHook, act } from '@testing-library/react-native';
+
 import { usePulse, usePulseCTA } from '../hooks/usePulse';
-import * as hapticUtils from '../utils/haptic';
 import * as featureFlags from '../utils/featureFlags';
+import * as hapticUtils from '../utils/haptic';
 
 // Mock dependencies
 jest.mock('../utils/haptic', () => ({
