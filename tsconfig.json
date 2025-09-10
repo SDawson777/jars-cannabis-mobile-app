@@ -28,6 +28,7 @@
     "backend",
     "server",
     "functions",
-    "apps"
+    "apps",
+    "tests/awards.redeem.test.ts"
   ]
 }

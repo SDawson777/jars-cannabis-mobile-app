@@ -42,6 +42,7 @@ export type RootStackParamList = {
   ArticleList: undefined;
   /** Now requires a slug param */
   ArticleDetail: { slug: string };
+  TerpeneWheel: undefined;
   CommunityGarden: undefined;
   ConciergeChat: undefined;
   DataTransparency: undefined;
