@@ -4,8 +4,8 @@ import * as SecureStore from 'expo-secure-store';
 import LottieView from 'lottie-react-native';
 import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import HapticFeedback from 'react-native-haptic-feedback';
 
+import haptics from '../lib/haptics';
 import type { RootStackParamList } from '../navigation/types';
 
 export default function SplashScreenWrapper() {
@@ -13,7 +13,7 @@ export default function SplashScreenWrapper() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      HapticFeedback.trigger('impactHeavy');
+      haptics.impactHeavy();
       SecureStore.setItemAsync('onboardingComplete', 'true');
       navigation.replace('Onboarding');
     }, 2000);
@@ -27,7 +27,7 @@ export default function SplashScreenWrapper() {
         autoPlay
         loop={false}
         onAnimationFinish={() => {
-          HapticFeedback.trigger('impactHeavy');
+          haptics.impactHeavy();
           SecureStore.setItemAsync('onboardingComplete', 'true');
           navigation.replace('Onboarding');
         }}

@@ -4,13 +4,13 @@ import * as Speech from 'expo-speech';
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { AccessibilityInfo } from 'react-native';
-import HapticFeedback from 'react-native-haptic-feedback';
 import PagerView from 'react-native-pager-view';
 
 import AnimatedBackgroundGradient from '../components/AnimatedBackgroundGradient';
 import CustomAudioPlayer from '../components/CustomAudioPlayer';
 import OnboardingSlide from '../components/OnboardingSlide';
 import PaginationDots from '../components/PaginationDots';
+import haptics from '../lib/haptics';
 import type { RootStackParamList } from '../navigation/types';
 
 
@@ -49,7 +49,7 @@ export default function OnboardingPager() {
       <PagerView
         style={styles.pager}
         onPageSelected={(e: any) => {
-          HapticFeedback.trigger('impactLight');
+          haptics.impactLight();
           setIndex(e.nativeEvent.position);
         }}
       >
@@ -66,7 +66,7 @@ export default function OnboardingPager() {
                 accessibilityRole="button"
                 style={styles.button}
                 onPress={() => {
-                  HapticFeedback.trigger('impactMedium');
+                  haptics.impactMedium();
                   navigation.replace('AgeVerification');
                 }}
               >

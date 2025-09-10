@@ -1,18 +1,16 @@
 // src/utils/haptic.ts
-import * as Haptics from 'expo-haptics';
+import haptics from '../lib/haptics';
 
 // Light — subtle selection taps
-export const hapticLight = () => Haptics.selectionAsync();
+export const hapticLight = () => haptics.impactLight();
 
 // Medium — meaningful actions (e.g. add/remove)
-export const hapticMedium = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+export const hapticMedium = () => haptics.impactMedium();
 
 // Heavy — final/completion actions
-export const hapticHeavy = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+export const hapticHeavy = () => haptics.impactHeavy();
 
 // Notification patterns
-export const hapticSuccess = () =>
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-export const hapticWarning = () =>
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-export const hapticError = () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+export const hapticSuccess = () => haptics.success();
+export const hapticWarning = () => haptics.warning();
+export const hapticError = () => haptics.error();

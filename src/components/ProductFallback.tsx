@@ -1,6 +1,7 @@
-import * as Haptics from 'expo-haptics';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+
+import haptics from '../lib/haptics';
 
 interface Props {
   onRetry: () => void;
@@ -14,7 +15,7 @@ export default function ProductFallback({ onRetry, loading }: Props) {
       <Text style={styles.subtitle}>Try switching stores or check back later.</Text>
       <Pressable
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          haptics.impactMedium();
           onRetry();
         }}
         style={styles.button}
