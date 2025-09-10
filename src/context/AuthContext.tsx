@@ -6,6 +6,7 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { Alert } from 'react-native';
 
 import { useUserProfile, UserProfile } from '../api/hooks/useUserProfile';
+import logger from '../lib/logger';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 
@@ -115,7 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         }
       } catch (e) {
-        console.warn('Failed to load auth from storage', e);
+        logger.warn('Failed to load auth from storage', { error: e });
       }
     };
     loadAuth();

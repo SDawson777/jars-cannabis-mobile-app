@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import logger from '../../lib/logger';
 import { phase4Client } from '../phase4Client';
 
 export interface UserProfile {
@@ -20,6 +21,6 @@ export function useUserProfile() {
     queryFn: fetchProfile,
     staleTime: 300000,
     retry: false,
-    onError: (err: Error) => console.error(err),
+    onError: (err: Error) => logger.error('useUserProfile error', { error: err }, err),
   } as any);
 }

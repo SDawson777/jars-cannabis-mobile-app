@@ -4,6 +4,7 @@ import { Linking } from 'react-native';
 
 import type { StoreData } from '../@types/store';
 import { useStore } from '../context/StoreContext';
+import logger from '../lib/logger';
 import { parseDeepLink, isJarsDeepLink } from '../utils/deepLinkUtils';
 
 export default function useDeepLinkHandler(stores: StoreData[]) {
@@ -20,7 +21,7 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
 
         const parsed = parseDeepLink(url);
         if (!parsed) {
-          console.warn('Could not parse deep link:', url);
+          logger.warn('Could not parse deep link:', { url });
           return;
         }
 
@@ -54,7 +55,7 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
             if (params && Object.keys(params).length > 0) {
               navigation.navigate(routeName as never, params as never);
             } else {
-              console.warn(`Route ${routeName} requires parameters but none provided`);
+              logger.warn(`Route ${routeName} requires parameters but none provided`, { routeName });
             }
             break;
           }
@@ -70,7 +71,7 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
           }
         }
       } catch (error) {
-        console.warn('Error handling deep link:', url, error);
+        logger.warn('Error handling deep link:', { url, error });
       }
     };
 

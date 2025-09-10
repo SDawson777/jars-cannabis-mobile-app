@@ -19,7 +19,7 @@ export const AnimatedSoundPlayer = forwardRef<AnimatedSoundPlayerHandle, Props>(
         try {
           await sound.current.loadAsync(source);
         } catch (e) {
-          console.warn('Failed to load sound', e);
+          logger.warn('Failed to load sound', { error: e });
         }
       })();
       return () => {
@@ -34,7 +34,7 @@ export const AnimatedSoundPlayer = forwardRef<AnimatedSoundPlayerHandle, Props>(
           await sound.current.setPositionAsync(0);
           await sound.current.playAsync();
         } catch (e) {
-          console.warn('Sound playback failed', e);
+          logger.warn('Sound playback failed', { error: e });
         }
       },
     }));

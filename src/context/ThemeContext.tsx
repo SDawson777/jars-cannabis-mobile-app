@@ -3,6 +3,8 @@ import { getLocales } from 'expo-localization';
 import * as Location from 'expo-location';
 import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
+
+import logger from '../lib/logger';
 const EXPO_PUBLIC_OPENWEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_KEY as string;
 
 // Tuned threshold constants
@@ -58,7 +60,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
         // Abort early if no API key provided
         if (!EXPO_PUBLIC_OPENWEATHER_KEY) {
-          console.warn('OpenWeather API key missing or invalid; using time-based theme.');
+          logger.warn('OpenWeather API key missing or invalid; using time-based theme.');
           setColorTemp(temp);
           return;
         }
@@ -83,7 +85,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             `&units=${units}`;
           const resp = await fetch(url);
           if (!resp.ok) {
-            console.warn(
+            logger.warn(
               `OpenWeather request failed with status ${resp.status}; using time-based theme.`
             );
             setColorTemp(temp);
@@ -118,7 +120,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
         setColorTemp(temp);
       } catch (error) {
-        console.warn('ThemeContext weather failed, falling back to time-based:', error);
+        logger.warn('ThemeContext weather failed, falling back to time-based:', { error });
         setColorTemp(computeTimeTemp());
       } finally {
         setLoading(false);
