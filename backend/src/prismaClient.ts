@@ -2,11 +2,9 @@ import { PrismaClient } from '@prisma/client';
 
 // Lazily create the Prisma client so the backend can boot in demo mode without a DB.
 // The actual connection is only attempted when a route first accesses the client.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let prismaInstance: any | null = null;
+let prismaInstance: PrismaClient | null = null;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPrismaInstance(): any {
+function getPrismaInstance(): PrismaClient {
   if (!prismaInstance) {
     // If DATABASE_URL is missing, defer throwing until a DB-backed route is called.
     if (!process.env.DATABASE_URL) {
@@ -19,15 +17,16 @@ function getPrismaInstance(): any {
   return prismaInstance;
 }
 
-// Proxy forwards property access to the real Prisma client on first use
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const prisma: any = new Proxy(
-  {},
+// Type-safe proxy that forwards property access to the real Prisma client on first use
+type LazyPrismaClient = {
+  [K in keyof PrismaClient]: PrismaClient[K];
+};
+
+export const prisma: LazyPrismaClient = new Proxy(
+  {} as LazyPrismaClient,
   {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    get(_target: any, prop: string) {
+    get<K extends keyof PrismaClient>(_target: LazyPrismaClient, prop: K): PrismaClient[K] {
       const client = getPrismaInstance();
-      // @ts-ignore dynamic property access to Prisma client delegates
       return client[prop];
     },
   }
