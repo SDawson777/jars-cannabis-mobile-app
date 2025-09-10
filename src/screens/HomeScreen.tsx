@@ -25,6 +25,7 @@ import {
   UIManager,
   Platform,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { phase4Client } from '../api/phase4Client';
 import ForYouTodayCard from '../components/ForYouTodayCard';
@@ -32,6 +33,7 @@ import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
 import OfflineNotice from '../components/OfflineNotice';
 import { ThemeContext } from '../context/ThemeContext';
 import { useForYouToday } from '../hooks/useForYouToday';
+import { usePulseCTA } from '../hooks/usePulse';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
@@ -55,6 +57,17 @@ export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const { data: forYou, isLoading } = useForYouToday('1', '1');
+
+  // Pulse animations for key CTAs
+  const terpeneWheelPulse = usePulseCTA(
+    () => navigation.navigate('TerpeneWheel'),
+    { maxScale: 1.02, duration: 200 }
+  );
+
+  const shopCTAPulse = usePulseCTA(
+    () => navigation.navigate('ShopScreen'),
+    { maxScale: 1.02, duration: 200 }
+  );
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -235,8 +248,10 @@ export default function HomeScreen() {
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Featured Products</Text>
-          <Pressable onPress={() => navigation.navigate('ShopScreen')}>
-            <Text style={[styles.seeMore, { color: jarsPrimary }]}>Shop All</Text>
+          <Pressable onPress={shopCTAPulse.onPress}>
+            <Animated.Text style={[styles.seeMore, { color: jarsPrimary }, shopCTAPulse.pulseStyle]}>
+              Shop All
+            </Animated.Text>
           </Pressable>
         </View>
         {featuredLoading ? (
@@ -309,15 +324,15 @@ export default function HomeScreen() {
           <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Educational Resources</Text>
         </View>
         <Pressable
-          onPress={() => navigation.navigate('TerpeneWheel')}
+          onPress={terpeneWheelPulse.onPress}
           style={styles.terpeneWheelCard}
         >
-          <View style={styles.terpeneWheelContent}>
+          <Animated.View style={[styles.terpeneWheelContent, terpeneWheelPulse.pulseStyle]}>
             <Text style={styles.terpeneWheelTitle}>🌿 Explore Terpenes</Text>
             <Text style={styles.terpeneWheelDescription}>
               Discover the aromatic compounds that give cannabis its unique scents and effects
             </Text>
-          </View>
+          </Animated.View>
         </Pressable>
       </ScrollView>
 
