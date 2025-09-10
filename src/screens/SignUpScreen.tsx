@@ -18,6 +18,7 @@ import {
 import PasswordStrengthBar from '../components/PasswordStrengthBar';
 import { ThemeContext } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
+import logger from '../lib/logger';
 import type { RootStackParamList } from '../navigation/types';
 import { logEvent } from '../utils/analytics';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
@@ -84,7 +85,7 @@ export default function SignUpScreen() {
       navigation.navigate('OTPScreen');
     } catch (err: any) {
       hapticHeavy();
-      console.warn(err);
+      logger.warn('Sign up failed', { error: err });
     }
   };
 

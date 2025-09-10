@@ -1,5 +1,7 @@
 import { Audio } from 'expo-av';
 
+import logger from './logger';
+
 interface AudioOptions {
   timeout?: number;
   enablePreload?: boolean;
@@ -26,7 +28,7 @@ export async function initializeAudio(): Promise<void> {
     });
     isInitialized = true;
   } catch (error) {
-    console.warn('Failed to initialize audio:', error);
+    logger.warn('Failed to initialize audio:', { error });
   }
 }
 
@@ -57,7 +59,7 @@ export async function preload(key: string, source: any, options: AudioOptions = 
     await Promise.race([loadPromise, timeoutPromise]);
     cache[key] = sound;
   } catch (error) {
-    console.warn(`Failed to preload audio ${key}:`, error);
+    logger.warn(`Failed to preload audio ${key}:`, { error });
     // Don't throw, just warn and continue
   }
 }
@@ -75,7 +77,7 @@ export async function play(key: string, source?: any, options: AudioOptions = {}
     
     const sound = cache[key];
     if (!sound) {
-      console.warn(`No audio found for key: ${key}`);
+      logger.warn(`No audio found for key: ${key}`, { key });
       return;
     }
     
@@ -87,7 +89,7 @@ export async function play(key: string, source?: any, options: AudioOptions = {}
     
     await sound.replayAsync();
   } catch (error) {
-    console.warn(`Failed to play audio ${key}:`, error);
+    logger.warn(`Failed to play audio ${key}:`, { error });
     // Don't throw, just warn and continue
   }
 }
@@ -105,7 +107,7 @@ export async function stop(key: string): Promise<void> {
       await sound.stopAsync();
     }
   } catch (error) {
-    console.warn(`Failed to stop audio ${key}:`, error);
+    logger.warn(`Failed to stop audio ${key}:`, { error });
   }
 }
 
@@ -120,7 +122,7 @@ export async function unload(key: string): Promise<void> {
     await sound.unloadAsync();
     delete cache[key];
   } catch (error) {
-    console.warn(`Failed to unload audio ${key}:`, error);
+    logger.warn(`Failed to unload audio ${key}:`, { error });
   }
 }
 
@@ -132,7 +134,7 @@ export async function unloadAll(): Promise<void> {
     try {
       await sound.unloadAsync();
     } catch (error) {
-      console.warn(`Failed to unload audio ${key}:`, error);
+      logger.warn(`Failed to unload audio ${key}:`, { error });
     }
   });
   
