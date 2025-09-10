@@ -9,7 +9,7 @@ import Illustration from '../../assets/svg/illustration-no-nearby-stores.svg';
 import { onProximityAlert } from '../../tasks/locationWatcher';
 import { phase4Client } from '../api/phase4Client';
 import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
-import CustomAudioPlayer from '../components/CustomAudioPlayer';
+import AudioPlayer from '../components/AudioPlayer';
 import LocationStatusDisplay from '../components/LocationStatusDisplay';
 import PermissionRationaleModal from '../components/PermissionRationaleModal';
 import StoreCard from '../components/StoreCard';
@@ -139,7 +139,11 @@ export default function StoreSelectionScreen() {
         <View style={styles.emptyContainer}>
           <Image source={Illustration} style={styles.illustration} />
           <Text style={styles.emptyText}>No nearby stores</Text>
-          <CustomAudioPlayer source={require('../../assets/audio/empty_state_sigh.mp3')} play />
+          <AudioPlayer 
+            audioKey="empty_state_sigh" 
+            source={require('../../assets/audio/empty_state_sigh.mp3')} 
+            play={true} 
+          />
           <Pressable onPress={() => navigation.navigate('StoreLocator')}>
             <Text style={styles.link}>Search All Locations</Text>
           </Pressable>

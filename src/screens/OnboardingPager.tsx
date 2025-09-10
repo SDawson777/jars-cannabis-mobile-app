@@ -7,7 +7,7 @@ import { AccessibilityInfo } from 'react-native';
 import PagerView from 'react-native-pager-view';
 
 import AnimatedBackgroundGradient from '../components/AnimatedBackgroundGradient';
-import CustomAudioPlayer from '../components/CustomAudioPlayer';
+import AudioPlayer from '../components/AudioPlayer';
 import OnboardingSlide from '../components/OnboardingSlide';
 import PaginationDots from '../components/PaginationDots';
 import haptics from '../lib/haptics';
@@ -77,9 +77,11 @@ export default function OnboardingPager() {
         ))}
       </PagerView>
       <PaginationDots current={index} total={slides.length} />
-      <CustomAudioPlayer
+      <AudioPlayer
+        audioKey="onboarding_ambient"
         source={require('../../assets/audio/onboarding_ambient_loop.mp3')}
         play={true}
+        loop={true}
       />
     </AnimatedBackgroundGradient>
   );
