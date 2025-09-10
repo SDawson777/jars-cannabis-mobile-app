@@ -303,6 +303,22 @@ export default function HomeScreen() {
         ) : (
           <Text style={styles.emptyText}>No ways to shop.</Text>
         )}
+
+        {/* Educational Content CTA */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Educational Resources</Text>
+        </View>
+        <Pressable
+          onPress={() => navigation.navigate('TerpeneWheel')}
+          style={styles.terpeneWheelCard}
+        >
+          <View style={styles.terpeneWheelContent}>
+            <Text style={styles.terpeneWheelTitle}>🌿 Explore Terpenes</Text>
+            <Text style={styles.terpeneWheelDescription}>
+              Discover the aromatic compounds that give cannabis its unique scents and effects
+            </Text>
+          </View>
+        </Pressable>
       </ScrollView>
 
       {/* Bottom Navigation */}
@@ -456,4 +472,26 @@ const styles = StyleSheet.create({
   },
   navItem: { alignItems: 'center' },
   navLabel: { fontSize: 12, color: '#666', marginTop: 4 },
+  terpeneWheelCard: {
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  terpeneWheelContent: {
+    flexDirection: 'column',
+  },
+  terpeneWheelTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#2E7D32',
+  },
+  terpeneWheelDescription: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
 });

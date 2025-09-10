@@ -66,6 +66,7 @@ import StoreLocatorListScreen from './src/screens/StoreLocatorListScreen';
 import StoreLocatorMapScreen from './src/screens/StoreLocatorMapScreen';
 import StoreLocatorScreen from './src/screens/StoreLocatorScreen';
 import StoreSelectionScreen from './src/screens/StoreSelectionScreen';
+import TerpeneWheelScreen from './src/screens/TerpeneWheelScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import AgeVerificationScreen from './src/screens/onboarding/AgeVerificationScreen';
 import OrderHistoryScreen from './src/screens/orders/OrderHistoryScreen';
@@ -273,6 +274,7 @@ function App() {
                         />
                         <Stack.Screen name="ArticleList" component={ArticleListScreen} />
                         <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+                        <Stack.Screen name="TerpeneWheel" component={TerpeneWheelScreen} />
                         <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
                         <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
                         <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />
