@@ -8,8 +8,13 @@ export interface LoyaltyStatus {
 }
 
 async function fetchLoyalty(): Promise<LoyaltyStatus> {
-  const res = await phase4Client.get('/loyalty');
-  return res.data;
+  const res = await phase4Client.get('/loyalty/status');
+  const d = res.data || {};
+  // Map backend record to the shape the UI expects
+  return {
+    points: d.points ?? d.balance ?? 0,
+    level: d.level ?? d.tier ?? 'bronze',
+  } as LoyaltyStatus;
 }
 
 export function useLoyaltyStatus() {

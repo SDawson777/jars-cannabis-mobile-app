@@ -1,3 +1,5 @@
+
+
 import 'dotenv/config';
 
 import cors from 'cors';
@@ -33,20 +35,28 @@ try { initFirebase(); } catch (e) {
   logger.debug('Firebase init skipped:', (e as any)?.message);
 }
 
-app.use('/api/v1', authRouter);
-app.use('/api/v1', profileRouter);
-app.use('/api/v1', storesRouter);
-app.use('/api/v1', productsRouter);
-app.use('/api/v1', cartRouter);
-app.use('/api/v1', ordersRouter);
-app.use('/api/v1', contentRouter);
-app.use('/api/v1', loyaltyRouter);
-app.use('/api/v1', journalRouter);
-app.use('/api/v1', recommendationsRouter);
-app.use('/api/v1', dataRouter);
-app.use('/api/v1', conciergeRouter);
-app.use('/api/v1', arRouter);
-app.use('/api/v1', homeRouter);
+// Register routers under both /api and /api/v1 for compatibility with tests and older clients
+const routers = [
+  authRouter,
+  profileRouter,
+  storesRouter,
+  productsRouter,
+  cartRouter,
+  ordersRouter,
+  contentRouter,
+  loyaltyRouter,
+  journalRouter,
+  recommendationsRouter,
+  dataRouter,
+  conciergeRouter,
+  arRouter,
+  homeRouter,
+];
+
+for (const r of routers) {
+  app.use('/api', r);
+  app.use('/api/v1', r);
+}
 if (process.env.DEBUG_DIAG === '1') app.use('/api/v1', qaRouter);
 
 // Global error handler so nothing crashes
