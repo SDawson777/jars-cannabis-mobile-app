@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render } from '@testing-library/react-native';
 
-// Use real timers for this test to avoid react-test-renderer issues
+// Use real timers by default to avoid react-test-renderer issues
 jest.useRealTimers();
 jest.setTimeout(15000);
 
@@ -85,8 +85,14 @@ describe('useOfflineCartQueue', () => {
         isConnected: true,
       });
       if (netListener) netListener({ isConnected: true });
-      // advance timers in case queue processing uses any timeouts
-      jest.runAllTimers();
+      // Temporarily switch to fake timers to advance any queued timeouts
+      jest.useFakeTimers();
+      try {
+        jest.runAllTimers();
+      } finally {
+        // restore real timers to avoid affecting react-test-renderer
+        jest.useRealTimers();
+      }
       // give promises a tick
       await Promise.resolve();
     });
@@ -100,3 +106,6 @@ describe('useOfflineCartQueue', () => {
     );
   });
 });
+
+// Restore timers after tests to avoid affecting other test files
+// No global afterAll needed since we restore timers inline
