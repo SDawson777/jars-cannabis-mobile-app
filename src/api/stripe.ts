@@ -12,7 +12,7 @@ export interface PaymentSheetParams {
 }
 
 export async function fetchPaymentSheetParams(): Promise<PaymentSheetParams> {
-  const res = await fetch(`${API_URL}/stripe/payment-sheet`, {
+  const res = await fetch(`${API_URL}/api/v1/stripe/payment-sheet`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ platform: Platform.OS }),

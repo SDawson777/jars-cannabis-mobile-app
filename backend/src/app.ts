@@ -22,6 +22,7 @@ import { profileRouter } from './routes/profile';
 import { qaRouter } from './routes/qa';
 import { recommendationsRouter } from './routes/recommendations';
 import { storesRouter } from './routes/stores';
+import { stripeRouter } from './routes/stripe';
 import { logger } from './utils/logger';
 
 const app = express();
@@ -40,6 +41,7 @@ const routers = [
   authRouter,
   profileRouter,
   storesRouter,
+  stripeRouter,
   productsRouter,
   cartRouter,
   ordersRouter,
