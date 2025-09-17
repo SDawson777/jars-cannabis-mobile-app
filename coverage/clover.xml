@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1758150701541" clover="3.2.0">
-  <project timestamp="1758150701541" name="All files">
-    <metrics statements="2543" coveredstatements="212" conditionals="1320" coveredconditionals="80" methods="836" coveredmethods="79" elements="4699" coveredelements="371" complexity="0" loc="2543" ncloc="2543" packages="26" files="200" classes="200"/>
+<coverage generated="1757483522464" clover="3.2.0">
+  <project timestamp="1757483522464" name="All files">
+    <metrics statements="2413" coveredstatements="0" conditionals="1246" coveredconditionals="0" methods="806" coveredmethods="0" elements="4465" coveredelements="0" complexity="0" loc="2413" ncloc="2413" packages="25" files="189" classes="189"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="declarations.d.ts" path="/workspaces/jars-cannabis-mobile-app/src/@types/declarations.d.ts">

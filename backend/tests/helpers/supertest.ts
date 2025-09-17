@@ -1,5 +1,8 @@
 import request from 'supertest';
 
+// Enable DB-path in routes during tests so we exercise prisma mocks below
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'test';
+
 // Mock jwt.verify so tests can pass a static token 'valid-token'
 jest.mock('jsonwebtoken', () => ({
 	verify: (token: string, _secret: string) => {
@@ -15,7 +18,32 @@ if (typeof (global as any).setImmediate === 'undefined') {
 
 // Mock prisma with a tiny in-memory implementation for tests
 jest.mock('../../src/prismaClient', () => {
+	// Minimal in-memory store for tests (carts + products)
 	const carts: Record<string, any> = {};
+
+	const seededProducts = [
+		{
+			id: 'prod_db_1',
+			name: 'DB Daily Blend',
+			price: 1999,
+			image: '/images/db_prod_1.png',
+			purchasesLast30d: 42,
+			variants: [{ id: 'v1', price: 1999 }],
+		},
+		{
+			id: 'prod_db_2',
+			name: 'DB Chill Tincture',
+			price: 2499,
+			image: '/images/db_prod_2.png',
+			purchasesLast30d: 21,
+			variants: [{ id: 'v2', price: 2499 }],
+		},
+	];
+
+	const storeProducts = [
+		{ storeId: 'store_1', productId: 'prod_db_1' },
+	];
+
 	return {
 		prisma: {
 			cart: {
@@ -53,7 +81,18 @@ jest.mock('../../src/prismaClient', () => {
 						c.items = c.items.filter((x: any) => !(id && id.in && id.in.includes(x.id)));
 					}
 				}
-			}
+			},
+			// Seeded product/variant/storeProduct mock
+			product: {
+				findMany: async ({ take = 24, orderBy }: any) => {
+					// ignore orderBy in this simple mock, return top `take` products sorted by purchasesLast30d
+					return seededProducts.slice(0, take);
+				},
+				findUnique: async ({ where: { id } }: any) => seededProducts.find((p) => p.id === id) ?? null,
+			},
+			storeProduct: {
+				findMany: async ({ where: { storeId } }: any) => storeProducts.filter((s) => s.storeId === storeId),
+			},
 		}
 	};
 });
