@@ -53,19 +53,26 @@ jest.mock('../utils/haptic', () => ({
 jest.mock('../components/useSkeletonText', () => () => null);
 
 describe('OrderHistoryScreen', () => {
-  it('renders orders from api', async () => {
+  it('renders orders from api with hydrated data', async () => {
     (orderClient.fetchOrders as jest.Mock).mockResolvedValue({
       orders: [
         {
           id: '1',
-          createdAt: '2025-01-01',
+          createdAt: '2025-01-01T00:00:00.000Z',
           total: 10,
           status: 'Completed',
-          store: 'Store',
-          items: [],
+          store: 'JARS Store Downtown', // Now a string, not an object
+          items: [
+            {
+              id: 'item1',
+              name: 'Blue Dream', // Now hydrated with product name
+              quantity: 1,
+              price: 8, // Now hydrated with price
+            },
+          ],
           subtotal: 8,
-          taxes: 1,
-          fees: 1,
+          taxes: 1, // Renamed from tax
+          fees: 1, // Added fees field
         },
       ],
     });

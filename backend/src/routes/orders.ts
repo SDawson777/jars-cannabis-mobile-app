@@ -57,13 +57,77 @@ const where: any = { userId: uid };
 if (status) where.status = status as any;
 const take = Math.min(100, parseInt(limit));
 const skip = (Math.max(1, parseInt(page)) - 1) * take;
-const items = await prisma.order.findMany({ where, orderBy: { createdAt: 'desc' }, take, skip, include: { items: true } });
-res.json({ items });
+
+const rawOrders = await prisma.order.findMany({ 
+  where, 
+  orderBy: { createdAt: 'desc' }, 
+  take, 
+  skip, 
+  include: { 
+    items: {
+      include: {
+        product: true,
+        variant: true
+      }
+    },
+    store: true
+  } 
+});
+
+// Transform to match expected OrdersResponse format
+const orders = rawOrders.map(order => ({
+  id: order.id,
+  createdAt: order.createdAt.toISOString(),
+  total: order.total || 0,
+  status: order.status,
+  store: order.store.name,
+  subtotal: order.subtotal || 0,
+  taxes: order.tax || 0, // Rename tax -> taxes
+  fees: 0, // Add fees field (0 for now)
+  items: order.items.map(item => ({
+    id: item.id,
+    name: item.variant?.name || item.product.name,
+    quantity: item.quantity,
+    price: item.unitPrice || 0
+  }))
+}));
+
+res.json({ orders });
 });
 
 ordersRouter.get('/orders/:id', requireAuth, async (req, res) => {
 const uid = (req as any).user.userId as string;
-const o = await prisma.order.findFirst({ where: { id: req.params.id, userId: uid }, include: { items: true } });
-if (!o) return res.status(404).json({ error: 'Order not found' });
-res.json(o);
+const rawOrder = await prisma.order.findFirst({ 
+  where: { id: req.params.id, userId: uid }, 
+  include: { 
+    items: {
+      include: {
+        product: true,
+        variant: true
+      }
+    },
+    store: true
+  } 
+});
+if (!rawOrder) return res.status(404).json({ error: 'Order not found' });
+
+// Transform to match expected Order format
+const order = {
+  id: rawOrder.id,
+  createdAt: rawOrder.createdAt.toISOString(),
+  total: rawOrder.total || 0,
+  status: rawOrder.status,
+  store: rawOrder.store.name,
+  subtotal: rawOrder.subtotal || 0,
+  taxes: rawOrder.tax || 0, // Rename tax -> taxes
+  fees: 0, // Add fees field (0 for now)
+  items: rawOrder.items.map(item => ({
+    id: item.id,
+    name: item.variant?.name || item.product.name,
+    quantity: item.quantity,
+    price: item.unitPrice || 0
+  }))
+};
+
+res.json(order);
 });
