@@ -22,7 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.1",
     "@sentry/node": "^9.46.0",
     "bcryptjs": "^2.4.3",
     "bull": "^4.16.5",
@@ -32,7 +32,7 @@
     "firebase-admin": "^12.7.0",
     "module-alias": "^2.2.3",
     "openai": "^4.104.0",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.1",
     "stripe": "^14.25.0",
     "uuid": "^9.0.1",
     "helmet": "^7.2.0",
