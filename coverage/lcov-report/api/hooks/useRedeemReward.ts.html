@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>14/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>2/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -119,37 +119,37 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -163,38 +163,38 @@ interface RewardPayload {
   points: number;
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >redeemReward(</span>reward: RewardPayload) {
-<span class="cstat-no" title="statement not covered" >  await phase4Client.post(`/rewards/${reward.id}/redeem`);</span>
+async function redeemReward(reward: RewardPayload) {
+  await phase4Client.post(`/rewards/${reward.id}/redeem`);
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useRedeemReward(</span>) {
-  const queryClient = <span class="cstat-no" title="statement not covered" >useQueryClient();</span>
+export function useRedeemReward() {
+  const queryClient = useQueryClient();
 &nbsp;
-  const optimisticRollback = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (</span>
+  const optimisticRollback = async (
     reward: RewardPayload
   ): Promise&lt;{ previous: any | undefined }&gt; =&gt; {
-<span class="cstat-no" title="statement not covered" >    await queryClient.cancelQueries({ queryKey: ['loyaltyStatus'] });</span>
-    const previous = <span class="cstat-no" title="statement not covered" >queryClient.getQueryData(['loyaltyStatus']);</span>
-<span class="cstat-no" title="statement not covered" >    queryClient.setQueryData(['loyaltyStatus'], <span class="fstat-no" title="function not covered" >(o</span>ld: any) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (!old) <span class="cstat-no" title="statement not covered" >return old;</span></span>
+    await queryClient.cancelQueries({ queryKey: ['loyaltyStatus'] });
+    const previous = queryClient.getQueryData(['loyaltyStatus']);
+    queryClient.setQueryData(['loyaltyStatus'], (old: any) =&gt; {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (!old) return old;
 <span class="cstat-no" title="statement not covered" >      return { ...old, points: old.points - reward.points };</span>
     });
-<span class="cstat-no" title="statement not covered" >    return { previous };</span>
+    return { previous };
   };
 &nbsp;
-  const rollback = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(e</span>rr: Error, _reward: RewardPayload, context?: { previous?: any }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (context?.previous) {</span>
+  const rollback = (err: Error, _reward: RewardPayload, context?: { previous?: any }) =&gt; {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (context?.previous) {
 <span class="cstat-no" title="statement not covered" >      queryClient.setQueryData(['loyaltyStatus'], context.previous);</span>
     }
-<span class="cstat-no" title="statement not covered" >    toast(err.message);</span>
+    toast(err.message);
   };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return useMutation&lt;void, Error, RewardPayload, { previous?: any }&gt;({</span>
+  return useMutation&lt;void, Error, RewardPayload, { previous?: any }&gt;({
     mutationFn: redeemReward,
     onMutate: optimisticRollback,
     onError: rollback,
-    onSettled: <span class="fstat-no" title="function not covered" >()</span> =&gt; {
-<span class="cstat-no" title="statement not covered" >      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });</span>
+    onSettled: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
     },
   });
 }
@@ -205,7 +205,7 @@ export function <span class="fstat-no" title="function not covered" >useRedeemRe
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-10T05:52:02.365Z
+                at 2025-09-17T23:34:30.538Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

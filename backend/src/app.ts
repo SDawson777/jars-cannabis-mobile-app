@@ -21,6 +21,7 @@ import { productsRouter } from './routes/products';
 import { profileRouter } from './routes/profile';
 import { qaRouter } from './routes/qa';
 import { recommendationsRouter } from './routes/recommendations';
+import { personalizationRouter } from './routes/personalization';
 import { storesRouter } from './routes/stores';
 import { logger } from './utils/logger';
 
@@ -51,6 +52,7 @@ const routers = [
   conciergeRouter,
   arRouter,
   homeRouter,
+  personalizationRouter,
 ];
 
 for (const r of routers) {
