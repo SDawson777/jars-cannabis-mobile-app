@@ -1,4 +1,4 @@
-import { linking } from '../navigation';
+import { linking } from '../navigation/linking';
 import logger from '../lib/logger';
 
 export interface ParsedRoute {
@@ -19,12 +19,12 @@ export function parseDeepLink(url: string): ParsedRoute | null {
         break;
       }
     }
-    
+
     // Remove leading slash if present
     if (path.startsWith('/')) {
       path = path.slice(1);
     }
-    
+
     // Find matching route
     const screens = linking.config.screens;
     for (const [routeName, pattern] of Object.entries(screens)) {
@@ -36,10 +36,10 @@ export function parseDeepLink(url: string): ParsedRoute | null {
         };
       }
     }
-    
+
     return null;
   } catch (error) {
-    logger.warn('Failed to parse deep link', { url }, error);
+    logger.warn('Failed to parse deep link', { url, error });
     return null;
   }
 }
@@ -52,27 +52,27 @@ function matchPattern(path: string, pattern: string): { params: Record<string, s
   if (!pattern && !path) {
     return { params: {} };
   }
-  
+
   // Convert pattern to regex, extracting parameter names
   const paramNames: string[] = [];
   const regexPattern = pattern.replace(/:([^/]+)/g, (_, paramName) => {
     paramNames.push(paramName);
     return '([^/]+)';
   });
-  
+
   const regex = new RegExp(`^${regexPattern}$`);
   const match = path.match(regex);
-  
+
   if (!match) {
     return null;
   }
-  
+
   // Extract parameters
   const params: Record<string, string> = {};
   for (let i = 0; i < paramNames.length; i++) {
     params[paramNames[i]] = match[i + 1];
   }
-  
+
   return { params };
 }
 
@@ -82,20 +82,20 @@ function matchPattern(path: string, pattern: string): { params: Record<string, s
 export function buildDeepLink(routeName: string, params?: Record<string, string>): string {
   const screens = linking.config.screens;
   const pattern = screens[routeName as keyof typeof screens];
-  
+
   if (!pattern) {
     throw new Error(`Route ${routeName} not found in linking configuration`);
   }
-  
+
   let path = pattern;
-  
+
   // Replace parameters in the pattern
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       path = path.replace(`:${key}`, value);
     }
   }
-  
+
   // Use the primary prefix (custom protocol)
   return `${linking.prefixes[0]}${path}`;
 }

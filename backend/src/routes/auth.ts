@@ -8,6 +8,9 @@ export const authRouter = Router();
 authRouter.post('/auth/register', async (req, res) => {
 const { email, password } = req.body || {};
 if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+// basic validation expected by tests
+if (typeof email === 'string' && !/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ error: 'Invalid email' });
+if (typeof password === 'string' && password.length < 6) return res.status(400).json({ error: 'password too weak' });
 try {
 const passwordHash = await bcrypt.hash(password, 10);
 const user = await prisma.user.create({ data: { email, passwordHash } });
@@ -34,4 +37,29 @@ authRouter.post('/auth/forgot-password', async (_req, res) => {
 return res.status(202).json({ message: 'If the email exists, a reset has been sent.' });
 });
 
-authRouter.post('/auth/logout', async (_req, res) => res.status(204).send());
+authRouter.post('/auth/logout', async (_req, res) => res.status(200).json({ ok: true }));
+
+// POST /auth/refresh - expects { refreshToken }
+authRouter.post('/auth/refresh', async (req, res) => {
+	const { refreshToken } = req.body || {};
+	if (!refreshToken) return res.status(401).json({ error: 'Missing token' });
+	try {
+		// Use the top-level jwt import (mocked in tests) instead of dynamic import
+		const payload: any = (jwt as any).verify(refreshToken, process.env.JWT_SECRET!);
+		if (!payload?.userId) return res.status(401).json({ error: 'Invalid token' });
+		const token = (jwt as any).sign({ userId: payload.userId }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+		return res.json({ token });
+	} catch (e) {
+		return res.status(401).json({ error: 'Invalid token' });
+	}
+});
+
+// GET /auth/me - return current user info
+import { requireAuth } from '../middleware/auth';
+authRouter.get('/auth/me', requireAuth, async (req, res) => {
+	const uid = (req as any).user?.userId as string;
+	if (!uid) return res.status(401).json({ error: 'Missing token' });
+	const u = await prisma.user.findUnique({ where: { id: uid } });
+	if (!u) return res.status(404).json({ error: 'User not found' });
+	return res.json({ user: { id: u.id, email: u.email } });
+});

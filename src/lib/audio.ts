@@ -17,7 +17,7 @@ let isInitialized = false;
  */
 export async function initializeAudio(): Promise<void> {
   if (isInitialized) return;
-  
+
   try {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
@@ -28,7 +28,7 @@ export async function initializeAudio(): Promise<void> {
     });
     isInitialized = true;
   } catch (error) {
-    logger.warn('Failed to initialize audio:', { error });
+    logger.warn('Failed to initialize audio:', error);
   }
 }
 
@@ -37,29 +37,29 @@ export async function initializeAudio(): Promise<void> {
  */
 export async function preload(key: string, source: any, options: AudioOptions = {}): Promise<void> {
   if (cache[key]) return;
-  
+
   const { timeout = 5000 } = options;
-  
+
   try {
     await initializeAudio();
-    
+
     const sound = new Audio.Sound();
-    
+
     // Add timeout wrapper
     const loadPromise = sound.loadAsync(source, {
       shouldPlay: false,
       volume: options.volume ?? 1.0,
       isLooping: options.loop ?? false,
     });
-    
+
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error(`Audio preload timeout for ${key}`)), timeout);
     });
-    
+
     await Promise.race([loadPromise, timeoutPromise]);
     cache[key] = sound;
   } catch (error) {
-    logger.warn(`Failed to preload audio ${key}:`, { error });
+    logger.warn(`Failed to preload audio ${key}:`, error);
     // Don't throw, just warn and continue
   }
 }
@@ -70,26 +70,26 @@ export async function preload(key: string, source: any, options: AudioOptions = 
 export async function play(key: string, source?: any, options: AudioOptions = {}): Promise<void> {
   try {
     await initializeAudio();
-    
+
     if (!cache[key] && source) {
       await preload(key, source, options);
     }
-    
+
     const sound = cache[key];
     if (!sound) {
-      logger.warn(`No audio found for key: ${key}`, { key });
+      logger.warn(`No audio found for key: ${key}`);
       return;
     }
-    
+
     // Stop current playback if playing
     const status = await sound.getStatusAsync();
     if (status.isLoaded && status.isPlaying) {
       await sound.stopAsync();
     }
-    
+
     await sound.replayAsync();
   } catch (error) {
-    logger.warn(`Failed to play audio ${key}:`, { error });
+    logger.warn(`Failed to play audio ${key}:`, error);
     // Don't throw, just warn and continue
   }
 }
@@ -101,13 +101,13 @@ export async function stop(key: string): Promise<void> {
   try {
     const sound = cache[key];
     if (!sound) return;
-    
+
     const status = await sound.getStatusAsync();
     if (status.isLoaded && status.isPlaying) {
       await sound.stopAsync();
     }
   } catch (error) {
-    logger.warn(`Failed to stop audio ${key}:`, { error });
+    logger.warn(`Failed to stop audio ${key}:`, error);
   }
 }
 
@@ -118,11 +118,11 @@ export async function unload(key: string): Promise<void> {
   try {
     const sound = cache[key];
     if (!sound) return;
-    
+
     await sound.unloadAsync();
     delete cache[key];
   } catch (error) {
-    logger.warn(`Failed to unload audio ${key}:`, { error });
+    logger.warn(`Failed to unload audio ${key}:`, error);
   }
 }
 
@@ -134,12 +134,14 @@ export async function unloadAll(): Promise<void> {
     try {
       await sound.unloadAsync();
     } catch (error) {
-      logger.warn(`Failed to unload audio ${key}:`, { error });
+      logger.warn(`Failed to unload audio ${key}:`, error);
     }
   });
-  
+
   await Promise.all(unloadPromises);
   cache = {};
+  // reset initialization state so tests that call unloadAll in afterEach get a fresh module state
+  isInitialized = false;
 }
 
 /**

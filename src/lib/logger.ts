@@ -1,15 +1,20 @@
 import * as Sentry from '@sentry/react-native';
 
-type Meta = Record<string, unknown>;
-
-const fmt = (msg: string, meta?: Meta) => meta ? `${msg} :: ${JSON.stringify(meta)}` : msg;
+type Meta = unknown;
 
 export const logger = {
-  log:   (m: string, meta?: Meta) => console.log(fmt(m, meta)),
-  warn:  (m: string, meta?: Meta) => console.warn(fmt(m, meta)),
-  error: (m: string, meta?: Meta, err?: unknown) => { 
-    console.error(fmt(m, meta)); 
-    if (err) Sentry.captureException(err); 
+  log: (m: string, meta?: Meta) => {
+    if (meta !== undefined) console.log(m, meta);
+    else console.log(m);
+  },
+  warn: (m: string, meta?: Meta) => {
+    if (meta !== undefined) console.warn(m, meta);
+    else console.warn(m);
+  },
+  error: (m: string, meta?: Meta, err?: unknown) => {
+    if (meta !== undefined) console.error(m, meta);
+    else console.error(m);
+    if (err) Sentry.captureException(err);
   },
 };
 

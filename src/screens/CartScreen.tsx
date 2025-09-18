@@ -23,19 +23,13 @@ import { useCartStore, hydrateCartStore } from '../../stores/useCartStore';
 import { ThemeContext } from '../context/ThemeContext';
 import { useCartValidation } from '../hooks/useCartValidation';
 import type { RootStackParamList } from '../navigation/types';
-import {
-  hapticLight,
-  hapticMedium,
-  hapticHeavy,
-  hapticError,
-} from '../utils/haptic';
+import { hapticLight, hapticMedium, hapticHeavy, hapticError } from '../utils/haptic';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 type CartNavProp = NativeStackNavigationProp<RootStackParamList, 'CartScreen'>;
-
 
 const IMAGE_SIZE = 80;
 
@@ -191,6 +185,7 @@ export default function CartScreen() {
                   <Pressable
                     onPress={() => updateQty(item.id, -1)}
                     style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                    testID={`decrease-quantity-${item.id}`}
                     accessibilityLabel={`Decrease quantity of ${item.name}`}
                   >
                     <Text style={styles.qtyBtnText}>−</Text>
@@ -199,6 +194,7 @@ export default function CartScreen() {
                   <Pressable
                     onPress={() => updateQty(item.id, 1)}
                     style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                    testID={`increase-quantity-${item.id}`}
                     accessibilityLabel={`Increase quantity of ${item.name}`}
                   >
                     <Text style={styles.qtyBtnText}>+</Text>
@@ -206,6 +202,7 @@ export default function CartScreen() {
                   <Pressable
                     onPress={() => removeItem(item.id)}
                     style={styles.remove}
+                    testID={`remove-item-${item.id}`}
                     accessibilityLabel={`Remove ${item.name} from cart`}
                   >
                     <Trash2 color={jarsPrimary} size={20} />
@@ -224,6 +221,7 @@ export default function CartScreen() {
           placeholder="Enter Promo Code"
           placeholderTextColor={jarsSecondary}
           value={promo}
+          testID="coupon-input"
           onChangeText={setPromo}
         />
         <Pressable

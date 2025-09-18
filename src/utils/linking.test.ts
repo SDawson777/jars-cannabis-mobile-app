@@ -1,6 +1,6 @@
 import { Linking } from 'react-native';
 
-import { linking } from '../navigation';
+import { linking } from '../navigation/linking';
 
 describe('Linking Configuration', () => {
   beforeEach(() => {
@@ -246,19 +246,60 @@ describe('Linking Configuration', () => {
   describe('Route coverage completeness', () => {
     // This test ensures we haven't missed any routes from the navigation types
     const expectedRoutes = [
-      'SplashScreen', 'Onboarding', 'AgeVerification', 'LoginSignUpDecision',
-      'Login', 'SignUp', 'ForgotPassword', 'OTPScreen', 'StoreSelection',
-      'HomeScreen', 'ShopScreen', 'ProductList', 'ProductDetail', 'CartScreen',
-      'Checkout', 'OrderConfirmation', 'OrderTracking', 'OrderHistory',
-      'OrderDetails', 'StoreLocator', 'StoreLocatorMap', 'StoreLocatorList',
-      'StoreDetails', 'Profile', 'EditProfile', 'Favorites', 'SavedAddresses',
-      'AddAddress', 'EditAddress', 'SavedPayments', 'AddPayment', 'EditPayment',
-      'LoyaltyProgram', 'Notifications', 'PrivacySettings', 'AppSettings',
-      'HelpFAQ', 'ContactUs', 'EducationalGreenhouse', 'ArticleList',
-      'ArticleDetail', 'TerpeneWheel', 'CommunityGarden', 'ConciergeChat',
-      'DataTransparency', 'PrivacyIntelligence', 'AccessibilitySettings',
-      'Awards', 'Legal', 'MyJars', 'JournalEntry', 'MyJarsInsights',
-      'EthicalAIDashboard', 'LanguageSelection'
+      'SplashScreen',
+      'Onboarding',
+      'AgeVerification',
+      'LoginSignUpDecision',
+      'Login',
+      'SignUp',
+      'ForgotPassword',
+      'OTPScreen',
+      'StoreSelection',
+      'HomeScreen',
+      'ShopScreen',
+      'ProductList',
+      'ProductDetail',
+      'CartScreen',
+      'Checkout',
+      'OrderConfirmation',
+      'OrderTracking',
+      'OrderHistory',
+      'OrderDetails',
+      'StoreLocator',
+      'StoreLocatorMap',
+      'StoreLocatorList',
+      'StoreDetails',
+      'Profile',
+      'EditProfile',
+      'Favorites',
+      'SavedAddresses',
+      'AddAddress',
+      'EditAddress',
+      'SavedPayments',
+      'AddPayment',
+      'EditPayment',
+      'LoyaltyProgram',
+      'Notifications',
+      'PrivacySettings',
+      'AppSettings',
+      'HelpFAQ',
+      'ContactUs',
+      'EducationalGreenhouse',
+      'ArticleList',
+      'ArticleDetail',
+      'TerpeneWheel',
+      'CommunityGarden',
+      'ConciergeChat',
+      'DataTransparency',
+      'PrivacyIntelligence',
+      'AccessibilitySettings',
+      'Awards',
+      'Legal',
+      'MyJars',
+      'JournalEntry',
+      'MyJarsInsights',
+      'EthicalAIDashboard',
+      'LanguageSelection',
     ];
 
     it('should have all expected routes configured', () => {
