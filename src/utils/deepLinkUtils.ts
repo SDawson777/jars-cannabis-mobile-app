@@ -25,6 +25,10 @@ export function parseDeepLink(url: string): ParsedRoute | null {
       path = path.slice(1);
     }
 
+    // Strip query string and fragment so matching compares only the path
+    // e.g. 'shop?store=midtown' -> 'shop'
+    path = path.split('?')[0].split('#')[0];
+
     // Find matching route
     const screens = linking.config.screens;
     for (const [routeName, pattern] of Object.entries(screens)) {

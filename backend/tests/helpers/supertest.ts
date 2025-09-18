@@ -33,10 +33,69 @@ const users: Record<string, any> = {
 	'test-user': { id: 'test-user', email: 'token-user@example.com', passwordHash: 'hashed-securePassword123' }
 };
 const carts: Record<string, any> = {
-	'test-user': { id: 'cart-test-user', userId: 'test-user', storeId: 'store_1', items: [{ id: 'ci-1', productId: 'prod_db_1', quantity: 1, unitPrice: 19.99 }] },
+	// keyed by user id for convenience, values include .id
+	'test-user': { id: 'cart-test-user', userId: 'test-user', storeId: 'store_1', items: [{ id: 'ci-1', productId: 'prod_db_1', quantity: 1, unitPrice: 19.99 }, { id: 'test-cart-item-id', productId: 'test-product-id', quantity: 1, unitPrice: 19.99 }] },
 	'empty-user': { id: 'cart-empty-user', userId: 'empty-user', storeId: 'store_1', items: [] }
 };
-const orders: Record<string, any> = {};
+const mockOrders: Record<string, any> = {
+	// Order owned by test-user used across several tests
+	'test-order-id': {
+		id: 'test-order-id',
+		userId: 'test-user',
+		storeId: 'store_1',
+		status: 'PENDING',
+		subtotal: 19.99,
+		tax: 1.2,
+		total: 21.19,
+		createdAt: new Date().toISOString(),
+		items: [ { id: 'oi-1', productId: 'prod_db_1', quantity: 1, unitPrice: 19.99 } ]
+	},
+	// Order owned by another user to test access control
+	'other-users-order-id': {
+		id: 'other-users-order-id',
+		userId: 'other-user',
+		storeId: 'store_1',
+		status: 'PENDING',
+		subtotal: 19.99,
+		tax: 1.2,
+		total: 21.19,
+		createdAt: new Date().toISOString(),
+		items: [ { id: 'oi-2', productId: 'prod_db_1', quantity: 1, unitPrice: 19.99 } ]
+	},
+	'delivered-order-id': {
+		id: 'delivered-order-id',
+		userId: 'test-user',
+		storeId: 'store_1',
+		status: 'DELIVERED',
+		subtotal: 29.99,
+		tax: 1.8,
+		total: 31.79,
+		createdAt: new Date().toISOString(),
+		items: [ { id: 'oi-3', productId: 'prod_db_2', quantity: 1, unitPrice: 29.99 } ]
+	},
+	'completed-order-id': {
+		id: 'completed-order-id',
+		userId: 'test-user',
+		storeId: 'store_1',
+		status: 'COMPLETED',
+		subtotal: 39.99,
+		tax: 2.4,
+		total: 42.39,
+		createdAt: new Date().toISOString(),
+		items: [ { id: 'oi-4', productId: 'prod_db_2', quantity: 1, unitPrice: 39.99 } ]
+	},
+	'pending-order-id': {
+		id: 'pending-order-id',
+		userId: 'test-user',
+		storeId: 'store_1',
+		status: 'PENDING',
+		subtotal: 9.99,
+		tax: 0.6,
+		total: 10.59,
+		createdAt: new Date().toISOString(),
+		items: [ { id: 'oi-5', productId: 'prod_db_1', quantity: 1, unitPrice: 9.99 } ]
+	}
+};
 const seededProducts = [
 	{ id: 'test-product-id', name: 'Blue Dream OG', price: 1999, slug: 'blue-dream-flower', category: 'flower', defaultPrice: 19.99, featured: true, variants: [{ id: 'v-test-1', price: 1999 }], purchasesLast30d: 50 },
 	{ id: 'prod_db_1', name: 'DB Daily Blend', price: 1999, slug: 'db-daily-blend', category: 'flower', defaultPrice: 19.99, featured: false, variants: [{ id: 'v1', price: 1999 }], purchasesLast30d: 42 },
@@ -65,13 +124,17 @@ jest.mock('../../src/prismaClient', () => ({
 		},
 		cartItem: {
 			create: async ({ data }: any) => {
-				const cart = carts[data.cartId.split('-')[1]];
+				// accept cartId as full id or as 'cart-user' -> try to find matching cart
+				const findCartById = (id: string) => Object.values(carts).find((c: any) => c.id === id) ?? carts[id.split('-')[1]];
+				const cart = findCartById(data.cartId);
+				if (!cart) throw new Error('Cart not found');
 				const item = { id: `item-${Math.random().toString(36).slice(2,9)}`, ...data };
 				cart.items.push(item);
 				return item;
 			},
 			findMany: async ({ where: { cartId } }: any) => {
-				const cart = carts[cartId.split('-')[1]];
+				const findCartById = (id: string) => Object.values(carts).find((c: any) => c.id === id) ?? carts[id.split('-')[1]];
+				const cart = findCartById(cartId);
 				return cart ? cart.items : [];
 			},
 			update: async ({ where: { id }, data }: any) => {
@@ -84,7 +147,7 @@ jest.mock('../../src/prismaClient', () => ({
 			delete: async ({ where: { id } }: any) => {
 				for (const c of Object.values(carts)) {
 					const idx = c.items.findIndex((x: any) => x.id === id);
-					if (idx >= 0) { c.items.splice(idx, 1); return; }
+					if (idx >= 0) { const removed = c.items.splice(idx, 1); return removed[0]; }
 				}
 				throw new Error('Not found');
 			},
@@ -118,7 +181,7 @@ jest.mock('../../src/prismaClient', () => ({
 		},
 		order: {
 			findMany: async ({ where = {} }: any) => {
-				const arr = Object.values(orders) as any[];
+				const arr = Object.values(mockOrders) as any[];
 				let res = where.userId ? arr.filter((o) => o.userId === where.userId) : arr;
 				if (where.status) {
 					const s = String(where.status).toLowerCase();
@@ -126,15 +189,15 @@ jest.mock('../../src/prismaClient', () => ({
 				}
 				return res;
 			},
-			findFirst: async ({ where = {} }: any) => Object.values(orders).find((o: any) => o.id === where.id && (!where.userId || o.userId === where.userId)) ?? null,
-			findUnique: async ({ where: { id } }: any) => orders[id] ?? null,
+			findFirst: async ({ where = {} }: any) => Object.values(mockOrders).find((o: any) => o.id === where.id && (!where.userId || o.userId === where.userId)) ?? null,
+			findUnique: async ({ where: { id } }: any) => mockOrders[id] ?? null,
 			create: async ({ data }: any) => {
 				const id = `order-${Math.random().toString(36).slice(2,9)}`;
 				const o = { id, userId: data.userId, storeId: data.storeId, status: data.status ?? 'pending', items: (data.items?.create || []).map((it: any, i: number) => ({ id: `oi-${i}`, ...it })), subtotal: data.subtotal ?? 0, total: data.total ?? 0, createdAt: new Date().toISOString() };
-				orders[id] = o;
+				mockOrders[id] = o;
 				return o;
 			},
-			update: async ({ where: { id }, data }: any) => { const o = orders[id]; if (!o) throw new Error('Not found'); Object.assign(o, data); return o; }
+			update: async ({ where: { id }, data }: any) => { const o = mockOrders[id]; if (!o) throw new Error('Not found'); Object.assign(o, data); return o; }
 		},
 		storeProduct: { findMany: async ({ where: { storeId } }: any) => [{ storeId, productId: 'prod_db_1' }] }
 	}

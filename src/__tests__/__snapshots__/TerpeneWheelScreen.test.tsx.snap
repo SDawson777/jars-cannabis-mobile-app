@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TerpeneWheelScreen renders correctly and matches snapshot 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#fff",
+      "flex": 1,
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+    }
+  }
+  testID="terpene-wheel-screen"
+>
+  <Text
+    style={
+      {
+        "fontSize": 24,
+        "fontWeight": "bold",
+        "marginBottom": 16,
+      }
+    }
+  >
+    Terpene Wheel
+  </Text>
+  <View
+    onPress={[Function]}
+    testID="terpene-wheel"
+  />
+</View>
+`;

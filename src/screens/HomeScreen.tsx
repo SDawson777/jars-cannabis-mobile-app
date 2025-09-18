@@ -59,15 +59,15 @@ export default function HomeScreen() {
   const { data: forYou, isLoading } = useForYouToday('1', '1');
 
   // Pulse animations for key CTAs
-  const terpeneWheelPulse = usePulseCTA(
-    () => navigation.navigate('TerpeneWheel'),
-    { maxScale: 1.02, duration: 200 }
-  );
+  const terpeneWheelPulse = usePulseCTA(() => navigation.navigate('TerpeneWheel'), {
+    maxScale: 1.02,
+    duration: 200,
+  });
 
-  const shopCTAPulse = usePulseCTA(
-    () => navigation.navigate('ShopScreen'),
-    { maxScale: 1.02, duration: 200 }
-  );
+  const shopCTAPulse = usePulseCTA(() => navigation.navigate('ShopScreen'), {
+    maxScale: 1.02,
+    duration: 200,
+  });
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -249,7 +249,9 @@ export default function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Featured Products</Text>
           <Pressable onPress={shopCTAPulse.onPress}>
-            <Animated.Text style={[styles.seeMore, { color: jarsPrimary }, shopCTAPulse.pulseStyle]}>
+            <Animated.Text
+              style={[styles.seeMore, { color: jarsPrimary }, shopCTAPulse.pulseStyle]}
+            >
               Shop All
             </Animated.Text>
           </Pressable>
@@ -324,6 +326,7 @@ export default function HomeScreen() {
           <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Educational Resources</Text>
         </View>
         <Pressable
+          testID="terpene-wheel-cta"
           onPress={terpeneWheelPulse.onPress}
           style={styles.terpeneWheelCard}
         >

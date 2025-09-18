@@ -2,6 +2,12 @@ jest.mock(
   '@react-native-async-storage/async-storage',
   () => require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
+// Ensure UIManager.getViewManagerConfig exists in the test environment
+try {
+  jest.mock('react-native/Libraries/ReactNative/UIManager', () => ({
+    getViewManagerConfig: () => undefined,
+  }));
+} catch {}
 jest.mock('expo-haptics', () => ({
   selectionAsync: jest.fn(),
   impactAsync: jest.fn(),
@@ -35,12 +41,11 @@ try {
 }
 
 // Reanimated mock (v3-compatible)
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  // Optional: keep animations disabled
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
+try {
+  // react-native-reanimated is mapped to a local mock via moduleNameMapper.
+  // No-op here to avoid circular requires during setup.
+  jest.mock('react-native-reanimated');
+} catch {}
 
 // Polyfill TextEncoder/TextDecoder for Node environment used in Jest
 if (typeof (global as any).TextEncoder === 'undefined') {
@@ -55,3 +60,30 @@ if (typeof (global as any).TextEncoder === 'undefined') {
 
 // If your code uses expo-constants or other Expo libs, you can add light mocks here:
 // jest.mock('expo-constants', () => ({ default: { manifest: {} } }));
+
+// Mock react-native-safe-area-context to provide initialWindow and hooks used by
+// react-navigation in unit tests (node env has no native window).
+try {
+  jest.mock('react-native-safe-area-context', () => {
+    const React = require('react');
+    return {
+      SafeAreaProvider: ({ children }: any) => React.createElement('SafeAreaProvider', null, children),
+      SafeAreaView: ({ children }: any) => React.createElement('SafeAreaView', null, children),
+      useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
+      initialWindow: { width: 1024, height: 768, scale: 1, fontScale: 1 },
+    };
+  });
+} catch {
+  // no-op if jest isn't available in this environment
+}
+
+// Provide a minimal UIManager shim; some react-navigation elements call
+// UIManager.getViewManagerConfig which isn't available in the jsdom environment.
+try {
+  const UIManager = require('react-native/Libraries/ReactNative/UIManager');
+  if (!UIManager.getViewManagerConfig) {
+    UIManager.getViewManagerConfig = (name: string) => undefined;
+  }
+} catch {
+  // ignore if not present
+}

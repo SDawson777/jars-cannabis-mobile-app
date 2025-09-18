@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   FlatList,
   Text,
+  View,
   Pressable,
   StyleSheet,
   LayoutAnimation,
@@ -15,6 +16,7 @@ import {
 } from 'react-native';
 
 import { ThemeContext } from '../context/ThemeContext';
+import { AuthContext } from '../context/AuthContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
@@ -37,6 +39,7 @@ const MENU: { id: keyof RootStackParamList; label: string }[] = [
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { data, clearAuth } = useContext(AuthContext as any);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -53,6 +56,43 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+      <View style={styles.headerWrap}>
+        {data ? (
+          <>
+            <Pressable testID="profile-image" onPress={() => navigateTo('EditProfile')}>
+              <Text accessibilityLabel="profile picture">IMG</Text>
+            </Pressable>
+            <View style={styles.profileInfo}>
+              <Text
+                testID="profile-name"
+                accessibilityRole="text"
+                style={[styles.name, { color: jarsPrimary }]}
+              >
+                {' '}
+                {data?.name ?? 'Guest'}{' '}
+              </Text>
+              <Text testID="profile-email" style={[styles.email, { color: jarsSecondary }]}>
+                {' '}
+                {data?.email ?? ''}{' '}
+              </Text>
+            </View>
+            <Pressable
+              testID="edit-profile-button"
+              accessibilityLabel="edit profile"
+              onPress={() => navigateTo('EditProfile')}
+            >
+              <Text>Edit</Text>
+            </Pressable>
+            <Pressable onPress={() => clearAuth && clearAuth()}>
+              <Text>Logout</Text>
+            </Pressable>
+          </>
+        ) : (
+          <Pressable testID="sign-in-button" accessibilityLabel="sign in">
+            <Text>Sign in</Text>
+          </Pressable>
+        )}
+      </View>
       <FlatList
         data={MENU}
         keyExtractor={m => m.id}
@@ -75,6 +115,15 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   list: { padding: 16 },
+  headerWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    justifyContent: 'space-between',
+  },
+  profileInfo: { flex: 1, marginHorizontal: 12 },
+  name: { fontSize: 18, fontWeight: '600' },
+  email: { fontSize: 14, marginTop: 4 },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',

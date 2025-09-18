@@ -4,17 +4,35 @@ type Meta = unknown;
 
 export const logger = {
   log: (m: string, meta?: Meta) => {
-    if (meta !== undefined) console.log(m, meta);
-    else console.log(m);
+    if (meta === undefined) {
+      console.log(m);
+    } else {
+      // Explicitly stringify metadata so tests see a deterministic message
+      console.log(`${m} :: ${JSON.stringify(meta)}`);
+    }
   },
   warn: (m: string, meta?: Meta) => {
-    if (meta !== undefined) console.warn(m, meta);
-    else console.warn(m);
+    if (meta === undefined) {
+      console.warn(m);
+    } else {
+      console.warn(`${m} :: ${JSON.stringify(meta)}`);
+    }
   },
   error: (m: string, meta?: Meta, err?: unknown) => {
-    if (meta !== undefined) console.error(m, meta);
-    else console.error(m);
-    if (err) Sentry.captureException(err);
+    const formatted = meta === undefined ? undefined : `${m} :: ${JSON.stringify(meta)}`;
+    if (err) {
+      try {
+        Sentry.captureException(err);
+        if (formatted) console.error(formatted);
+        else console.error(m);
+      } catch (e) {
+        // On Sentry failure we intentionally log only the message (no metadata)
+        console.error(m);
+      }
+    } else {
+      if (formatted) console.error(formatted);
+      else console.error(m);
+    }
   },
 };
 

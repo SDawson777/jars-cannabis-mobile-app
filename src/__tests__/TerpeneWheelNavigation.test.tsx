@@ -10,10 +10,12 @@ const Stack = createNativeStackNavigator();
 
 // Mock dependencies
 jest.mock('../context/ThemeContext', () => ({
-  ThemeContext: {
-    Consumer: ({ children }: any) => children({ jarsPrimary: '#4CAF50', jarsBackground: '#fff' }),
-  },
-  useContext: () => ({ jarsPrimary: '#4CAF50', jarsBackground: '#fff' }),
+  ThemeContext: require('react').createContext({
+    colorTemp: 'neutral',
+    jarsPrimary: '#4CAF50',
+    jarsSecondary: '#A0A0A0',
+    jarsBackground: '#ffffff',
+  }),
 }));
 
 jest.mock('../context/StoreContext', () => ({
@@ -22,6 +24,15 @@ jest.mock('../context/StoreContext', () => ({
 
 jest.mock('../api/phase4Client', () => ({
   phase4Client: { get: jest.fn().mockResolvedValue({ data: [] }) },
+}));
+
+jest.mock('../hooks/useForYouToday', () => ({
+  useForYouToday: () => ({ data: { message: 'For you', products: [] }, isLoading: false }),
+}));
+
+// Avoid running the pulse animation (which relies on react-native-reanimated) in unit tests
+jest.mock('../hooks/usePulse', () => ({
+  usePulseCTA: (onPress: any) => ({ pulseStyle: {}, onPress }),
 }));
 
 jest.mock('../terpene_wheel/components/TerpeneWheel', () => ({
@@ -45,10 +56,10 @@ function TestApp() {
 
 describe('TerpeneWheel Navigation', () => {
   it('navigates to TerpeneWheel when CTA is pressed', () => {
-    const { getByText } = render(<TestApp />);
+    const { getByTestId, getByText } = render(<TestApp />);
 
-    // Find and press the terpene wheel CTA
-    const terpeneWheelCTA = getByText('🌿 Explore Terpenes');
+    // Find and press the terpene wheel CTA by testID to avoid text/emoji mismatches
+    const terpeneWheelCTA = getByTestId('terpene-wheel-cta');
     expect(terpeneWheelCTA).toBeTruthy();
 
     fireEvent.press(terpeneWheelCTA);

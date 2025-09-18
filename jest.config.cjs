@@ -9,6 +9,12 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^react-native$': '<rootDir>/tests/__mocks__/react-native.js',
+  '^react-native-reanimated$': '<rootDir>/tests/__mocks__/react-native-reanimated.js',
+  '^react-native-reanimated/(.*)$': '<rootDir>/tests/__mocks__/react-native-reanimated.js',
+  '^@react-navigation/native-stack$': '<rootDir>/tests/__mocks__/@react-navigation/native-stack.js',
+  '^expo-av$': '<rootDir>/tests/__mocks__/expo-av.js',
+  '^react-native-shimmer-placeholder$': '<rootDir>/tests/__mocks__/react-native-shimmer-placeholder.js',
+  '^react-native-linear-gradient$': '<rootDir>/tests/__mocks__/react-native-linear-gradient.js',
   '^@stripe/stripe-react-native$': '<rootDir>/tests/__mocks__/stripe-react-native.js',
     '^@prisma/client$': '<rootDir>/tests/__mocks__/@prisma/client.js',
     '^@react-navigation/native$': '<rootDir>/tests/__mocks__/@react-navigation/native.js',

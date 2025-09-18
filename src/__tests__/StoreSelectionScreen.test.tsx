@@ -18,8 +18,10 @@ jest.mock('../api/phase4Client', () => ({
 }));
 
 jest.mock('expo-location', () => ({
-  requestForegroundPermissionsAsync: jest.fn(),
-  getCurrentPositionAsync: jest.fn(),
+  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
+  getCurrentPositionAsync: jest
+    .fn()
+    .mockResolvedValue({ coords: { latitude: 45, longitude: -73 } }),
 }));
 
 jest.mock('@react-navigation/native', () => ({
@@ -27,18 +29,20 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 describe('StoreSelectionScreen', () => {
-  it('renders StoreSelection flow and has proper accessibility labels', () => {
-    const { getByTestId } = render(<StoreSelectionScreen />);
+  it('renders StoreSelection flow and has proper accessibility labels', async () => {
+    const { findByTestId } = render(<StoreSelectionScreen />);
 
-    // Basic render test - screen should render without crashing
-    expect(getByTestId('store-selection-screen')).toBeTruthy();
+    // Basic render test - wait for the screen to appear after async permission checks
+    const screen = await findByTestId('store-selection-screen');
+    expect(screen).toBeTruthy();
   });
 
-  it('should render accessibility elements', () => {
-    const { getByText } = render(<StoreSelectionScreen />);
+  it('should render accessibility elements', async () => {
+    const { findByText } = render(<StoreSelectionScreen />);
 
     // The screen should have some accessible text content
-    // This is a basic test to ensure accessibility elements are present
-    expect(() => getByText(/store/i)).not.toThrow();
+    // Wait for any element containing 'store' to appear
+    const el = await findByText(/store/i);
+    expect(el).toBeTruthy();
   });
 });

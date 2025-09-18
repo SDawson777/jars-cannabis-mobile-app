@@ -2,14 +2,30 @@ const React = require('react');
 const { View } = require('react-native');
 
 function Icon(props) {
-  // Render a simple placeholder view for icon
-  return React.createElement(View, { ...props, testID: props.testID || 'mock-icon' });
+  const { children, ...rest } = props;
+  return React.createElement(View, { ...rest, testID: props.testID || 'mock-icon' }, children || null);
 }
 
 module.exports = {
+  Home: Icon,
+  Menu: Icon,
+  Heart: Icon,
+  ShoppingCart: Icon,
+  User: Icon,
+  MapPin: Icon,
+  ChevronDown: Icon,
+  Search: Icon,
   ChevronLeft: Icon,
   Trash2: Icon,
   HelpCircle: Icon,
-  // fallback: export a default Icon factory
+  ChevronRight: Icon,
+  Send: Icon,
+  Phone: Icon,
+  Clock: Icon,
+  Eye: Icon,
+  EyeOff: Icon,
+  Plus: Icon,
+  List: Icon,
+  // default export fallback
   default: Icon,
 };
