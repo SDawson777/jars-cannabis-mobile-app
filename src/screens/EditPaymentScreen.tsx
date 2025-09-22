@@ -25,21 +25,33 @@ import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
 
-
-
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 type EditPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'EditPayment'>;
 type EditPaymentRouteProp = RouteProp<RootStackParamList, 'EditPayment'>;
-type FormData = { cardNumber: string; name: string; expiry: string; cvv: string };
+type FormData = {
+  holderName: string;
+  cardBrand: string;
+  cardLast4: string;
+  expiry: string;
+  isDefault?: boolean;
+};
+
+type FieldDescriptor = {
+  name: keyof FormData;
+  label: string;
+  keyboard: any;
+  secure: boolean;
+  hint: string;
+};
 
 const schema = yup.object({
-  cardNumber: yup.string().required('Card number is required'),
-  name: yup.string().required('Name is required'),
+  holderName: yup.string().required('Name is required'),
+  cardBrand: yup.string().required('Card brand is required'),
+  cardLast4: yup.string().required('Last 4 required').length(4, 'Must be 4 digits'),
   expiry: yup.string().required('Expiry is required'),
-  cvv: yup.string().required('CVV is required'),
 });
 
 export default function EditPaymentScreen() {
@@ -58,10 +70,11 @@ export default function EditPaymentScreen() {
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
-      cardNumber: pm.cardNumber || '',
-      name: pm.name || '',
+      holderName: pm.holderName || pm.name || '',
+      cardBrand: pm.cardBrand || '',
+      cardLast4: pm.cardLast4 || '',
       expiry: pm.expiry || '',
-      cvv: pm.cvv || '',
+      isDefault: !!pm.isDefault,
     },
   });
 
@@ -101,7 +114,13 @@ export default function EditPaymentScreen() {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
-      await updatePaymentMethod(pm.id, data);
+      await updatePaymentMethod(pm.id, {
+        cardBrand: data.cardBrand,
+        cardLast4: data.cardLast4,
+        holderName: data.holderName,
+        expiry: data.expiry,
+        isDefault: !!data.isDefault,
+      });
       toast('Payment method updated');
       navigation.goBack();
       queryClient.invalidateQueries({ queryKey: ['paymentMethods'] });
@@ -110,36 +129,30 @@ export default function EditPaymentScreen() {
     }
   };
 
-  const fields = [
+  const fields: FieldDescriptor[] = [
     {
-      name: 'cardNumber',
-      label: 'Card Number',
-      keyboard: 'numeric',
-      secure: false,
-      hint: 'Edit your card number',
-    },
-    {
-      name: 'name',
+      name: 'holderName',
       label: 'Name on Card',
       keyboard: 'default',
       secure: false,
       hint: 'Edit the name on the card',
     },
     {
-      name: 'expiry',
-      label: 'Expiry (MM/YY)',
+      name: 'cardBrand',
+      label: 'Card Brand',
       keyboard: 'default',
       secure: false,
-      hint: 'Edit expiration date in MM/YY format',
+      hint: 'e.g. Visa',
     },
     {
-      name: 'cvv',
-      label: 'CVV',
+      name: 'cardLast4',
+      label: 'Last 4 digits',
       keyboard: 'numeric',
-      secure: true,
-      hint: 'Edit the security code',
+      secure: false,
+      hint: 'Last 4 digits',
     },
-  ] as const;
+    { name: 'expiry', label: 'Expiry (MM/YY)', keyboard: 'default', secure: false, hint: 'MM/YY' },
+  ];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -161,30 +174,54 @@ export default function EditPaymentScreen() {
         {fields.map(f => (
           <View key={f.name} style={styles.field}>
             <Text style={[styles.label, { color: jarsSecondary }]}>{f.label}</Text>
-            <Controller
-              control={control}
-              name={f.name}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
-                  placeholder={f.label}
-                  placeholderTextColor={jarsSecondary}
-                  keyboardType={f.keyboard as any}
-                  secureTextEntry={f.secure}
-                  onBlur={onBlur}
-                  value={value}
-                  onChangeText={t => {
-                    hapticLight();
-                    onChange(t);
-                  }}
-                  accessibilityLabel={f.label}
-                  accessibilityHint={f.hint}
-                />
-              )}
-            />
-            {errors[f.name] && (
+            {f.name === 'isDefault' ? (
+              <Controller
+                control={control}
+                name={f.name}
+                render={({ field: { value, onChange } }) => (
+                  <Pressable
+                    onPress={() => onChange(!value)}
+                    style={[
+                      styles.input,
+                      {
+                        borderColor: jarsSecondary,
+                        justifyContent: 'center',
+                        flexDirection: 'row',
+                      },
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityLabel={f.label}
+                  >
+                    <Text style={{ color: jarsPrimary }}>{value ? 'Yes (Default)' : 'No'}</Text>
+                  </Pressable>
+                )}
+              />
+            ) : (
+              <Controller
+                control={control}
+                name={f.name}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+                    placeholder={f.label}
+                    placeholderTextColor={jarsSecondary}
+                    keyboardType={f.keyboard as any}
+                    secureTextEntry={f.secure}
+                    onBlur={onBlur}
+                    value={value as string}
+                    onChangeText={t => {
+                      hapticLight();
+                      onChange(t);
+                    }}
+                    accessibilityLabel={f.label}
+                    accessibilityHint={f.hint}
+                  />
+                )}
+              />
+            )}
+            {errors[f.name as keyof FormData] && (
               <Text style={styles.error} accessibilityRole="alert">
-                {errors[f.name]?.message}
+                {errors[f.name as keyof FormData]?.message}
               </Text>
             )}
           </View>

@@ -69,20 +69,22 @@ describe('AddPaymentScreen form', () => {
     const { tree, client } = await render();
     const inputs = tree.root.findAllByType('TextInput' as any);
     await act(async () => {
-      inputs[0].props.onChangeText('4242424242424242');
-      inputs[1].props.onChangeText('John Doe');
-      inputs[2].props.onChangeText('12/30');
-      inputs[3].props.onChangeText('123');
+      // holderName, cardBrand, cardLast4, expiry
+      inputs[0].props.onChangeText('John Doe');
+      inputs[1].props.onChangeText('Visa');
+      inputs[2].props.onChangeText('4242');
+      inputs[3].props.onChangeText('12/30');
     });
     const button = tree.root.findAllByType('Pressable' as any).slice(-1)[0];
     await act(async () => {
       button.props.onClick();
     });
     expect(addPaymentMethod).toHaveBeenCalledWith({
-      cardNumber: '4242424242424242',
-      name: 'John Doe',
+      holderName: 'John Doe',
+      cardBrand: 'Visa',
+      cardLast4: '4242',
       expiry: '12/30',
-      cvv: '123',
+      isDefault: false,
     });
     expect(client.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['paymentMethods'] });
   });
@@ -96,18 +98,22 @@ describe('AddPaymentScreen form', () => {
     const texts = tree.root
       .findAllByType('Text' as any)
       .map(n => (Array.isArray(n.props.children) ? n.props.children.join('') : n.props.children));
-    expect(texts).toContain('Card number is required');
+    // new validation messages
+    expect(texts).toContain('Card brand is required');
   });
 
   it('shows toast on api error', async () => {
-    (addPaymentMethod as jest.Mock).mockRejectedValue(new Error('fail'));
+    (addPaymentMethod as jest.Mock).mockRejectedValueOnce(new Error('fail'));
+    // clear prior toast calls from other tests
+    (toast as jest.Mock).mockClear();
     const { tree } = await render();
     const inputs = tree.root.findAllByType('TextInput' as any);
     await act(async () => {
-      inputs[0].props.onChangeText('4242424242424242');
-      inputs[1].props.onChangeText('John Doe');
-      inputs[2].props.onChangeText('12/30');
-      inputs[3].props.onChangeText('123');
+      // holderName, cardBrand, cardLast4, expiry
+      inputs[0].props.onChangeText('John Doe');
+      inputs[1].props.onChangeText('Visa');
+      inputs[2].props.onChangeText('4242');
+      inputs[3].props.onChangeText('12/30');
     });
     const button = tree.root.findAllByType('Pressable' as any).slice(-1)[0];
     await act(async () => {

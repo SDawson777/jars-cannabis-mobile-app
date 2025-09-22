@@ -1,8 +1,9 @@
 // src/screens/SavedPaymentsScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
 import { Plus, ChevronRight } from 'lucide-react-native';
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -14,6 +15,7 @@ import {
   Platform,
 } from 'react-native';
 
+import { getPaymentMethods } from '../clients/paymentClient';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
@@ -27,18 +29,20 @@ type SavedPaymentsNavProp = NativeStackNavigationProp<RootStackParamList, 'Saved
 
 interface PaymentMethod {
   id: string;
-  label: string;
+  cardBrand?: string;
+  cardLast4?: string;
+  holderName?: string;
+  expiry?: string;
+  isDefault?: boolean;
 }
-
-const initialMethods: PaymentMethod[] = [
-  { id: '1', label: 'Visa ****1234' },
-  { id: '2', label: 'Mastercard ****5678' },
-];
 
 export default function SavedPaymentsScreen() {
   const navigation = useNavigation<SavedPaymentsNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [methods] = useState<PaymentMethod[]>(initialMethods);
+  const { data: methods = [], isLoading } = useQuery<PaymentMethod[]>({
+    queryKey: ['paymentMethods'],
+    queryFn: getPaymentMethods,
+  });
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -90,7 +94,10 @@ export default function SavedPaymentsScreen() {
             android_ripple={{ color: `${jarsSecondary}20` }}
             onPress={() => handleEdit(item)}
           >
-            <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
+            <Text style={[styles.label, { color: jarsPrimary }]}>
+              {item.cardBrand ? `${item.cardBrand} ****${item.cardLast4 ?? ''}` : item.holderName}
+              {item.isDefault ? ' (Default)' : ''}
+            </Text>
             <ChevronRight color={jarsPrimary} size={20} />
           </Pressable>
         )}
@@ -105,6 +112,7 @@ export default function SavedPaymentsScreen() {
           </Pressable>
         }
       />
+      {isLoading && <Text style={{ padding: 16, color: jarsSecondary }}>Loading...</Text>}
     </SafeAreaView>
   );
 }

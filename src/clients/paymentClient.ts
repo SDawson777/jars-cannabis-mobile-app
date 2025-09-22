@@ -4,10 +4,12 @@ import { getAuthToken } from '../utils/auth';
 const BASE_URL = API_BASE_URL;
 
 export interface PaymentPayload {
-  cardNumber: string;
-  name: string;
-  expiry: string;
-  cvv: string;
+  // tokenized metadata from payment processor
+  cardBrand: string;
+  cardLast4: string;
+  holderName?: string;
+  expiry?: string; // MM/YY
+  isDefault?: boolean;
 }
 
 async function authFetch(path: string, options: RequestInit) {
@@ -31,4 +33,8 @@ export async function addPaymentMethod(payload: PaymentPayload) {
 
 export async function updatePaymentMethod(id: string, payload: PaymentPayload) {
   return authFetch(`/payment-methods/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+}
+
+export async function getPaymentMethods() {
+  return authFetch('/payment-methods', { method: 'GET' });
 }
