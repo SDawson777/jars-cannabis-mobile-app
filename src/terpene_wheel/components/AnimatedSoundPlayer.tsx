@@ -1,6 +1,8 @@
 import { Audio } from 'expo-av';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
+import logger from '../../lib/logger';
+
 export interface AnimatedSoundPlayerHandle {
   play: () => Promise<void>;
 }

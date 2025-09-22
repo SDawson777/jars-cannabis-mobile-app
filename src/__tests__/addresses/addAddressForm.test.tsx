@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 
-import AddAddressScreen from '../../screens/AddAddressScreen';
 import { phase4Client } from '../../api/phase4Client';
+import AddAddressScreen from '../../screens/AddAddressScreen';
 import { toast } from '../../utils/toast';
 
 jest.mock('react-native', () => {
@@ -14,7 +14,8 @@ jest.mock('react-native', () => {
     SafeAreaView: ({ children }: any) => React.createElement('SafeAreaView', null, children),
     TextInput: ({ onChangeText, value, ...props }: any) =>
       React.createElement('TextInput', { onChangeText, value, ...props }),
-    Pressable: ({ children, onPress }: any) => React.createElement('Pressable', { onClick: onPress }, children),
+    Pressable: ({ children, onPress }: any) =>
+      React.createElement('Pressable', { onClick: onPress }, children),
     ActivityIndicator: () => React.createElement('ActivityIndicator'),
     StyleSheet: { create: (s: any) => s },
     LayoutAnimation: { configureNext: jest.fn(), Presets: { easeInEaseOut: {} } },

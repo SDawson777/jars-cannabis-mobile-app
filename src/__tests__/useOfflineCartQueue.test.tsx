@@ -1,5 +1,5 @@
-import React from 'react';
 import { act, render } from '@testing-library/react-native';
+import React from 'react';
 
 // Use real timers by default to avoid react-test-renderer issues
 jest.useRealTimers();
@@ -38,7 +38,7 @@ function HookWrapper({ onReady }: { onReady?: (q: any) => void }) {
   const q = useOfflineCartQueue();
   React.useEffect(() => {
     if (onReady) onReady(q);
-  }, [q]);
+  }, [onReady, q]);
   return null;
 }
 
@@ -63,7 +63,7 @@ describe('useOfflineCartQueue', () => {
     };
 
     // render the hook wrapper; let effects run
-    const rendered = render(<HookWrapper onReady={onReady} />);
+    const _rendered = render(<HookWrapper onReady={onReady} />);
     // allow microtasks to settle
     await act(async () => {
       await Promise.resolve();
@@ -72,9 +72,7 @@ describe('useOfflineCartQueue', () => {
 
     // Queue an action while offline with realistic item (productId, quantity, price, variantId)
     const queuedPayload = {
-      items: [
-        { productId: 'prod-1', quantity: 2, price: 19.99, variantId: 'v-1' },
-      ],
+      items: [{ productId: 'prod-1', quantity: 2, price: 19.99, variantId: 'v-1' }],
     };
     // Queue an action while offline
     await act(async () => {
@@ -103,8 +101,8 @@ describe('useOfflineCartQueue', () => {
       await Promise.resolve();
     });
 
-  // phase4Client.post should have been called with queued action and same payload shape
-  expect(mockPost).toHaveBeenCalledWith('/cart/update', queuedPayload);
+    // phase4Client.post should have been called with queued action and same payload shape
+    expect(mockPost).toHaveBeenCalledWith('/cart/update', queuedPayload);
 
     // AsyncStorage.removeItem should have been called to clear queue
     expect(require('@react-native-async-storage/async-storage').removeItem).toHaveBeenCalledWith(

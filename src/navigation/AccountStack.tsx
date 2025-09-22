@@ -1,23 +1,23 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import ProfileScreen from '../screens/ProfileScreen';
+import AccessibilitySettingsScreen from '../screens/AccessibilitySettingsScreen';
+import AddAddressScreen from '../screens/AddAddressScreen';
+import AddPaymentScreen from '../screens/AddPaymentScreen';
+import AppSettingsScreen from '../screens/AppSettingsScreen';
+import EditAddressScreen from '../screens/EditAddressScreen';
+import EditPaymentScreen from '../screens/EditPaymentScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
-import SavedAddressesScreen from '../screens/SavedAddressesScreen';
-import AddAddressScreen from '../screens/AddAddressScreen';
-import EditAddressScreen from '../screens/EditAddressScreen';
-import SavedPaymentsScreen from '../screens/SavedPaymentsScreen';
-import AddPaymentScreen from '../screens/AddPaymentScreen';
-import EditPaymentScreen from '../screens/EditPaymentScreen';
+import JournalEntryScreen from '../screens/JournalEntryScreen';
 import LoyaltyProgramScreen from '../screens/LoyaltyProgramDetailsScreen';
+import MyJarsInsightsScreen from '../screens/MyJarsInsightsScreen';
+import MyJarsScreen from '../screens/MyJarsScreen';
 import NotificationsScreen from '../screens/NotificationSettingsScreen';
 import PrivacySettingsScreen from '../screens/PrivacySettingsScreen';
-import AppSettingsScreen from '../screens/AppSettingsScreen';
-import AccessibilitySettingsScreen from '../screens/AccessibilitySettingsScreen';
-import MyJarsScreen from '../screens/MyJarsScreen';
-import JournalEntryScreen from '../screens/JournalEntryScreen';
-import MyJarsInsightsScreen from '../screens/MyJarsInsightsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import SavedAddressesScreen from '../screens/SavedAddressesScreen';
+import SavedPaymentsScreen from '../screens/SavedPaymentsScreen';
 
 export type AccountStackParamList = {
   Profile: undefined;

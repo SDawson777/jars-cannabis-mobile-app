@@ -1,5 +1,3 @@
-import { Linking } from 'react-native';
-
 import { linking } from '../navigation/linking';
 
 describe('Linking Configuration', () => {

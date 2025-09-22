@@ -1,12 +1,13 @@
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 // Instead of importing the full RN screen implementations (which pull many
 // native modules), provide lightweight mocks that require hooks at runtime so
 // individual tests can use jest.doMock to swap hook implementations.
 jest.mock('../screens/CartScreen', () => {
-  return function CartScreenMock(props: any) {
+  return function CartScreenMock(_props: any) {
     const React = require('react');
     // Prefer jest.requireMock so per-test jest.doMock overrides are respected
     const useCartModule =
@@ -19,7 +20,7 @@ jest.mock('../screens/CartScreen', () => {
     const { data, updateItem, removeItem, applyCoupon } = useCart();
 
     // Debug info to help understand which functions are wired
-    // eslint-disable-next-line no-console
+
     console.log('CartScreenMock useCart functions:', {
       hasUpdate: typeof updateItem,
       hasRemove: typeof removeItem,
@@ -131,7 +132,7 @@ jest.mock('../screens/CheckoutScreen', () => {
       // exists. Tests often provide a mutate spy that returns a Promise.
       if (createOrderHook && typeof createOrderHook.mutate === 'function') {
         // Debug: log that we're about to call mutate and current onSuccess
-        // eslint-disable-next-line no-console
+
         console.log(
           'CheckoutScreenMock onSubmit: calling mutate, has onSuccess?',
           typeof createOrderHook.onSuccess,
@@ -145,16 +146,13 @@ jest.mock('../screens/CheckoutScreen', () => {
         });
         if (result && typeof result.then === 'function') {
           result.then((data: any) => {
-            // eslint-disable-next-line no-console
             console.log('CheckoutScreenMock mutate.then resolved with', data);
             // Prefer module-scoped mockCreateOrderOnSuccess if test set it,
             // otherwise fall back to the hook's onSuccess.
             if (typeof mockCreateOrderOnSuccess === 'function') {
-              // eslint-disable-next-line no-console
               console.log('CheckoutScreenMock calling mockCreateOrderOnSuccess with', data);
               mockCreateOrderOnSuccess(data);
             } else if (createOrderHook.onSuccess) {
-              // eslint-disable-next-line no-console
               console.log('CheckoutScreenMock calling createOrderHook.onSuccess with', data);
               createOrderHook.onSuccess(data);
             }
@@ -163,11 +161,9 @@ jest.mock('../screens/CheckoutScreen', () => {
           // tests that expect immediate navigation don't hang waiting for the
           // promise resolution.
           if (typeof mockCreateOrderOnSuccess === 'function') {
-            // eslint-disable-next-line no-console
             console.log('CheckoutScreenMock calling mockCreateOrderOnSuccess synchronously');
             mockCreateOrderOnSuccess({ id: 'order-123', status: 'pending' });
           } else if (createOrderHook.onSuccess) {
-            // eslint-disable-next-line no-console
             console.log('CheckoutScreenMock calling createOrderHook.onSuccess synchronously');
             createOrderHook.onSuccess({ id: 'order-123', status: 'pending' });
           }
@@ -260,6 +256,8 @@ jest.mock('../screens/CheckoutScreen', () => {
   };
 });
 
+import { useCartStore } from '../../stores/useCartStore';
+
 // Helper functions to require the mocked components at render time so per-test
 // jest.doMock calls can override hooks before the component is required.
 const getCartScreen = () => {
@@ -270,8 +268,6 @@ const getCheckoutScreen = () => {
   const comp = require('../screens/CheckoutScreen').default || require('../screens/CheckoutScreen');
   return React.createElement(comp);
 };
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useCartStore } from '../../stores/useCartStore';
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -509,7 +505,7 @@ describe('Checkout Flow', () => {
     });
 
     it('should validate required fields', async () => {
-      const { getByText, getByTestId } = renderWithProviders(getCheckoutScreen());
+      const { getByText } = renderWithProviders(getCheckoutScreen());
 
       // Try to submit without filling required fields
       const submitButton = getByText('Place Order');

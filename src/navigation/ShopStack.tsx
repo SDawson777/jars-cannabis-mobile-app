@@ -1,13 +1,13 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import ShopScreen from '../screens/ShopScreen';
-import ProductListScreen from '../screens/ProductListScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
-import StoreLocatorScreen from '../screens/StoreLocatorScreen';
-import StoreLocatorMapScreen from '../screens/StoreLocatorMapScreen';
-import StoreLocatorListScreen from '../screens/StoreLocatorListScreen';
+import ProductListScreen from '../screens/ProductListScreen';
+import ShopScreen from '../screens/ShopScreen';
 import StoreDetailsScreen from '../screens/StoreDetailsScreen';
+import StoreLocatorListScreen from '../screens/StoreLocatorListScreen';
+import StoreLocatorMapScreen from '../screens/StoreLocatorMapScreen';
+import StoreLocatorScreen from '../screens/StoreLocatorScreen';
 
 export type ShopStackParamList = {
   ShopScreen: undefined;

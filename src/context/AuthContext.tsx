@@ -12,7 +12,7 @@ import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 
 export interface User extends UserProfile {}
 
-interface AuthContextType {
+export interface AuthContextType {
   token: string | null;
   setToken: (_token: string) => Promise<void>;
   clearAuth: () => Promise<void>;

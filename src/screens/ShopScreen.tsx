@@ -29,6 +29,7 @@ import type { CMSProduct } from '../types/cms';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
 
+// Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -37,50 +38,45 @@ type ShopNavProp = NativeStackNavigationProp<RootStackParamList, 'ShopScreen'>;
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
-
 export default function ShopScreen() {
   const navigation = useNavigation<ShopNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
-  // cart (tests often mock ../hooks/useCart). Require at render time so tests can replace it with jest.doMock
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  let cart: any;
   let _useProducts: any;
   let _useFiltersQuery: any;
+  let cart: any;
   try {
     // Simple require()-based runtime resolution. When tests call `jest.doMock` before requiring
     // this module, Node's module system will return the mocked module here. Avoid calling
     // jest.* helpers directly to prevent interfering with Jest's module system.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+
     cart = require('../hooks/useCart').useCart();
-  } catch (e) {
+  } catch (_e) {
     // fallback to a minimal stub to avoid runtime crashes in edge cases
     cart = { addItem: () => {} };
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     _useProducts = require('../hooks/useProducts').useProducts;
-  } catch (e) {
+  } catch (_e) {
     _useProducts = () => ({ data: null, isLoading: false, error: null });
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     _useFiltersQuery = require('../hooks/useFilters').useFiltersQuery;
-  } catch (e) {
+  } catch (_e) {
     _useFiltersQuery = () => ({ data: null, isLoading: false });
   }
 
   // product and pagination hooks (required at render time so tests can mock)
   const _productsResult = typeof _useProducts === 'function' ? _useProducts('1') : null;
   // debug: log the shape of products result (helps tests that use jest.doMock inside tests)
-  // eslint-disable-next-line no-console
+
   console.error(
     'ShopScreen: _productsResult keys:',
     _productsResult ? Object.keys(_productsResult) : _productsResult
   );
-  // eslint-disable-next-line no-console
+
   console.error(
     'ShopScreen: prodData sample:',
     _productsResult?.data
@@ -111,9 +107,7 @@ export default function ShopScreen() {
 
   // support both react-query infinite `data.pages` shape and ProductPage { products } shape
   const products =
-    prodData?.pages?.flatMap((p: any) => p.products ?? []) ??
-    (prodData as any)?.products ??
-    [];
+    prodData?.pages?.flatMap((p: any) => p.products ?? []) ?? (prodData as any)?.products ?? [];
   const _filtersResult = typeof _useFiltersQuery === 'function' ? _useFiltersQuery() : null;
   const { data: filters, isLoading: filtersLoading } = _filtersResult ?? {
     data: null,
@@ -186,11 +180,11 @@ export default function ShopScreen() {
         // support both: prefer calling with full items payload
         try {
           addItem({ items: [item] });
-        } catch (inner) {
+        } catch (_inner) {
           // fallback to calling addItem directly with single item (store-level API)
           addItem(item);
         }
-      } catch (e) {
+      } catch (_e) {
         // ignore test-side queued errors
       }
     }

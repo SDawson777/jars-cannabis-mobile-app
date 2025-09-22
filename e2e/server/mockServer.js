@@ -195,7 +195,8 @@ app.get('/health', (req, res) => {
 });
 
 // Error handling
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
+  void _next;
   console.error('Mock server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });

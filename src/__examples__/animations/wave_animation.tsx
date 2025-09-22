@@ -9,7 +9,7 @@ export default function WaveAnimation() {
   useEffect(() => {
     waveOpacity.value = withTiming(1, { duration: 500 });
     waveScale.value = withTiming(1.2, { duration: 500 });
-  }, []);
+  }, [waveOpacity, waveScale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: waveOpacity.value,

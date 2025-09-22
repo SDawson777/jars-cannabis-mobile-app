@@ -1,5 +1,5 @@
-import { linking } from '../navigation/linking';
 import logger from '../lib/logger';
+import { linking } from '../navigation/linking';
 
 export interface ParsedRoute {
   routeName: string;
@@ -124,9 +124,9 @@ export function getAvailableRoutes(): Record<string, string> {
  */
 export function validateRoutePattern(pattern: string): boolean {
   try {
-  // Disallow empty parameter names like ':', e.g. 'shop/' or 'shop/:'
-  // Colon does not need escaping inside the regex character sequence
-  if (/(?:^|\/):(?:$|\/)/.test(pattern)) return false;
+    // Disallow empty parameter names like ':', e.g. 'shop/' or 'shop/:'
+    // Colon does not need escaping inside the regex character sequence
+    if (/(?:^|\/):(?:$|\/)/.test(pattern)) return false;
 
     // Find parameters and ensure they match the allowed pattern (start with letter, then alnum or underscore)
     const paramMatches = pattern.match(/:([^/]+)/g);

@@ -34,7 +34,9 @@ describe('Logger', () => {
     it('should log a message with metadata', () => {
       const meta = { userId: '123', action: 'click' };
       logger.log('User action', meta);
-      expect(consoleSpy.log).toHaveBeenCalledWith('User action :: {"userId":"123","action":"click"}');
+      expect(consoleSpy.log).toHaveBeenCalledWith(
+        'User action :: {"userId":"123","action":"click"}'
+      );
     });
   });
 
@@ -47,7 +49,9 @@ describe('Logger', () => {
     it('should warn a message with metadata', () => {
       const meta = { component: 'AuthScreen', issue: 'deprecated prop' };
       logger.warn('Deprecated usage', meta);
-      expect(consoleSpy.warn).toHaveBeenCalledWith('Deprecated usage :: {"component":"AuthScreen","issue":"deprecated prop"}');
+      expect(consoleSpy.warn).toHaveBeenCalledWith(
+        'Deprecated usage :: {"component":"AuthScreen","issue":"deprecated prop"}'
+      );
     });
   });
 
@@ -61,17 +65,21 @@ describe('Logger', () => {
     it('should log an error message with metadata', () => {
       const meta = { endpoint: '/api/products', status: 500 };
       logger.error('API Error', meta);
-      expect(consoleSpy.error).toHaveBeenCalledWith('API Error :: {"endpoint":"/api/products","status":500}');
+      expect(consoleSpy.error).toHaveBeenCalledWith(
+        'API Error :: {"endpoint":"/api/products","status":500}'
+      );
       expect(Sentry.captureException).not.toHaveBeenCalled();
     });
 
     it('should log an error and capture exception in Sentry', () => {
       const error = new Error('Network timeout');
       const meta = { endpoint: '/api/cart', timeout: 5000 };
-      
+
       logger.error('Request failed', meta, error);
-      
-      expect(consoleSpy.error).toHaveBeenCalledWith('Request failed :: {"endpoint":"/api/cart","timeout":5000}');
+
+      expect(consoleSpy.error).toHaveBeenCalledWith(
+        'Request failed :: {"endpoint":"/api/cart","timeout":5000}'
+      );
       expect(Sentry.captureException).toHaveBeenCalledWith(error);
     });
 
@@ -87,11 +95,11 @@ describe('Logger', () => {
       const meta = {
         user: { id: '123', name: 'John' },
         timestamp: '2024-01-01T00:00:00Z',
-        config: { debug: true, version: '1.0.0' }
+        config: { debug: true, version: '1.0.0' },
       };
-      
+
       logger.log('Complex data', meta);
-      
+
       expect(consoleSpy.log).toHaveBeenCalledWith(
         'Complex data :: {"user":{"id":"123","name":"John"},"timestamp":"2024-01-01T00:00:00Z","config":{"debug":true,"version":"1.0.0"}}'
       );
@@ -114,11 +122,12 @@ describe('Logger', () => {
   describe('Sentry integration', () => {
     it('should only capture exceptions for error level', () => {
       const error = new Error('Test error');
-      
-      logger.log('Info message', {}, error as any);
-      logger.warn('Warning message', {}, error as any);
+
+      // logger.log and logger.warn don't accept an error argument; use logger.error to capture exceptions
+      logger.log('Info message', {});
+      logger.warn('Warning message', {});
       logger.error('Error message', {}, error);
-      
+
       expect(Sentry.captureException).toHaveBeenCalledTimes(1);
       expect(Sentry.captureException).toHaveBeenCalledWith(error);
     });
@@ -130,13 +139,13 @@ describe('Logger', () => {
       });
 
       const error = new Error('Original error');
-      
+
       expect(() => {
         logger.error('Error with Sentry failure', {}, error);
       }).not.toThrow();
-      
+
       expect(consoleSpy.error).toHaveBeenCalledWith('Error with Sentry failure');
-      
+
       // Restore original implementation
       (Sentry.captureException as jest.Mock).mockImplementation(originalCaptureException);
     });

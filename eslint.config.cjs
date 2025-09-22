@@ -23,6 +23,7 @@ module.exports = [
       'App.tsx',
       'jest.setup.ts'
     ],
+    ignores: ['**/*.d.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -70,8 +71,8 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
       'react/prop-types': 'off',
       'react/display-name': 'off',
-      'react-hooks/exhaustive-deps': 'warn',
-      'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
+    'react-hooks/exhaustive-deps': 'warn',
+    'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
       'import/no-unresolved': 'off',
       'import/no-extraneous-dependencies': ['error', {
         devDependencies: [
@@ -98,6 +99,11 @@ module.exports = [
       globals: {
         ...globals.jest,
         ...globals.node,
+        // Detox/E2E globals used in e2e tests
+        device: 'readonly',
+        element: 'readonly',
+        by: 'readonly',
+        waitFor: 'readonly'
       },
     },
     rules: {
@@ -138,6 +144,8 @@ module.exports = [
   },
   {
     ignores: [
+        '**/*.d.ts',
+      'app.config.ts',
       'dist/',
       'build/',
       'out/',

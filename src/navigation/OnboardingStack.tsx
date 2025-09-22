@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import SplashScreen from '../screens/SplashScreen';
-import OnboardingScreen from '../screens/OnboardingScreen';
-import AgeVerificationScreen from '../screens/onboarding/AgeVerificationScreen';
 import LoginSignUpDecisionScreen from '../screens/LoginSignUpDecisionScreen';
 import OTPScreen from '../screens/OTPScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
+import SplashScreen from '../screens/SplashScreen';
 import StoreSelectionScreen from '../screens/StoreSelectionScreen';
+import AgeVerificationScreen from '../screens/onboarding/AgeVerificationScreen';
 
 export type OnboardingStackParamList = {
   SplashScreen: undefined;

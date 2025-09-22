@@ -1,14 +1,3 @@
-import audio, { 
-  initializeAudio, 
-  preload, 
-  play, 
-  stop, 
-  unload, 
-  unloadAll, 
-  getCachedKeys, 
-  isCached 
-} from '../lib/audio';
-
 // Mock expo-av
 jest.mock('expo-av', () => ({
   Audio: {
@@ -28,9 +17,20 @@ jest.mock('expo-av', () => ({
 
 import { Audio } from 'expo-av';
 
+import audio, {
+  initializeAudio,
+  preload,
+  play,
+  stop,
+  unload,
+  unloadAll,
+  getCachedKeys,
+  isCached,
+} from '../lib/audio';
+
 describe('Audio Library', () => {
   let mockSound: any;
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockSound = {
@@ -43,7 +43,7 @@ describe('Audio Library', () => {
         isPlaying: false,
       }),
     };
-    (Audio.Sound as jest.Mock).mockImplementation(() => mockSound);
+    (Audio.Sound as unknown as jest.Mock).mockImplementation(() => mockSound);
   });
 
   afterEach(async () => {
@@ -54,7 +54,7 @@ describe('Audio Library', () => {
   describe('initializeAudio', () => {
     it('should initialize audio with correct settings', async () => {
       await initializeAudio();
-      
+
       expect(Audio.setAudioModeAsync).toHaveBeenCalledWith({
         allowsRecordingIOS: false,
         staysActiveInBackground: false,
@@ -67,9 +67,9 @@ describe('Audio Library', () => {
     it('should handle initialization errors gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
       (Audio.setAudioModeAsync as jest.Mock).mockRejectedValueOnce(new Error('Init failed'));
-      
+
       await initializeAudio();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to initialize audio:', expect.any(Error));
       consoleSpy.mockRestore();
     });
@@ -77,7 +77,7 @@ describe('Audio Library', () => {
     it('should not initialize twice', async () => {
       await initializeAudio();
       await initializeAudio();
-      
+
       expect(Audio.setAudioModeAsync).toHaveBeenCalledTimes(1);
     });
   });
@@ -85,9 +85,9 @@ describe('Audio Library', () => {
   describe('preload', () => {
     it('should preload audio file successfully', async () => {
       const source = { uri: 'test.mp3' };
-      
+
       await preload('test', source);
-      
+
       expect(Audio.Sound).toHaveBeenCalled();
       expect(mockSound.loadAsync).toHaveBeenCalledWith(source, {
         shouldPlay: false,
@@ -99,19 +99,19 @@ describe('Audio Library', () => {
 
     it('should not preload if already cached', async () => {
       const source = { uri: 'test.mp3' };
-      
+
       await preload('test', source);
       await preload('test', source); // Second call
-      
+
       expect(Audio.Sound).toHaveBeenCalledTimes(1);
     });
 
     it('should handle preload errors gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
       mockSound.loadAsync.mockRejectedValueOnce(new Error('Load failed'));
-      
+
       await preload('test', { uri: 'test.mp3' });
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to preload audio test:', expect.any(Error));
       expect(isCached('test')).toBe(false);
       consoleSpy.mockRestore();
@@ -120,10 +120,12 @@ describe('Audio Library', () => {
     it('should handle timeout errors', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
       // Mock a long-running load that will timeout
-      mockSound.loadAsync.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 6000)));
-      
+      mockSound.loadAsync.mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 6000))
+      );
+
       await preload('test', { uri: 'test.mp3' }, { timeout: 100 });
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to preload audio test:', expect.any(Error));
       consoleSpy.mockRestore();
     });
@@ -131,9 +133,9 @@ describe('Audio Library', () => {
     it('should apply custom options', async () => {
       const source = { uri: 'test.mp3' };
       const options = { volume: 0.5, loop: true };
-      
+
       await preload('test', source, options);
-      
+
       expect(mockSound.loadAsync).toHaveBeenCalledWith(source, {
         shouldPlay: false,
         volume: 0.5,
@@ -145,17 +147,17 @@ describe('Audio Library', () => {
   describe('play', () => {
     it('should play cached audio file', async () => {
       await preload('test', { uri: 'test.mp3' });
-      
+
       await play('test');
-      
+
       expect(mockSound.replayAsync).toHaveBeenCalled();
     });
 
     it('should preload and play if not cached', async () => {
       const source = { uri: 'test.mp3' };
-      
+
       await play('test', source);
-      
+
       expect(mockSound.loadAsync).toHaveBeenCalled();
       expect(mockSound.replayAsync).toHaveBeenCalled();
     });
@@ -163,19 +165,19 @@ describe('Audio Library', () => {
     it('should handle play errors gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
       mockSound.replayAsync.mockRejectedValueOnce(new Error('Play failed'));
-      
+
       await preload('test', { uri: 'test.mp3' });
       await play('test');
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to play audio test:', expect.any(Error));
       consoleSpy.mockRestore();
     });
 
     it('should warn if no audio found and no source provided', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      
+
       await play('nonexistent');
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('No audio found for key: nonexistent');
       consoleSpy.mockRestore();
     });
@@ -185,10 +187,10 @@ describe('Audio Library', () => {
         isLoaded: true,
         isPlaying: true,
       });
-      
+
       await preload('test', { uri: 'test.mp3' });
       await play('test');
-      
+
       expect(mockSound.stopAsync).toHaveBeenCalled();
       expect(mockSound.replayAsync).toHaveBeenCalled();
     });
@@ -200,10 +202,10 @@ describe('Audio Library', () => {
         isLoaded: true,
         isPlaying: true,
       });
-      
+
       await preload('test', { uri: 'test.mp3' });
       await stop('test');
-      
+
       expect(mockSound.stopAsync).toHaveBeenCalled();
     });
 
@@ -214,17 +216,17 @@ describe('Audio Library', () => {
         isLoaded: true,
         isPlaying: true,
       });
-      
+
       await preload('test', { uri: 'test.mp3' });
       await stop('test');
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to stop audio test:', expect.any(Error));
       consoleSpy.mockRestore();
     });
 
     it('should do nothing if audio not cached', async () => {
       await stop('nonexistent');
-      
+
       expect(mockSound.stopAsync).not.toHaveBeenCalled();
     });
   });
@@ -233,9 +235,9 @@ describe('Audio Library', () => {
     it('should unload specific audio file', async () => {
       await preload('test', { uri: 'test.mp3' });
       expect(isCached('test')).toBe(true);
-      
+
       await unload('test');
-      
+
       expect(mockSound.unloadAsync).toHaveBeenCalled();
       expect(isCached('test')).toBe(false);
     });
@@ -243,10 +245,10 @@ describe('Audio Library', () => {
     it('should handle unload errors gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
       mockSound.unloadAsync.mockRejectedValueOnce(new Error('Unload failed'));
-      
+
       await preload('test', { uri: 'test.mp3' });
       await unload('test');
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to unload audio test:', expect.any(Error));
       consoleSpy.mockRestore();
     });
@@ -256,31 +258,31 @@ describe('Audio Library', () => {
     it('should unload all cached audio files', async () => {
       await preload('test1', { uri: 'test1.mp3' });
       await preload('test2', { uri: 'test2.mp3' });
-      
+
       expect(getCachedKeys()).toEqual(['test1', 'test2']);
-      
+
       await unloadAll();
-      
+
       expect(getCachedKeys()).toEqual([]);
     });
 
     it('should handle unload errors for individual files', async () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      
+
       // Create two sounds, one that fails to unload
       const failingSound = {
         ...mockSound,
         unloadAsync: jest.fn().mockRejectedValue(new Error('Unload failed')),
       };
-      
-      (Audio.Sound as jest.Mock).mockImplementationOnce(() => mockSound);
+
+      (Audio.Sound as unknown as jest.Mock).mockImplementationOnce(() => mockSound);
       await preload('test1', { uri: 'test1.mp3' });
-      
-      (Audio.Sound as jest.Mock).mockImplementationOnce(() => failingSound);
+
+      (Audio.Sound as unknown as jest.Mock).mockImplementationOnce(() => failingSound);
       await preload('test2', { uri: 'test2.mp3' });
-      
+
       await unloadAll();
-      
+
       expect(consoleSpy).toHaveBeenCalledWith('Failed to unload audio test2:', expect.any(Error));
       expect(getCachedKeys()).toEqual([]);
       consoleSpy.mockRestore();
@@ -291,7 +293,7 @@ describe('Audio Library', () => {
     it('should return cached keys', async () => {
       await preload('test1', { uri: 'test1.mp3' });
       await preload('test2', { uri: 'test2.mp3' });
-      
+
       const keys = getCachedKeys();
       expect(keys).toContain('test1');
       expect(keys).toContain('test2');
@@ -299,9 +301,9 @@ describe('Audio Library', () => {
 
     it('should check if audio is cached', async () => {
       expect(isCached('test')).toBe(false);
-      
+
       await preload('test', { uri: 'test.mp3' });
-      
+
       expect(isCached('test')).toBe(true);
     });
   });

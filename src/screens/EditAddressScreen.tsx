@@ -1,6 +1,7 @@
 // src/screens/EditAddressScreen.tsx
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -18,7 +19,6 @@ import {
 } from 'react-native';
 
 import { phase4Client } from '../api/phase4Client';
-import { useQueryClient } from '@tanstack/react-query';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';

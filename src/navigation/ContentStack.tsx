@@ -1,20 +1,20 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import EducationalGreenhouseScreen from '../screens/EducationalGreenhouseScreen';
-import ArticleListScreen from '../screens/ArticleListScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
-import TerpeneWheelScreen from '../screens/TerpeneWheelScreen';
-import CommunityGardenScreen from '../screens/CommunityGardenScreen';
-import DataTransparencyScreen from '../screens/DataTransparencyScreen';
-import PrivacyIntelligenceScreen from '../screens/PrivacyIntelligenceScreen';
+import ArticleListScreen from '../screens/ArticleListScreen';
 import AwardsScreen from '../screens/AwardsScreen';
+import CommunityGardenScreen from '../screens/CommunityGardenScreen';
+import ConciergeChatScreen from '../screens/ConciergeChatScreen';
+import ContactUsScreen from '../screens/ContactUsScreen';
+import DataTransparencyScreen from '../screens/DataTransparencyScreen';
+import EducationalGreenhouseScreen from '../screens/EducationalGreenhouseScreen';
 import EthicalAIDashboardScreen from '../screens/EthicalAIDashboardScreen';
 import HelpFAQScreen from '../screens/HelpFAQScreen';
-import ContactUsScreen from '../screens/ContactUsScreen';
-import ConciergeChatScreen from '../screens/ConciergeChatScreen';
-import LegalScreen from '../screens/profile/LegalScreen';
 import LanguageSelectionScreen from '../screens/LanguageSelectionScreen';
+import PrivacyIntelligenceScreen from '../screens/PrivacyIntelligenceScreen';
+import TerpeneWheelScreen from '../screens/TerpeneWheelScreen';
+import LegalScreen from '../screens/profile/LegalScreen';
 
 export type ContentStackParamList = {
   EducationalGreenhouse: undefined;

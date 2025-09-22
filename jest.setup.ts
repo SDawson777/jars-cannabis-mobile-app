@@ -7,7 +7,9 @@ try {
   jest.mock('react-native/Libraries/ReactNative/UIManager', () => ({
     getViewManagerConfig: () => undefined,
   }));
-} catch {}
+} catch {
+  /* no-op: UIManager mock not available in this environment */
+}
 jest.mock('expo-haptics', () => ({
   selectionAsync: jest.fn(),
   impactAsync: jest.fn(),
@@ -22,22 +24,20 @@ jest.mock('expo-secure-store', () => ({
 // Built-in matchers for RTL (prefer new entry; fallback to deprecated jest-native)
 try {
   // RTL v12.4+ exposes this
-   
   require('@testing-library/react-native/extend-expect');
 } catch {
   try {
-     
     require('@testing-library/jest-native/extend-expect');
   } catch {
-  // no-op; tests can still run without extended matchers
-}
+    /* no-op; tests can still run without extended matchers */
+  }
 }
 
 // Silence useNativeDriver warnings & Animated native helper
 try {
   jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 } catch {
-  // no-op
+  /* no-op: NativeAnimatedHelper not available in this environment */
 }
 
 // Reanimated mock (v3-compatible)
@@ -45,7 +45,9 @@ try {
   // react-native-reanimated is mapped to a local mock via moduleNameMapper.
   // No-op here to avoid circular requires during setup.
   jest.mock('react-native-reanimated');
-} catch {}
+} catch {
+  /* no-op: react-native-reanimated mock not available here */
+}
 
 // Polyfill TextEncoder/TextDecoder for Node environment used in Jest
 if (typeof (global as any).TextEncoder === 'undefined') {
@@ -82,8 +84,70 @@ try {
 try {
   const UIManager = require('react-native/Libraries/ReactNative/UIManager');
   if (!UIManager.getViewManagerConfig) {
-    UIManager.getViewManagerConfig = (name: string) => undefined;
+    UIManager.getViewManagerConfig = (_name: string) => undefined;
   }
 } catch {
   // ignore if not present
+}
+
+// ---------------------------------------------------------------------------
+// Suppress noisy test-time console output that is expected and not actionable
+// - React "not wrapped in act(...)" warnings (tests often trigger async updates)
+// - jsdom's AggregateError originating from XMLHttpRequest failures in tests
+// We keep original console methods for anything else so real errors still surface.
+// ---------------------------------------------------------------------------
+{
+  const origError = console.error.bind(console);
+  const origWarn = console.warn.bind(console);
+  const origLog = console.log.bind(console);
+
+  const shouldIgnore = (args: any[]) => {
+    try {
+      const joined = args
+        .map(a => {
+          if (typeof a === 'string') return a;
+          try {
+            return JSON.stringify(a);
+          } catch {
+            return String(a);
+          }
+        })
+        .join(' ');
+      // React act(...) warnings
+      if (/not wrapped in act\(/i.test(joined) || /An update to .* inside a test was not wrapped in act\(/i.test(joined)) {
+        return true;
+      }
+
+      // jsdom AggregateError originating from XHR (commonly noisy in tests)
+      if (/AggregateError/.test(joined) && /XMLHttpRequest/.test(joined)) {
+        return true;
+      }
+
+  // App-level debug logs used during development but noisy in CI
+  if (/^ShopScreen:/.test(joined)) return true;
+  if (/^CartScreenMock/.test(joined)) return true;
+  if (/^CheckoutScreenMock/.test(joined)) return true;
+  if (/^Analytics Event:/.test(joined)) return true;
+
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  console.error = (...args: any[]) => {
+    if (shouldIgnore(args)) return;
+    origError(...args);
+  };
+
+  console.warn = (...args: any[]) => {
+    if (shouldIgnore(args)) return;
+    origWarn(...args);
+  };
+
+  // Also filter console.log output which some tests use for debug prints
+  console.log = (...args: any[]) => {
+    if (shouldIgnore(args)) return;
+    origLog(...args);
+  };
 }

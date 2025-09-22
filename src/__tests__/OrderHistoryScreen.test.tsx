@@ -61,34 +61,39 @@ jest.mock('../components/useSkeletonText', () => () => null);
 describe('OrderHistoryScreen', () => {
   it('renders orders from api', async () => {
     // Mock two pages: first returns nextPage=2, second returns no nextPage
-    const firstPage = { orders: [
-      {
-        id: '1',
-        createdAt: '2025-01-01',
-        total: 10,
-        status: 'Completed',
-        store: 'Store',
-        items: [],
-        subtotal: 8,
-        taxes: 1,
-        fees: 1,
-      },
-    ], nextPage: 2 };
-    const secondPage = { orders: [
-      {
-        id: '2',
-        createdAt: '2025-01-02',
-        total: 12,
-        status: 'Completed',
-        store: 'Store',
-        items: [],
-        subtotal: 10,
-        taxes: 1,
-        fees: 1,
-      },
-    ] };
+    const firstPage = {
+      orders: [
+        {
+          id: '1',
+          createdAt: '2025-01-01',
+          total: 10,
+          status: 'Completed',
+          store: 'Store',
+          items: [],
+          subtotal: 8,
+          taxes: 1,
+          fees: 1,
+        },
+      ],
+      nextPage: 2,
+    };
+    const secondPage = {
+      orders: [
+        {
+          id: '2',
+          createdAt: '2025-01-02',
+          total: 12,
+          status: 'Completed',
+          store: 'Store',
+          items: [],
+          subtotal: 10,
+          taxes: 1,
+          fees: 1,
+        },
+      ],
+    };
 
-    const mockFetch = (orderClient.fetchOrders as jest.Mock).mockImplementation((page: number) => {
+    const _mockFetch = (orderClient.fetchOrders as jest.Mock).mockImplementation((page: number) => {
       if (page === 1) return Promise.resolve(firstPage);
       if (page === 2) return Promise.resolve(secondPage);
       return Promise.resolve({ orders: [] });

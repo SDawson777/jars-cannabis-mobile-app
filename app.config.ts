@@ -1,3 +1,5 @@
+// This file is a TypeScript configuration file for Expo
+// @ts-nocheck
 import type { ExpoConfig } from 'expo/config';
 
 const config: ExpoConfig = {

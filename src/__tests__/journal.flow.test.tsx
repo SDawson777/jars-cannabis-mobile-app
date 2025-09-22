@@ -1,14 +1,15 @@
-import React from 'react';
 // Mock native slider used by JournalEntryScreen
 jest.mock('@react-native-community/slider', () => {
   const React = require('react');
-  return ({ value, onValueChange }: any) => React.createElement('Slider', { children: null, value, onValueChange });
+  return ({ value, onValueChange }: any) =>
+    React.createElement('Slider', { children: null, value, onValueChange });
 });
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import React from 'react';
 
-import JournalEntryScreen from '../screens/JournalEntryScreen';
 import * as phase4 from '../api/phase4Client';
+import JournalEntryScreen from '../screens/JournalEntryScreen';
 
 jest.mock('../api/phase4Client');
 
@@ -44,7 +45,9 @@ describe('Journal entry flow', () => {
     const save = getByText('Save');
     fireEvent.press(save);
 
-    await waitFor(() => expect(mocked.addJournal).toHaveBeenCalledWith(expect.objectContaining({ notes: 'my notes' })));
+    await waitFor(() =>
+      expect(mocked.addJournal).toHaveBeenCalledWith(expect.objectContaining({ notes: 'my notes' }))
+    );
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });
 });

@@ -15,6 +15,8 @@
     "tasks/**/*.ts",
     "jest.setup.ts",
     "jest.config.cjs",
+    "e2e/global.d.ts",
+    "app.config.ts",
     "App.tsx"
   ],
   "exclude": ["backend", "functions", "server", "apps", "node_modules"]

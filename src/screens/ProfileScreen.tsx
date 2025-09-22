@@ -15,8 +15,8 @@ import {
   Platform,
 } from 'react-native';
 
+import { AuthContext, AuthContextType } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
-import { AuthContext } from '../context/AuthContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
@@ -39,7 +39,8 @@ const MENU: { id: keyof RootStackParamList; label: string }[] = [
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { data, clearAuth } = useContext(AuthContext as any);
+  const auth = useContext(AuthContext) as AuthContextType;
+  const { data, clearAuth } = auth || { data: undefined, clearAuth: undefined };
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
+import React from 'react';
 
 // We'll mock the hooks before requiring ShopScreen so the component picks up the mocked shape
 jest.mock('../hooks/useProducts', () => ({

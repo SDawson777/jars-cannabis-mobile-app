@@ -56,7 +56,7 @@ function TestApp() {
 
 describe('TerpeneWheel Navigation', () => {
   it('navigates to TerpeneWheel when CTA is pressed', () => {
-    const { getByTestId, getByText } = render(<TestApp />);
+    const { getByTestId, getByText: _getByText } = render(<TestApp />);
 
     // Find and press the terpene wheel CTA by testID to avoid text/emoji mismatches
     const terpeneWheelCTA = getByTestId('terpene-wheel-cta');

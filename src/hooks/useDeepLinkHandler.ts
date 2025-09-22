@@ -40,10 +40,10 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
                 setPreferredStore(match);
               }
             }
-            navigation.navigate(routeName as never);
+            (navigation as any).navigate(routeName);
             break;
           }
-          
+
           case 'ProductDetail':
           case 'ArticleDetail':
           case 'OrderDetails':
@@ -53,19 +53,21 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
           case 'EditPayment': {
             // Routes that require parameters
             if (params && Object.keys(params).length > 0) {
-              navigation.navigate(routeName as never, params as never);
+              (navigation as any).navigate(routeName, params);
             } else {
-              logger.warn(`Route ${routeName} requires parameters but none provided`, { routeName });
+              logger.warn(`Route ${routeName} requires parameters but none provided`, {
+                routeName,
+              });
             }
             break;
           }
-          
+
           default: {
             // All other routes can be navigated to directly
             if (params && Object.keys(params).length > 0) {
-              navigation.navigate(routeName as never, params as never);
+              (navigation as any).navigate(routeName, params);
             } else {
-              navigation.navigate(routeName as never);
+              (navigation as any).navigate(routeName);
             }
             break;
           }
@@ -77,7 +79,7 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
 
     const listener = ({ url }: { url: string }) => handle(url);
     const subscription = Linking.addEventListener('url', listener);
-    
+
     // Handle initial URL if app was opened from a deep link
     Linking.getInitialURL().then(url => {
       if (url) {

@@ -20,12 +20,12 @@ describe('Buyer Happy Path E2E', () => {
       await waitFor(element(by.id('splash-screen')))
         .toBeVisible()
         .withTimeout(5000);
-      
+
       // If splash screen is visible, wait for it to finish
       await waitFor(element(by.id('home-screen')))
         .toBeVisible()
         .withTimeout(10000);
-    } catch (error) {
+    } catch {
       // If no splash screen, we might already be on home or need to navigate
       console.log('No splash screen detected, checking current screen');
     }
@@ -34,23 +34,23 @@ describe('Buyer Happy Path E2E', () => {
     await waitFor(element(by.id('home-screen')))
       .toBeVisible()
       .withTimeout(10000);
-    
+
     await expect(element(by.text('Welcome to JARS'))).toBeVisible();
 
     // Step 2: Navigate to Shop
     await element(by.id('shop-tab-button')).tap();
-    
+
     await waitFor(element(by.id('shop-screen')))
       .toBeVisible()
       .withTimeout(5000);
-    
+
     await expect(element(by.text('Shop Cannabis'))).toBeVisible();
 
     // Step 3: Browse products and select one
     await waitFor(element(by.id('product-list')))
       .toBeVisible()
       .withTimeout(5000);
-    
+
     // Tap on the first product
     await element(by.id('product-item-0')).tap();
 
@@ -58,14 +58,14 @@ describe('Buyer Happy Path E2E', () => {
     await waitFor(element(by.id('product-detail-screen')))
       .toBeVisible()
       .withTimeout(5000);
-    
+
     await expect(element(by.id('product-name'))).toBeVisible();
     await expect(element(by.id('product-price'))).toBeVisible();
     await expect(element(by.id('add-to-cart-button'))).toBeVisible();
 
     // Step 5: Add product to cart
     await element(by.id('add-to-cart-button')).tap();
-    
+
     // Wait for confirmation (could be a toast or modal)
     await waitFor(element(by.text('Added to cart')))
       .toBeVisible()
@@ -73,7 +73,7 @@ describe('Buyer Happy Path E2E', () => {
 
     // Step 6: Navigate to cart
     await element(by.id('cart-tab-button')).tap();
-    
+
     await waitFor(element(by.id('cart-screen')))
       .toBeVisible()
       .withTimeout(5000);
@@ -84,7 +84,7 @@ describe('Buyer Happy Path E2E', () => {
 
     // Step 7: Proceed to checkout
     await element(by.id('checkout-button')).tap();
-    
+
     await waitFor(element(by.id('checkout-screen')))
       .toBeVisible()
       .withTimeout(5000);
@@ -92,7 +92,7 @@ describe('Buyer Happy Path E2E', () => {
     // Step 8: Fill checkout form (simplified for E2E)
     await element(by.id('delivery-address-input')).typeText('123 Test St, Denver, CO 80202');
     await element(by.id('payment-method-card')).tap();
-    
+
     // Verify order summary is displayed
     await expect(element(by.id('order-summary'))).toBeVisible();
     await expect(element(by.id('order-total'))).toBeVisible();
@@ -100,7 +100,7 @@ describe('Buyer Happy Path E2E', () => {
     // Note: In a real E2E test, we would complete the order
     // For now, we just verify the checkout screen is functional
     await expect(element(by.id('place-order-button'))).toBeVisible();
-    
+
     console.log('✅ Buyer happy path E2E test completed successfully');
   });
 
@@ -118,7 +118,7 @@ describe('Buyer Happy Path E2E', () => {
       await waitFor(element(by.id(tab.screen)))
         .toBeVisible()
         .withTimeout(3000);
-      
+
       console.log(`✅ Successfully navigated to ${tab.screen}`);
     }
   });
@@ -148,7 +148,7 @@ describe('Buyer Happy Path E2E', () => {
 
     // Navigate to shop (should show offline state)
     await element(by.id('shop-tab-button')).tap();
-    
+
     // Check for offline indicator
     await waitFor(element(by.id('offline-indicator')))
       .toBeVisible()

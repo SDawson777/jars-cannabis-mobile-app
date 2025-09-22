@@ -1,5 +1,6 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
+import React from 'react';
+
 import { ThemeContext } from '../context/ThemeContext';
 
 // mock the hook before requiring the screen
@@ -45,7 +46,13 @@ describe('ProductDetailScreen integration', () => {
     // require the screen after mock
     const ProductDetailScreen = require('../screens/ProductDetailScreen').default;
 
-  const theme = { colorTemp: 'neutral' as const, jarsPrimary: '#000', jarsSecondary: '#666', jarsBackground: '#fff', loading: false };
+    const theme = {
+      colorTemp: 'neutral' as const,
+      jarsPrimary: '#000',
+      jarsSecondary: '#666',
+      jarsBackground: '#fff',
+      loading: false,
+    };
 
     const { getByText } = render(
       <ThemeContext.Provider value={theme}>

@@ -1,9 +1,9 @@
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 // Do not import ShopScreen at top-level. Tests will require it after installing per-test mocks
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -83,13 +83,13 @@ describe('Shop Flow', () => {
   describe('ShopScreen', () => {
     const getShopScreen = () => {
       // require after default mocks are registered
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+
       return require('../screens/ShopScreen').default;
     };
 
     it('should render shop screen with products', async () => {
       const ShopScreen = getShopScreen();
-      const { getByText, getByTestId } = renderWithProviders(<ShopScreen />);
+      const { getByText, getByTestId: _getByTestId } = renderWithProviders(<ShopScreen />);
 
       // Check if products are displayed
       await waitFor(() => {
@@ -192,7 +192,10 @@ describe('Shop Flow', () => {
       const calledWith = mockAddItem.mock.calls[0][0];
       const legacyShape = calledWith && calledWith.productId === '1' && calledWith.quantity === 1;
       const newShape =
-        calledWith && Array.isArray(calledWith.items) && calledWith.items[0].productId === '1' && calledWith.items[0].quantity === 1;
+        calledWith &&
+        Array.isArray(calledWith.items) &&
+        calledWith.items[0].productId === '1' &&
+        calledWith.items[0].quantity === 1;
       expect(legacyShape || newShape).toBeTruthy();
     });
 

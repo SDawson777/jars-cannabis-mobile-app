@@ -4,9 +4,9 @@ import React from 'react';
 import CartScreen from '../screens/CartScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import OrderConfirmationScreen from '../screens/OrderConfirmationScreen';
+import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import OrderTrackingScreen from '../screens/OrderTrackingScreen';
 import OrderHistoryScreen from '../screens/orders/OrderHistoryScreen';
-import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 
 export type CheckoutStackParamList = {
   CartScreen: undefined;

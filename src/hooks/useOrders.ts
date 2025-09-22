@@ -3,6 +3,6 @@ export function useCreateOrder() {
   return { mutate: async () => {}, isLoading: false };
 }
 
-export function useOrder(orderId: string) {
+export function useOrder(_orderId: string) {
   return { data: null, isLoading: false };
 }

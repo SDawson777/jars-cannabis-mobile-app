@@ -1,6 +1,6 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 jest.mock('react-native', () => {
   const React = require('react');
@@ -16,13 +16,17 @@ jest.mock('react-native', () => {
         data.map((item: any, i: number) => {
           const rendered = renderItem({ item, index: i });
           // ensure a key prop to avoid React warnings in tests
-          return React.cloneElement(rendered, { key: keyExtractor ? keyExtractor(item) : item.id ?? i });
+          return React.cloneElement(rendered, {
+            key: keyExtractor ? keyExtractor(item) : (item.id ?? i),
+          });
         })
       ),
     Image: () => React.createElement('Image'),
     ActivityIndicator: () => React.createElement('ActivityIndicator'),
-  Button: ({ title, onPress, ...rest }: any) => React.createElement('button', { onClick: onPress, ...rest }, title),
-  Pressable: ({ children, onPress, ...rest }: any) => React.createElement('button', { onClick: onPress, ...rest }, children),
+    Button: ({ title, onPress, ...rest }: any) =>
+      React.createElement('button', { onClick: onPress, ...rest }, title),
+    Pressable: ({ children, onPress, ...rest }: any) =>
+      React.createElement('button', { onClick: onPress, ...rest }, children),
     Platform: { OS: 'ios' },
     UIManager: { setLayoutAnimationEnabledExperimental: () => {} },
     Animated: {
@@ -38,8 +42,8 @@ jest.mock('react-native', () => {
         }
       },
       timing: () => ({ start: () => {} }),
-      loop: (x: any) => ({ start: () => {}, stop: () => {} }),
-      sequence: (a: any) => ({}),
+      loop: (_x: any) => ({ start: () => {}, stop: () => {} }),
+      sequence: (_a: any) => ({}),
     },
     LayoutAnimation: { configureNext: () => {}, Presets: { easeInEaseOut: {} } },
     StyleSheet: { create: (s: any) => s },
@@ -47,6 +51,7 @@ jest.mock('react-native', () => {
 });
 
 jest.mock('react-native-confetti-cannon', () => 'ConfettiCannon');
+
 jest.mock('../api/phase4Client');
 jest.mock('lucide-react-native', () => ({ Settings: () => null, ChevronLeft: () => null }));
 import { phase4Client } from '../api/phase4Client';
@@ -57,7 +62,14 @@ jest.mock('../utils/toast');
 
 describe('Awards flow', () => {
   it('loads awards and redeems a reward', async () => {
-    (phase4Client.get as jest.Mock).mockResolvedValue({ data: { user: { name: 'Test', points: 500, tier: 'Gold', progress: 0.5 }, awards: [{ id: 'a1', title: 'Badge', description: 'Desc', iconUrl: '', earnedDate: '2025-01-01' }] } });
+    (phase4Client.get as jest.Mock).mockResolvedValue({
+      data: {
+        user: { name: 'Test', points: 500, tier: 'Gold', progress: 0.5 },
+        awards: [
+          { id: 'a1', title: 'Badge', description: 'Desc', iconUrl: '', earnedDate: '2025-01-01' },
+        ],
+      },
+    });
     (phase4Client.post as jest.Mock).mockResolvedValue({ data: { success: true } });
 
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -73,13 +85,19 @@ describe('Awards flow', () => {
     });
 
     // Ensure awards were rendered
-    const texts = tree!.root.findAllByType('Text' as any).map((n: any) => (Array.isArray(n.props.children) ? n.props.children.join('') : n.props.children));
+    const texts = tree!.root
+      .findAllByType('Text' as any)
+      .map((n: any) =>
+        Array.isArray(n.props.children) ? n.props.children.join('') : n.props.children
+      );
     expect(texts.join(' ')).toContain('Badge');
 
     // Simulate pressing the first reward (REWARDS array uses static entries; ensure redeem is called)
     const buttons = tree!.root.findAllByType('button' as any);
     // find Redeem button by accessibilityLabel
-    const redeemButton = buttons.find((b: any) => (b.props.accessibilityLabel || '').startsWith('Redeem'));
+    const redeemButton = buttons.find((b: any) =>
+      (b.props.accessibilityLabel || '').startsWith('Redeem')
+    );
     expect(redeemButton).toBeDefined();
     await act(async () => {
       redeemButton!.props.onClick();
