@@ -1,6 +1,15 @@
 // src/utils/auth.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getSecure, saveSecure, deleteSecure } from './secureStorage';
 
+// Read the persisted server-issued JWT used by AuthContext
 export async function getAuthToken(): Promise<string | null> {
-  return AsyncStorage.getItem('userToken');
+  return getSecure('jwtToken');
+}
+
+export async function saveAuthToken(token: string) {
+  return saveSecure('jwtToken', token);
+}
+
+export async function clearAuthToken() {
+  return deleteSecure('jwtToken');
 }
