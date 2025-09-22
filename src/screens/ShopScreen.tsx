@@ -109,8 +109,11 @@ export default function ShopScreen() {
     isRefetching: false,
   };
 
-  // support both react-query infinite `data.pages` shape and legacy `{ products }` shape used by some tests/mocks
-  const products = prodData?.pages?.flat() ?? (prodData as any)?.products ?? [];
+  // support both react-query infinite `data.pages` shape and ProductPage { products } shape
+  const products =
+    prodData?.pages?.flatMap((p: any) => p.products ?? []) ??
+    (prodData as any)?.products ??
+    [];
   const _filtersResult = typeof _useFiltersQuery === 'function' ? _useFiltersQuery() : null;
   const { data: filters, isLoading: filtersLoading } = _filtersResult ?? {
     data: null,
@@ -174,9 +177,19 @@ export default function ShopScreen() {
     const addItem = cart?.addItem ?? cart?.updateCart ?? cart?.addToCart;
     const productId = (product as any).id ?? (product as any)._id ?? (product as any).slug;
     if (typeof addItem === 'function') {
-      // tests expect payload { productId, quantity }
+      // construct backend-expected payload: { items: [{ productId, quantity, price?, variantId? }] }
+      const item: any = { productId, quantity: 1 };
+      if ((product as any).price) item.price = (product as any).price;
+      if ((product as any).variantId) item.variantId = (product as any).variantId;
       try {
-        addItem({ productId, quantity: 1 });
+        // some hooks expose addItem(item) while our mutation expects { items: [...] }
+        // support both: prefer calling with full items payload
+        try {
+          addItem({ items: [item] });
+        } catch (inner) {
+          // fallback to calling addItem directly with single item (store-level API)
+          addItem(item);
+        }
       } catch (e) {
         // ignore test-side queued errors
       }

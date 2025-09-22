@@ -35,8 +35,10 @@ export function useCart() {
       throw new Error('Offline');
     }
     const { data } = await phase4Client.get('/cart');
-    await AsyncStorage.setItem('cart', JSON.stringify(data));
-    return data;
+    // backend returns { cart: { items: [...], total } }
+    const cartPayload = data?.cart ?? data;
+    await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
+    return cartPayload;
   };
 
   const query = useQuery<Cart, Error>({
@@ -52,11 +54,15 @@ export function useCart() {
     mutationFn: async body => {
       const state = await NetInfo.fetch();
       if (!state.isConnected) {
-        await queueAction({ endpoint: '/cart/update', payload: body });
+        // ensure payload matches backend expectation: { items: [...] }
+        const payload = body.items ? body : { items: (body as any).items ?? [] };
+        await queueAction({ endpoint: '/cart/update', payload });
         throw new Error('queued');
       }
-      const { data } = await phase4Client.post('/cart/update', body);
-      return data;
+      const payload = body.items ? body : { items: (body as any).items ?? [] };
+      const { data } = await phase4Client.post('/cart/update', payload);
+      // backend returns { cart: {...} }
+      return data?.cart ?? data;
     },
     onMutate: async vars => {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
@@ -86,6 +92,16 @@ export function useCart() {
     isFetching: query.isFetching,
     error: query.error,
     updateCart: mutation.mutateAsync,
+    // convenience helper to send an array of items: { items: [...] }
+    addItems: async (items: Partial<CartItem>[]) => {
+      return mutation.mutateAsync({ items } as any);
+    },
+    // convenience helper to add a single item (keeps backwards compatibility)
+    addItem: async (item: Partial<CartItem>) => {
+      // If caller passes legacy shape { productId, quantity } copy into item.id
+      // The server expects productId in items; preserve caller fields (productId/quantity/price/variantId)
+      return mutation.mutateAsync({ items: [item] } as any);
+    },
     applyPromo,
     refetchCart: query.refetch,
     hasPending: pending,

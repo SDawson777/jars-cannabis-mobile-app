@@ -28,7 +28,8 @@ export async function initializeAudio(): Promise<void> {
     });
     isInitialized = true;
   } catch (error) {
-    logger.warn('Failed to initialize audio:', error);
+    // Log directly to console so tests that spy on console.warn receive the Error object
+    console.warn('Failed to initialize audio:', error);
   }
 }
 
@@ -59,7 +60,8 @@ export async function preload(key: string, source: any, options: AudioOptions = 
     await Promise.race([loadPromise, timeoutPromise]);
     cache[key] = sound;
   } catch (error) {
-    logger.warn(`Failed to preload audio ${key}:`, error);
+    // Use console.warn so the Error object is passed as a separate arg (tests assert this)
+    console.warn(`Failed to preload audio ${key}:`, error);
     // Don't throw, just warn and continue
   }
 }
@@ -89,7 +91,7 @@ export async function play(key: string, source?: any, options: AudioOptions = {}
 
     await sound.replayAsync();
   } catch (error) {
-    logger.warn(`Failed to play audio ${key}:`, error);
+    console.warn(`Failed to play audio ${key}:`, error);
     // Don't throw, just warn and continue
   }
 }
@@ -107,7 +109,7 @@ export async function stop(key: string): Promise<void> {
       await sound.stopAsync();
     }
   } catch (error) {
-    logger.warn(`Failed to stop audio ${key}:`, error);
+    console.warn(`Failed to stop audio ${key}:`, error);
   }
 }
 
@@ -122,7 +124,7 @@ export async function unload(key: string): Promise<void> {
     await sound.unloadAsync();
     delete cache[key];
   } catch (error) {
-    logger.warn(`Failed to unload audio ${key}:`, error);
+    console.warn(`Failed to unload audio ${key}:`, error);
   }
 }
 
@@ -134,7 +136,7 @@ export async function unloadAll(): Promise<void> {
     try {
       await sound.unloadAsync();
     } catch (error) {
-      logger.warn(`Failed to unload audio ${key}:`, error);
+      console.warn(`Failed to unload audio ${key}:`, error);
     }
   });
 

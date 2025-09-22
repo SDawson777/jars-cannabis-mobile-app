@@ -17,9 +17,15 @@ export interface ProductDetails {
   variants: ProductVariant[];
 }
 
+// The backend returns { product, relatedProducts } where product may include variants
 async function fetchProduct(productId: string, storeId?: string): Promise<ProductDetails> {
   const res = await phase4Client.get(`/products/${productId}`, { params: { storeId } });
-  return res.data;
+  // normalize to { product, variants }
+  const payload = res.data || {};
+  const product = payload.product ?? payload;
+  const variants: ProductVariant[] = (product && (product.variants ?? product.variants) as any) || [];
+  // ensure variants are in the expected shape (fallback empty)
+  return { product, variants };
 }
 
 export function useProductDetails(productId: string | undefined, storeId?: string) {

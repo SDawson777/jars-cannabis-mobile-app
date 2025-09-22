@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 
 import { phase4Client } from '../api/phase4Client';
+import { useQueryClient } from '@tanstack/react-query';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
@@ -47,6 +48,7 @@ export default function EditAddressScreen() {
     },
   });
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -66,8 +68,10 @@ export default function EditAddressScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
-      await phase4Client.put(`/addresses/${addr.id}`, values);
+      const res = await phase4Client.put(`/addresses/${addr.id}`, values);
+      if (res && res.data && res.data.error) throw new Error(res.data.error);
       toast('Address saved');
+      queryClient.invalidateQueries({ queryKey: ['addresses'] });
       navigation.goBack();
     } catch (e: any) {
       toast(e.message || 'Failed to save address');

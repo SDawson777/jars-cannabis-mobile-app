@@ -9,7 +9,8 @@ interface RewardPayload {
 }
 
 async function redeemReward(reward: RewardPayload) {
-  await phase4Client.post(`/rewards/${reward.id}/redeem`);
+  // New awards contract: POST /awards/:id/redeem
+  await phase4Client.post(`/awards/${reward.id}/redeem`);
 }
 
 export function useRedeemReward() {
@@ -40,6 +41,7 @@ export function useRedeemReward() {
     onError: rollback,
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['awards'] });
     },
   });
 }

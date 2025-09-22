@@ -7,15 +7,22 @@ import type { CMSProduct } from '../types/cms';
 
 const PAGE_SIZE = 20;
 
-async function fetchPage(page: number, storeId?: string, filter?: string) {
-  const res = await phase4Client.get<CMSProduct[]>('/products', {
+interface ProductPage {
+  products: CMSProduct[];
+  page: number;
+  hasNextPage: boolean;
+}
+
+async function fetchPage(page: number, storeId?: string, filter?: string): Promise<ProductPage> {
+  const res = await phase4Client.get<{ products: CMSProduct[]; total?: number }>('/products', {
     params: { page, limit: PAGE_SIZE, storeId, filter },
   });
-  return res.data;
+  const products = res.data.products ?? (res.data as any) ?? [];
+  return { products, page, hasNextPage: products.length === PAGE_SIZE };
 }
 
 export function useProducts(storeId?: string, filter?: string) {
-  return useInfiniteQuery<CMSProduct[], Error>({
+  return useInfiniteQuery<ProductPage, Error>({
     queryKey: ['products', storeId, filter],
     queryFn: async ({ pageParam = 1 }) => {
       const cacheKey = `products:${storeId || 'all'}:${filter || 'all'}:${pageParam}`;
@@ -23,7 +30,7 @@ export function useProducts(storeId?: string, filter?: string) {
 
       if (!state.isConnected) {
         const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) return JSON.parse(cached) as CMSProduct[];
+        if (cached) return JSON.parse(cached) as ProductPage;
         throw new Error('Offline');
       }
 
@@ -33,12 +40,12 @@ export function useProducts(storeId?: string, filter?: string) {
         return data;
       } catch (err) {
         const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) return JSON.parse(cached) as CMSProduct[];
+        if (cached) return JSON.parse(cached) as ProductPage;
         throw err;
       }
     },
-    getNextPageParam: (lastPage: CMSProduct[], pages: CMSProduct[][]) =>
-      lastPage.length === PAGE_SIZE ? pages.length + 1 : undefined,
+    getNextPageParam: (lastPage: ProductPage, pages: ProductPage[]) =>
+      lastPage.hasNextPage ? pages.length + 1 : undefined,
     initialPageParam: 1,
   } as any);
 }

@@ -15,6 +15,13 @@ jest.mock('jsonwebtoken', () => ({
 	}
 }));
 
+// Mock the server firebase admin helper used by phase4 routes so tests can import it.
+jest.mock('../../src/bootstrap/firebase-admin', () => ({
+	initFirebase: () => {},
+}));
+
+// phase4 route includes a runtime fallback when @server/firebaseAdmin isn't available in test/demo envs
+
 jest.mock('bcryptjs', () => ({
 	hash: async (s: string, _salt: number) => `hashed-${s}`,
 	hashSync: (s: string) => `hashed-${s}`,
@@ -30,7 +37,7 @@ if (typeof (global as any).setImmediate === 'undefined') {
 // In-memory stores
 const users: Record<string, any> = {
 	// token-only user used by tests that send a raw token
-	'test-user': { id: 'test-user', email: 'token-user@example.com', passwordHash: 'hashed-securePassword123' }
+	'test-user': { id: 'test-user', email: 'token-user@example.com', passwordHash: 'hashed-securePassword123', name: 'Token User', phone: null }
 };
 const carts: Record<string, any> = {
 	// keyed by user id for convenience, values include .id
@@ -102,6 +109,14 @@ const seededProducts = [
 	{ id: 'prod_db_2', name: 'DB Chill Tincture', price: 2499, slug: 'db-chill-tincture', category: 'tincture', defaultPrice: 24.99, variants: [{ id: 'v2', price: 2499 }], purchasesLast30d: 21 }
 ];
 
+// In-memory journal entries store keyed by id
+const journalEntries: Record<string, any> = {};
+// In-memory payment methods store keyed by id
+const paymentMethods: Record<string, any> = {};
+// In-memory addresses store keyed by id
+const addresses: Record<string, any> = {};
+
+
 jest.mock('../../src/prismaClient', () => ({
 	prisma: {
 		user: {
@@ -115,41 +130,12 @@ jest.mock('../../src/prismaClient', () => ({
 				if (email) return Object.values(users).find((u: any) => u.email === email) ?? null;
 				if (id) return users[id] ?? null;
 				return null;
-			}
-		},
-		cart: {
-			findFirst: async ({ where: { userId } }: any) => carts[userId] ?? null,
-			create: async ({ data }: any) => { carts[data.userId] = { id: `cart-${data.userId}`, userId: data.userId, storeId: data.storeId, items: [] }; return carts[data.userId]; },
-			findUnique: async ({ where: { id } }: any) => Object.values(carts).find((c: any) => c.id === id) ?? null,
-		},
-		cartItem: {
-			create: async ({ data }: any) => {
-				// accept cartId as full id or as 'cart-user' -> try to find matching cart
-				const findCartById = (id: string) => Object.values(carts).find((c: any) => c.id === id) ?? carts[id.split('-')[1]];
-				const cart = findCartById(data.cartId);
-				if (!cart) throw new Error('Cart not found');
-				const item = { id: `item-${Math.random().toString(36).slice(2,9)}`, ...data };
-				cart.items.push(item);
-				return item;
-			},
-			findMany: async ({ where: { cartId } }: any) => {
-				const findCartById = (id: string) => Object.values(carts).find((c: any) => c.id === id) ?? carts[id.split('-')[1]];
-				const cart = findCartById(cartId);
-				return cart ? cart.items : [];
 			},
 			update: async ({ where: { id }, data }: any) => {
-				for (const c of Object.values(carts)) {
-					const it = c.items.find((x: any) => x.id === id);
-					if (it) { Object.assign(it, data); return it; }
-				}
-				throw new Error('Not found');
-			},
-			delete: async ({ where: { id } }: any) => {
-				for (const c of Object.values(carts)) {
-					const idx = c.items.findIndex((x: any) => x.id === id);
-					if (idx >= 0) { const removed = c.items.splice(idx, 1); return removed[0]; }
-				}
-				throw new Error('Not found');
+				const existing = users[id];
+				if (!existing) throw new Error('Not found');
+				Object.assign(existing, data);
+				return existing;
 			},
 			deleteMany: async ({ where: { id } }: any) => {
 				for (const c of Object.values(carts)) {
@@ -162,6 +148,30 @@ jest.mock('../../src/prismaClient', () => ({
 			findUnique: async ({ where: { id } }: any) => seededProducts.find((p) => p.id === id) ?? null,
 			findManyBySlug: async ({ where: { slug } }: any) => seededProducts.find((p) => p.slug === slug) ?? null,
 			findManyByCategory: async ({ where: { category } }: any) => seededProducts.filter((p) => p.category === category),
+		},
+		journalEntry: {
+			findMany: async ({ where = {}, orderBy = {}, take, skip }: any) => {
+				const all = Object.values(journalEntries).filter((e: any) => !where.userId || e.userId === where.userId);
+				// simple ordering by createdAt desc
+				all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
+				const s = skip || 0;
+				const t = take || all.length;
+				return all.slice(s, s + t);
+			},
+			findUnique: async ({ where: { id } }: any) => journalEntries[id] ?? null,
+			create: async ({ data }: any) => {
+				const id = `je-${Math.random().toString(36).slice(2,9)}`;
+				const createdAt = new Date().toISOString();
+				const e = { id, createdAt, ...data };
+				journalEntries[id] = e;
+				return e;
+			},
+			update: async ({ where: { id }, data }: any) => {
+				const existing = journalEntries[id];
+				if (!existing) throw new Error('Not found');
+				Object.assign(existing, data);
+				return existing;
+			}
 		},
 		review: {
 			findMany: async ({ where: { productId } }: any) => [],
@@ -179,6 +189,88 @@ jest.mock('../../src/prismaClient', () => ({
 		store: {
 			findUnique: async ({ where: { id } }: any) => id ? { id, name: `Store ${id}` } : null
 		},
+			paymentMethod: {
+				findMany: async ({ where = {}, orderBy = {} }: any) => {
+					const all = Object.values(paymentMethods).filter((pm: any) => !where.userId || pm.userId === where.userId);
+					// simple ordering by createdAt desc
+					all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
+					return all;
+				},
+				findUnique: async ({ where: { id } }: any) => paymentMethods[id] ?? null,
+				create: async ({ data }: any) => {
+					const id = `pm-${Math.random().toString(36).slice(2,9)}`;
+					const createdAt = new Date().toISOString();
+					const pm = { id, createdAt, updatedAt: createdAt, ...data };
+					paymentMethods[id] = pm;
+					return pm;
+				},
+				update: async ({ where: { id }, data }: any) => {
+					const existing = paymentMethods[id];
+					if (!existing) throw new Error('Not found');
+					Object.assign(existing, { ...data, updatedAt: new Date().toISOString() });
+					return existing;
+				},
+				updateMany: async ({ where = {}, data }: any) => {
+					// honor where.userId and where.id.not to avoid overwriting the newly-updated/created record
+					const notId = where.id && where.id.not;
+					let count = 0;
+					for (const k of Object.keys(paymentMethods)) {
+						const pm = paymentMethods[k];
+						if (where.userId && pm.userId !== where.userId) continue;
+						if (notId && pm.id === notId) continue;
+						Object.assign(pm, data);
+						pm.updatedAt = new Date().toISOString();
+						count++;
+					}
+					return { count };
+				}
+				,
+				// helper used by the route fallback in tests to remove a payment method from the in-memory store
+				_removePaymentMethod: (id: string) => {
+					delete paymentMethods[id];
+				}
+			},
+			address: {
+				findMany: async ({ where = {}, orderBy = {} }: any) => {
+					const all = Object.values(addresses).filter((a: any) => !where.userId || a.userId === where.userId);
+					all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
+					return all;
+				},
+				findUnique: async ({ where: { id } }: any) => addresses[id] ?? null,
+				create: async ({ data }: any) => {
+					const id = `addr-${Math.random().toString(36).slice(2,9)}`;
+					const createdAt = new Date().toISOString();
+					const a = { id, createdAt, updatedAt: createdAt, ...data };
+					addresses[id] = a;
+					return a;
+				},
+				update: async ({ where: { id }, data }: any) => {
+					const existing = addresses[id];
+					if (!existing) throw new Error('Not found');
+					Object.assign(existing, { ...data, updatedAt: new Date().toISOString() });
+					return existing;
+				},
+				updateMany: async ({ where = {}, data }: any) => {
+					const notId = where.id && where.id.not;
+					let count = 0;
+					for (const k of Object.keys(addresses)) {
+						const a = addresses[k];
+						if (where.userId && a.userId !== where.userId) continue;
+						if (notId && a.id === notId) continue;
+						Object.assign(a, data);
+						a.updatedAt = new Date().toISOString();
+						count++;
+					}
+					return { count };
+				},
+				delete: async ({ where: { id } }: any) => {
+					if (!addresses[id]) throw new Error('Not found');
+					const removed = addresses[id];
+					delete addresses[id];
+					return removed;
+				},
+				_removeAddress: (id: string) => { delete addresses[id]; },
+			},
 		order: {
 			findMany: async ({ where = {} }: any) => {
 				const arr = Object.values(mockOrders) as any[];
@@ -200,6 +292,95 @@ jest.mock('../../src/prismaClient', () => ({
 			update: async ({ where: { id }, data }: any) => { const o = mockOrders[id]; if (!o) throw new Error('Not found'); Object.assign(o, data); return o; }
 		},
 		storeProduct: { findMany: async ({ where: { storeId } }: any) => [{ storeId, productId: 'prod_db_1' }] }
+		,
+		cart: {
+			findFirst: async ({ where: { userId, id } = {} }: any) => {
+				if (userId) return carts[userId] ?? null;
+				if (id) return Object.values(carts).find((c: any) => c.id === id) ?? null;
+				return null;
+			},
+			create: async ({ data }: any) => {
+				const id = `cart-${Math.random().toString(36).slice(2,9)}`;
+				const c = { id, userId: data.userId, storeId: data.storeId || null, items: [] };
+				carts[data.userId] = c;
+				return c;
+			},
+			findUnique: async ({ where: { id } }: any) => {
+				return Object.values(carts).find((c: any) => c.id === id) ?? null;
+			},
+			update: async ({ where: { id }, data }: any) => {
+				const c = Object.values(carts).find((x: any) => x.id === id);
+				if (!c) throw new Error('Not found');
+				Object.assign(c, data);
+				return c;
+			}
+		},
+		cartItem: {
+			findMany: async ({ where: { cartId } }: any) => {
+				const cart = Object.values(carts).find((c: any) => c.id === cartId);
+				return cart ? (cart.items || []) : [];
+			},
+			create: async ({ data }: any) => {
+				const id = `ci-${Math.random().toString(36).slice(2,9)}`;
+				const item = { id, ...data };
+				const cart = Object.values(carts).find((c: any) => c.id === data.cartId) || carts[data.userId];
+				if (cart) {
+					cart.items = cart.items || [];
+					cart.items.push(item);
+				}
+				return item;
+			},
+			update: async ({ where: { id }, data }: any) => {
+				for (const c of Object.values(carts)) {
+					const it = (c as any).items?.find((i: any) => i.id === id);
+					if (it) {
+						Object.assign(it, data);
+						return it;
+					}
+				}
+				throw new Error('Not found');
+			},
+			delete: async ({ where: { id } }: any) => {
+				for (const c of Object.values(carts)) {
+					const idx = (c as any).items?.findIndex((i: any) => i.id === id);
+					if (idx >= 0) {
+						const [removed] = (c as any).items.splice(idx, 1);
+						return removed;
+					}
+				}
+				throw new Error('Not found');
+			},
+			deleteMany: async ({ where }: any) => {
+				// support deleteMany({ where: { id: { in: ids } } }) or deleteMany({ where: { cartId } })
+				let ids: string[] = [];
+				if (where) {
+					if (where.id && Array.isArray(where.id.in)) ids = where.id.in;
+					// delete by cartId
+					if (where.cartId) {
+						const cid = where.cartId;
+						let count = 0;
+						for (const c of Object.values(carts)) {
+							if ((c as any).id === cid) {
+								count = (c as any).items?.length || 0;
+								(c as any).items = [];
+								return { count };
+							}
+						}
+						return { count: 0 };
+					}
+				}
+
+				let count = 0;
+				if (ids.length) {
+					for (const c of Object.values(carts)) {
+						const before = (c as any).items?.length || 0;
+						(c as any).items = (c as any).items?.filter((i: any) => !ids.includes(i.id)) || [];
+						count += before - ((c as any).items?.length || 0);
+					}
+				}
+				return { count };
+			}
+		},
 	}
 }));
 

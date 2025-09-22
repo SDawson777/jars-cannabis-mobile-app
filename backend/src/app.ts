@@ -22,7 +22,12 @@ import { profileRouter } from './routes/profile';
 import { qaRouter } from './routes/qa';
 import { recommendationsRouter } from './routes/recommendations';
 import { personalizationRouter } from './routes/personalization';
+import { awardsApiRouter } from './routes/awardsApi';
+import { stripeRouter } from './routes/stripe';
+import { paymentMethodsRouter } from './routes/paymentMethods';
+import { addressesRouter } from './routes/addresses';
 import { storesRouter } from './routes/stores';
+import { phase4Router } from './routes/phase4';
 import { logger } from './utils/logger';
 
 const app = express();
@@ -40,6 +45,8 @@ try { initFirebase(); } catch (e) {
 const routers = [
   authRouter,
   profileRouter,
+  paymentMethodsRouter,
+  addressesRouter,
   storesRouter,
   productsRouter,
   cartRouter,
@@ -52,7 +59,10 @@ const routers = [
   conciergeRouter,
   arRouter,
   homeRouter,
+  phase4Router,
   personalizationRouter,
+  awardsApiRouter,
+  stripeRouter,
 ];
 
 for (const r of routers) {

@@ -29,6 +29,11 @@ function createOrderClient(): AxiosInstance {
 export const orderClient = createOrderClient();
 
 export async function fetchOrders(page = 1): Promise<OrdersResponse> {
-  const res = await orderClient.get<OrdersResponse>('/orders', { params: { page } });
-  return res.data;
+  const res = await orderClient.get('/orders', { params: { page } });
+  // Backend returns { orders, pagination: { page, limit, nextPage } }
+  // Normalize to OrdersResponse: { orders, nextPage }
+  const d: any = res.data ?? {};
+  const orders = d.orders ?? d.data?.orders ?? [];
+  const nextPage = d.pagination?.nextPage ?? d.data?.pagination?.nextPage ?? undefined;
+  return { orders, nextPage };
 }

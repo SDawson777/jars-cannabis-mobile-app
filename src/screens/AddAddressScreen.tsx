@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 
 import { phase4Client } from '../api/phase4Client';
+import { useQueryClient } from '@tanstack/react-query';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
@@ -41,6 +42,7 @@ export default function AddAddressScreen() {
     resolver: yupResolver(addressSchema),
   });
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -79,8 +81,14 @@ export default function AddAddressScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
-      await phase4Client.post('/addresses', values);
+      const res = await phase4Client.post('/addresses', values);
+      // surface server error body if present
+      if (res && res.data && res.data.error) {
+        throw new Error(res.data.error);
+      }
       toast('Address saved');
+      // invalidate addresses list so saved screen refreshes
+      queryClient.invalidateQueries({ queryKey: ['addresses'] });
       navigation.goBack();
     } catch (e: any) {
       toast(e.message || 'Failed to save address');

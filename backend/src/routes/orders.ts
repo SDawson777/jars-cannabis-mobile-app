@@ -175,7 +175,7 @@ ordersRouter.put('/orders/:id/cancel', requireAuth, async (req, res) => {
 	const o = await prisma.order.findUnique({ where: { id } });
 	if (!o) return res.status(404).json({ error: 'Order not found' });
 	if (o.userId !== uid) return res.status(403).json({ error: 'No access to order' });
-	if (o.status !== 'PENDING' && o.status !== 'CREATED') return res.status(400).json({ error: 'cannot cancel' });
+	if (String(o.status) !== 'PENDING' && String(o.status) !== 'CREATED') return res.status(400).json({ error: 'cannot cancel' });
 	const updated = await prisma.order.update({ where: { id }, data: { status: 'CANCELLED' } });
 	// normalize status to lowercase in API payload
 	res.json({ order: { ...updated, status: 'cancelled' }, message: 'Order cancelled' });
@@ -194,7 +194,7 @@ ordersRouter.post('/orders/:id/rate', requireAuth, async (req, res) => {
 	const id = req.params.id;
 	const o = await prisma.order.findUnique({ where: { id } });
 	if (!o) return res.status(404).json({ error: 'Order not found' });
-	if (o.status !== 'COMPLETED') return res.status(400).json({ error: 'Order must be completed to rate' });
+	if (String(o.status) !== 'COMPLETED') return res.status(400).json({ error: 'Order must be completed to rate' });
 	// simple echo back
 	res.status(201).json({ rating: { rating: req.body.rating }, message: 'Thanks' });
 });

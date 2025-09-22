@@ -70,9 +70,15 @@ describe('useOfflineCartQueue', () => {
     });
     expect(actionRef).not.toBeNull();
 
+    // Queue an action while offline with realistic item (productId, quantity, price, variantId)
+    const queuedPayload = {
+      items: [
+        { productId: 'prod-1', quantity: 2, price: 19.99, variantId: 'v-1' },
+      ],
+    };
     // Queue an action while offline
     await act(async () => {
-      await actionRef.queueAction({ endpoint: '/cart/update', payload: { items: [] } });
+      await actionRef.queueAction({ endpoint: '/cart/update', payload: queuedPayload });
     });
 
     // queued into AsyncStorage
@@ -97,8 +103,8 @@ describe('useOfflineCartQueue', () => {
       await Promise.resolve();
     });
 
-    // phase4Client.post should have been called with queued action
-    expect(mockPost).toHaveBeenCalledWith('/cart/update', { items: [] });
+  // phase4Client.post should have been called with queued action and same payload shape
+  expect(mockPost).toHaveBeenCalledWith('/cart/update', queuedPayload);
 
     // AsyncStorage.removeItem should have been called to clear queue
     expect(require('@react-native-async-storage/async-storage').removeItem).toHaveBeenCalledWith(

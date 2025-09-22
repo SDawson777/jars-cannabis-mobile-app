@@ -87,7 +87,8 @@ export function buildDeepLink(routeName: string, params?: Record<string, string>
   const screens = linking.config.screens;
   const pattern = screens[routeName as keyof typeof screens];
 
-  if (!pattern) {
+  // Treat undefined as missing; empty string is a valid root route pattern
+  if (pattern === undefined) {
     throw new Error(`Route ${routeName} not found in linking configuration`);
   }
 
@@ -123,10 +124,13 @@ export function getAvailableRoutes(): Record<string, string> {
  */
 export function validateRoutePattern(pattern: string): boolean {
   try {
-    // Check for balanced parameter syntax
+  // Disallow empty parameter names like ':', e.g. 'shop/' or 'shop/:'
+  // Colon does not need escaping inside the regex character sequence
+  if (/(?:^|\/):(?:$|\/)/.test(pattern)) return false;
+
+    // Find parameters and ensure they match the allowed pattern (start with letter, then alnum or underscore)
     const paramMatches = pattern.match(/:([^/]+)/g);
     if (paramMatches) {
-      // Ensure all parameters have valid names (no special characters except allowed ones)
       return paramMatches.every(param => /^:[a-zA-Z][a-zA-Z0-9_]*$/.test(param));
     }
     return true;

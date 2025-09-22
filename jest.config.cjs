@@ -11,6 +11,7 @@ module.exports = {
     '^react-native$': '<rootDir>/tests/__mocks__/react-native.js',
   '^react-native-reanimated$': '<rootDir>/tests/__mocks__/react-native-reanimated.js',
   '^react-native-reanimated/(.*)$': '<rootDir>/tests/__mocks__/react-native-reanimated.js',
+  '^react-native-animatable$': '<rootDir>/tests/__mocks__/react-native-animatable.js',
   '^@react-navigation/native-stack$': '<rootDir>/tests/__mocks__/@react-navigation/native-stack.js',
   '^expo-av$': '<rootDir>/tests/__mocks__/expo-av.js',
   '^react-native-shimmer-placeholder$': '<rootDir>/tests/__mocks__/react-native-shimmer-placeholder.js',

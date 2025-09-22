@@ -61,7 +61,10 @@ export default function ProductDetailScreen() {
     return <ProductFallback onRetry={() => refetch()} loading={isFetching} />;
   }
 
-  const { product, variants } = data;
+  // Support backend shapes: { product, relatedProducts } where product contains variants
+  const product = (data as any)?.product ?? (data as any)?.product ?? (data as any)?.product;
+  const variants: any[] = (data as any)?.product?.variants ?? (data as any)?.variants ?? [];
+  const relatedProducts: any[] = (data as any)?.relatedProducts ?? [];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
