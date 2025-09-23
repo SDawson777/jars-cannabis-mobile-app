@@ -38,16 +38,18 @@ export default function EditAddressScreen() {
 
   // Existing address passed via params
   const addr = (route.params as any)?.address || {};
+  // Support legacy navigation param using `_state` by normalizing to `state`.
+  const normalizedAddr = { ...addr, state: addr.state ?? addr._state };
   const { control, handleSubmit } = useForm<AddressFormValues>({
     resolver: yupResolver(addressSchema) as unknown as Resolver<AddressFormValues, any>,
     defaultValues: {
-      fullName: addr.fullName,
-      phone: addr.phone,
-      line1: addr.line1,
-      city: addr.city,
-      _state: addr._state,
-      zipCode: addr.zipCode,
-      country: addr.country || 'US',
+      fullName: normalizedAddr.fullName,
+      phone: normalizedAddr.phone,
+      line1: normalizedAddr.line1,
+      city: normalizedAddr.city,
+      state: normalizedAddr.state,
+      zipCode: normalizedAddr.zipCode,
+      country: normalizedAddr.country || 'US',
     },
   });
   const [loading, setLoading] = useState(false);
@@ -101,7 +103,7 @@ export default function EditAddressScreen() {
           { name: 'phone', placeholder: 'Phone' },
           { name: 'line1', placeholder: 'Street Address' },
           { name: 'city', placeholder: 'City' },
-          { name: '_state', placeholder: 'State' },
+          { name: 'state', placeholder: 'State' },
           { name: 'zipCode', placeholder: 'ZIP Code', keyboard: 'numeric' },
           { name: 'country', placeholder: 'Country' },
         ].map(({ name, placeholder, keyboard }) => (

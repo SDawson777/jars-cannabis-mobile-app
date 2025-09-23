@@ -114,7 +114,7 @@ export default function AddAddressScreen() {
           { name: 'phone', placeholder: 'Phone' },
           { name: 'line1', placeholder: 'Street Address' },
           { name: 'city', placeholder: 'City' },
-          { name: '_state', placeholder: 'State' },
+          { name: 'state', placeholder: 'State' },
           { name: 'zipCode', placeholder: 'ZIP Code', keyboard: 'numeric' },
           { name: 'country', placeholder: 'Country' },
         ].map(({ name, placeholder, keyboard }) => (

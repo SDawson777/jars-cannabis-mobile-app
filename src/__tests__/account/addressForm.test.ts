@@ -7,7 +7,7 @@ describe('addressSchema', () => {
       phone: '555-555-5555',
       line1: '123 Main',
       city: 'Detroit',
-      _state: 'MI',
+      state: 'MI',
       zipCode: '12345',
       country: 'US',
     });
@@ -20,7 +20,7 @@ describe('addressSchema', () => {
       phone: 'abc',
       line1: '',
       city: '',
-      _state: '',
+      state: '',
       zipCode: 'abc',
       country: '',
     });
