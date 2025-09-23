@@ -16,7 +16,8 @@
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",
     "postinstall": "prisma generate",
-    "seed": "ts-node --transpile-only prisma/seed.ts"
+    "seed": "ts-node --transpile-only prisma/seed.ts",
+    "test:ci": "jest --config jest.config.cjs --runInBand"
   },
   "keywords": [],
   "author": "",

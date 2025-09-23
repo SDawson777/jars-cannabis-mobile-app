@@ -44,7 +44,10 @@ module.exports = {
     '^react-native/jest/setup.js$': '<rootDir>/tests/__mocks__/reactNativeSetup.js',
     '^react-native/jest/.*': '<rootDir>/tests/__mocks__/reactNativeMock.js',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
+  // Ignore backend tests here because backend has its own Jest config and separate
+  // dependency installation step in CI. Running them in the root (jsdom) context
+  // before backend deps (e.g. helmet) are installed causes module-not-found errors.
+  testPathIgnorePatterns: ['/node_modules/', '/e2e/', '<rootDir>/backend/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/__mocks__/**'],
   // Adjusted temporary coverage thresholds to reflect current baseline so CI passes.
