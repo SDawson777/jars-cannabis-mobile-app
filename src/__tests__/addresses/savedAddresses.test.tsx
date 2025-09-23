@@ -80,15 +80,19 @@ describe('SavedAddressesScreen', () => {
     ];
     (getAddresses as jest.Mock).mockResolvedValue(mockAddrs);
     const { tree } = await render();
-    // wait for React Query to settle
-    await act(async () => {
-      await new Promise(r => process.nextTick(r));
-    });
-    // should render two address rows
-    const texts = tree.root.findAllByType('Text' as any);
-    const combined = texts.map(t => (t.props.children || '').toString());
-    expect(combined.join('|')).toContain('Jane Doe');
-    expect(combined.join('|')).toContain('Default');
-    expect(combined.join('|')).toContain('456 Elm');
+    // robust wait loop: react-query schedules async state update microtask
+    let combined: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      const texts = tree.root.findAllByType('Text' as any);
+      combined = texts.map(t => (t.props.children || '').toString());
+      if (combined.join('|').includes('Jane Doe')) break;
+      await act(async () => {
+        await new Promise(r => setTimeout(r, 0));
+      });
+    }
+    const joined = combined.join('|');
+    expect(joined).toContain('Jane Doe');
+    expect(joined).toContain('Default');
+    expect(joined).toContain('456 Elm');
   });
 });
