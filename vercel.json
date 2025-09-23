@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install --legacy-peer-deps",
   "outputDirectory": "dist",
   "env": {
     "EXPO_PUBLIC_API_BASE_URL": "https://api.jarscannabis.com"
