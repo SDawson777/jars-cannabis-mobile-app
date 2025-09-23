@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 
-import { phase4Client } from '../../api/phase4Client';
+import { getAddresses } from '../../api/phase4Client';
 import SavedAddressesScreen from '../../screens/SavedAddressesScreen';
 
 jest.mock('react-native', () => {
@@ -42,7 +42,10 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: jest.fn() }),
 }));
 
-jest.mock('../../api/phase4Client');
+jest.mock('../../api/phase4Client', () => ({
+  __esModule: true,
+  getAddresses: jest.fn(),
+}));
 
 jest.mock('../../context/ThemeContext', () => {
   const React = require('react');
@@ -75,12 +78,7 @@ describe('SavedAddressesScreen', () => {
       { id: '1', fullName: 'Jane Doe', line1: '123 Main', city: 'Detroit', isDefault: true },
       { id: '2', fullName: 'Work', line1: '456 Elm', city: 'Detroit', isDefault: false },
     ];
-    const api = require('../../api/phase4Client');
-    if (api.getAddresses) {
-      (api.getAddresses as jest.Mock).mockResolvedValue(mockAddrs);
-    } else {
-      (phase4Client.get as jest.Mock).mockResolvedValue({ data: mockAddrs });
-    }
+    (getAddresses as jest.Mock).mockResolvedValue(mockAddrs);
     const { tree } = await render();
     // wait for React Query to settle
     await act(async () => {

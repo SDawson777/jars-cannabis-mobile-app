@@ -101,6 +101,9 @@ module.exports = [
         __DEV__: 'readonly'
       }
     },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -230,7 +233,6 @@ module.exports = [
     },
     rules: {
       'no-undef': 'off',
-      '@typescript-eslint/no-unused-vars': 'off'
     }
   },
   {
