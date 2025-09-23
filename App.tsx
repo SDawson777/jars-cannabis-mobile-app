@@ -12,6 +12,7 @@ import { Alert, Text, View } from 'react-native';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import OfflineNotice from './src/components/OfflineNotice';
 import { CMSPreviewProvider } from './src/context/CMSPreviewContext';
+import { AuthProvider } from './src/context/AuthContext';
 import { LoyaltyProvider } from './src/context/LoyaltyContext';
 import { SettingsProvider } from './src/context/SettingsContext';
 import { StoreProvider } from './src/context/StoreContext';
@@ -200,7 +201,8 @@ function App() {
             <ThemeProvider>
               <SettingsProvider>
                 <CMSPreviewProvider>
-                  <QueryClientProvider client={queryClient}>
+                  <AuthProvider>
+                    <QueryClientProvider client={queryClient}>
                     <OfflineNotice />
                     {!notificationsEnabled && (
                       <View
@@ -296,7 +298,8 @@ function App() {
                         />
                       </Stack.Navigator>
                     </NavigationContainer>
-                  </QueryClientProvider>
+                    </QueryClientProvider>
+                  </AuthProvider>
                 </CMSPreviewProvider>
               </SettingsProvider>
             </ThemeProvider>
