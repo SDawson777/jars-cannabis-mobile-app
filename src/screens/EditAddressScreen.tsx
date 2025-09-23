@@ -38,8 +38,8 @@ export default function EditAddressScreen() {
 
   // Existing address passed via params
   const addr = (route.params as any)?.address || {};
-  // Support legacy navigation param using `_state` by normalizing to `state`.
-  const normalizedAddr = { ...addr, state: addr.state ?? addr._state };
+  // Address object is expected to already use `state`.
+  const normalizedAddr = addr;
   const { control, handleSubmit } = useForm<AddressFormValues>({
     resolver: yupResolver(addressSchema) as unknown as Resolver<AddressFormValues, any>,
     defaultValues: {

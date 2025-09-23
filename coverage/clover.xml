@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1758671064407" clover="3.2.0">
-  <project timestamp="1758671064408" name="All files">
-    <metrics statements="2653" coveredstatements="810" conditionals="1481" coveredconditionals="381" methods="863" coveredmethods="225" elements="4997" coveredelements="1416" complexity="0" loc="2653" ncloc="2653" packages="26" files="202" classes="202"/>
+<coverage generated="1758671896858" clover="3.2.0">
+  <project timestamp="1758671896858" name="All files">
+    <metrics statements="2653" coveredstatements="810" conditionals="1477" coveredconditionals="379" methods="863" coveredmethods="225" elements="4993" coveredelements="1414" complexity="0" loc="2653" ncloc="2653" packages="26" files="202" classes="202"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="declarations.d.ts" path="/workspaces/jars-cannabis-mobile-app/src/@types/declarations.d.ts">
@@ -1255,7 +1255,7 @@
       </file>
     </package>
     <package name="screens">
-      <metrics statements="1475" coveredstatements="417" conditionals="960" coveredconditionals="241" methods="460" coveredmethods="108"/>
+      <metrics statements="1475" coveredstatements="417" conditionals="956" coveredconditionals="239" methods="460" coveredmethods="108"/>
       <file name="AccessibilitySettingsScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/AccessibilitySettingsScreen.tsx">
         <metrics statements="49" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="12" coveredmethods="0"/>
         <line num="27" count="0" type="cond" truecount="0" falsecount="4"/>
@@ -1836,14 +1836,14 @@
         <line num="209" count="0" type="stmt"/>
       </file>
       <file name="EditAddressScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/EditAddressScreen.tsx">
-        <metrics statements="35" coveredstatements="31" conditionals="27" coveredconditionals="17" methods="7" coveredmethods="6"/>
+        <metrics statements="35" coveredstatements="31" conditionals="25" coveredconditionals="15" methods="7" coveredmethods="6"/>
         <line num="30" count="1" type="cond" truecount="2" falsecount="2"/>
         <line num="31" count="0" type="stmt"/>
         <line num="35" count="8" type="stmt"/>
         <line num="36" count="8" type="stmt"/>
         <line num="37" count="8" type="stmt"/>
         <line num="40" count="8" type="cond" truecount="1" falsecount="1"/>
-        <line num="42" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="42" count="8" type="stmt"/>
         <line num="43" count="8" type="stmt"/>
         <line num="55" count="8" type="stmt"/>
         <line num="56" count="8" type="stmt"/>
@@ -2549,28 +2549,28 @@
         <line num="116" count="1" type="stmt"/>
       </file>
       <file name="SavedAddressesScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/SavedAddressesScreen.tsx">
-        <metrics statements="21" coveredstatements="12" conditionals="15" coveredconditionals="8" methods="7" coveredmethods="3"/>
+        <metrics statements="21" coveredstatements="12" conditionals="13" coveredconditionals="8" methods="7" coveredmethods="3"/>
         <line num="25" count="1" type="cond" truecount="2" falsecount="2"/>
         <line num="26" count="0" type="stmt"/>
-        <line num="47" count="2" type="stmt"/>
-        <line num="48" count="2" type="stmt"/>
-        <line num="49" count="2" type="cond" truecount="1" falsecount="0"/>
-        <line num="54" count="2" type="stmt"/>
-        <line num="55" count="2" type="stmt"/>
-        <line num="59" count="2" type="cond" truecount="2" falsecount="2"/>
-        <line num="61" count="2" type="stmt"/>
+        <line num="45" count="2" type="stmt"/>
+        <line num="46" count="2" type="stmt"/>
+        <line num="47" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="52" count="2" type="stmt"/>
+        <line num="53" count="2" type="stmt"/>
+        <line num="57" count="2" type="cond" truecount="2" falsecount="2"/>
+        <line num="59" count="2" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
         <line num="62" count="0" type="stmt"/>
-        <line num="63" count="0" type="stmt"/>
-        <line num="64" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="67" count="2" type="stmt"/>
+        <line num="65" count="2" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
         <line num="68" count="0" type="stmt"/>
-        <line num="69" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="73" count="2" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
-        <line num="80" count="2" type="stmt"/>
-        <line num="83" count="0" type="stmt"/>
-        <line num="117" count="1" type="stmt"/>
+        <line num="71" count="2" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="78" count="2" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="115" count="1" type="stmt"/>
       </file>
       <file name="SavedPaymentsScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/SavedPaymentsScreen.tsx">
         <metrics statements="22" coveredstatements="0" conditionals="21" coveredconditionals="0" methods="7" coveredmethods="0"/>
@@ -2892,7 +2892,7 @@
       <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="addressSchema.ts" path="/workspaces/jars-cannabis-mobile-app/src/screens/account/addressSchema.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="6" count="3" type="stmt"/>
+        <line num="4" count="3" type="stmt"/>
       </file>
       <file name="profileSchema.ts" path="/workspaces/jars-cannabis-mobile-app/src/screens/account/profileSchema.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>

@@ -1,8 +1,6 @@
 import * as yup from 'yup';
 
-// NOTE: Previously this schema used `_state` which did not match the backend API (`state`).
-// We have renamed the field to `state` end-to-end. If any persisted data or navigation params
-// still provide `_state`, the screens now map it into `state` when setting default values.
+// Address form schema (mobile <-> backend) uses `state`.
 export const addressSchema = yup.object({
   fullName: yup.string().required('Full name is required'),
   phone: yup.string().required('Phone is required'),

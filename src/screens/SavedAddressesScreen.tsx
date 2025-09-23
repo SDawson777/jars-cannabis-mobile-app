@@ -39,8 +39,6 @@ interface Address {
   zipCode?: string;
   country?: string;
   isDefault?: boolean;
-  // legacy support (will be ignored but allows tests/fixtures that still provide _state)
-  _state?: string;
 }
 
 export default function SavedAddressesScreen() {
@@ -61,7 +59,7 @@ export default function SavedAddressesScreen() {
   const handleEdit = (addr: Address) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('EditAddress', { address: { ...addr, state: addr.state ?? addr._state } });
+    navigation.navigate('EditAddress', { address: addr });
   };
 
   const handleAdd = () => {

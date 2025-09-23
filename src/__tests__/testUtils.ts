@@ -8,7 +8,7 @@ export const makeStore = (overrides: Partial<StoreData> = {}): StoreData => ({
   longitude: 0,
   address: '123 Main St',
   city: 'Phoenix',
-  _state: 'AZ',
+  state: 'AZ',
   zip: '85001',
   phone: '555-555-5555',
   ...overrides,
