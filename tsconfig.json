@@ -15,7 +15,8 @@
     "types": ["jest", "react", "react-native"],
     "baseUrl": ".",
     "paths": {
-      "@server/*": ["server/*"]
+      "@server/*": ["server/*"],
+      "react-native/jest/*": ["tests/__mocks__/reactNativeMock.js"]
     }
   },
   "include": ["src", "app", "**/*.ts", "**/*.tsx", "e2e/global.d.ts"],
