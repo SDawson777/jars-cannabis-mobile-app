@@ -18,7 +18,7 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum PaymentMethod {
+enum OrderPaymentMethod {
   pay_at_pickup
   card
 }
@@ -70,6 +70,8 @@ model User {
   events         UserEvent[]
   carts          Cart[]
   orders         Order[]
+  addresses      Address[]
+  paymentMethods PaymentMethod[]
 
   @@index([email])
 }
@@ -212,6 +214,26 @@ model PaymentMethod {
   @@index([userId])
 }
 
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  fullName  String
+  phone     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  zipCode   String
+  country   String   @default("US")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model CartItem {
   id        String   @id @default(cuid())
   cartId    String
@@ -233,8 +255,8 @@ model Order {
   id            String        @id @default(cuid())
   userId        String
   storeId       String
-  status        OrderStatus   @default(CREATED)
-  paymentMethod PaymentMethod @default(pay_at_pickup)
+  status        OrderStatus        @default(CREATED)
+  paymentMethod OrderPaymentMethod @default(pay_at_pickup)
   notes         String?
   contactName   String?
   contactPhone  String?

@@ -27,7 +27,19 @@ jest.mock('react-native', () => {
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ goBack: jest.fn() }),
   useRoute: () => ({
-    params: { address: { id: 'addr-1', line1: 'Old', city: 'X', state: 'Y', zip: '00000' } },
+    params: {
+      address: {
+        id: 'addr-1',
+        fullName: 'Jane Doe',
+        phone: '555-555-5555',
+        line1: 'Old',
+        city: 'X',
+        state: 'Y',
+        zipCode: '00000',
+        country: 'US',
+        isDefault: true,
+      },
+    },
   }),
 }));
 
@@ -72,12 +84,14 @@ describe('EditAddressScreen form', () => {
     const { tree, client } = await render();
     const inputs = tree.root.findAllByType('TextInput' as any);
     await act(async () => {
-      // fill label + other fields
-      inputs[0].props.onChangeText('Home');
-      inputs[1].props.onChangeText('New St');
-      inputs[2].props.onChangeText('City');
-      inputs[3].props.onChangeText('ST');
-      inputs[4].props.onChangeText('11111');
+      // fill updated fields matching new schema
+      inputs[0].props.onChangeText('Jane Doe Updated'); // fullName
+      inputs[1].props.onChangeText('666-666-6666'); // phone
+      inputs[2].props.onChangeText('New St'); // line1
+      inputs[3].props.onChangeText('City'); // city
+      inputs[4].props.onChangeText('ST'); // state
+      inputs[5].props.onChangeText('11111'); // zipCode
+      inputs[6].props.onChangeText('US'); // country
     });
     const button = tree.root.findAllByType('Pressable' as any).slice(-1)[0];
     await act(async () => {

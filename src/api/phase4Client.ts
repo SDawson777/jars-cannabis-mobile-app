@@ -57,6 +57,11 @@ export async function getLoyaltyBadges() {
   return res.data;
 }
 
+export async function getAddresses() {
+  const res = await phase4Client.get('/addresses');
+  return res.data;
+}
+
 export async function conciergeChat(payload: { message: string; history?: any[] }) {
   const res = await phase4Client.post('/concierge/chat', payload);
   return res.data;

@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import type { Resolver } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -38,13 +39,15 @@ export default function EditAddressScreen() {
   // Existing address passed via params
   const addr = (route.params as any)?.address || {};
   const { control, handleSubmit } = useForm<AddressFormValues>({
-    resolver: yupResolver(addressSchema),
+    resolver: yupResolver(addressSchema) as unknown as Resolver<AddressFormValues, any>,
     defaultValues: {
-      label: addr.label,
+      fullName: addr.fullName,
+      phone: addr.phone,
       line1: addr.line1,
       city: addr.city,
       state: addr.state,
-      zip: addr.zip,
+      zipCode: addr.zipCode,
+      country: addr.country || 'US',
     },
   });
   const [loading, setLoading] = useState(false);
@@ -94,11 +97,13 @@ export default function EditAddressScreen() {
       {/* Form */}
       <View style={styles.form}>
         {[
-          { name: 'label', placeholder: 'Label' },
+          { name: 'fullName', placeholder: 'Full name' },
+          { name: 'phone', placeholder: 'Phone' },
           { name: 'line1', placeholder: 'Street Address' },
           { name: 'city', placeholder: 'City' },
           { name: 'state', placeholder: 'State' },
-          { name: 'zip', placeholder: 'ZIP Code', keyboard: 'numeric' },
+          { name: 'zipCode', placeholder: 'ZIP Code', keyboard: 'numeric' },
+          { name: 'country', placeholder: 'Country' },
         ].map(({ name, placeholder, keyboard }) => (
           <View key={name}>
             <Text style={[styles.label, { color: jarsPrimary }]}>{placeholder}</Text>
@@ -109,7 +114,7 @@ export default function EditAddressScreen() {
                 <>
                   <TextInput
                     style={[styles.input, { borderColor: jarsSecondary }]}
-                    value={value}
+                    value={(value ?? '') as string}
                     onBlur={onBlur}
                     onChangeText={t => {
                       hapticLight();

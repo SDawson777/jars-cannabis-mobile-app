@@ -69,12 +69,14 @@ describe('AddAddressScreen form', () => {
     const { tree, client } = await render();
     const inputs = tree.root.findAllByType('TextInput' as any);
     await act(async () => {
-      // fill all required fields including label
-      inputs[0].props.onChangeText('Home');
-      inputs[1].props.onChangeText('123 Main St');
-      inputs[2].props.onChangeText('Denver');
-      inputs[3].props.onChangeText('CO');
-      inputs[4].props.onChangeText('80202');
+      // fill all required fields matching new schema
+      inputs[0].props.onChangeText('Jane Doe'); // fullName
+      inputs[1].props.onChangeText('555-555-5555'); // phone
+      inputs[2].props.onChangeText('123 Main St'); // line1
+      inputs[3].props.onChangeText('Denver'); // city
+      inputs[4].props.onChangeText('CO'); // state
+      inputs[5].props.onChangeText('80202'); // zipCode
+      inputs[6].props.onChangeText('US'); // country
     });
     const button = tree.root.findAllByType('Pressable' as any).slice(-1)[0];
     await act(async () => {

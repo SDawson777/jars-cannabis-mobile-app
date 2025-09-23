@@ -1,8 +1,9 @@
 // src/screens/SavedAddressesScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
 import { Plus, ChevronRight } from 'lucide-react-native';
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -15,6 +16,7 @@ import {
   Platform,
 } from 'react-native';
 
+import { getAddresses } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
@@ -28,20 +30,24 @@ type SavedAddressesNavProp = NativeStackNavigationProp<RootStackParamList, 'Save
 
 interface Address {
   id: string;
-  label: string;
+  fullName: string;
+  phone?: string;
   line1: string;
+  line2?: string | null;
   city: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  isDefault?: boolean;
 }
-
-const initial: Address[] = [
-  { id: '1', label: 'Home', line1: '123 Main St', city: 'Detroit, MI' },
-  { id: '2', label: 'Work', line1: '456 Elm St', city: 'Detroit, MI' },
-];
 
 export default function SavedAddressesScreen() {
   const navigation = useNavigation<SavedAddressesNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [addresses] = useState<Address[]>(initial);
+  const { data: addresses = [] } = useQuery<Address[], Error>({
+    queryKey: ['addresses'],
+    queryFn: getAddresses,
+  });
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -75,9 +81,17 @@ export default function SavedAddressesScreen() {
             onPress={() => handleEdit(item)}
           >
             <View>
-              <Text style={[styles.label, { color: jarsPrimary }]}>{item.label}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={[styles.label, { color: jarsPrimary }]}>{item.fullName}</Text>
+                {item.isDefault ? (
+                  <View style={[styles.defaultBadge, { borderColor: jarsSecondary }]}>
+                    <Text style={[styles.defaultText, { color: jarsSecondary }]}>Default</Text>
+                  </View>
+                ) : null}
+              </View>
               <Text style={[styles.subLabel, { color: jarsSecondary }]}>
-                {item.line1}, {item.city}
+                {item.line1}
+                {item.city ? ', ' + item.city : ''}
               </Text>
             </View>
             <ChevronRight color={jarsPrimary} size={20} />
@@ -120,4 +134,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addText: { marginLeft: 8, fontSize: 16, fontWeight: '600' },
+  defaultBadge: {
+    marginLeft: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    marginTop: 0,
+  },
+  defaultText: { fontSize: 12, fontWeight: '600' },
 });

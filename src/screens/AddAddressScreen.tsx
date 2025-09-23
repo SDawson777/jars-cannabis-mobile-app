@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import type { Resolver } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -39,7 +40,7 @@ export default function AddAddressScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const { control, handleSubmit } = useForm<AddressFormValues>({
-    resolver: yupResolver(addressSchema),
+    resolver: yupResolver(addressSchema) as unknown as Resolver<AddressFormValues, any>,
   });
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -81,6 +82,7 @@ export default function AddAddressScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
+      // map form values straight through - names match server schema
       const res = await phase4Client.post('/addresses', values);
       // surface server error body if present
       if (res && res.data && res.data.error) {
@@ -108,11 +110,13 @@ export default function AddAddressScreen() {
       </View>
       <View style={styles.form}>
         {[
-          { name: 'label', placeholder: 'Label (Home, Work)' },
+          { name: 'fullName', placeholder: 'Full name' },
+          { name: 'phone', placeholder: 'Phone' },
           { name: 'line1', placeholder: 'Street Address' },
           { name: 'city', placeholder: 'City' },
           { name: 'state', placeholder: 'State' },
-          { name: 'zip', placeholder: 'ZIP Code', keyboard: 'numeric' },
+          { name: 'zipCode', placeholder: 'ZIP Code', keyboard: 'numeric' },
+          { name: 'country', placeholder: 'Country' },
         ].map(({ name, placeholder, keyboard }) => (
           <View key={name}>
             <Text style={[styles.label, { color: jarsSecondary }]}>{placeholder}</Text>
@@ -128,7 +132,7 @@ export default function AddAddressScreen() {
                     keyboardType={keyboard as any}
                     accessibilityLabel={placeholder}
                     accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
-                    value={value}
+                    value={(value ?? '') as string}
                     onBlur={onBlur}
                     onChangeText={text => {
                       hapticLight();

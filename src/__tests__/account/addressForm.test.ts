@@ -3,22 +3,26 @@ import { addressSchema } from '../../screens/account/addressSchema';
 describe('addressSchema', () => {
   it('validates correct data', async () => {
     const valid = await addressSchema.isValid({
-      label: 'Home',
+      fullName: 'Jane Doe',
+      phone: '555-555-5555',
       line1: '123 Main',
       city: 'Detroit',
       state: 'MI',
-      zip: '12345',
+      zipCode: '12345',
+      country: 'US',
     });
     expect(valid).toBe(true);
   });
 
   it('fails with missing or invalid fields', async () => {
     const valid = await addressSchema.isValid({
-      label: '',
+      fullName: '',
+      phone: 'abc',
       line1: '',
       city: '',
       state: '',
-      zip: 'abc',
+      zipCode: 'abc',
+      country: '',
     });
     expect(valid).toBe(false);
   });

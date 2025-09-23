@@ -5,7 +5,7 @@ import type { Product } from '@prisma/client';
 export async function forYou(userId?: string, storeId?: string, limit = 12) {
   // Popularity baseline by store
   const popular = await prisma.product.findMany({
-    where: { storeId },
+    where: storeId ? { stores: { some: { storeId } } } : {},
     orderBy: [{ purchasesLast30d: 'desc' }],
     take: limit,
   });
@@ -24,7 +24,7 @@ export async function forYou(userId?: string, storeId?: string, limit = 12) {
   const likedTerps = freq(recent.flatMap(e => e.terpenes ?? []));
 
   const candidates = await prisma.product.findMany({
-    where: { storeId },
+    where: storeId ? { stores: { some: { storeId } } } : {},
     take: 500,
     orderBy: [{ purchasesLast30d: 'desc' }],
   });
@@ -40,7 +40,7 @@ export async function relatedTo(productId: string, storeId?: string, limit = 8) 
   if (!base) return [];
   const siblings = await prisma.product.findMany({
     where: {
-      storeId,
+      ...(storeId ? { stores: { some: { storeId } } } : {}),
       id: { not: base.id },
       OR: [
         { brand: base.brand },

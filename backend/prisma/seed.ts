@@ -79,3 +79,33 @@ create: { type: ContentType.faq, locale: 'en-US', slug: 'general', title: 'FAQ',
 }
 
 main().finally(() => prisma.$disconnect());
+
+// Add sample addresses for existing demo users if present
+async function seedAddresses() {
+  try {
+    const users = await prisma.user.findMany({ take: 2 });
+    for (const u of users) {
+      await prisma.address.upsert({
+        where: { id: `addr-${u.id}` },
+        update: {},
+        create: {
+          id: `addr-${u.id}`,
+          userId: u.id,
+          fullName: u.name || 'Demo User',
+          phone: u.phone || '555-555-5555',
+          line1: '123 Demo St',
+          line2: null,
+          city: 'Demo City',
+          state: 'CA',
+          zipCode: '90001',
+          country: 'US',
+          isDefault: true,
+        },
+      });
+    }
+  } catch (e) {
+    // ignore if users table isn't present in demo/test envs
+  }
+}
+
+seedAddresses().finally(() => {});
