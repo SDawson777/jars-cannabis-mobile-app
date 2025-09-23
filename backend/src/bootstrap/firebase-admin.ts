@@ -7,7 +7,10 @@ function serviceAccountFromEnv(): admin.ServiceAccount {
   if (!b64) throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 missing');
   const json = Buffer.from(b64, 'base64').toString('utf8');
   const svc = JSON.parse(json);
-  if (typeof (svc as any).private_key !== 'string' || !(svc as any).private_key.includes('BEGIN PRIVATE KEY')) {
+  if (
+    typeof (svc as any).private_key !== 'string' ||
+    !(svc as any).private_key.includes('BEGIN PRIVATE KEY')
+  ) {
     throw new Error('service account JSON missing valid private_key');
   }
   return svc as admin.ServiceAccount;

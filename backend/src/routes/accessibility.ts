@@ -11,4 +11,3 @@ accessibilityRouter.get('/accessibility', getAccessibilitySettings);
 
 // PUT /accessibility
 accessibilityRouter.put('/accessibility', updateAccessibilitySettings);
-

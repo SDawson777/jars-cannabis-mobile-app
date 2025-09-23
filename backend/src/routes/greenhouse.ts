@@ -16,4 +16,3 @@ greenhouseRouter.get('/greenhouse/articles/:slug', (req, res) => {
 greenhouseRouter.post('/greenhouse/articles/:slug/complete', (req, res) => {
   res.json({ slug: req.params.slug, completed: true });
 });
-

@@ -40,4 +40,3 @@ homeRouter.get('/home/ways', (_req, res) => {
     { id: 'deli', label: 'Shop The Deli' },
   ]);
 });
-

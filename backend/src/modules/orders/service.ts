@@ -13,9 +13,9 @@ export async function updateOrderStatus(orderId: string, status: string) {
     await admin.messaging().send({
       token: order.user.fcmToken,
       notification: {
-  title: 'Order Update',
-  body: `Your order ${order.id} is now ${status}.`,
-},
+        title: 'Order Update',
+        body: `Your order ${order.id} is now ${status}.`,
+      },
     });
   }
 

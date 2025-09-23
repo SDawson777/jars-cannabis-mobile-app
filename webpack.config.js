@@ -18,13 +18,9 @@ module.exports = async function (env, argv) {
     ),
     'react-native-pager-view': path.resolve(__dirname, 'src/shims/pager-view.web.ts'),
     'react-native-haptic-feedback': path.resolve(__dirname, 'src/shims/haptics.web.ts'),
-    '@stripe/stripe-react-native': path.resolve(
-      __dirname,
-      'src/shims/stripe-react-native.web.ts'
-    ),
+    '@stripe/stripe-react-native': path.resolve(__dirname, 'src/shims/stripe-react-native.web.ts'),
     'react-native-maps': path.resolve(__dirname, 'src/shims/react-native-maps.web.ts'),
   };
 
   return config;
 };
-

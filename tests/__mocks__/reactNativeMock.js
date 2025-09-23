@@ -10,6 +10,6 @@ module.exports = {
       // moduleName sometimes comes as moduleRef like 'm#ModuleName'
       const name = String(moduleName).replace(/^m#/, '');
       return jest.mock(name, factory);
-    }
-  }
+    },
+  },
 };

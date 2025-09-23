@@ -18,9 +18,7 @@ describe('Orders Controller', () => {
     });
 
     it('should reject request without authentication', async () => {
-      await api()
-        .get('/api/orders')
-        .expect(401);
+      await api().get('/api/orders').expect(401);
     });
 
     it('should filter orders by status', async () => {
@@ -32,8 +30,8 @@ describe('Orders Controller', () => {
       expect(response.body.orders).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            status: 'pending'
-          })
+            status: 'pending',
+          }),
         ])
       );
     });
@@ -58,9 +56,7 @@ describe('Orders Controller', () => {
     it('should reject request without authentication', async () => {
       const orderId = 'test-order-id';
 
-      await api()
-        .get(`/api/orders/${orderId}`)
-        .expect(401);
+      await api().get(`/api/orders/${orderId}`).expect(401);
     });
 
     it('should return 404 for non-existent order', async () => {
@@ -94,13 +90,13 @@ describe('Orders Controller', () => {
           street: '123 Main St',
           city: 'Denver',
           state: 'CO',
-          zipCode: '80202'
+          zipCode: '80202',
         },
         paymentMethod: 'card',
         paymentDetails: {
-          cardToken: 'valid-card-token'
+          cardToken: 'valid-card-token',
         },
-        tip: 2.50
+        tip: 2.5,
       };
 
       const response = await api()
@@ -117,13 +113,10 @@ describe('Orders Controller', () => {
 
     it('should reject order without authentication', async () => {
       const orderData = {
-        deliveryMethod: 'delivery'
+        deliveryMethod: 'delivery',
       };
 
-      await api()
-        .post('/api/orders')
-        .send(orderData)
-        .expect(401);
+      await api().post('/api/orders').send(orderData).expect(401);
     });
 
     it('should reject order with empty cart', async () => {
@@ -133,8 +126,8 @@ describe('Orders Controller', () => {
           street: '123 Main St',
           city: 'Denver',
           state: 'CO',
-          zipCode: '80202'
-        }
+          zipCode: '80202',
+        },
       };
 
       const response = await api()
@@ -151,9 +144,9 @@ describe('Orders Controller', () => {
       const orderData = {
         deliveryMethod: 'delivery',
         deliveryAddress: {
-          street: '123 Main St'
+          street: '123 Main St',
           // Missing required fields
-        }
+        },
       };
 
       const response = await api()
@@ -173,9 +166,9 @@ describe('Orders Controller', () => {
           street: '123 Main St',
           city: 'Denver',
           state: 'CO',
-          zipCode: '80202'
+          zipCode: '80202',
         },
-        paymentMethod: 'invalid-method'
+        paymentMethod: 'invalid-method',
       };
 
       const response = await api()
@@ -206,9 +199,7 @@ describe('Orders Controller', () => {
     it('should reject cancel without authentication', async () => {
       const orderId = 'test-order-id';
 
-      await api()
-        .put(`/api/orders/${orderId}/cancel`)
-        .expect(401);
+      await api().put(`/api/orders/${orderId}/cancel`).expect(401);
     });
 
     it('should reject cancel for non-cancellable order', async () => {
@@ -243,9 +234,7 @@ describe('Orders Controller', () => {
     it('should reject tracking request without authentication', async () => {
       const orderId = 'test-order-id';
 
-      await api()
-        .get(`/api/orders/${orderId}/tracking`)
-        .expect(401);
+      await api().get(`/api/orders/${orderId}/tracking`).expect(401);
     });
 
     it('should return 404 for non-existent order tracking', async () => {
@@ -267,8 +256,8 @@ describe('Orders Controller', () => {
         driverRating: 5,
         productRatings: [
           { productId: 'product-1', rating: 4 },
-          { productId: 'product-2', rating: 5 }
-        ]
+          { productId: 'product-2', rating: 5 },
+        ],
       };
 
       const response = await api()
@@ -286,20 +275,17 @@ describe('Orders Controller', () => {
       const orderId = 'completed-order-id';
       const ratingData = {
         rating: 5,
-        comment: 'Great!'
+        comment: 'Great!',
       };
 
-      await api()
-        .post(`/api/orders/${orderId}/rate`)
-        .send(ratingData)
-        .expect(401);
+      await api().post(`/api/orders/${orderId}/rate`).send(ratingData).expect(401);
     });
 
     it('should reject rating for non-completed order', async () => {
       const orderId = 'pending-order-id';
       const ratingData = {
         rating: 5,
-        comment: 'Great!'
+        comment: 'Great!',
       };
 
       const response = await api()

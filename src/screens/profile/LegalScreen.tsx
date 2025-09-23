@@ -9,7 +9,6 @@ import { ThemeContext } from '../../context/ThemeContext';
 import type { RootStackParamList } from '../../navigation/types';
 import { hapticLight } from '../../utils/haptic';
 
-
 type NavProp = NativeStackNavigationProp<RootStackParamList, 'Legal'>;
 
 const LINKS = [

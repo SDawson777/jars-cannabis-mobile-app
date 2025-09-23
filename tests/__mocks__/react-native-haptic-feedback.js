@@ -4,5 +4,5 @@ module.exports = {
   __esModule: true,
   default: {
     trigger: jest.fn(),
-  }
+  },
 };

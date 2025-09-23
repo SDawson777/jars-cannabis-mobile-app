@@ -7,4 +7,3 @@ export default function MapView({ style, children }: ViewProps & any) {
 
 export const Marker = ({ children }: any) => <View>{children}</View>;
 export type Region = any;
-

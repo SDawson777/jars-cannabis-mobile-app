@@ -1,6 +1,5 @@
-jest.mock(
-  '@react-native-async-storage/async-storage',
-  () => require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 // Ensure UIManager.getViewManagerConfig exists in the test environment
 try {
@@ -72,7 +71,8 @@ try {
   jest.mock('react-native-safe-area-context', () => {
     const React = require('react');
     return {
-      SafeAreaProvider: ({ children }: any) => React.createElement('SafeAreaProvider', null, children),
+      SafeAreaProvider: ({ children }: any) =>
+        React.createElement('SafeAreaProvider', null, children),
       SafeAreaView: ({ children }: any) => React.createElement('SafeAreaView', null, children),
       useSafeAreaInsets: () => ({ top: 0, left: 0, right: 0, bottom: 0 }),
       initialWindow: { width: 1024, height: 768, scale: 1, fontScale: 1 },
@@ -117,7 +117,10 @@ try {
         })
         .join(' ');
       // React act(...) warnings
-      if (/not wrapped in act\(/i.test(joined) || /An update to .* inside a test was not wrapped in act\(/i.test(joined)) {
+      if (
+        /not wrapped in act\(/i.test(joined) ||
+        /An update to .* inside a test was not wrapped in act\(/i.test(joined)
+      ) {
         return true;
       }
 
@@ -126,11 +129,11 @@ try {
         return true;
       }
 
-  // App-level debug logs used during development but noisy in CI
-  if (/^ShopScreen:/.test(joined)) return true;
-  if (/^CartScreenMock/.test(joined)) return true;
-  if (/^CheckoutScreenMock/.test(joined)) return true;
-  if (/^Analytics Event:/.test(joined)) return true;
+      // App-level debug logs used during development but noisy in CI
+      if (/^ShopScreen:/.test(joined)) return true;
+      if (/^CartScreenMock/.test(joined)) return true;
+      if (/^CheckoutScreenMock/.test(joined)) return true;
+      if (/^Analytics Event:/.test(joined)) return true;
 
       return false;
     } catch {

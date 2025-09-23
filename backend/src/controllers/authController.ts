@@ -27,7 +27,7 @@ export async function register(req: Request, res: Response) {
 
   // Only fields that exist in your Prisma model
   const user = await prisma.user.create({
-    data: { email, passwordHash }
+    data: { email, passwordHash },
   });
 
   const token = jwt.sign({ userId: user.id }, getJwtSecret(), { expiresIn: '1h' });

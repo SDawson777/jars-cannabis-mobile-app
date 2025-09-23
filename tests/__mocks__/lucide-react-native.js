@@ -3,7 +3,11 @@ const { View } = require('react-native');
 
 function Icon(props) {
   const { children, ...rest } = props;
-  return React.createElement(View, { ...rest, testID: props.testID || 'mock-icon' }, children || null);
+  return React.createElement(
+    View,
+    { ...rest, testID: props.testID || 'mock-icon' },
+    children || null
+  );
 }
 
 module.exports = {

@@ -19,9 +19,7 @@ describe('Cart Controller', () => {
     });
 
     it('should reject request without authentication', async () => {
-      await api()
-        .get('/api/cart')
-        .expect(401);
+      await api().get('/api/cart').expect(401);
     });
   });
 
@@ -30,7 +28,7 @@ describe('Cart Controller', () => {
       const itemData = {
         productId: 'test-product-id',
         quantity: 2,
-        variant: 'eighth'
+        variant: 'eighth',
       };
 
       const response = await api()
@@ -48,19 +46,16 @@ describe('Cart Controller', () => {
     it('should reject add item without authentication', async () => {
       const itemData = {
         productId: 'test-product-id',
-        quantity: 2
+        quantity: 2,
       };
 
-      await api()
-        .post('/api/cart/items')
-        .send(itemData)
-        .expect(401);
+      await api().post('/api/cart/items').send(itemData).expect(401);
     });
 
     it('should reject add item with invalid quantity', async () => {
       const itemData = {
         productId: 'test-product-id',
-        quantity: -1
+        quantity: -1,
       };
 
       const response = await api()
@@ -76,7 +71,7 @@ describe('Cart Controller', () => {
     it('should reject add item with non-existent product', async () => {
       const itemData = {
         productId: 'non-existent-product',
-        quantity: 1
+        quantity: 1,
       };
 
       const response = await api()
@@ -94,7 +89,7 @@ describe('Cart Controller', () => {
     it('should update cart item quantity successfully', async () => {
       const itemId = 'test-cart-item-id';
       const updateData = {
-        quantity: 3
+        quantity: 3,
       };
 
       const response = await api()
@@ -111,18 +106,15 @@ describe('Cart Controller', () => {
     it('should reject update without authentication', async () => {
       const itemId = 'test-cart-item-id';
       const updateData = {
-        quantity: 3
+        quantity: 3,
       };
 
-      await api()
-        .put(`/api/cart/items/${itemId}`)
-        .send(updateData)
-        .expect(401);
+      await api().put(`/api/cart/items/${itemId}`).send(updateData).expect(401);
     });
 
     it('should return 404 for non-existent cart item', async () => {
       const updateData = {
-        quantity: 3
+        quantity: 3,
       };
 
       const response = await api()
@@ -151,9 +143,7 @@ describe('Cart Controller', () => {
     it('should reject remove without authentication', async () => {
       const itemId = 'test-cart-item-id';
 
-      await api()
-        .delete(`/api/cart/items/${itemId}`)
-        .expect(401);
+      await api().delete(`/api/cart/items/${itemId}`).expect(401);
     });
 
     it('should return 404 for non-existent item', async () => {
@@ -179,16 +169,14 @@ describe('Cart Controller', () => {
     });
 
     it('should reject clear cart without authentication', async () => {
-      await api()
-        .delete('/api/cart')
-        .expect(401);
+      await api().delete('/api/cart').expect(401);
     });
   });
 
   describe('POST /api/cart/apply-coupon', () => {
     it('should apply valid coupon successfully', async () => {
       const couponData = {
-        code: 'SAVE10'
+        code: 'SAVE10',
       };
 
       const response = await api()
@@ -204,7 +192,7 @@ describe('Cart Controller', () => {
 
     it('should reject invalid coupon', async () => {
       const couponData = {
-        code: 'INVALID'
+        code: 'INVALID',
       };
 
       const response = await api()

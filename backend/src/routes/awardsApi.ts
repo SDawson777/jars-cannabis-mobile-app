@@ -11,7 +11,16 @@ awardsApiRouter.get('/awards', async (req, res) => {
   try {
     const user = (req as any).user || { id: 'anonymous', name: 'You' };
     const awards = await prisma.award.findMany({ where: { userId: user.id } });
-    return res.json({ user: { id: user.id, name: (user.name as string) || 'You', points: (user.points as number) || 0, tier: (user.tier as string) || '', progress: (user.progress as number) || 0 }, awards });
+    return res.json({
+      user: {
+        id: user.id,
+        name: (user.name as string) || 'You',
+        points: (user.points as number) || 0,
+        tier: (user.tier as string) || '',
+        progress: (user.progress as number) || 0,
+      },
+      awards,
+    });
   } catch (err) {
     console.error('Error in awards route:', err);
     return res.status(500).json({ error: (err as Error).message });

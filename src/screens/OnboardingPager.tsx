@@ -13,7 +13,6 @@ import PaginationDots from '../components/PaginationDots';
 import haptics from '../lib/haptics';
 import type { RootStackParamList } from '../navigation/types';
 
-
 const slides = [
   {
     headline: 'Personalized',

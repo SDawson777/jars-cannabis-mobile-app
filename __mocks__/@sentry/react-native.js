@@ -9,6 +9,6 @@ module.exports = {
   setUser: () => {},
   setContext: () => {},
   Scope: function Scope() {},
-  withScope: (fn) => fn && fn(),
+  withScope: fn => fn && fn(),
   lastEventId: () => null,
 };

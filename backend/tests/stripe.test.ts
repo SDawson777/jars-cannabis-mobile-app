@@ -10,9 +10,7 @@ jest.mock('stripe', () => {
 
 describe('Stripe routes', () => {
   it('should return payment sheet credentials', async () => {
-    const res = await api()
-      .post('/api/v1/stripe/payment-sheet')
-      .expect(200);
+    const res = await api().post('/api/v1/stripe/payment-sheet').expect(200);
 
     expect(res.body).toHaveProperty('paymentIntent');
     expect(res.body).toHaveProperty('ephemeralKey');

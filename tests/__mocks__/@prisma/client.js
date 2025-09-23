@@ -20,13 +20,13 @@ const __STORE = {
 
 function makeDelegate(collection) {
   return {
-    deleteMany: jest.fn(async (q) => {
+    deleteMany: jest.fn(async q => {
       const before = collection.length;
       collection.length = 0;
       return { count: before };
     }),
     create: jest.fn(async ({ data }) => {
-      const item = { id: `${Math.random().toString(36).slice(2,9)}`, ...(data || {}) };
+      const item = { id: `${Math.random().toString(36).slice(2, 9)}`, ...(data || {}) };
       collection.push(item);
       return item;
     }),
@@ -35,7 +35,7 @@ function makeDelegate(collection) {
       const key = Object.keys(where)[0];
       return collection.find(item => String(item[key]) === String(where[key])) || null;
     }),
-    findMany: jest.fn(async (q) => {
+    findMany: jest.fn(async q => {
       return collection.slice();
     }),
     update: jest.fn(async ({ where, data }) => {
@@ -52,7 +52,7 @@ function makeDelegate(collection) {
         Object.assign(found, update || {});
         return found;
       }
-      const item = { id: `${Math.random().toString(36).slice(2,9)}`, ...(create || {}) };
+      const item = { id: `${Math.random().toString(36).slice(2, 9)}`, ...(create || {}) };
       collection.push(item);
       return item;
     }),
@@ -61,21 +61,25 @@ function makeDelegate(collection) {
 
 class PrismaClient {
   constructor() {
-  // Use the shared store slices
-  this._store = __STORE;
+    // Use the shared store slices
+    this._store = __STORE;
 
-  this.user = makeDelegate(this._store.user);
-  this.award = makeDelegate(this._store.award);
-  this.order = makeDelegate(this._store.order);
-  this.cart = makeDelegate(this._store.cart);
-  this.cartItem = makeDelegate(this._store.cartItem);
-  this.product = makeDelegate(this._store.product);
-  this.productVariant = makeDelegate(this._store.productVariant);
-  this.loyaltyBadge = makeDelegate(this._store.loyaltyBadge);
+    this.user = makeDelegate(this._store.user);
+    this.award = makeDelegate(this._store.award);
+    this.order = makeDelegate(this._store.order);
+    this.cart = makeDelegate(this._store.cart);
+    this.cartItem = makeDelegate(this._store.cartItem);
+    this.product = makeDelegate(this._store.product);
+    this.productVariant = makeDelegate(this._store.productVariant);
+    this.loyaltyBadge = makeDelegate(this._store.loyaltyBadge);
   }
 
-  $connect() { return Promise.resolve(); }
-  $disconnect() { return Promise.resolve(); }
+  $connect() {
+    return Promise.resolve();
+  }
+  $disconnect() {
+    return Promise.resolve();
+  }
 }
 
 module.exports = { PrismaClient };

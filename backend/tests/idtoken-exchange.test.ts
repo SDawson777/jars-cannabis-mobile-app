@@ -11,7 +11,10 @@ describe('Auth integration', () => {
     const token = reg.body.token as string;
 
     // Access protected profile
-    const profileRes = await api().get('/api/v1/profile').set('Authorization', `Bearer ${token}`).expect(200);
-  expect(profileRes.body).toHaveProperty('email');
+    const profileRes = await api()
+      .get('/api/v1/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+    expect(profileRes.body).toHaveProperty('email');
   });
 });

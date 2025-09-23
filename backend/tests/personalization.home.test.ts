@@ -2,7 +2,9 @@ import { api } from './helpers/supertest';
 
 describe('GET /personalization/home', () => {
   it('returns a ForYouTodayPayload shaped response', async () => {
-    const res = await api().get('/api/v1/personalization/home').set('Authorization', 'Bearer valid-token');
+    const res = await api()
+      .get('/api/v1/personalization/home')
+      .set('Authorization', 'Bearer valid-token');
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('greeting');
     expect(res.body).toHaveProperty('products');
@@ -15,14 +17,18 @@ describe('GET /personalization/home', () => {
   });
 
   it('honors the limit query parameter', async () => {
-    const res = await api().get('/api/v1/personalization/home?limit=1').set('Authorization', 'Bearer valid-token');
+    const res = await api()
+      .get('/api/v1/personalization/home?limit=1')
+      .set('Authorization', 'Bearer valid-token');
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.products)).toBe(true);
     expect(res.body.products.length).toBeLessThanOrEqual(1);
   });
 
   it('prioritizes store-stocked products when storeId is provided', async () => {
-    const res = await api().get('/api/v1/personalization/home?storeId=store_1&limit=2').set('Authorization', 'Bearer valid-token');
+    const res = await api()
+      .get('/api/v1/personalization/home?storeId=store_1&limit=2')
+      .set('Authorization', 'Bearer valid-token');
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.products)).toBe(true);
     // seeded storeProducts marks prod_db_1 as in-stock for store_1, so it should appear in results

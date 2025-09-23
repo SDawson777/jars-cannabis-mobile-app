@@ -18,7 +18,7 @@ try {
     collection: () => ({
       get: async () => ({ docs: [] }),
       doc: (id?: string) => ({
-        id: id || `doc-${Math.random().toString(36).slice(2,8)}`,
+        id: id || `doc-${Math.random().toString(36).slice(2, 8)}`,
         get: async () => ({ exists: false, data: () => null }),
         set: async () => {},
       }),

@@ -75,7 +75,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{productId}}"
+          example: '{{productId}}'
       responses:
         '200':
           description: OK
@@ -88,7 +88,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{productId}}"
+          example: '{{productId}}'
       responses:
         '200':
           description: OK
@@ -100,7 +100,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{productId}}"
+          example: '{{productId}}'
       responses:
         '201':
           description: Created
@@ -119,7 +119,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{storeId}}"
+          example: '{{storeId}}'
       responses:
         '200':
           description: OK
@@ -143,7 +143,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{itemId}}"
+          example: '{{itemId}}'
       responses:
         '200':
           description: OK
@@ -155,7 +155,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{itemId}}"
+          example: '{{itemId}}'
       responses:
         '204':
           description: Deleted
@@ -179,7 +179,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{orderId}}"
+          example: '{{orderId}}'
       responses:
         '200':
           description: OK
@@ -210,7 +210,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{productId}}"
+          example: '{{productId}}'
       responses:
         '200':
           description: OK
@@ -241,7 +241,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{articleSlug}}"
+          example: '{{articleSlug}}'
       responses:
         '200':
           description: OK
@@ -254,7 +254,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{articleSlug}}"
+          example: '{{articleSlug}}'
       responses:
         '200':
           description: OK
@@ -278,7 +278,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{entryId}}"
+          example: '{{entryId}}'
       responses:
         '200':
           description: OK
@@ -320,7 +320,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "{{productId}}"
+          example: '{{productId}}'
       responses:
         '501':
           description: Not implemented

@@ -16,10 +16,7 @@ describe('Auth Controller', () => {
         dateOfBirth: '1990-01-01',
       };
 
-      const response = await api()
-        .post('/api/auth/register')
-        .send(userData)
-        .expect(201);
+      const response = await api().post('/api/auth/register').send(userData).expect(201);
 
       expect(response.body).toHaveProperty('token');
       expect(response.body.user).toHaveProperty('email', userData.email);
@@ -34,10 +31,7 @@ describe('Auth Controller', () => {
         lastName: 'Doe',
       };
 
-      const response = await api()
-        .post('/api/auth/register')
-        .send(userData)
-        .expect(400);
+      const response = await api().post('/api/auth/register').send(userData).expect(400);
 
       expect(response.body).toHaveProperty('error');
       expect(response.body.error).toContain('email');
@@ -51,10 +45,7 @@ describe('Auth Controller', () => {
         lastName: 'Doe',
       };
 
-      const response = await api()
-        .post('/api/auth/register')
-        .send(userData)
-        .expect(400);
+      const response = await api().post('/api/auth/register').send(userData).expect(400);
 
       expect(response.body).toHaveProperty('error');
       expect(response.body.error).toContain('password');
@@ -68,10 +59,7 @@ describe('Auth Controller', () => {
         password: 'securePassword123',
       };
 
-      const response = await api()
-        .post('/api/auth/login')
-        .send(loginData)
-        .expect(200);
+      const response = await api().post('/api/auth/login').send(loginData).expect(200);
 
       expect(response.body).toHaveProperty('token');
       expect(response.body.user).toHaveProperty('email', loginData.email);
@@ -83,10 +71,7 @@ describe('Auth Controller', () => {
         password: 'wrongPassword',
       };
 
-      const response = await api()
-        .post('/api/auth/login')
-        .send(loginData)
-        .expect(401);
+      const response = await api().post('/api/auth/login').send(loginData).expect(401);
 
       expect(response.body).toHaveProperty('error');
       expect(response.body.error).toContain('credentials');
@@ -97,10 +82,7 @@ describe('Auth Controller', () => {
         password: 'securePassword123',
       };
 
-      await api()
-        .post('/api/auth/login')
-        .send(loginData)
-        .expect(400);
+      await api().post('/api/auth/login').send(loginData).expect(400);
     });
   });
 
@@ -110,10 +92,7 @@ describe('Auth Controller', () => {
         refreshToken: 'valid-refresh-token',
       };
 
-      const response = await api()
-        .post('/api/auth/refresh')
-        .send(refreshData)
-        .expect(200);
+      const response = await api().post('/api/auth/refresh').send(refreshData).expect(200);
 
       expect(response.body).toHaveProperty('token');
     });
@@ -123,19 +102,13 @@ describe('Auth Controller', () => {
         refreshToken: 'invalid-refresh-token',
       };
 
-      await api()
-        .post('/api/auth/refresh')
-        .send(refreshData)
-        .expect(401);
+      await api().post('/api/auth/refresh').send(refreshData).expect(401);
     });
   });
 
   describe('POST /api/auth/logout', () => {
     it('should logout successfully', async () => {
-      await api()
-        .post('/api/auth/logout')
-        .set('Authorization', 'Bearer valid-token')
-        .expect(200);
+      await api().post('/api/auth/logout').set('Authorization', 'Bearer valid-token').expect(200);
     });
   });
 
@@ -151,9 +124,7 @@ describe('Auth Controller', () => {
     });
 
     it('should reject request without token', async () => {
-      await api()
-        .get('/api/auth/me')
-        .expect(401);
+      await api().get('/api/auth/me').expect(401);
     });
   });
 });

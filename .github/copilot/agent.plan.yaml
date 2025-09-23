@@ -1,14 +1,14 @@
 version: 1
-name: "JARS Mobile App – Finish Line Mission"
-owner: "SDawson777"
+name: 'JARS Mobile App – Finish Line Mission'
+owner: 'SDawson777'
 repo_context:
   monorepo: false
-  frontend_root: "./"
-  backend_root: "./backend"
-  node_version: "20.x"
-  package_manager: "npm"
-  mobile_stack: "Expo React Native + TypeScript"
-  backend_stack: "Express + Prisma + PostgreSQL (Railway)"
+  frontend_root: './'
+  backend_root: './backend'
+  node_version: '20.x'
+  package_manager: 'npm'
+  mobile_stack: 'Expo React Native + TypeScript'
+  backend_stack: 'Express + Prisma + PostgreSQL (Railway)'
 global_constraints:
   - All changes must keep existing brand/design specs and dynamic theming intact.
   - Keep haptics, animations, and accessibility consistent with prior Codex patches.
@@ -24,330 +24,329 @@ definitions_of_done:
   - Deep links open all top-level flows; Detox test for one complete buyer flow added.
 
 tasks:
-
   - id: repo_sanity_and_scripts
-    title: "Repository sanity & scripts"
+    title: 'Repository sanity & scripts'
     description: |
       Ensure scripts exist and run locally/CI. Add Jest/RTL config for app, Jest+Supertest for backend, and Detox stubs for e2e.
     changes:
-      - edit: "package.json"
-        intent: "Add/normalize scripts: lint, typecheck, test, test:watch, test:ci, build, precommit; ensure workspaces not required."
+      - edit: 'package.json'
+        intent: 'Add/normalize scripts: lint, typecheck, test, test:watch, test:ci, build, precommit; ensure workspaces not required.'
       - ensure_files:
-          - path: "jest.config.ts"
-            from_template: "frontend_jest_config"
-          - path: "backend/jest.config.ts"
-            from_template: "backend_jest_config"
-          - path: "backend/tests/helpers/supertest.ts"
-            from_template: "supertest_helper"
-          - path: "e2e/detox.config.js"
-            from_template: "detox_config"
-          - path: "e2e/buyer.happy.path.spec.ts"
-            from_template: "detox_happy_path"
+          - path: 'jest.config.ts'
+            from_template: 'frontend_jest_config'
+          - path: 'backend/jest.config.ts'
+            from_template: 'backend_jest_config'
+          - path: 'backend/tests/helpers/supertest.ts'
+            from_template: 'supertest_helper'
+          - path: 'e2e/detox.config.js'
+            from_template: 'detox_config'
+          - path: 'e2e/buyer.happy.path.spec.ts'
+            from_template: 'detox_happy_path'
     commands:
-      - "npm ci || npm install"
-      - "npm run lint"
-      - "npm run typecheck"
-      - "npm run test:ci"
+      - 'npm ci || npm install'
+      - 'npm run lint'
+      - 'npm run typecheck'
+      - 'npm run test:ci'
     tests:
-      - "All commands succeed"
-      - "At least one app and one backend test discovered and executed"
+      - 'All commands succeed'
+      - 'At least one app and one backend test discovered and executed'
     acceptance:
-      - "CI job passes on branch with no code changes beyond script/config additions"
+      - 'CI job passes on branch with no code changes beyond script/config additions'
 
   - id: remove_duplicate_screens
-    title: "Remove or integrate duplicate/legacy screen components"
+    title: 'Remove or integrate duplicate/legacy screen components'
     description: |
       Remove `StoreSelection.tsx` in favor of `StoreSelectionScreen.tsx` (or vice versa),
       and ensure all checkout step screens are actually wired in navigation.
     changes:
       - search_and_fix:
           - duplicates:
-              - "src/screens/StoreSelection.tsx vs src/screens/StoreSelectionScreen.tsx"
+              - 'src/screens/StoreSelection.tsx vs src/screens/StoreSelectionScreen.tsx'
           - unify_exports: true
-      - edit: "src/navigation/RootNavigator.tsx"
-        intent: "Mount checkout step screens in the Checkout stack; verify typed routes."
+      - edit: 'src/navigation/RootNavigator.tsx'
+        intent: 'Mount checkout step screens in the Checkout stack; verify typed routes.'
     commands:
-      - "npm run lint"
-      - "npm run typecheck"
-      - "npm run test -w"
+      - 'npm run lint'
+      - 'npm run typecheck'
+      - 'npm run test -w'
     tests:
-      - "Add unit test: render StoreSelection flow, assert accessibility labels"
-      - "Add navigation test: move through checkout steps; screen headers present"
+      - 'Add unit test: render StoreSelection flow, assert accessibility labels'
+      - 'Add navigation test: move through checkout steps; screen headers present'
     acceptance:
-      - "No duplicate screen files remain"
-      - "Checkout screens reachable via navigation and tested"
+      - 'No duplicate screen files remain'
+      - 'Checkout screens reachable via navigation and tested'
 
   - id: terpene_wheel_integration
-    title: "Expose Terpene Wheel in app UI"
+    title: 'Expose Terpene Wheel in app UI'
     description: |
       Wire `src/terpene_wheel` into UI: add `TerpeneWheelScreen.tsx` and entry point in navigation.
       Add a discoverable link from Home > Educational Greenhouse and Awards (placeholder section).
     changes:
-      - add: "src/screens/TerpeneWheelScreen.tsx"
-        from_template: "terpene_wheel_screen"
-      - edit: "src/navigation/RootNavigator.tsx"
-        intent: "Add route `TerpeneWheel` to Content/Greenhouse stack"
-      - edit: "src/screens/HomeScreen.tsx"
-        intent: "Add CTA card to open TerpeneWheel"
+      - add: 'src/screens/TerpeneWheelScreen.tsx'
+        from_template: 'terpene_wheel_screen'
+      - edit: 'src/navigation/RootNavigator.tsx'
+        intent: 'Add route `TerpeneWheel` to Content/Greenhouse stack'
+      - edit: 'src/screens/HomeScreen.tsx'
+        intent: 'Add CTA card to open TerpeneWheel'
     commands:
-      - "npm run lint && npm run typecheck"
-      - "npm run test:ci"
+      - 'npm run lint && npm run typecheck'
+      - 'npm run test:ci'
     tests:
-      - "Component snapshot for TerpeneWheelScreen"
-      - "Nav test: pressing CTA navigates to TerpeneWheel"
+      - 'Component snapshot for TerpeneWheelScreen'
+      - 'Nav test: pressing CTA navigates to TerpeneWheel'
     acceptance:
-      - "Visible entry to Terpene Wheel; tests passing"
+      - 'Visible entry to Terpene Wheel; tests passing'
 
   - id: standardize_haptics
-    title: "Standardize haptic feedback utilities"
+    title: 'Standardize haptic feedback utilities'
     description: |
       Create `src/lib/haptics.ts` wrapper (success, warning, selection, impactLight/Medium/Heavy).
       Refactor components importing `react-native-haptic-feedback` directly to use wrapper.
     changes:
-      - add: "src/lib/haptics.ts"
-        from_template: "haptics_lib"
+      - add: 'src/lib/haptics.ts'
+        from_template: 'haptics_lib'
       - codemod:
           pattern: "from 'react-native-haptic-feedback'"
           replace_with: "from '@/lib/haptics'"
     commands:
-      - "npm run lint && npm run typecheck"
-      - "npm run test:ci"
+      - 'npm run lint && npm run typecheck'
+      - 'npm run test:ci'
     tests:
-      - "Unit test: wrapper calls library with correct options (mocked)"
-      - "Shallow render of key screens ensures no import regressions"
+      - 'Unit test: wrapper calls library with correct options (mocked)'
+      - 'Shallow render of key screens ensures no import regressions'
     acceptance:
-      - "Single import source for haptics; no direct imports remain"
+      - 'Single import source for haptics; no direct imports remain'
 
   - id: harden_audio
-    title: "Harden sound effects handling"
+    title: 'Harden sound effects handling'
     description: |
       Replace `CustomAudioPlayer` with `src/lib/audio.ts` that supports preload, fallback, and error handling.
       Support remote and local assets, timeouts, and guard rails to avoid memory leaks.
     changes:
-      - add: "src/lib/audio.ts"
-        from_template: "audio_lib"
+      - add: 'src/lib/audio.ts'
+        from_template: 'audio_lib'
       - codemod:
-          pattern: "CustomAudioPlayer"
-          replace_with: "audio.play()/audio.preload() wrapper"
+          pattern: 'CustomAudioPlayer'
+          replace_with: 'audio.play()/audio.preload() wrapper'
     commands:
-      - "npm run lint && npm run typecheck"
-      - "npm run test:ci"
+      - 'npm run lint && npm run typecheck'
+      - 'npm run test:ci'
     tests:
-      - "Mock expo-av; test preload/play/stop flows and error branches"
+      - 'Mock expo-av; test preload/play/stop flows and error branches'
     acceptance:
-      - "No unhandled promise rejections from audio; tests cover failure/success"
+      - 'No unhandled promise rejections from audio; tests cover failure/success'
 
   - id: expand_deep_links
-    title: "Expand deep-linking configuration"
+    title: 'Expand deep-linking configuration'
     description: |
       Update `app.config.ts` (or `app.json`) linking config so deep links cover Onboarding, Auth, Home, Shop, Product, Cart, Checkout, Orders, Profile, Awards, Greenhouse, TerpeneWheel.
     changes:
-      - edit: "app.config.ts"
-        intent: "Add full linking config + route map"
-      - add: "src/utils/linking.test.ts"
-        from_template: "linking_tests"
+      - edit: 'app.config.ts'
+        intent: 'Add full linking config + route map'
+      - add: 'src/utils/linking.test.ts'
+        from_template: 'linking_tests'
     commands:
-      - "npm run typecheck && npm run test:ci"
+      - 'npm run typecheck && npm run test:ci'
     tests:
-      - "Unit: parseUrl -> correct route name and params for representative set"
+      - 'Unit: parseUrl -> correct route name and params for representative set'
     acceptance:
-      - "Deep-links tested and passing; Shop no longer the only linked route"
+      - 'Deep-links tested and passing; Shop no longer the only linked route'
 
   - id: animation_helpers_cleanup
-    title: "Clean up or utilize unused animation helpers"
+    title: 'Clean up or utilize unused animation helpers'
     description: |
       If `src/hooks/usePulse.ts` is used nowhere, either remove or wire into CTA buttons (Home screen cards).
       Remove `src/terpene_wheel/snippets/*` if obsolete, else move into `__examples__` with documentation.
     changes:
-      - edit: "src/screens/HomeScreen.tsx"
-        intent: "Showcase `usePulse` for CTA focus (optional)"
+      - edit: 'src/screens/HomeScreen.tsx'
+        intent: 'Showcase `usePulse` for CTA focus (optional)'
       - move_or_delete:
-          - "src/terpene_wheel/snippets/*"
+          - 'src/terpene_wheel/snippets/*'
     commands:
-      - "npm run lint && npm run typecheck && npm run test"
+      - 'npm run lint && npm run typecheck && npm run test'
     tests:
-      - "Snapshot updates only; no runtime warnings"
+      - 'Snapshot updates only; no runtime warnings'
     acceptance:
-      - "No orphaned helpers; optional tasteful pulse on CTA behind a feature flag"
+      - 'No orphaned helpers; optional tasteful pulse on CTA behind a feature flag'
 
   - id: refactor_navigation
-    title: "Refactor navigation into feature-based stacks"
+    title: 'Refactor navigation into feature-based stacks'
     description: |
       Create `src/navigation/{OnboardingStack,ShopStack,AccountStack,ContentStack,CheckoutStack}.tsx` and a clean RootNavigator.
       Keep types in `src/navigation/types.ts`.
     changes:
       - add_many:
-          - "src/navigation/RootNavigator.tsx"
-          - "src/navigation/OnboardingStack.tsx"
-          - "src/navigation/ShopStack.tsx"
-          - "src/navigation/CheckoutStack.tsx"
-          - "src/navigation/AccountStack.tsx"
-          - "src/navigation/ContentStack.tsx"
-          - "src/navigation/types.ts"
-      - edit: "App.tsx"
-        intent: "Import RootNavigator; remove monolithic stack"
+          - 'src/navigation/RootNavigator.tsx'
+          - 'src/navigation/OnboardingStack.tsx'
+          - 'src/navigation/ShopStack.tsx'
+          - 'src/navigation/CheckoutStack.tsx'
+          - 'src/navigation/AccountStack.tsx'
+          - 'src/navigation/ContentStack.tsx'
+          - 'src/navigation/types.ts'
+      - edit: 'App.tsx'
+        intent: 'Import RootNavigator; remove monolithic stack'
     commands:
-      - "npm run lint && npm run typecheck"
-      - "npm run test"
+      - 'npm run lint && npm run typecheck'
+      - 'npm run test'
     tests:
-      - "Render RootNavigator; navigate between stacks; no type errors"
+      - 'Render RootNavigator; navigate between stacks; no type errors'
     acceptance:
-      - "Readable, modular navigation; CI green"
+      - 'Readable, modular navigation; CI green'
 
   - id: fix_high_vulns
-    title: "Resolve high-severity npm vulnerabilities"
+    title: 'Resolve high-severity npm vulnerabilities'
     description: |
       Use `npm audit fix --force` only if safe; otherwise bump specific packages:
       - `@expo/webpack-config`, `webpack-dev-server`, and any transitive advisories.
       Replace deprecated packages; pin versions in package.json with comments.
     changes:
-      - edit: "package.json"
-        intent: "Upgrade/bump vulnerable deps/devDeps"
-      - add: "SECURITY_NOTES.md"
-        from_template: "security_notes"
+      - edit: 'package.json'
+        intent: 'Upgrade/bump vulnerable deps/devDeps'
+      - add: 'SECURITY_NOTES.md'
+        from_template: 'security_notes'
     commands:
-      - "npm install"
-      - "npm audit --production --audit-level=high || true"
+      - 'npm install'
+      - 'npm audit --production --audit-level=high || true'
     tests:
-      - "Build app successfully; run jest afterwards"
+      - 'Build app successfully; run jest afterwards'
     acceptance:
-      - "`npm audit` shows no high severity; app builds and tests pass"
+      - '`npm audit` shows no high severity; app builds and tests pass'
 
   - id: delete_stray_artifacts
-    title: "Delete outdated files"
+    title: 'Delete outdated files'
     description: |
       Remove `package.json.new` and stray zero-byte `backend@1.0.0` in root.
     changes:
-      - delete: ["package.json.new", "backend@1.0.0"]
+      - delete: ['package.json.new', 'backend@1.0.0']
     commands:
-      - "git status"
+      - 'git status'
     tests:
-      - "N/A"
+      - 'N/A'
     acceptance:
-      - "Files removed; no references remain in CI"
+      - 'Files removed; no references remain in CI'
 
   - id: backend_tests_add
-    title: "Add backend route and controller tests"
+    title: 'Add backend route and controller tests'
     description: |
       Add tests for auth, products, cart, orders (happy paths + common errors) using Supertest + Jest.
     changes:
       - add_many:
-          - "backend/tests/auth.test.ts"
-          - "backend/tests/products.test.ts"
-          - "backend/tests/cart.test.ts"
-          - "backend/tests/orders.test.ts"
+          - 'backend/tests/auth.test.ts'
+          - 'backend/tests/products.test.ts'
+          - 'backend/tests/cart.test.ts'
+          - 'backend/tests/orders.test.ts'
       - ensure_env:
           files:
-            - path: "backend/.env.example"
-              note: "Include local DB URL and JWT_SECRET placeholders"
+            - path: 'backend/.env.example'
+              note: 'Include local DB URL and JWT_SECRET placeholders'
     commands:
-      - "npm --prefix backend install"
-      - "npm --prefix backend run test:ci"
+      - 'npm --prefix backend install'
+      - 'npm --prefix backend run test:ci'
     tests:
-      - "≥80% coverage for backend/controllers"
+      - '≥80% coverage for backend/controllers'
     acceptance:
-      - "Controllers/routes covered; factual responses match README_API spec"
+      - 'Controllers/routes covered; factual responses match README_API spec'
 
   - id: setup_script_localize
-    title: "Refactor setup.sh to avoid global installs"
+    title: 'Refactor setup.sh to avoid global installs'
     description: |
       Replace global installs with `npx` (expo, firebase-tools, prisma). Document usage in README.
     changes:
-      - edit: "scripts/setup.sh"
-        intent: "Use npx; print versions; exit on error; idempotent"
-      - edit: "README.md"
-        intent: "Add local setup notes, Codespaces quickstart"
+      - edit: 'scripts/setup.sh'
+        intent: 'Use npx; print versions; exit on error; idempotent'
+      - edit: 'README.md'
+        intent: 'Add local setup notes, Codespaces quickstart'
     commands:
-      - "bash scripts/setup.sh"
+      - 'bash scripts/setup.sh'
     tests:
-      - "Script completes in Codespaces with no global perms"
+      - 'Script completes in Codespaces with no global perms'
     acceptance:
-      - "Local-first tooling; reproducible dev bootstrap"
+      - 'Local-first tooling; reproducible dev bootstrap'
 
   - id: centralize_logging
-    title: "Centralize logging (console.* → logger)"
+    title: 'Centralize logging (console.* → logger)'
     description: |
       Create `src/lib/logger.ts` that wraps `console` + Sentry (already integrated) and respects NODE_ENV.
       Replace scattered console calls with logger.* and add unit tests for formatting.
     changes:
-      - add: "src/lib/logger.ts"
-        from_template: "logger_lib"
+      - add: 'src/lib/logger.ts'
+        from_template: 'logger_lib'
       - codemod:
-          pattern: "console.(log|warn|error)"
-          replace_with: "logger.$1"
+          pattern: 'console.(log|warn|error)'
+          replace_with: 'logger.$1'
     commands:
-      - "npm run lint && npm run typecheck && npm run test"
+      - 'npm run lint && npm run typecheck && npm run test'
     tests:
-      - "Unit: logger formats messages; Sentry capture for error"
+      - 'Unit: logger formats messages; Sentry capture for error'
     acceptance:
-      - "No stray console.* in src except in logger.ts"
+      - 'No stray console.* in src except in logger.ts'
 
   - id: api_docs_openapi_update
-    title: "Update API docs and OpenAPI spec"
+    title: 'Update API docs and OpenAPI spec'
     description: |
       Replace placeholders in `backend/README_API.md`; sync with OpenAPI (openapi.yaml).
       Ensure Postman collection can be generated/exported from OpenAPI.
     changes:
-      - edit: "backend/README_API.md"
-      - add_or_edit: "backend/openapi.yaml"
-      - add: "backend/scripts/export-postman.mjs"
-        from_template: "export_postman_script"
+      - edit: 'backend/README_API.md'
+      - add_or_edit: 'backend/openapi.yaml'
+      - add: 'backend/scripts/export-postman.mjs'
+        from_template: 'export_postman_script'
     commands:
-      - "node backend/scripts/export-postman.mjs"
+      - 'node backend/scripts/export-postman.mjs'
     tests:
-      - "lint OpenAPI via `npx @redocly/cli lint backend/openapi.yaml`"
+      - 'lint OpenAPI via `npx @redocly/cli lint backend/openapi.yaml`'
     acceptance:
-      - "Docs reflect implemented endpoints; Postman JSON exported to /dist/postman"
+      - 'Docs reflect implemented endpoints; Postman JSON exported to /dist/postman'
 
   - id: prisma_ts_strict
-    title: "Eliminate @ts-ignore in prismaClient"
+    title: 'Eliminate @ts-ignore in prismaClient'
     description: |
       Replace dynamic property access with typed helpers; narrow generics; enable strict options if safe.
     changes:
-      - edit: "backend/src/prismaClient.ts"
-        intent: "Remove ts-ignore; add typed accessors"
+      - edit: 'backend/src/prismaClient.ts'
+        intent: 'Remove ts-ignore; add typed accessors'
     commands:
-      - "npm --prefix backend run typecheck"
-      - "npm --prefix backend run test"
+      - 'npm --prefix backend run typecheck'
+      - 'npm --prefix backend run test'
     tests:
-      - "No ts-ignore in file; types pass"
+      - 'No ts-ignore in file; types pass'
     acceptance:
-      - "Clean Prisma client; strict typing preserved"
+      - 'Clean Prisma client; strict typing preserved'
 
   - id: expand_frontend_tests
-    title: "Expand frontend test coverage for core shopping flows"
+    title: 'Expand frontend test coverage for core shopping flows'
     description: |
       Add tests for Shop → Product → Add to Cart → Cart → Checkout → Order Confirmation,
       Profile basics, and deep link parsing.
     changes:
       - add_many:
-          - "src/__tests__/shop.flow.test.tsx"
-          - "src/__tests__/checkout.flow.test.tsx"
-          - "src/__tests__/profile.basic.test.tsx"
-          - "src/__tests__/deeplink.routes.test.ts"
+          - 'src/__tests__/shop.flow.test.tsx'
+          - 'src/__tests__/checkout.flow.test.tsx'
+          - 'src/__tests__/profile.basic.test.tsx'
+          - 'src/__tests__/deeplink.routes.test.ts'
     commands:
-      - "npm run test:ci"
+      - 'npm run test:ci'
     tests:
-      - "≥70% coverage in src/screens and src/navigation"
+      - '≥70% coverage in src/screens and src/navigation'
     acceptance:
-      - "Green tests; coverage threshold met"
+      - 'Green tests; coverage threshold met'
 
   - id: e2e_smoke_path
-    title: "E2E smoke (Detox) – happy buyer path"
+    title: 'E2E smoke (Detox) – happy buyer path'
     description: |
       Add a minimal Detox test to launch app and navigate Home → Shop → Product → Add to Cart → Checkout (mock network).
     changes:
-      - edit: "e2e/buyer.happy.path.spec.ts"
-        intent: "Complete implementation with mocks"
-      - add: "e2e/server/mockServer.js"
-        from_template: "detox_mock_server"
+      - edit: 'e2e/buyer.happy.path.spec.ts'
+        intent: 'Complete implementation with mocks'
+      - add: 'e2e/server/mockServer.js'
+        from_template: 'detox_mock_server'
     commands:
-      - "npm run e2e:build || true"
-      - "npm run e2e:test || true"
+      - 'npm run e2e:build || true'
+      - 'npm run e2e:test || true'
     tests:
-      - "Local-only or CI emulator ready; if emulator not available, job should no-op with success note"
+      - 'Local-only or CI emulator ready; if emulator not available, job should no-op with success note'
     acceptance:
-      - "Detox spec included and runnable on dev machines; CI will skip if no emulator"
+      - 'Detox spec included and runnable on dev machines; CI will skip if no emulator'
 
 templates:
   frontend_jest_config: |

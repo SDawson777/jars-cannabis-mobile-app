@@ -7,9 +7,12 @@ export const addressesRouter = Router();
 addressesRouter.get('/addresses', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const p = prisma as any;
-  const addrs = await p.address.findMany({ where: { userId: uid }, orderBy: { createdAt: 'desc' } });
+  const addrs = await p.address.findMany({
+    where: { userId: uid },
+    orderBy: { createdAt: 'desc' },
+  });
   // normalize response shape
-  const out = addrs.map((a) => ({
+  const out = addrs.map(a => ({
     id: a.id,
     fullName: a.fullName,
     phone: a.phone,
@@ -29,9 +32,25 @@ addressesRouter.get('/addresses', requireAuth, async (req, res) => {
 addressesRouter.post('/addresses', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const p = prisma as any;
-  const { line1, line2, city, state, zipCode, country, fullName, phone, isDefault } = req.body || {};
+  const { line1, line2, city, state, zipCode, country, fullName, phone, isDefault } =
+    req.body || {};
   // simple runtime validation
-  if (!fullName || typeof fullName !== 'string' || !phone || typeof phone !== 'string' || !line1 || typeof line1 !== 'string' || !city || typeof city !== 'string' || !state || typeof state !== 'string' || !zipCode || typeof zipCode !== 'string' || !country || typeof country !== 'string') {
+  if (
+    !fullName ||
+    typeof fullName !== 'string' ||
+    !phone ||
+    typeof phone !== 'string' ||
+    !line1 ||
+    typeof line1 !== 'string' ||
+    !city ||
+    typeof city !== 'string' ||
+    !state ||
+    typeof state !== 'string' ||
+    !zipCode ||
+    typeof zipCode !== 'string' ||
+    !country ||
+    typeof country !== 'string'
+  ) {
     return res.status(400).json({ error: 'Invalid address payload' });
   }
   const created = await p.address.create({
@@ -49,7 +68,10 @@ addressesRouter.post('/addresses', requireAuth, async (req, res) => {
     },
   });
   if (isDefault) {
-    await p.address.updateMany({ where: { userId: uid, id: { not: created.id } }, data: { isDefault: false } });
+    await p.address.updateMany({
+      where: { userId: uid, id: { not: created.id } },
+      data: { isDefault: false },
+    });
   }
   const out = {
     id: created.id,
@@ -75,10 +97,13 @@ addressesRouter.put('/addresses/:id', requireAuth, async (req, res) => {
   const existing = await p.address.findUnique({ where: { id } });
   if (!existing) return res.status(404).json({ error: 'Not found' });
   if (existing.userId !== uid) return res.status(403).json({ error: 'Forbidden' });
-  const { line1, line2, city, state, zipCode, country, fullName, phone, isDefault } = req.body || {};
+  const { line1, line2, city, state, zipCode, country, fullName, phone, isDefault } =
+    req.body || {};
   // optional type checks
-  if (fullName !== undefined && typeof fullName !== 'string') return res.status(400).json({ error: 'Invalid fullName' });
-  if (phone !== undefined && typeof phone !== 'string') return res.status(400).json({ error: 'Invalid phone' });
+  if (fullName !== undefined && typeof fullName !== 'string')
+    return res.status(400).json({ error: 'Invalid fullName' });
+  if (phone !== undefined && typeof phone !== 'string')
+    return res.status(400).json({ error: 'Invalid phone' });
   const updated = await p.address.update({
     where: { id },
     data: {
@@ -94,7 +119,10 @@ addressesRouter.put('/addresses/:id', requireAuth, async (req, res) => {
     },
   });
   if (isDefault) {
-    await p.address.updateMany({ where: { userId: uid, id: { not: updated.id } }, data: { isDefault: false } });
+    await p.address.updateMany({
+      where: { userId: uid, id: { not: updated.id } },
+      data: { isDefault: false },
+    });
   }
   const out = {
     id: updated.id,

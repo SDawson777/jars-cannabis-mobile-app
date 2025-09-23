@@ -5,7 +5,9 @@ This directory contains example components demonstrating various animation patte
 ## Components
 
 ### `wave_animation.tsx`
+
 A simple wave animation component that demonstrates:
+
 - Fade-in effect using `opacity`
 - Scale-up effect using `transform: scale`
 - Basic `react-native-reanimated` usage with `useSharedValue` and `useAnimatedStyle`
@@ -16,11 +18,13 @@ A simple wave animation component that demonstrates:
 import WaveAnimation from './wave_animation';
 
 // Usage
-<WaveAnimation />
+<WaveAnimation />;
 ```
 
 ### `bottom_sheet.tsx`
+
 A content component for bottom sheets showing terpene information:
+
 - Simple content layout for informational displays
 - Demonstrates text hierarchy with different styles
 - Shows how to structure data for bottom sheet content
@@ -32,13 +36,13 @@ import { BottomSheetContent } from './bottom_sheet';
 
 // Usage
 const terpeneInfo = {
-  name: "Myrcene",
-  aromas: ["Earthy", "Musky", "Herbal"],
-  effects: ["Relaxing", "Sedating", "Pain Relief"],
-  strains: ["Granddaddy Purple", "Blue Dream", "OG Kush"]
+  name: 'Myrcene',
+  aromas: ['Earthy', 'Musky', 'Herbal'],
+  effects: ['Relaxing', 'Sedating', 'Pain Relief'],
+  strains: ['Granddaddy Purple', 'Blue Dream', 'OG Kush'],
 };
 
-<BottomSheetContent info={terpeneInfo} />
+<BottomSheetContent info={terpeneInfo} />;
 ```
 
 ## Integration Notes
@@ -53,6 +57,7 @@ These examples were moved from `src/terpene_wheel/snippets/` to maintain them as
 ## Best Practices
 
 When using these patterns:
+
 - Always test animations on lower-end devices
 - Ensure animations respect user's motion preferences
 - Add accessibility labels for screen readers

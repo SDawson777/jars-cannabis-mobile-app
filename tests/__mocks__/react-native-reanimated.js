@@ -4,25 +4,25 @@ const { View, Text } = require('react-native');
 // Minimal mock of react-native-reanimated used in unit tests.
 const AnimatedMock = {
   // mimic createAnimatedComponent by returning the wrapped component
-  createAnimatedComponent: (C) => C,
+  createAnimatedComponent: C => C,
   // provide Text and View so Animated.Text / Animated.View work in JSX
   Text,
   View,
   // Hooks used by our code
-  useSharedValue: (initial) => ({ value: initial }),
-  useAnimatedStyle: (fn) => {
+  useSharedValue: initial => ({ value: initial }),
+  useAnimatedStyle: fn => {
     try {
       return fn();
     } catch (e) {
       return {};
     }
   },
-  withTiming: (toValue) => toValue,
+  withTiming: toValue => toValue,
   withSequence: (...args) => args[args.length - 1],
   Easing: {
-    out: (f) => f,
-    in: (f) => f,
-    ease: (v) => v,
+    out: f => f,
+    in: f => f,
+    ease: v => v,
   },
 };
 

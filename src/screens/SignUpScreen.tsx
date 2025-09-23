@@ -35,7 +35,6 @@ export default function SignUpScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const { signUp } = useAuth();
 
-
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

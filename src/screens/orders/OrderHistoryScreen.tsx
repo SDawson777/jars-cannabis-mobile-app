@@ -20,7 +20,6 @@ import { toast } from '../../utils/toast';
 
 import OrderDetailModal from './OrderDetailModal';
 
-
 export default function OrderHistoryScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const [selected, setSelected] = useState<Order | null>(null);

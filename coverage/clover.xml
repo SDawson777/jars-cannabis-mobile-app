@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1758662896532" clover="3.2.0">
-  <project timestamp="1758662896532" name="All files">
+<coverage generated="1758665792004" clover="3.2.0">
+  <project timestamp="1758665792004" name="All files">
     <metrics statements="2652" coveredstatements="809" conditionals="1477" coveredconditionals="379" methods="863" coveredmethods="225" elements="4992" coveredelements="1413" complexity="0" loc="2652" ncloc="2652" packages="26" files="202" classes="202"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -151,8 +151,8 @@
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="7" count="3" type="stmt"/>
         <line num="8" count="2" type="stmt"/>
-        <line num="12" count="7" type="stmt"/>
-        <line num="14" count="7" type="stmt"/>
+        <line num="12" count="8" type="stmt"/>
+        <line num="14" count="8" type="stmt"/>
         <line num="17" count="2" type="stmt"/>
         <line num="20" count="1" type="stmt"/>
       </file>
@@ -286,7 +286,7 @@
       </file>
       <file name="CMSImage.tsx" path="/workspaces/jars-cannabis-mobile-app/src/components/CMSImage.tsx">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-        <line num="12" count="18" type="stmt"/>
+        <line num="12" count="20" type="stmt"/>
       </file>
       <file name="CartErrorBanner.tsx" path="/workspaces/jars-cannabis-mobile-app/src/components/CartErrorBanner.tsx">
         <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
@@ -352,10 +352,10 @@
       </file>
       <file name="OfflineNotice.tsx" path="/workspaces/jars-cannabis-mobile-app/src/components/OfflineNotice.tsx">
         <metrics statements="5" coveredstatements="4" conditionals="2" coveredconditionals="1" methods="1" coveredmethods="1"/>
-        <line num="6" count="17" type="stmt"/>
-        <line num="7" count="17" type="cond" truecount="1" falsecount="1"/>
+        <line num="6" count="18" type="stmt"/>
+        <line num="7" count="18" type="cond" truecount="1" falsecount="1"/>
         <line num="8" count="0" type="stmt"/>
-        <line num="14" count="17" type="stmt"/>
+        <line num="14" count="18" type="stmt"/>
         <line num="17" count="3" type="stmt"/>
       </file>
       <file name="OnboardingSlide.tsx" path="/workspaces/jars-cannabis-mobile-app/src/components/OnboardingSlide.tsx">
@@ -529,10 +529,10 @@
       </file>
       <file name="useSkeletonText.tsx" path="/workspaces/jars-cannabis-mobile-app/src/components/useSkeletonText.tsx">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
-        <line num="6" count="26" type="stmt"/>
-        <line num="8" count="26" type="stmt"/>
+        <line num="6" count="28" type="stmt"/>
+        <line num="8" count="28" type="stmt"/>
         <line num="9" count="20" type="stmt"/>
-        <line num="19" count="26" type="stmt"/>
+        <line num="19" count="28" type="stmt"/>
         <line num="37" count="2" type="stmt"/>
       </file>
     </package>
@@ -637,7 +637,7 @@
         <line num="18" count="0" type="cond" truecount="0" falsecount="4"/>
         <line num="25" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
-        <line num="32" count="12" type="stmt"/>
+        <line num="32" count="13" type="stmt"/>
       </file>
       <file name="LoyaltyContext.tsx" path="/workspaces/jars-cannabis-mobile-app/src/context/LoyaltyContext.tsx">
         <metrics statements="3" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
@@ -820,8 +820,8 @@
       </file>
       <file name="useCMSContent.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/useCMSContent.ts">
         <metrics statements="17" coveredstatements="10" conditionals="10" coveredconditionals="4" methods="2" coveredmethods="2"/>
-        <line num="9" count="12" type="stmt"/>
-        <line num="11" count="12" type="stmt"/>
+        <line num="9" count="13" type="stmt"/>
+        <line num="11" count="13" type="stmt"/>
         <line num="14" count="9" type="stmt"/>
         <line num="15" count="9" type="cond" truecount="1" falsecount="1"/>
         <line num="17" count="9" type="cond" truecount="1" falsecount="1"/>
@@ -967,7 +967,7 @@
       </file>
       <file name="useFilters.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/useFilters.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-        <line num="6" count="12" type="stmt"/>
+        <line num="6" count="13" type="stmt"/>
       </file>
       <file name="useForYouToday.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/useForYouToday.ts">
         <metrics statements="14" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="2" coveredmethods="0"/>
@@ -1096,23 +1096,23 @@
       </file>
       <file name="usePulse.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/usePulse.ts">
         <metrics statements="17" coveredstatements="17" conditionals="19" coveredconditionals="19" methods="5" coveredmethods="5"/>
+        <line num="37" count="22" type="cond" truecount="4" falsecount="0"/>
+        <line num="39" count="22" type="stmt"/>
+        <line num="40" count="22" type="stmt"/>
         <line num="42" count="22" type="stmt"/>
-        <line num="44" count="22" type="stmt"/>
-        <line num="45" count="22" type="stmt"/>
-        <line num="47" count="22" type="stmt"/>
-        <line num="49" count="13" type="cond" truecount="4" falsecount="0"/>
-        <line num="50" count="2" type="stmt"/>
-        <line num="54" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="55" count="8" type="stmt"/>
-        <line num="59" count="11" type="stmt"/>
-        <line num="71" count="22" type="stmt"/>
-        <line num="75" count="22" type="stmt"/>
-        <line num="89" count="9" type="stmt"/>
-        <line num="91" count="9" type="stmt"/>
-        <line num="92" count="8" type="cond" truecount="2" falsecount="0"/>
-        <line num="93" count="6" type="stmt"/>
-        <line num="95" count="8" type="stmt"/>
-        <line num="98" count="9" type="stmt"/>
+        <line num="44" count="13" type="cond" truecount="4" falsecount="0"/>
+        <line num="45" count="2" type="stmt"/>
+        <line num="49" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="50" count="8" type="stmt"/>
+        <line num="54" count="11" type="stmt"/>
+        <line num="66" count="22" type="stmt"/>
+        <line num="70" count="22" type="stmt"/>
+        <line num="81" count="9" type="stmt"/>
+        <line num="83" count="9" type="stmt"/>
+        <line num="84" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="85" count="6" type="stmt"/>
+        <line num="87" count="8" type="stmt"/>
+        <line num="90" count="9" type="stmt"/>
       </file>
     </package>
     <package name="lib">
@@ -1914,22 +1914,22 @@
         <metrics statements="33" coveredstatements="29" conditionals="20" coveredconditionals="11" methods="7" coveredmethods="6"/>
         <line num="29" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="30" count="2" type="stmt"/>
-        <line num="37" count="15" type="stmt"/>
-        <line num="38" count="15" type="stmt"/>
-        <line num="39" count="15" type="stmt"/>
-        <line num="41" count="15" type="cond" truecount="1" falsecount="1"/>
-        <line num="42" count="15" type="stmt"/>
-        <line num="50" count="15" type="stmt"/>
-        <line num="51" count="15" type="stmt"/>
-        <line num="53" count="15" type="stmt"/>
+        <line num="37" count="16" type="stmt"/>
+        <line num="38" count="16" type="stmt"/>
+        <line num="39" count="16" type="stmt"/>
+        <line num="41" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="42" count="16" type="stmt"/>
+        <line num="50" count="16" type="stmt"/>
+        <line num="51" count="16" type="stmt"/>
+        <line num="53" count="16" type="stmt"/>
         <line num="54" count="6" type="stmt"/>
-        <line num="58" count="15" type="cond" truecount="2" falsecount="2"/>
-        <line num="61" count="15" type="cond" truecount="1" falsecount="1"/>
-        <line num="79" count="15" type="stmt"/>
+        <line num="58" count="16" type="cond" truecount="2" falsecount="2"/>
+        <line num="61" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="79" count="16" type="stmt"/>
         <line num="80" count="0" type="stmt"/>
         <line num="81" count="0" type="stmt"/>
         <line num="82" count="0" type="stmt"/>
-        <line num="85" count="15" type="stmt"/>
+        <line num="85" count="16" type="stmt"/>
         <line num="86" count="3" type="stmt"/>
         <line num="87" count="3" type="stmt"/>
         <line num="88" count="3" type="stmt"/>
@@ -1939,8 +1939,8 @@
         <line num="92" count="3" type="stmt"/>
         <line num="94" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="96" count="3" type="stmt"/>
-        <line num="100" count="15" type="stmt"/>
-        <line num="116" count="45" type="stmt"/>
+        <line num="100" count="16" type="stmt"/>
+        <line num="116" count="48" type="stmt"/>
         <line num="122" count="57" type="stmt"/>
         <line num="131" count="5" type="stmt"/>
         <line num="132" count="5" type="stmt"/>
@@ -2151,58 +2151,58 @@
       </file>
       <file name="LoginScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/LoginScreen.tsx">
         <metrics statements="52" coveredstatements="0" conditionals="32" coveredconditionals="0" methods="15" coveredmethods="0"/>
-        <line num="30" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="31" count="0" type="stmt"/>
+        <line num="28" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
         <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
         <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
         <line num="41" count="0" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
         <line num="44" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="51" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="72" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="49" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="52" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
         <line num="73" count="0" type="stmt"/>
+        <line num="74" count="0" type="cond" truecount="0" falsecount="4"/>
         <line num="75" count="0" type="stmt"/>
-        <line num="76" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="77" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
         <line num="78" count="0" type="stmt"/>
+        <line num="79" count="0" type="stmt"/>
         <line num="80" count="0" type="stmt"/>
         <line num="81" count="0" type="stmt"/>
         <line num="82" count="0" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
         <line num="84" count="0" type="stmt"/>
         <line num="85" count="0" type="stmt"/>
-        <line num="86" count="0" type="stmt"/>
         <line num="87" count="0" type="stmt"/>
+        <line num="88" count="0" type="stmt"/>
         <line num="89" count="0" type="stmt"/>
         <line num="90" count="0" type="stmt"/>
-        <line num="91" count="0" type="stmt"/>
         <line num="92" count="0" type="stmt"/>
-        <line num="94" count="0" type="stmt"/>
-        <line num="98" count="0" type="stmt"/>
+        <line num="96" count="0" type="stmt"/>
+        <line num="103" count="0" type="stmt"/>
+        <line num="104" count="0" type="stmt"/>
         <line num="105" count="0" type="stmt"/>
-        <line num="106" count="0" type="stmt"/>
-        <line num="107" count="0" type="stmt"/>
-        <line num="109" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="132" count="0" type="stmt"/>
-        <line num="133" count="0" type="stmt"/>
-        <line num="153" count="0" type="stmt"/>
-        <line num="154" count="0" type="stmt"/>
-        <line num="160" count="0" type="stmt"/>
+        <line num="107" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="130" count="0" type="stmt"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
+        <line num="158" count="0" type="stmt"/>
+        <line num="178" count="0" type="stmt"/>
+        <line num="179" count="0" type="stmt"/>
         <line num="180" count="0" type="stmt"/>
-        <line num="181" count="0" type="stmt"/>
-        <line num="182" count="0" type="stmt"/>
-        <line num="184" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="193" count="0" type="stmt"/>
-        <line num="220" count="0" type="stmt"/>
-        <line num="221" count="0" type="stmt"/>
-        <line num="231" count="0" type="stmt"/>
-        <line num="232" count="0" type="stmt"/>
-        <line num="244" count="0" type="stmt"/>
+        <line num="182" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="191" count="0" type="stmt"/>
+        <line num="218" count="0" type="stmt"/>
+        <line num="219" count="0" type="stmt"/>
+        <line num="229" count="0" type="stmt"/>
+        <line num="230" count="0" type="stmt"/>
+        <line num="242" count="0" type="stmt"/>
       </file>
       <file name="LoginSignUpDecisionScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/LoginSignUpDecisionScreen.tsx">
         <metrics statements="10" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
@@ -2239,11 +2239,11 @@
         <line num="57" count="0" type="stmt"/>
         <line num="58" count="0" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="81" count="0" type="stmt"/>
         <line num="82" count="0" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
-        <line num="104" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="102" count="0" type="stmt"/>
       </file>
       <file name="MyJarsInsightsScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/MyJarsInsightsScreen.tsx">
         <metrics statements="16" coveredstatements="15" conditionals="8" coveredconditionals="5" methods="5" coveredmethods="5"/>
@@ -2271,8 +2271,8 @@
         <line num="17" count="0" type="stmt"/>
         <line num="18" count="0" type="stmt"/>
         <line num="19" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
       </file>
       <file name="NotificationSettingsScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/NotificationSettingsScreen.tsx">
         <metrics statements="23" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="7" coveredmethods="0"/>
@@ -2339,19 +2339,19 @@
       </file>
       <file name="OnboardingPager.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/OnboardingPager.tsx">
         <metrics statements="13" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="6" coveredmethods="0"/>
-        <line num="17" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
         <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
         <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="43" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="47" count="0" type="stmt"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
         <line num="52" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
         <line num="69" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="90" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
       </file>
       <file name="OnboardingScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/OnboardingScreen.tsx">
         <metrics statements="16" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
@@ -2602,41 +2602,41 @@
         <line num="34" count="2" type="stmt"/>
         <line num="39" count="2" type="stmt"/>
         <line num="40" count="2" type="stmt"/>
-        <line num="42" count="14" type="stmt"/>
-        <line num="43" count="14" type="stmt"/>
-        <line num="48" count="13" type="stmt"/>
-        <line num="53" count="13" type="stmt"/>
+        <line num="42" count="15" type="stmt"/>
+        <line num="43" count="15" type="stmt"/>
+        <line num="48" count="14" type="stmt"/>
+        <line num="53" count="14" type="stmt"/>
         <line num="56" count="0" type="stmt"/>
-        <line num="59" count="13" type="stmt"/>
-        <line num="60" count="13" type="stmt"/>
+        <line num="59" count="14" type="stmt"/>
+        <line num="60" count="14" type="stmt"/>
         <line num="62" count="0" type="stmt"/>
-        <line num="65" count="13" type="stmt"/>
-        <line num="66" count="13" type="stmt"/>
+        <line num="65" count="14" type="stmt"/>
+        <line num="66" count="14" type="stmt"/>
         <line num="68" count="0" type="stmt"/>
-        <line num="72" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="75" count="13" type="stmt"/>
-        <line num="80" count="13" type="stmt"/>
-        <line num="97" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="110" count="13" type="cond" truecount="4" falsecount="1"/>
-        <line num="111" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="112" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="116" count="13" type="stmt"/>
-        <line num="119" count="13" type="stmt"/>
-        <line num="120" count="13" type="stmt"/>
-        <line num="123" count="13" type="stmt"/>
-        <line num="124" count="13" type="stmt"/>
-        <line num="126" count="13" type="stmt"/>
+        <line num="72" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="75" count="14" type="stmt"/>
+        <line num="80" count="14" type="stmt"/>
+        <line num="97" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="110" count="14" type="cond" truecount="4" falsecount="1"/>
+        <line num="111" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="112" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="116" count="14" type="stmt"/>
+        <line num="119" count="14" type="stmt"/>
+        <line num="120" count="14" type="stmt"/>
+        <line num="123" count="14" type="stmt"/>
+        <line num="124" count="14" type="stmt"/>
+        <line num="126" count="14" type="stmt"/>
         <line num="127" count="10" type="cond" truecount="2" falsecount="0"/>
         <line num="128" count="1" type="stmt"/>
-        <line num="133" count="13" type="stmt"/>
+        <line num="133" count="14" type="stmt"/>
         <line num="134" count="10" type="stmt"/>
-        <line num="139" count="13" type="cond" truecount="2" falsecount="2"/>
-        <line num="143" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="161" count="13" type="stmt"/>
+        <line num="139" count="14" type="cond" truecount="2" falsecount="2"/>
+        <line num="143" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="161" count="14" type="stmt"/>
         <line num="162" count="1" type="stmt"/>
         <line num="163" count="1" type="stmt"/>
         <line num="164" count="1" type="stmt"/>
-        <line num="170" count="13" type="stmt"/>
+        <line num="170" count="14" type="stmt"/>
         <line num="171" count="1" type="cond" truecount="1" falsecount="2"/>
         <line num="172" count="1" type="cond" truecount="1" falsecount="2"/>
         <line num="173" count="1" type="cond" truecount="1" falsecount="1"/>
@@ -2647,19 +2647,19 @@
         <line num="181" count="1" type="stmt"/>
         <line num="182" count="1" type="stmt"/>
         <line num="185" count="0" type="stmt"/>
-        <line num="193" count="13" type="stmt"/>
-        <line num="204" count="13" type="stmt"/>
+        <line num="193" count="14" type="stmt"/>
+        <line num="204" count="14" type="stmt"/>
         <line num="208" count="1" type="cond" truecount="1" falsecount="1"/>
         <line num="232" count="6" type="stmt"/>
-        <line num="247" count="22" type="cond" truecount="2" falsecount="0"/>
-        <line num="250" count="22" type="cond" truecount="2" falsecount="0"/>
-        <line num="253" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="247" count="24" type="cond" truecount="2" falsecount="0"/>
+        <line num="250" count="24" type="cond" truecount="2" falsecount="0"/>
+        <line num="253" count="24" type="cond" truecount="2" falsecount="0"/>
         <line num="256" count="0" type="stmt"/>
         <line num="260" count="0" type="cond" truecount="0" falsecount="3"/>
         <line num="263" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="269" count="0" type="stmt"/>
         <line num="270" count="0" type="stmt"/>
-        <line num="278" count="21" type="stmt"/>
+        <line num="278" count="23" type="stmt"/>
         <line num="284" count="1" type="stmt"/>
         <line num="298" count="1" type="stmt"/>
         <line num="311" count="2" type="stmt"/>
@@ -2671,6 +2671,7 @@
         <line num="34" count="0" type="stmt"/>
         <line num="35" count="0" type="stmt"/>
         <line num="36" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
         <line num="39" count="0" type="stmt"/>
         <line num="40" count="0" type="stmt"/>
         <line num="41" count="0" type="stmt"/>
@@ -2678,46 +2679,45 @@
         <line num="43" count="0" type="stmt"/>
         <line num="44" count="0" type="stmt"/>
         <line num="45" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
         <line num="48" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="58" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="77" count="0" type="cond" truecount="0" falsecount="5"/>
+        <line num="53" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="57" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="76" count="0" type="cond" truecount="0" falsecount="5"/>
+        <line num="77" count="0" type="stmt"/>
         <line num="78" count="0" type="stmt"/>
-        <line num="79" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
         <line num="81" count="0" type="stmt"/>
         <line num="82" count="0" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
         <line num="84" count="0" type="stmt"/>
-        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
         <line num="87" count="0" type="stmt"/>
-        <line num="88" count="0" type="stmt"/>
-        <line num="92" count="0" type="stmt"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
         <line num="108" count="0" type="stmt"/>
-        <line num="109" count="0" type="stmt"/>
+        <line num="126" count="0" type="stmt"/>
         <line num="127" count="0" type="stmt"/>
-        <line num="128" count="0" type="stmt"/>
+        <line num="145" count="0" type="stmt"/>
         <line num="146" count="0" type="stmt"/>
-        <line num="147" count="0" type="stmt"/>
+        <line num="165" count="0" type="stmt"/>
         <line num="166" count="0" type="stmt"/>
-        <line num="167" count="0" type="stmt"/>
-        <line num="171" count="0" type="stmt"/>
+        <line num="170" count="0" type="stmt"/>
+        <line num="195" count="0" type="stmt"/>
         <line num="196" count="0" type="stmt"/>
-        <line num="197" count="0" type="stmt"/>
-        <line num="201" count="0" type="stmt"/>
-        <line num="210" count="0" type="stmt"/>
-        <line num="218" count="0" type="stmt"/>
+        <line num="200" count="0" type="stmt"/>
+        <line num="209" count="0" type="stmt"/>
+        <line num="217" count="0" type="stmt"/>
+        <line num="237" count="0" type="stmt"/>
         <line num="238" count="0" type="stmt"/>
-        <line num="239" count="0" type="stmt"/>
+        <line num="248" count="0" type="stmt"/>
         <line num="249" count="0" type="stmt"/>
-        <line num="250" count="0" type="stmt"/>
+        <line num="263" count="0" type="stmt"/>
         <line num="264" count="0" type="stmt"/>
         <line num="265" count="0" type="stmt"/>
-        <line num="266" count="0" type="stmt"/>
-        <line num="268" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="277" count="0" type="stmt"/>
+        <line num="267" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="276" count="0" type="stmt"/>
       </file>
       <file name="SplashScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/SplashScreen.tsx">
         <metrics statements="14" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="4" coveredmethods="0"/>
@@ -2902,18 +2902,18 @@
       <metrics statements="13" coveredstatements="1" conditionals="10" coveredconditionals="0" methods="4" coveredmethods="0"/>
       <file name="ForgotPasswordScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/auth/ForgotPasswordScreen.tsx">
         <metrics statements="12" coveredstatements="0" conditionals="10" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <line num="20" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
         <line num="33" count="0" type="stmt"/>
         <line num="34" count="0" type="stmt"/>
         <line num="35" count="0" type="stmt"/>
         <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="63" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
       </file>
       <file name="forgotPasswordSchema.ts" path="/workspaces/jars-cannabis-mobile-app/src/screens/auth/forgotPasswordSchema.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -2988,50 +2988,50 @@
       </file>
       <file name="OrderHistoryScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/orders/OrderHistoryScreen.tsx">
         <metrics statements="21" coveredstatements="14" conditionals="18" coveredconditionals="12" methods="12" coveredmethods="8"/>
+        <line num="24" count="3" type="stmt"/>
         <line num="25" count="3" type="stmt"/>
-        <line num="26" count="3" type="stmt"/>
-        <line num="37" count="3" type="stmt"/>
-        <line num="40" count="2" type="stmt"/>
-        <line num="41" count="9" type="stmt"/>
-        <line num="44" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="46" count="3" type="stmt"/>
-        <line num="47" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="53" count="3" type="cond" truecount="2" falsecount="2"/>
-        <line num="55" count="3" type="stmt"/>
-        <line num="60" count="5" type="stmt"/>
-        <line num="74" count="0" type="stmt"/>
-        <line num="76" count="3" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="39" count="2" type="stmt"/>
+        <line num="40" count="9" type="stmt"/>
+        <line num="43" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="3" type="stmt"/>
+        <line num="46" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="52" count="3" type="cond" truecount="2" falsecount="2"/>
+        <line num="54" count="3" type="stmt"/>
+        <line num="59" count="5" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="75" count="3" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
         <line num="79" count="0" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
         <line num="90" count="0" type="stmt"/>
-        <line num="91" count="0" type="stmt"/>
-        <line num="96" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="103" count="0" type="stmt"/>
-        <line num="108" count="1" type="stmt"/>
+        <line num="95" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="107" count="1" type="stmt"/>
       </file>
     </package>
     <package name="screens.profile">
       <metrics statements="17" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="8" coveredmethods="0"/>
       <file name="LegalScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/profile/LegalScreen.tsx">
         <metrics statements="17" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="8" coveredmethods="0"/>
-        <line num="15" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
         <line num="26" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
         <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="32" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="34" count="0" type="stmt"/>
+        <line num="31" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
         <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
         <line num="55" count="0" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="62" count="0" type="stmt"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="82" count="0" type="stmt"/>
-        <line num="87" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
       </file>
     </package>
     <package name="shims">
@@ -3045,11 +3045,11 @@
       <file name="firebase-messaging.web.tsx" path="/workspaces/jars-cannabis-mobile-app/src/shims/firebase-messaging.web.tsx">
         <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
         <line num="5" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
         <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
       </file>
       <file name="haptics.web.tsx" path="/workspaces/jars-cannabis-mobile-app/src/shims/haptics.web.tsx">
         <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>

@@ -1,5 +1,3 @@
-
-
 import 'dotenv/config';
 
 import cors from 'cors';
@@ -37,7 +35,9 @@ app.use(cors({ origin: (process.env.CORS_ORIGIN?.split(',') as any) || '*' }));
 
 app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
 
-try { initFirebase(); } catch (e) {
+try {
+  initFirebase();
+} catch (e) {
   logger.debug('Firebase init skipped:', (e as any)?.message);
 }
 

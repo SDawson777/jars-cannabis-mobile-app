@@ -19,7 +19,6 @@ export default function MyJarsScreen() {
     navigation.navigate('MyJarsInsights');
   };
 
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>

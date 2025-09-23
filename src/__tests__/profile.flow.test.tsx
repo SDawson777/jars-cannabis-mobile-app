@@ -28,11 +28,9 @@ describe('EditProfileScreen flow', () => {
     const qc = new QueryClient();
     // phase4Client is exported from the module; ensure its `put` is mocked
     if ((mocked as any).phase4Client) {
-      (mocked as any).phase4Client.put = jest
-        .fn()
-        .mockResolvedValue({
-          data: { id: 'u-1', name: 'New Name', email: 'old@example.com', phone: '+15551234567' },
-        });
+      (mocked as any).phase4Client.put = jest.fn().mockResolvedValue({
+        data: { id: 'u-1', name: 'New Name', email: 'old@example.com', phone: '+15551234567' },
+      });
     } else if ((mocked as any).put) {
       (mocked as any).put.mockResolvedValue({
         data: { id: 'u-1', name: 'New Name', email: 'old@example.com', phone: '+15551234567' },
@@ -40,11 +38,9 @@ describe('EditProfileScreen flow', () => {
     } else {
       // Fallback: create a phase4Client mock
       (mocked as any).phase4Client = {
-        put: jest
-          .fn()
-          .mockResolvedValue({
-            data: { id: 'u-1', name: 'New Name', email: 'old@example.com', phone: '+15551234567' },
-          }),
+        put: jest.fn().mockResolvedValue({
+          data: { id: 'u-1', name: 'New Name', email: 'old@example.com', phone: '+15551234567' },
+        }),
       };
     }
 

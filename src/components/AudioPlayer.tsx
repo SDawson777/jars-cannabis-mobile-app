@@ -21,20 +21,20 @@ interface AudioPlayerProps {
  * Enhanced audio player component using the new audio library
  * Replaces the old CustomAudioPlayer with better error handling and caching
  */
-export default function AudioPlayer({ 
-  audioKey, 
-  source, 
-  play, 
-  loop = false, 
-  volume = 1.0, 
-  preload = true 
+export default function AudioPlayer({
+  audioKey,
+  source,
+  play,
+  loop = false,
+  volume = 1.0,
+  preload = true,
 }: AudioPlayerProps) {
   useEffect(() => {
     // Preload the audio file when component mounts if enabled
     if (preload) {
       audio.preload(audioKey, source, { volume, loop });
     }
-    
+
     // Cleanup when component unmounts
     return () => {
       audio.stop(audioKey);

@@ -24,8 +24,6 @@ import type { RootStackParamList } from '../navigation/types';
 import { logEvent } from '../utils/analytics';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 
-
-
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

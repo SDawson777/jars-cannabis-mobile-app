@@ -56,7 +56,9 @@ qaRouter.post('/diag/firebase', async (req, res) => {
     const bucket = admin.storage().bucket();
     const path = `diag/${Date.now()}.txt`;
     await bucket.file(path).save('ok', { contentType: 'text/plain' });
-    const [url] = await bucket.file(path).getSignedUrl({ action: 'read', expires: Date.now() + 60_000 });
+    const [url] = await bucket
+      .file(path)
+      .getSignedUrl({ action: 'read', expires: Date.now() + 60_000 });
     res.json({ ok: true, file: path, url });
   } catch (e: any) {
     res.status(500).json({ ok: false, message: e?.message || String(e) });
@@ -74,7 +76,14 @@ qaRouter.post('/diag/bootstrap', async (req, res) => {
   const store = await prisma.store.upsert({
     where: { slug: 'detroit' },
     update: {},
-    create: { name: 'JARS Detroit', slug: 'detroit', city: 'Detroit', state: 'MI', latitude: 42.3314, longitude: -83.0458 },
+    create: {
+      name: 'JARS Detroit',
+      slug: 'detroit',
+      city: 'Detroit',
+      state: 'MI',
+      latitude: 42.3314,
+      longitude: -83.0458,
+    },
   });
 
   // ensure a product + variant
@@ -96,9 +105,21 @@ qaRouter.post('/diag/bootstrap', async (req, res) => {
   // ensure in-stock at store
   if (variant) {
     await prisma.storeProduct.upsert({
-      where: { storeId_productId_variantId: { storeId: store.id, productId: product.id, variantId: variant.id } },
+      where: {
+        storeId_productId_variantId: {
+          storeId: store.id,
+          productId: product.id,
+          variantId: variant.id,
+        },
+      },
       update: { price: 28, stock: 50 },
-      create: { storeId: store.id, productId: product.id, variantId: variant.id, price: 28, stock: 50 },
+      create: {
+        storeId: store.id,
+        productId: product.id,
+        variantId: variant.id,
+        price: 28,
+        stock: 50,
+      },
     });
   }
 
@@ -112,4 +133,3 @@ qaRouter.post('/diag/bootstrap', async (req, res) => {
     note: 'Use testEmail for /auth/register; then login → set token; then add-to-cart → create order.',
   });
 });
-

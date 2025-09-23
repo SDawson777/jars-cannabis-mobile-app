@@ -11,7 +11,7 @@ recommendationsRouter.get('/recommendations/for-you', async (req, res, next) => 
     let items = await prisma.product.findMany({
       orderBy: { purchasesLast30d: 'desc' },
       take,
-      include: { variants: true }
+      include: { variants: true },
     });
     if (storeId) {
       const stocked = await prisma.storeProduct.findMany({ where: { storeId: String(storeId) } });
@@ -19,7 +19,9 @@ recommendationsRouter.get('/recommendations/for-you', async (req, res, next) => 
       items = items.sort((a, b) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
     }
     res.json({ items });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 // "Related": same brand/category
@@ -32,11 +34,13 @@ recommendationsRouter.get('/recommendations/related/:productId', async (req, res
     const items = await prisma.product.findMany({
       where: {
         id: { not: base.id },
-        OR: [{ brand: base.brand ?? undefined }, { category: base.category }]
+        OR: [{ brand: base.brand ?? undefined }, { category: base.category }],
       },
       take: Math.min(20, parseInt(limit || '8', 10)),
-      orderBy: { purchasesLast30d: 'desc' }
+      orderBy: { purchasesLast30d: 'desc' },
     });
     res.json({ items });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });

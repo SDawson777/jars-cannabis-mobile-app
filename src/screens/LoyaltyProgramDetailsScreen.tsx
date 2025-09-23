@@ -72,7 +72,9 @@ export default function LoyaltyProgramDetailsScreen() {
       {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={[styles.points, { color: jarsPrimary }]}>{points} points</Text>
-        <Text style={[styles.description, { color: jarsPrimary }]}>You’re only {pointsAway} points away from your next reward!</Text>
+        <Text style={[styles.description, { color: jarsPrimary }]}>
+          You’re only {pointsAway} points away from your next reward!
+        </Text>
         <PointsProgressBar current={points} target={target} />
         <Pressable
           style={[styles.button, { backgroundColor: jarsSecondary }]}
@@ -90,12 +92,8 @@ export default function LoyaltyProgramDetailsScreen() {
             <Text style={styles.buttonText}>Redeem Reward</Text>
           )}
         </Pressable>
-        {redeemMutation.isSuccess && (
-          <Text style={styles.successText}>Reward redeemed!</Text>
-        )}
-        {redeemMutation.isError && (
-          <Text style={styles.errorText}>Failed to redeem reward.</Text>
-        )}
+        {redeemMutation.isSuccess && <Text style={styles.successText}>Reward redeemed!</Text>}
+        {redeemMutation.isError && <Text style={styles.errorText}>Failed to redeem reward.</Text>}
       </ScrollView>
     </SafeAreaView>
   );

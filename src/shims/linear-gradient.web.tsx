@@ -6,4 +6,3 @@ type Props = ViewProps & { colors?: string[] };
 export default function LinearGradient({ style, children }: Props) {
   return <View style={style}>{children}</View>;
 }
-

@@ -4,7 +4,10 @@ export const conciergeRouter = Router();
 // Add a hard timeout so platforms never see "application failed to respond"
 function withTimeout<T>(p: Promise<T>, ms = 12000): Promise<T> {
   return new Promise((resolve, reject) => {
-    const t = setTimeout(() => reject(Object.assign(new Error('timeout'), { code: 'timeout' })), ms);
+    const t = setTimeout(
+      () => reject(Object.assign(new Error('timeout'), { code: 'timeout' })),
+      ms
+    );
     p.then(
       v => {
         clearTimeout(t);
@@ -40,7 +43,8 @@ conciergeRouter.post('/concierge/chat', async (req, res) => {
       }),
       12000
     );
-    const reply = (r as any).choices?.[0]?.message?.content ?? 'Sorry, I had trouble answering that.';
+    const reply =
+      (r as any).choices?.[0]?.message?.content ?? 'Sorry, I had trouble answering that.';
     res.json({ reply });
   } catch (e: any) {
     const status = e?.status || 502;

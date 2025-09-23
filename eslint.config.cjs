@@ -21,7 +21,7 @@ module.exports = [
       'scripts/**/*.{ts,tsx}',
       'tasks/**/*.{ts,tsx}',
       'App.tsx',
-      'jest.setup.ts'
+      'jest.setup.ts',
     ],
     ignores: ['**/*.d.ts'],
     languageOptions: {
@@ -31,7 +31,7 @@ module.exports = [
         tsconfigRootDir: __dirname,
         ecmaVersion: 'latest',
         sourceType: 'module',
-        ecmaFeatures: { jsx: true }
+        ecmaFeatures: { jsx: true },
       },
       globals: {
         ...globals.browser,
@@ -48,8 +48,8 @@ module.exports = [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         fetch: 'readonly',
-        __DEV__: 'readonly'
-      }
+        __DEV__: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
@@ -58,7 +58,7 @@ module.exports = [
       'react-native': reactNative,
       import: importPlugin,
       jest,
-      'testing-library': testingLibrary
+      'testing-library': testingLibrary,
     },
     rules: {
       '@typescript-eslint/no-unused-vars': [
@@ -82,7 +82,7 @@ module.exports = [
         tsconfigRootDir: __dirname,
         ecmaVersion: 'latest',
         sourceType: 'module',
-        ecmaFeatures: { jsx: true }
+        ecmaFeatures: { jsx: true },
       },
       globals: {
         ...globals.node,
@@ -98,8 +98,8 @@ module.exports = [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         fetch: 'readonly',
-        __DEV__: 'readonly'
-      }
+        __DEV__: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
@@ -126,7 +126,7 @@ module.exports = [
         tsconfigRootDir: __dirname,
         ecmaVersion: 'latest',
         sourceType: 'module',
-        ecmaFeatures: { jsx: true }
+        ecmaFeatures: { jsx: true },
       },
       globals: {
         ...globals.node,
@@ -142,8 +142,8 @@ module.exports = [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         fetch: 'readonly',
-        __DEV__: 'readonly'
-      }
+        __DEV__: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
@@ -152,42 +152,54 @@ module.exports = [
       'react-native': reactNative,
       import: importPlugin,
       jest,
-      'testing-library': testingLibrary
+      'testing-library': testingLibrary,
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_'
-      }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       'no-unused-vars': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       'react/prop-types': 'off',
       'react/display-name': 'off',
-    'react-hooks/exhaustive-deps': 'warn',
-    'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
+      'react-hooks/exhaustive-deps': 'warn',
+      'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
       'import/no-unresolved': 'off',
-      'import/no-extraneous-dependencies': ['error', {
-        devDependencies: [
-          '**/*.test.*',
-          '**/__tests__/**',
-          'jest*.{cjs,js,ts}',
-          'jest.setup.ts',
-          'tests/**',
-          'scripts/**',
-          'config/**'
-        ]
-      }],
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.test.*',
+            '**/__tests__/**',
+            'jest*.{cjs,js,ts}',
+            'jest.setup.ts',
+            'tests/**',
+            'scripts/**',
+            'config/**',
+          ],
+        },
+      ],
       'react-native/no-inline-styles': 'off',
-      'react-native/no-raw-text': 'off'
-    }
+      'react-native/no-raw-text': 'off',
+    },
   },
   {
-    files: ['**/*.test.*', '**/__tests__/**', 'jest.setup.ts', 'e2e/**/*.spec.*', 'e2e/**/*.test.*'],
+    files: [
+      '**/*.test.*',
+      '**/__tests__/**',
+      'jest.setup.ts',
+      'e2e/**/*.spec.*',
+      'e2e/**/*.test.*',
+    ],
     plugins: {
       jest,
-      'testing-library': testingLibrary
+      'testing-library': testingLibrary,
     },
     languageOptions: {
       globals: {
@@ -197,13 +209,13 @@ module.exports = [
         device: 'readonly',
         element: 'readonly',
         by: 'readonly',
-        waitFor: 'readonly'
+        waitFor: 'readonly',
       },
     },
     rules: {
       'testing-library/no-unnecessary-act': 'off',
-      'testing-library/no-await-sync-events': 'off'
-    }
+      'testing-library/no-await-sync-events': 'off',
+    },
   },
   {
     files: ['tests/**/*.js', 'tests/__mocks__/**/*.js'],
@@ -211,20 +223,34 @@ module.exports = [
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
+        sourceType: 'module',
       },
       globals: {
         ...globals.node,
-        ...globals.jest
-      }
+        ...globals.jest,
+      },
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
   {
-    files: ['**/*.js', '**/*.cjs', '**/*.mjs', 'scripts/**/*.ts', 'config/**/*.ts', 'webpack.config.js', 'tailwind.config.js', 'babel.config.js', 'App.tsx', 'config/firebaseClient.ts', 'scripts/checkAssets.ts', 'tasks/locationWatcher.ts', 'tests/firebase.e2e.ts'],
+    files: [
+      '**/*.js',
+      '**/*.cjs',
+      '**/*.mjs',
+      'scripts/**/*.ts',
+      'config/**/*.ts',
+      'webpack.config.js',
+      'tailwind.config.js',
+      'babel.config.js',
+      'App.tsx',
+      'config/firebaseClient.ts',
+      'scripts/checkAssets.ts',
+      'tasks/locationWatcher.ts',
+      'tests/firebase.e2e.ts',
+    ],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -233,7 +259,7 @@ module.exports = [
     },
     rules: {
       'no-undef': 'off',
-    }
+    },
   },
   {
     ignores: [
@@ -266,6 +292,6 @@ module.exports = [
       'functions/lib/',
       'server/',
       'apps/',
-    ]
-  }
+    ],
+  },
 ];

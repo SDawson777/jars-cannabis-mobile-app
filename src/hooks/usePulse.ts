@@ -13,7 +13,7 @@ import { hapticLight } from '../utils/haptic';
 
 /**
  * Hook for a one-time "pulse" animation (scale up then back down).
- * 
+ *
  * Features:
  * - Configurable duration and scale
  * - Optional haptic feedback
@@ -34,12 +34,7 @@ export function usePulse(
     disabled?: boolean;
   } = {}
 ) {
-  const {
-    duration = 150,
-    maxScale = 1.05,
-    enableHaptics = true,
-    disabled = false,
-  } = options;
+  const { duration = 150, maxScale = 1.05, enableHaptics = true, disabled = false } = options;
 
   const isPulseEnabled = useFeatureFlag('enableCtaPulseAnimation');
   const scale = useSharedValue(1);
@@ -57,13 +52,13 @@ export function usePulse(
 
     // Animate the pulse
     scale.value = withSequence(
-      withTiming(maxScale, { 
-        duration: duration / 2, 
-        easing: Easing.out(Easing.ease) 
+      withTiming(maxScale, {
+        duration: duration / 2,
+        easing: Easing.out(Easing.ease),
       }),
-      withTiming(1, { 
-        duration: duration / 2, 
-        easing: Easing.in(Easing.ease) 
+      withTiming(1, {
+        duration: duration / 2,
+        easing: Easing.in(Easing.ease),
       })
     );
   }, [duration, maxScale, scale, disabled, isPulseEnabled, enableHaptics]);
@@ -72,8 +67,8 @@ export function usePulse(
     transform: [{ scale: scale.value }],
   }));
 
-  return { 
-    pulseStyle: isPulseEnabled && !disabled ? pulseStyle : {}, 
+  return {
+    pulseStyle: isPulseEnabled && !disabled ? pulseStyle : {},
     triggerPulse,
     isPulseEnabled: isPulseEnabled && !disabled,
   };
@@ -82,10 +77,7 @@ export function usePulse(
 /**
  * Convenience hook for CTA buttons that combines pulse with press handling
  */
-export function usePulseCTA(
-  onPress: () => void,
-  options?: Parameters<typeof usePulse>[0]
-) {
+export function usePulseCTA(onPress: () => void, options?: Parameters<typeof usePulse>[0]) {
   const { pulseStyle, triggerPulse, isPulseEnabled } = usePulse(options);
 
   const handlePress = useCallback(() => {

@@ -21,7 +21,10 @@ stripeRouter.post('/stripe/payment-sheet', async (_req, res) => {
   try {
     const s = getStripe();
     const customer = await s.customers.create();
-    const ephemeralKey = await s.ephemeralKeys.create({ customer: customer.id }, { apiVersion: '2022-11-15' });
+    const ephemeralKey = await s.ephemeralKeys.create(
+      { customer: customer.id },
+      { apiVersion: '2022-11-15' }
+    );
     const paymentIntent = await s.paymentIntents.create({
       amount: 1000,
       currency: 'usd',

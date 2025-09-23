@@ -15,7 +15,7 @@ const mockProducts = [
     name: 'Blue Dream',
     slug: 'blue-dream',
     category: 'flower',
-    price: 35.00,
+    price: 35.0,
     description: 'A popular hybrid strain',
     imageUrl: 'https://example.com/blue-dream.jpg',
     featured: true,
@@ -23,11 +23,11 @@ const mockProducts = [
     cbdContent: 0.2,
   },
   {
-    id: '2', 
+    id: '2',
     name: 'OG Kush',
     slug: 'og-kush',
     category: 'flower',
-    price: 40.00,
+    price: 40.0,
     description: 'Classic indica-dominant strain',
     imageUrl: 'https://example.com/og-kush.jpg',
     featured: false,
@@ -70,17 +70,15 @@ app.get('/api/v1/auth/me', (req, res) => {
 app.get('/api/v1/products', (req, res) => {
   const { search, category, page = 1, limit = 20 } = req.query;
   let products = [...mockProducts];
-  
+
   if (search) {
-    products = products.filter(p => 
-      p.name.toLowerCase().includes(search.toLowerCase())
-    );
+    products = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
   }
-  
+
   if (category) {
     products = products.filter(p => p.category === category);
   }
-  
+
   res.json({
     products,
     pagination: {
@@ -97,19 +95,19 @@ app.get('/api/v1/products/:id', (req, res) => {
   if (!product) {
     return res.status(404).json({ error: 'Product not found' });
   }
-  
+
   res.json({
     product,
-    relatedProducts: mockProducts.filter(p => 
-      p.category === product.category && p.id !== product.id
-    ).slice(0, 3),
+    relatedProducts: mockProducts
+      .filter(p => p.category === product.category && p.id !== product.id)
+      .slice(0, 3),
   });
 });
 
 // Cart endpoints
 app.get('/api/v1/cart', (req, res) => {
-  const total = mockCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
+  const total = mockCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   res.json({
     cart: {
       items: mockCart,
@@ -122,11 +120,11 @@ app.get('/api/v1/cart', (req, res) => {
 app.post('/api/v1/cart/items', (req, res) => {
   const { productId, quantity, variant } = req.body;
   const product = mockProducts.find(p => p.id === productId);
-  
+
   if (!product) {
     return res.status(404).json({ error: 'Product not found' });
   }
-  
+
   const cartItem = {
     id: `cart-${Date.now()}`,
     productId,
@@ -135,11 +133,11 @@ app.post('/api/v1/cart/items', (req, res) => {
     price: product.price,
     product,
   };
-  
+
   mockCart.push(cartItem);
-  
-  const total = mockCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
+
+  const total = mockCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   res.status(201).json({
     item: cartItem,
     cart: {
@@ -164,16 +162,16 @@ app.post('/api/v1/orders', (req, res) => {
     id: `order-${Date.now()}`,
     status: 'pending',
     items: [...mockCart],
-    total: mockCart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+    total: mockCart.reduce((sum, item) => sum + item.price * item.quantity, 0),
     deliveryMethod: req.body.deliveryMethod,
     deliveryAddress: req.body.deliveryAddress,
     createdAt: new Date().toISOString(),
     estimatedDelivery: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
   };
-  
+
   mockOrders.push(order);
   mockCart = []; // Clear cart after order
-  
+
   res.status(201).json({ order });
 });
 

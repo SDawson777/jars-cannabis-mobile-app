@@ -1,11 +1,16 @@
-import { parseDeepLink, buildDeepLink, isJarsDeepLink, getAvailableRoutes } from '../utils/deepLinkUtils';
+import {
+  parseDeepLink,
+  buildDeepLink,
+  isJarsDeepLink,
+  getAvailableRoutes,
+} from '../utils/deepLinkUtils';
 
 describe('Deep Link Routes', () => {
   describe('parseDeepLink', () => {
     it('should parse product deep link with slug parameter', () => {
       const url = 'jars://shop/product/blue-dream-indica';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'ProductDetail',
         params: { slug: 'blue-dream-indica' },
@@ -15,7 +20,7 @@ describe('Deep Link Routes', () => {
     it('should parse order details deep link with order ID', () => {
       const url = 'jars://order/abc123def456';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'OrderDetails',
         params: { orderId: 'abc123def456' },
@@ -25,7 +30,7 @@ describe('Deep Link Routes', () => {
     it('should parse store details deep link with store ID', () => {
       const url = 'jars://store/downtown-denver';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'StoreDetails',
         params: { storeId: 'downtown-denver' },
@@ -35,7 +40,7 @@ describe('Deep Link Routes', () => {
     it('should parse article detail deep link with slug', () => {
       const url = 'jars://education/article/cannabis-terpenes-guide';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'ArticleDetail',
         params: { slug: 'cannabis-terpenes-guide' },
@@ -45,7 +50,7 @@ describe('Deep Link Routes', () => {
     it('should parse journal entry deep link with item ID', () => {
       const url = 'jars://jars/journal/item789';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'JournalEntry',
         params: { itemId: 'item789' },
@@ -55,7 +60,7 @@ describe('Deep Link Routes', () => {
     it('should parse address edit deep link with address ID', () => {
       const url = 'jars://profile/addresses/edit/addr123';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'EditAddress',
         params: { addressId: 'addr123' },
@@ -65,7 +70,7 @@ describe('Deep Link Routes', () => {
     it('should parse payment edit deep link with payment ID', () => {
       const url = 'jars://profile/payments/edit/pay456';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'EditPayment',
         params: { paymentId: 'pay456' },
@@ -75,7 +80,7 @@ describe('Deep Link Routes', () => {
     it('should handle home route (empty path)', () => {
       const url = 'jars://';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'SplashScreen',
         params: {},
@@ -85,7 +90,7 @@ describe('Deep Link Routes', () => {
     it('should handle HTTPS URLs', () => {
       const url = 'https://jars.app/shop/product/og-kush';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'ProductDetail',
         params: { slug: 'og-kush' },
@@ -95,7 +100,7 @@ describe('Deep Link Routes', () => {
     it('should handle www subdomain URLs', () => {
       const url = 'https://www.jars.app/profile';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'Profile',
         params: {},
@@ -105,21 +110,21 @@ describe('Deep Link Routes', () => {
     it('should return null for invalid URLs', () => {
       const url = 'jars://invalid/path/that/does/not/exist';
       const result = parseDeepLink(url);
-      
+
       expect(result).toBeNull();
     });
 
     it('should handle malformed URLs gracefully', () => {
       const url = 'not-a-valid-url';
       const result = parseDeepLink(url);
-      
+
       expect(result).toBeNull();
     });
 
     it('should handle URLs with leading slash', () => {
       const url = 'jars:///shop';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         routeName: 'ShopScreen',
         params: {},
@@ -183,7 +188,7 @@ describe('Deep Link Routes', () => {
   describe('getAvailableRoutes', () => {
     it('should return all configured routes', () => {
       const routes = getAvailableRoutes();
-      
+
       // Check that key routes are present
       expect(routes).toHaveProperty('HomeScreen');
       expect(routes).toHaveProperty('ShopScreen');
@@ -191,7 +196,7 @@ describe('Deep Link Routes', () => {
       expect(routes).toHaveProperty('CartScreen');
       expect(routes).toHaveProperty('Profile');
       expect(routes).toHaveProperty('TerpeneWheel');
-      
+
       // Check route patterns
       expect(routes.ProductDetail).toBe('shop/product/:slug');
       expect(routes.OrderDetails).toBe('order/:orderId');
@@ -201,7 +206,7 @@ describe('Deep Link Routes', () => {
     it('should include all required navigation routes', () => {
       const routes = getAvailableRoutes();
       const routeNames = Object.keys(routes);
-      
+
       const requiredRoutes = [
         'SplashScreen',
         'Onboarding',
@@ -242,17 +247,17 @@ describe('Deep Link Routes', () => {
 
     it('should match parameterized routes', () => {
       const testCases = [
-        { 
-          url: 'jars://shop/product/test-slug', 
-          expected: { routeName: 'ProductDetail', params: { slug: 'test-slug' } }
+        {
+          url: 'jars://shop/product/test-slug',
+          expected: { routeName: 'ProductDetail', params: { slug: 'test-slug' } },
         },
-        { 
-          url: 'jars://order/order-123', 
-          expected: { routeName: 'OrderDetails', params: { orderId: 'order-123' } }
+        {
+          url: 'jars://order/order-123',
+          expected: { routeName: 'OrderDetails', params: { orderId: 'order-123' } },
         },
-        { 
-          url: 'jars://store/store-456', 
-          expected: { routeName: 'StoreDetails', params: { storeId: 'store-456' } }
+        {
+          url: 'jars://store/store-456',
+          expected: { routeName: 'StoreDetails', params: { storeId: 'store-456' } },
         },
       ];
 
@@ -264,21 +269,21 @@ describe('Deep Link Routes', () => {
 
     it('should handle complex nested routes', () => {
       const testCases = [
-        { 
-          url: 'jars://profile/addresses/edit/addr-789', 
-          expected: { routeName: 'EditAddress', params: { addressId: 'addr-789' } }
+        {
+          url: 'jars://profile/addresses/edit/addr-789',
+          expected: { routeName: 'EditAddress', params: { addressId: 'addr-789' } },
         },
-        { 
-          url: 'jars://profile/payments/edit/pay-101', 
-          expected: { routeName: 'EditPayment', params: { paymentId: 'pay-101' } }
+        {
+          url: 'jars://profile/payments/edit/pay-101',
+          expected: { routeName: 'EditPayment', params: { paymentId: 'pay-101' } },
         },
-        { 
-          url: 'jars://education/article/article-slug', 
-          expected: { routeName: 'ArticleDetail', params: { slug: 'article-slug' } }
+        {
+          url: 'jars://education/article/article-slug',
+          expected: { routeName: 'ArticleDetail', params: { slug: 'article-slug' } },
         },
-        { 
-          url: 'jars://jars/journal/item-202', 
-          expected: { routeName: 'JournalEntry', params: { itemId: 'item-202' } }
+        {
+          url: 'jars://jars/journal/item-202',
+          expected: { routeName: 'JournalEntry', params: { itemId: 'item-202' } },
         },
       ];
 
@@ -293,14 +298,8 @@ describe('Deep Link Routes', () => {
     it('should handle parsing errors gracefully', () => {
       // Mock console.warn to test error handling
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      
-      const invalidUrls = [
-        null,
-        undefined,
-        123,
-        {},
-        'jars://invalid/path/structure',
-      ];
+
+      const invalidUrls = [null, undefined, 123, {}, 'jars://invalid/path/structure'];
 
       invalidUrls.forEach(url => {
         const result = parseDeepLink(url as any);
@@ -312,12 +311,12 @@ describe('Deep Link Routes', () => {
 
     it('should log parsing failures', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      
+
       parseDeepLink('jars://definitely/not/a/valid/route');
-      
+
       // Should not log for valid failures (this is expected behavior)
       expect(consoleSpy).not.toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
   });

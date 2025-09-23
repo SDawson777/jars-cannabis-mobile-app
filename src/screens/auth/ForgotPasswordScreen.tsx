@@ -12,7 +12,6 @@ import { toast } from '../../utils/toast';
 
 import { forgotPasswordSchema } from './forgotPasswordSchema';
 
-
 type FormData = { email: string };
 
 type ForgotPasswordNavProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;

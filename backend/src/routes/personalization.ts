@@ -22,9 +22,13 @@ personalizationRouter.get('/personalization/home', async (req, res) => {
       let results = items;
       if (storeId && prisma.storeProduct) {
         try {
-          const stocked = await prisma.storeProduct.findMany({ where: { storeId: String(storeId) } });
+          const stocked = await prisma.storeProduct.findMany({
+            where: { storeId: String(storeId) },
+          });
           const inStock = new Set(stocked.map((s: any) => s.productId));
-          results = results.sort((a: any, b: any) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
+          results = results.sort(
+            (a: any, b: any) => Number(inStock.has(b.id)) - Number(inStock.has(a.id))
+          );
         } catch {
           // ignore store scoping failures
         }
@@ -38,7 +42,10 @@ personalizationRouter.get('/personalization/home', async (req, res) => {
       return res.json({ greeting: 'Hi there', message: 'Recommended for you', products });
     } catch (err) {
       // If DB call fails, fall through to fixture
-      console.debug('personalization: DB lookup failed, using fixture', (err as any)?.message || err);
+      console.debug(
+        'personalization: DB lookup failed, using fixture',
+        (err as any)?.message || err
+      );
     }
   }
 

@@ -22,12 +22,9 @@ type LazyPrismaClient = {
   [K in keyof PrismaClient]: PrismaClient[K];
 };
 
-export const prisma: LazyPrismaClient = new Proxy(
-  {} as LazyPrismaClient,
-  {
-    get<K extends keyof PrismaClient>(_target: LazyPrismaClient, prop: K): PrismaClient[K] {
-      const client = getPrismaInstance();
-      return client[prop];
-    },
-  }
-);
+export const prisma: LazyPrismaClient = new Proxy({} as LazyPrismaClient, {
+  get<K extends keyof PrismaClient>(_target: LazyPrismaClient, prop: K): PrismaClient[K] {
+    const client = getPrismaInstance();
+    return client[prop];
+  },
+});

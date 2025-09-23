@@ -125,9 +125,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const queryClient = new QueryClient();
 
 function App() {
-  const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | undefined>(
-    undefined
-  );
+  const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | undefined>(undefined);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
@@ -168,9 +166,7 @@ function App() {
 
       const unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
         const { title, body } = remoteMessage.notification || {};
-        Alert.alert(title || 'Notification', body, [
-          { text: 'OK' },
-        ]);
+        Alert.alert(title || 'Notification', body, [{ text: 'OK' }]);
       });
 
       const unsubscribeOnNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
@@ -265,7 +261,10 @@ function App() {
                         <Stack.Screen name="Notifications" component={NotificationSettingsScreen} />
                         <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
                         <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
-                        <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} />
+                        <Stack.Screen
+                          name="LanguageSelection"
+                          component={LanguageSelectionScreen}
+                        />
                         <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
                         <Stack.Screen name="ContactUs" component={ContactUsScreen} />
                         <Stack.Screen
