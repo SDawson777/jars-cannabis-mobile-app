@@ -64,7 +64,7 @@ export default function ProductDetailScreen() {
   // Support backend shapes: { product, relatedProducts } where product contains variants
   const product = (data as any)?.product ?? (data as any)?.product ?? (data as any)?.product;
   const variants: any[] = (data as any)?.product?.variants ?? (data as any)?.variants ?? [];
-  const _relatedProducts: any[] = (data as any)?.relatedProducts ?? [];
+  const __relatedProducts: any[] = (data as any)?.relatedProducts ?? [];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>

@@ -7,7 +7,7 @@ import ProductCardMini from './ProductCardMini';
 
 interface Props {
   data: ForYouTodayPayload;
-  onSelectProduct: (_id: string) => void;
+  onSelectProduct: (__id: string) => void;
   onSeeAll?: () => void;
 }
 

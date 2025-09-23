@@ -47,7 +47,7 @@ export default function CheckoutScreen() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  // animate on any state change
+  // animate on any _state change
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, [step, method, address, fullName, phone, email, payment, termsAccepted]);
@@ -118,7 +118,7 @@ export default function CheckoutScreen() {
       }
       toast('Payment successful');
       return true;
-    } catch (_e) {
+    } catch (__e) {
       toast('Payment failed');
       return false;
     }

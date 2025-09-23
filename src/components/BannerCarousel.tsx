@@ -8,7 +8,7 @@ import CMSImage from './CMSImage';
 
 interface Props {
   banners: CMSBanner[];
-  onPress?: (_banner: CMSBanner) => void;
+  onPress?: (__banner: CMSBanner) => void;
 }
 
 export default function BannerCarousel({ banners, onPress }: Props) {
@@ -34,7 +34,7 @@ export default function BannerCarousel({ banners, onPress }: Props) {
     >
       {banners.map(b => (
         <Pressable
-          key={b._id}
+          key={b.__id}
           onPress={() => {
             hapticLight();
             onPress?.(b);

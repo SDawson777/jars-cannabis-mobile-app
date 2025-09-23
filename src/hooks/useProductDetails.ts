@@ -23,7 +23,8 @@ async function fetchProduct(productId: string, storeId?: string): Promise<Produc
   // normalize to { product, variants }
   const payload = res.data || {};
   const product = payload.product ?? payload;
-  const variants: ProductVariant[] = (product && (product.variants ?? product.variants) as any) || [];
+  const variants: ProductVariant[] =
+    (product && ((product.variants ?? product.variants) as any)) || [];
   // ensure variants are in the expected shape (fallback empty)
   return { product, variants };
 }
@@ -35,8 +36,8 @@ export function useProductDetails(productId: string | undefined, storeId?: strin
     queryFn: async () => {
       if (!productId) throw new Error('Missing productId');
       const cacheKey = `productDetails:${productId}:${storeId || 'all'}`;
-      const state = await NetInfo.fetch();
-      if (!state.isConnected) {
+      const _state = await NetInfo.fetch();
+      if (!_state.isConnected) {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached) return JSON.parse(cached) as ProductDetails;
         throw new Error('Offline');

@@ -31,7 +31,6 @@ import { trackEvent } from '../utils/analytics'; // ensure exported in utils/ana
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
 
-
 // Define Award type
 interface Award {
   id: string;
@@ -136,7 +135,7 @@ export default function AwardsScreen() {
     );
   };
 
-  const openFaq = () => {
+  const openFa_q = () => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('HelpFAQ');
@@ -162,7 +161,7 @@ export default function AwardsScreen() {
     </View>
   );
 
-  // Loading state
+  // Loading _state
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -171,7 +170,7 @@ export default function AwardsScreen() {
     );
   }
 
-  // Error state
+  // Error _state
   if (isError) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -190,7 +189,7 @@ export default function AwardsScreen() {
     );
   }
 
-  // Success state
+  // Success _state
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Header */}
@@ -306,7 +305,7 @@ export default function AwardsScreen() {
 
         {/* FAQ Link */}
         <Pressable
-          onPress={openFaq}
+          onPress={openFa_q}
           style={styles.linkRow}
           accessibilityRole="button"
           accessibilityLabel="Open Loyalty FAQs"

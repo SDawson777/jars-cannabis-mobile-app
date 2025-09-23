@@ -89,7 +89,7 @@ describe('Shop Flow', () => {
 
     it('should render shop screen with products', async () => {
       const ShopScreen = getShopScreen();
-      const { getByText, getByTestId: _getByTestId } = renderWithProviders(<ShopScreen />);
+      const { getByText, getByTestId: __getByTestId } = renderWithProviders(<ShopScreen />);
 
       // Check if products are displayed
       await waitFor(() => {
@@ -139,7 +139,7 @@ describe('Shop Flow', () => {
       jest.restoreAllMocks();
     });
 
-    it('should show empty state when no products match filter', async () => {
+    it('should show empty _state when no products match filter', async () => {
       // Spy on the useProducts hook and return empty products for this test
       const prodModule = require('../hooks/useProducts');
       jest.spyOn(prodModule, 'useProducts').mockReturnValue({
@@ -199,7 +199,7 @@ describe('Shop Flow', () => {
       expect(legacyShape || newShape).toBeTruthy();
     });
 
-    it('should show loading state', async () => {
+    it('should show loading _state', async () => {
       const prodModule = require('../hooks/useProducts');
       jest.spyOn(prodModule, 'useProducts').mockReturnValue({
         data: null,
@@ -215,7 +215,7 @@ describe('Shop Flow', () => {
       });
     });
 
-    it('should show error state', () => {
+    it('should show error _state', () => {
       const prodModule = require('../hooks/useProducts');
       jest.spyOn(prodModule, 'useProducts').mockReturnValue({
         data: null,

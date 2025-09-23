@@ -1,31 +1,36 @@
 import { renderHook } from '@testing-library/react-native';
 
-import { getFeatureFlags, isFeatureEnabled, useFeatureFlags, useFeatureFlag } from '../utils/featureFlags';
+import {
+  getFeatureFlags,
+  isFeatureEnabled,
+  useFeatureFlags,
+  useFeatureFlag,
+} from '../utils/featureFlags';
 
 describe('Feature Flags', () => {
   describe('getFeatureFlags', () => {
     it('should return default feature flags', () => {
       const flags = getFeatureFlags();
-      
+
       expect(flags).toHaveProperty('enableCtaPulseAnimation');
       expect(flags).toHaveProperty('enableEnhancedHaptics');
       expect(flags).toHaveProperty('enableTerpeneAnimations');
-      
+
       expect(typeof flags.enableCtaPulseAnimation).toBe('boolean');
       expect(typeof flags.enableEnhancedHaptics).toBe('boolean');
       expect(typeof flags.enableTerpeneAnimations).toBe('boolean');
     });
 
-    it('should return consistent values across calls', () => {
+    it('should return consistent _values across calls', () => {
       const flags1 = getFeatureFlags();
       const flags2 = getFeatureFlags();
-      
+
       expect(flags1).toEqual(flags2);
     });
 
-    it('should have expected default values', () => {
+    it('should have expected default _values', () => {
       const flags = getFeatureFlags();
-      
+
       expect(flags.enableCtaPulseAnimation).toBe(true);
       expect(flags.enableEnhancedHaptics).toBe(true);
       expect(flags.enableTerpeneAnimations).toBe(false);
@@ -33,7 +38,7 @@ describe('Feature Flags', () => {
   });
 
   describe('isFeatureEnabled', () => {
-    it('should return correct values for known flags', () => {
+    it('should return correct _values for known flags', () => {
       expect(isFeatureEnabled('enableCtaPulseAnimation')).toBe(true);
       expect(isFeatureEnabled('enableEnhancedHaptics')).toBe(true);
       expect(isFeatureEnabled('enableTerpeneAnimations')).toBe(false);
@@ -41,7 +46,7 @@ describe('Feature Flags', () => {
 
     it('should be consistent with getFeatureFlags', () => {
       const flags = getFeatureFlags();
-      
+
       expect(isFeatureEnabled('enableCtaPulseAnimation')).toBe(flags.enableCtaPulseAnimation);
       expect(isFeatureEnabled('enableEnhancedHaptics')).toBe(flags.enableEnhancedHaptics);
       expect(isFeatureEnabled('enableTerpeneAnimations')).toBe(flags.enableTerpeneAnimations);
@@ -51,16 +56,16 @@ describe('Feature Flags', () => {
   describe('useFeatureFlags hook', () => {
     it('should return feature flags object', () => {
       const { result } = renderHook(() => useFeatureFlags());
-      
+
       expect(result.current).toHaveProperty('enableCtaPulseAnimation');
       expect(result.current).toHaveProperty('enableEnhancedHaptics');
       expect(result.current).toHaveProperty('enableTerpeneAnimations');
     });
 
-    it('should return same values as getFeatureFlags', () => {
+    it('should return same _values as getFeatureFlags', () => {
       const { result } = renderHook(() => useFeatureFlags());
       const directFlags = getFeatureFlags();
-      
+
       expect(result.current).toEqual(directFlags);
     });
   });
@@ -68,19 +73,19 @@ describe('Feature Flags', () => {
   describe('useFeatureFlag hook', () => {
     it('should return correct value for enableCtaPulseAnimation', () => {
       const { result } = renderHook(() => useFeatureFlag('enableCtaPulseAnimation'));
-      
+
       expect(result.current).toBe(true);
     });
 
     it('should return correct value for enableEnhancedHaptics', () => {
       const { result } = renderHook(() => useFeatureFlag('enableEnhancedHaptics'));
-      
+
       expect(result.current).toBe(true);
     });
 
     it('should return correct value for enableTerpeneAnimations', () => {
       const { result } = renderHook(() => useFeatureFlag('enableTerpeneAnimations'));
-      
+
       expect(result.current).toBe(false);
     });
 
@@ -88,7 +93,7 @@ describe('Feature Flags', () => {
       const { result: pulseResult } = renderHook(() => useFeatureFlag('enableCtaPulseAnimation'));
       const { result: hapticsResult } = renderHook(() => useFeatureFlag('enableEnhancedHaptics'));
       const { result: terpeneResult } = renderHook(() => useFeatureFlag('enableTerpeneAnimations'));
-      
+
       expect(pulseResult.current).toBe(isFeatureEnabled('enableCtaPulseAnimation'));
       expect(hapticsResult.current).toBe(isFeatureEnabled('enableEnhancedHaptics'));
       expect(terpeneResult.current).toBe(isFeatureEnabled('enableTerpeneAnimations'));
@@ -103,7 +108,7 @@ describe('Feature Flags', () => {
         'enableEnhancedHaptics',
         'enableTerpeneAnimations',
       ];
-      
+
       validKeys.forEach(key => {
         expect(typeof isFeatureEnabled(key)).toBe('boolean');
       });
@@ -114,12 +119,12 @@ describe('Feature Flags', () => {
     it('should be easy to add new feature flags', () => {
       // This test documents the expected structure for future flags
       const flags = getFeatureFlags();
-      
+
       // All flags should be boolean
       Object.values(flags).forEach(value => {
         expect(typeof value).toBe('boolean');
       });
-      
+
       // Should be a flat object
       expect(Array.isArray(flags)).toBe(false);
       expect(flags.constructor).toBe(Object);

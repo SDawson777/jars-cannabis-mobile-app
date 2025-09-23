@@ -63,7 +63,7 @@ export default function ProductListScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList<CMSProduct>
         data={products}
-        keyExtractor={item => item._id}
+        keyExtractor={item => item.__id}
         numColumns={2}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (

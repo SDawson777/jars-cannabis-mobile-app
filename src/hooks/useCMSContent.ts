@@ -11,10 +11,10 @@ export function useCMSContent<T>(key: string[], path: string) {
   return useQuery<T, Error>({
     queryKey: [...key, preview],
     queryFn: async () => {
-      const state = await NetInfo.fetch();
+      const _state = await NetInfo.fetch();
       const cacheKey = `cms:${path}${preview ? ':preview' : ''}`;
 
-      if (!state.isConnected) {
+      if (!_state.isConnected) {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached) {
           return JSON.parse(cached) as T;

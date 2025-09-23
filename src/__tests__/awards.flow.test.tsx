@@ -42,8 +42,8 @@ jest.mock('react-native', () => {
         }
       },
       timing: () => ({ start: () => {} }),
-      loop: (_x: any) => ({ start: () => {}, stop: () => {} }),
-      sequence: (_a: any) => ({}),
+      loop: (__x: any) => ({ start: () => {}, stop: () => {} }),
+      sequence: (__a: any) => ({}),
     },
     LayoutAnimation: { configureNext: () => {}, Presets: { easeInEaseOut: {} } },
     StyleSheet: { create: (s: any) => s },

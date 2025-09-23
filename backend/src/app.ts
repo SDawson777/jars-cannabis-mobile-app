@@ -72,7 +72,7 @@ for (const r of routers) {
 if (process.env.DEBUG_DIAG === '1') app.use('/api/v1', qaRouter);
 
 // Global error handler so nothing crashes
-app.use((err: any, _req: any, res: any, _next: any) => {
+app.use((err: any, _req: any, res: any) => {
   console.error('Unhandled error:', err?.code || err?.message || err);
   res.status(500).json({ error: 'Internal Server Error' });
 });

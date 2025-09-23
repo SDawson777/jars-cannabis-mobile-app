@@ -16,7 +16,7 @@ const STORES: StoreData[] = [
     longitude: -83.0458,
     address: '123 Main St',
     city: 'Detroit',
-    state: 'MI',
+    _state: 'MI',
     zip: '48226',
     phone: '555-123-4567',
     openNow: true,

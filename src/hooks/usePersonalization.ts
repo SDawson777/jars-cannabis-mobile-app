@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 const KEY = 'personalization_enabled';
 
-export function usePersonalization(): [boolean, (_val: boolean) => Promise<void>] {
+export function usePersonalization(): [boolean, (__val: boolean) => Promise<void>] {
   const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
@@ -12,9 +12,9 @@ export function usePersonalization(): [boolean, (_val: boolean) => Promise<void>
     });
   }, []);
 
-  const update = async (_val: boolean) => {
-    setEnabled(_val);
-    await AsyncStorage.setItem(KEY, _val ? 'true' : 'false');
+  const update = async (__val: boolean) => {
+    setEnabled(__val);
+    await AsyncStorage.setItem(KEY, __val ? 'true' : 'false');
   };
 
   return [enabled, update];

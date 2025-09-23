@@ -17,7 +17,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   }),
 }));
 
-let netListener: ((state: any) => void) | null = null;
+let netListener: ((_state: any) => void) | null = null;
 jest.mock('@react-native-community/netinfo', () => ({
   fetch: jest.fn(async () => ({ isConnected: false })),
   addEventListener: jest.fn((cb: any) => {
@@ -26,7 +26,7 @@ jest.mock('@react-native-community/netinfo', () => ({
   }),
 }));
 
-const mockPost = jest.fn(async (_endpoint: string, _payload: any) => ({ data: {} }));
+const mockPost = jest.fn(async (__endpoint: string, __payload: any) => ({ data: {} }));
 jest.mock('../../src/api/phase4Client', () => ({
   phase4Client: { post: (endpoint: string, payload: any) => mockPost(endpoint, payload) },
 }));
@@ -34,11 +34,11 @@ jest.mock('../../src/api/phase4Client', () => ({
 // Import hook after mocks
 import { useOfflineCartQueue } from '../hooks/useOfflineCartQueue';
 
-function HookWrapper({ onReady }: { onReady?: (q: any) => void }) {
-  const q = useOfflineCartQueue();
+function HookWrapper({ onReady }: { onReady?: (_q: any) => void }) {
+  const _q = useOfflineCartQueue();
   React.useEffect(() => {
-    if (onReady) onReady(q);
-  }, [onReady, q]);
+    if (onReady) onReady(_q);
+  }, [onReady, _q]);
   return null;
 }
 
@@ -58,12 +58,12 @@ describe('useOfflineCartQueue', () => {
 
   it('queues actions offline and replays when back online', async () => {
     let actionRef: any = null;
-    const onReady = (q: any) => {
-      actionRef = q;
+    const onReady = (_q: any) => {
+      actionRef = _q;
     };
 
     // render the hook wrapper; let effects run
-    const _rendered = render(<HookWrapper onReady={onReady} />);
+    const __rendered = render(<HookWrapper onReady={onReady} />);
     // allow microtasks to settle
     await act(async () => {
       await Promise.resolve();

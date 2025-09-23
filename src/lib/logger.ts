@@ -25,7 +25,7 @@ export const logger = {
         Sentry.captureException(err);
         if (formatted) console.error(formatted);
         else console.error(m);
-      } catch (_e) {
+      } catch (__e) {
         // On Sentry failure we intentionally log only the message (no metadata)
         console.error(m);
       }

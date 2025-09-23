@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/19</span>
             </div>
         
             
@@ -107,7 +107,23 @@
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -118,8 +134,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,23 +174,30 @@ import type { CMSProduct } from '../types/cms';
 &nbsp;
 const PAGE_SIZE = <span class="cstat-no" title="statement not covered" >20;</span>
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >fetchPage(</span>page: number, storeId?: string, filter?: string) {
-  const res = <span class="cstat-no" title="statement not covered" >await phase4Client.get&lt;CMSProduct[]&gt;('/products', {</span>
+interface ProductPage {
+  products: CMSProduct[];
+  page: number;
+  hasNextPage: boolean;
+}
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >fetchPage(</span>page: number, storeId?: string, filter?: string): Promise&lt;ProductPage&gt; {
+  const res = <span class="cstat-no" title="statement not covered" >await phase4Client.get&lt;{ products: CMSProduct[]; total?: number }&gt;('/products', {</span>
     params: { page, limit: PAGE_SIZE, storeId, filter },
   });
-<span class="cstat-no" title="statement not covered" >  return res.data;</span>
+  const products = <span class="cstat-no" title="statement not covered" >res.data.products ?? (res.data as any) ?? [];</span>
+<span class="cstat-no" title="statement not covered" >  return { products, page, hasNextPage: products.length === PAGE_SIZE };</span>
 }
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >useProducts(</span>storeId?: string, filter?: string) {
-<span class="cstat-no" title="statement not covered" >  return useInfiniteQuery&lt;CMSProduct[], Error&gt;({</span>
+<span class="cstat-no" title="statement not covered" >  return useInfiniteQuery&lt;ProductPage, Error&gt;({</span>
     queryKey: ['products', storeId, filter],
     queryFn: <span class="fstat-no" title="function not covered" >as</span>ync ({ pageParam = <span class="branch-0 cbranch-no" title="branch not covered" >1 </span>}) =&gt; {
       const cacheKey = <span class="cstat-no" title="statement not covered" >`products:${storeId || 'all'}:${filter || 'all'}:${pageParam}`;</span>
-      const state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
+      const _state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!state.isConnected) {</span>
+<span class="cstat-no" title="statement not covered" >      if (!_state.isConnected) {</span>
         const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as CMSProduct[];</span></span>
+<span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as ProductPage;</span></span>
 <span class="cstat-no" title="statement not covered" >        throw new Error('Offline');</span>
       }
 &nbsp;
@@ -186,12 +207,12 @@ export function <span class="fstat-no" title="function not covered" >useProducts
 <span class="cstat-no" title="statement not covered" >        return data;</span>
       } catch (err) {
         const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as CMSProduct[];</span></span>
+<span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as ProductPage;</span></span>
 <span class="cstat-no" title="statement not covered" >        throw err;</span>
       }
     },
-    getNextPageParam: <span class="fstat-no" title="function not covered" >(l</span>astPage: CMSProduct[], pages: CMSProduct[][]) =&gt;
-<span class="cstat-no" title="statement not covered" >      lastPage.length === PAGE_SIZE ? pages.length + 1 : undefined,</span>
+    getNextPageParam: <span class="fstat-no" title="function not covered" >(l</span>astPage: ProductPage, pages: ProductPage[]) =&gt;
+<span class="cstat-no" title="statement not covered" >      lastPage.hasNextPage ? pages.length + 1 : undefined,</span>
     initialPageParam: 1,
   } as any);
 }
@@ -202,7 +223,7 @@ export function <span class="fstat-no" title="function not covered" >useProducts
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-10T05:52:02.365Z
+                at 2025-09-23T18:45:22.147Z
             </div>
         <script src="../prettify.js"></script>
         <script>

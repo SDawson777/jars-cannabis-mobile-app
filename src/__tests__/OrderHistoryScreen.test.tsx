@@ -93,11 +93,13 @@ describe('OrderHistoryScreen', () => {
       ],
     };
 
-    const _mockFetch = (orderClient.fetchOrders as jest.Mock).mockImplementation((page: number) => {
-      if (page === 1) return Promise.resolve(firstPage);
-      if (page === 2) return Promise.resolve(secondPage);
-      return Promise.resolve({ orders: [] });
-    });
+    const __mockFetch = (orderClient.fetchOrders as jest.Mock).mockImplementation(
+      (page: number) => {
+        if (page === 1) return Promise.resolve(firstPage);
+        if (page === 2) return Promise.resolve(secondPage);
+        return Promise.resolve({ orders: [] });
+      }
+    );
 
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     let tree: renderer.ReactTestRenderer | undefined;

@@ -7,9 +7,9 @@ import { saveSecure, getSecure } from '../utils/secureStorage';
 
 interface SettingsContextState {
   biometricEnabled: boolean;
-  setBiometricEnabled: (_value: boolean) => Promise<void>;
+  setBiometricEnabled: (__value: boolean) => Promise<void>;
   locale: string;
-  setLocale: (_value: string) => Promise<void>;
+  setLocale: (__value: string) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextState>({

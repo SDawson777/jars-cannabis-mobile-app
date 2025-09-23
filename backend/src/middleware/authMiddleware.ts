@@ -20,7 +20,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     // Attach to req.user for downstream handlers
     (req as any).user = { id: payload.userId };
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 }

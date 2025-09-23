@@ -45,7 +45,7 @@ export default function EditAddressScreen() {
       phone: addr.phone,
       line1: addr.line1,
       city: addr.city,
-      state: addr.state,
+      _state: addr._state,
       zipCode: addr.zipCode,
       country: addr.country || 'US',
     },
@@ -66,12 +66,12 @@ export default function EditAddressScreen() {
     navigation.goBack();
   };
 
-  const onSave = async (values: AddressFormValues) => {
+  const onSave = async (_values: AddressFormValues) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
-      const res = await phase4Client.put(`/addresses/${addr.id}`, values);
+      const res = await phase4Client.put(`/addresses/${addr.id}`, _values);
       if (res && res.data && res.data.error) throw new Error(res.data.error);
       toast('Address saved');
       queryClient.invalidateQueries({ queryKey: ['addresses'] });
@@ -101,7 +101,7 @@ export default function EditAddressScreen() {
           { name: 'phone', placeholder: 'Phone' },
           { name: 'line1', placeholder: 'Street Address' },
           { name: 'city', placeholder: 'City' },
-          { name: 'state', placeholder: 'State' },
+          { name: '_state', placeholder: 'State' },
           { name: 'zipCode', placeholder: 'ZIP Code', keyboard: 'numeric' },
           { name: 'country', placeholder: 'Country' },
         ].map(({ name, placeholder, keyboard }) => (

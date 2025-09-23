@@ -11,9 +11,9 @@ export function useForYouToday(userId: string | undefined, storeId: string | und
     enabled: !!userId && !!storeId,
     queryFn: async () => {
       const cacheKey = `forYouToday:${userId}:${storeId}`;
-      const state = await NetInfo.fetch();
+      const _state = await NetInfo.fetch();
 
-      if (!state.isConnected) {
+      if (!_state.isConnected) {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached) return JSON.parse(cached) as ForYouTodayPayload;
         throw new Error('Offline');

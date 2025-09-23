@@ -5,7 +5,7 @@ export const addressSchema = yup.object({
   phone: yup.string().required('Phone is required'),
   line1: yup.string().required('Street address is required'),
   city: yup.string().required('City is required'),
-  state: yup.string().required('State is required'),
+  _state: yup.string().required('State is required'),
   zipCode: yup.string().matches(/^\d+$/, 'ZIP must be numeric').required('ZIP is required'),
   country: yup.string().required('Country is required'),
   line2: yup.string().nullable().notRequired(),

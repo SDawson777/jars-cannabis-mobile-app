@@ -82,12 +82,12 @@ export default function EditProfileScreen() {
     navigation.goBack();
   };
 
-  const onSave = async (values: ProfileFormValues) => {
+  const onSave = async (_values: ProfileFormValues) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
-      await updateProfile.mutateAsync(values);
+      await updateProfile.mutateAsync(_values);
       toast('Profile updated');
       navigation.goBack();
     } catch (e: any) {

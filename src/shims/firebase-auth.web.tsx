@@ -2,13 +2,12 @@
 export default function auth() {
   return {
     currentUser: null as any,
-    async signInWithEmailAndPassword(_email: string, _password: string) {
+    async signInWithEmailAndPassword(__email: string, __password: string) {
       throw new Error('Auth not available in web demo.');
     },
-    async createUserWithEmailAndPassword(_email: string, _password: string) {
+    async createUserWithEmailAndPassword(__email: string, __password: string) {
       throw new Error('Sign up not available in web demo.');
     },
     async signOut() {},
   };
 }
-

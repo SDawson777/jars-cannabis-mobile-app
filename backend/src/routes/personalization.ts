@@ -25,7 +25,7 @@ personalizationRouter.get('/personalization/home', async (req, res) => {
           const stocked = await prisma.storeProduct.findMany({ where: { storeId: String(storeId) } });
           const inStock = new Set(stocked.map((s: any) => s.productId));
           results = results.sort((a: any, b: any) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
-        } catch (err) {
+        } catch {
           // ignore store scoping failures
         }
       }

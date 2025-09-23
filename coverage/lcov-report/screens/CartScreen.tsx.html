@@ -421,14 +421,7 @@
 <a name='L356'></a><a href='#L356'>356</a>
 <a name='L357'></a><a href='#L357'>357</a>
 <a name='L358'></a><a href='#L358'>358</a>
-<a name='L359'></a><a href='#L359'>359</a>
-<a name='L360'></a><a href='#L360'>360</a>
-<a name='L361'></a><a href='#L361'>361</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L359'></a><a href='#L359'>359</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -457,7 +450,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -622,14 +614,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -808,12 +804,7 @@ import { useCartStore, hydrateCartStore } from '../../stores/useCartStore';
 import { ThemeContext } from '../context/ThemeContext';
 import { useCartValidation } from '../hooks/useCartValidation';
 import type { RootStackParamList } from '../navigation/types';
-import {
-  hapticLight,
-  hapticMedium,
-  hapticHeavy,
-  hapticError,
-} from '../utils/haptic';
+import { hapticLight, hapticMedium, hapticHeavy, hapticError } from '../utils/haptic';
 &nbsp;
 <span class="cstat-no" title="statement not covered" >if (Platform.OS === 'android' &amp;&amp; UIManager.setLayoutAnimationEnabledExperimental) {</span>
 <span class="cstat-no" title="statement not covered" >  UIManager.setLayoutAnimationEnabledExperimental(true);</span>
@@ -821,15 +812,14 @@ import {
 &nbsp;
 type CartNavProp = NativeStackNavigationProp&lt;RootStackParamList, 'CartScreen'&gt;;
 &nbsp;
-&nbsp;
 const IMAGE_SIZE = <span class="cstat-no" title="statement not covered" >80;</span>
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >CartScreen(</span>) {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation&lt;CartNavProp&gt;();</span>
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
-  const items = <span class="cstat-no" title="statement not covered" >useCartStore(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; <span class="cstat-no" title="statement not covered" >state.items)</span>;</span>
-  const updateQuantity = <span class="cstat-no" title="statement not covered" >useCartStore(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; <span class="cstat-no" title="statement not covered" >state.updateQuantity)</span>;</span>
-  const removeItemFromStore = <span class="cstat-no" title="statement not covered" >useCartStore(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; <span class="cstat-no" title="statement not covered" >state.removeItem)</span>;</span>
+  const items = <span class="cstat-no" title="statement not covered" >useCartStore(<span class="fstat-no" title="function not covered" >_s</span>tate =&gt; <span class="cstat-no" title="statement not covered" >_state.items)</span>;</span>
+  const updateQuantity = <span class="cstat-no" title="statement not covered" >useCartStore(<span class="fstat-no" title="function not covered" >_s</span>tate =&gt; <span class="cstat-no" title="statement not covered" >_state.updateQuantity)</span>;</span>
+  const removeItemFromStore = <span class="cstat-no" title="statement not covered" >useCartStore(<span class="fstat-no" title="function not covered" >_s</span>tate =&gt; <span class="cstat-no" title="statement not covered" >_state.removeItem)</span>;</span>
   const [promo, setPromo] = <span class="cstat-no" title="statement not covered" >useState('');</span>
 &nbsp;
   const [hydrated, setHydrated] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
@@ -976,6 +966,7 @@ export default function <span class="fstat-no" title="function not covered" >Car
                   &lt;Pressable
                     onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >updateQty(item.id, -1)}</span>
                     style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                    testID={`decrease-quantity-${item.id}`}
                     accessibilityLabel={`Decrease quantity of ${item.name}`}
                   &gt;
                     &lt;Text style={styles.qtyBtnText}&gt;−&lt;/Text&gt;
@@ -984,6 +975,7 @@ export default function <span class="fstat-no" title="function not covered" >Car
                   &lt;Pressable
                     onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >updateQty(item.id, 1)}</span>
                     style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                    testID={`increase-quantity-${item.id}`}
                     accessibilityLabel={`Increase quantity of ${item.name}`}
                   &gt;
                     &lt;Text style={styles.qtyBtnText}&gt;+&lt;/Text&gt;
@@ -991,6 +983,7 @@ export default function <span class="fstat-no" title="function not covered" >Car
                   &lt;Pressable
                     onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >removeItem(item.id)}</span>
                     style={styles.remove}
+                    testID={`remove-item-${item.id}`}
                     accessibilityLabel={`Remove ${item.name} from cart`}
                   &gt;
                     &lt;Trash2 color={jarsPrimary} size={20} /&gt;
@@ -1009,6 +1002,7 @@ export default function <span class="fstat-no" title="function not covered" >Car
           placeholder="Enter Promo Code"
           placeholderTextColor={jarsSecondary}
           value={promo}
+          testID="coupon-input"
           onChangeText={setPromo}
         /&gt;
         &lt;Pressable
@@ -1150,7 +1144,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-10T05:52:02.365Z
+                at 2025-09-23T18:45:22.147Z
             </div>
         <script src="../prettify.js"></script>
         <script>

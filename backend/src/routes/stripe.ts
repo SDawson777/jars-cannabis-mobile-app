@@ -34,7 +34,7 @@ stripeRouter.post('/stripe/payment-sheet', async (_req, res) => {
       ephemeralKey: ephemeralKey.secret,
       customer: customer.id,
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Stripe error' });
   }
 });

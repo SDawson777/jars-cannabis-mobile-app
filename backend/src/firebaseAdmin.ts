@@ -1,5 +1,7 @@
 // backend/src/firebaseAdmin.ts
 import admin from 'firebase-admin';
+import type { firestore as FirebaseFirestoreNS } from 'firebase-admin';
+type FirebaseFirestore = typeof FirebaseFirestoreNS;
 
 let app: admin.app.App | null = null;
 

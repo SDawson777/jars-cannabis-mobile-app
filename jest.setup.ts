@@ -40,6 +40,9 @@ try {
   /* no-op: NativeAnimatedHelper not available in this environment */
 }
 
+// Ensure __DEV__ is defined for tests that reference it
+(globalThis as any).__DEV__ = true;
+
 // Reanimated mock (v3-compatible)
 try {
   // react-native-reanimated is mapped to a local mock via moduleNameMapper.

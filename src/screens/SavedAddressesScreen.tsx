@@ -35,7 +35,7 @@ interface Address {
   line1: string;
   line2?: string | null;
   city: string;
-  state?: string;
+  _state?: string;
   zipCode?: string;
   country?: string;
   isDefault?: boolean;

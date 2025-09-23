@@ -142,7 +142,7 @@ export async function unloadAll(): Promise<void> {
 
   await Promise.all(unloadPromises);
   cache = {};
-  // reset initialization state so tests that call unloadAll in afterEach get a fresh module state
+  // reset initialization _state so tests that call unloadAll in afterEach get a fresh module _state
   isInitialized = false;
 }
 

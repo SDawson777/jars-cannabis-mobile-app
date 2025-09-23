@@ -18,7 +18,6 @@ function withTimeout<T>(p: Promise<T>, ms = 12000): Promise<T> {
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 conciergeRouter.post('/concierge/chat', async (req, res) => {
   const apiKey = process.env.OPENAI_API_KEY;
   const { message, history = [] } = req.body || {};

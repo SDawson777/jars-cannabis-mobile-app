@@ -34,7 +34,7 @@ jest.mock('@react-navigation/native', () => ({
         phone: '555-555-5555',
         line1: 'Old',
         city: 'X',
-        state: 'Y',
+        _state: 'Y',
         zipCode: '00000',
         country: 'US',
         isDefault: true,
@@ -89,7 +89,7 @@ describe('EditAddressScreen form', () => {
       inputs[1].props.onChangeText('666-666-6666'); // phone
       inputs[2].props.onChangeText('New St'); // line1
       inputs[3].props.onChangeText('City'); // city
-      inputs[4].props.onChangeText('ST'); // state
+      inputs[4].props.onChangeText('ST'); // _state
       inputs[5].props.onChangeText('11111'); // zipCode
       inputs[6].props.onChangeText('US'); // country
     });

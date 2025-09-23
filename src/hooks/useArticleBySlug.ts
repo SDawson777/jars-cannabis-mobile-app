@@ -26,8 +26,8 @@ export function useArticleBySlug(slug: string) {
   return useQuery<CMSArticle, Error>({
     queryKey: ['cmsArticle', slug, preview],
     queryFn: async () => {
-      const state = await NetInfo.fetch();
-      if (!state.isConnected) {
+      const _state = await NetInfo.fetch();
+      if (!_state.isConnected) {
         return fetchArticle(slug, preview);
       }
       return fetchArticle(slug, preview);

@@ -17,7 +17,7 @@ export const contactInfoSchema = Yup.object().shape({
 });
 
 interface Props {
-  onNext: (values: { name: string; email: string; phone: string }) => void;
+  onNext: (_values: { name: string; email: string; phone: string }) => void;
 }
 
 export default function ContactInfoScreen({ onNext }: Props) {

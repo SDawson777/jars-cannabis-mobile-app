@@ -4,7 +4,7 @@ export interface CMSImageAsset {
 }
 
 export interface CMSProduct {
-  _id: string;
+  __id: string;
   name: string;
   slug: string;
   price: number;
@@ -14,7 +14,7 @@ export interface CMSProduct {
 }
 
 export interface CMSBanner {
-  _id: string;
+  __id: string;
   title: string;
   cta?: string;
   link?: string;
@@ -22,7 +22,7 @@ export interface CMSBanner {
 }
 
 export interface CMSArticle {
-  _id: string;
+  __id: string;
   title: string;
   slug: string;
   publishedAt: string;
@@ -31,7 +31,7 @@ export interface CMSArticle {
 }
 
 export interface CMSDrop {
-  _id: string;
+  __id: string;
   title: string;
   highlight?: string;
   items: number;

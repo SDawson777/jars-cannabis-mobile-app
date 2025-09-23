@@ -74,7 +74,7 @@ describe('AddAddressScreen form', () => {
       inputs[1].props.onChangeText('555-555-5555'); // phone
       inputs[2].props.onChangeText('123 Main St'); // line1
       inputs[3].props.onChangeText('Denver'); // city
-      inputs[4].props.onChangeText('CO'); // state
+      inputs[4].props.onChangeText('CO'); // _state
       inputs[5].props.onChangeText('80202'); // zipCode
       inputs[6].props.onChangeText('US'); // country
     });

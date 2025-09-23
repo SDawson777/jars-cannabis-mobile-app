@@ -7,7 +7,7 @@ import React from 'react';
 // native modules), provide lightweight mocks that require hooks at runtime so
 // individual tests can use jest.doMock to swap hook implementations.
 jest.mock('../screens/CartScreen', () => {
-  return function CartScreenMock(_props: any) {
+  return function CartScreenMock(__props: any) {
     const React = require('react');
     // Prefer jest.requireMock so per-test jest.doMock overrides are respected
     const useCartModule =
@@ -230,7 +230,7 @@ jest.mock('../screens/CheckoutScreen', () => {
       deliveryMethod === 'delivery'
         ? React.createElement('Text', null, 'Delivery Fee: $5.00')
         : React.createElement('Text', null, 'Pickup - No fee'),
-      // Order summary static values matching mockCart
+      // Order summary static _values matching mockCart
       React.createElement('Text', null, 'Subtotal'),
       React.createElement('Text', null, '$110.00'),
       React.createElement('Text', null, 'Tax'),
@@ -329,7 +329,7 @@ let mockCreateOrderMutate: any = jest.fn();
 let mockCreateOrderIsLoading = false;
 let mockCreateOrderOnSuccess: any = undefined;
 
-// Mock the useOrders hook to return values driven by the module-scoped defaults
+// Mock the useOrders hook to return _values driven by the module-scoped defaults
 jest.mock('../hooks/useOrders', () => ({
   useCreateOrder: () => ({
     // wrap so the current value of the module-scoped mock is used
@@ -376,10 +376,10 @@ describe('Checkout Flow', () => {
 
   describe('CartScreen', () => {
     // Ensure the zustand cart store is pre-populated so the screen doesn't stay
-    // in its initial loading state (hydrateCartStore). Individual tests can
+    // in its initial loading _state (hydrateCartStore). Individual tests can
     // override the store as needed.
     beforeEach(() => {
-      // Pre-populate zustand store so screen isn't in loading state
+      // Pre-populate zustand store so screen isn't in loading _state
       useCartStore.setState({
         items: mockCartItems.map(i => ({
           id: i.id,
@@ -464,7 +464,7 @@ describe('Checkout Flow', () => {
       expect(mockNavigate).toHaveBeenCalledWith('Checkout');
     });
 
-    it('should show empty cart state', async () => {
+    it('should show empty cart _state', async () => {
       defaultCartData = { items: [], total: 0, itemCount: 0 };
       const { getByText } = renderWithProviders(getCartScreen());
 
@@ -581,7 +581,7 @@ describe('Checkout Flow', () => {
       expect(getByText('Pickup - No fee')).toBeTruthy();
     });
 
-    it('should show loading state during order submission', async () => {
+    it('should show loading _state during order submission', async () => {
       mockCreateOrderMutate = jest.fn();
       mockCreateOrderIsLoading = true;
       const { getByTestId } = renderWithProviders(getCheckoutScreen());

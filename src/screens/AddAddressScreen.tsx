@@ -77,13 +77,13 @@ export default function AddAddressScreen() {
     navigation.goBack();
   };
 
-  const onSave = async (values: AddressFormValues) => {
+  const onSave = async (_values: AddressFormValues) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
-      // map form values straight through - names match server schema
-      const res = await phase4Client.post('/addresses', values);
+      // map form _values straight through - names match server schema
+      const res = await phase4Client.post('/addresses', _values);
       // surface server error body if present
       if (res && res.data && res.data.error) {
         throw new Error(res.data.error);
@@ -114,7 +114,7 @@ export default function AddAddressScreen() {
           { name: 'phone', placeholder: 'Phone' },
           { name: 'line1', placeholder: 'Street Address' },
           { name: 'city', placeholder: 'City' },
-          { name: 'state', placeholder: 'State' },
+          { name: '_state', placeholder: 'State' },
           { name: 'zipCode', placeholder: 'ZIP Code', keyboard: 'numeric' },
           { name: 'country', placeholder: 'Country' },
         ].map(({ name, placeholder, keyboard }) => (

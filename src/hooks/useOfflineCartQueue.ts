@@ -13,8 +13,8 @@ export function useOfflineCartQueue() {
   const [pending, setPending] = useState(false);
   useEffect(() => {
     const processQueue = async () => {
-      const state = await NetInfo.fetch();
-      if (!state.isConnected) return;
+      const _state = await NetInfo.fetch();
+      if (!_state.isConnected) return;
       const raw = await AsyncStorage.getItem('cartQueue');
       if (!raw) {
         setPending(false);
@@ -32,8 +32,8 @@ export function useOfflineCartQueue() {
       setPending(false);
     };
     processQueue();
-    const unsub = NetInfo.addEventListener(state => {
-      if (state.isConnected) processQueue();
+    const unsub = NetInfo.addEventListener(_state => {
+      if (_state.isConnected) processQueue();
     });
     return () => unsub();
   }, []);

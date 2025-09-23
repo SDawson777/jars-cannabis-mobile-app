@@ -27,7 +27,7 @@ export function useAuth() {
         await saveSecure('useBiometricAuth', 'true');
         return;
       }
-    } catch (_e) {
+    } catch (__e) {
       // fall through to Firebase fallback
     }
 
@@ -60,7 +60,7 @@ export function useAuth() {
         await saveSecure('useBiometricAuth', 'true');
         return;
       }
-    } catch (_e) {
+    } catch (__e) {
       // fallback to Firebase create + exchange idToken
     }
 

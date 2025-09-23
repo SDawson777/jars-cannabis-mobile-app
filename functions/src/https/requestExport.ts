@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+
 import { logger } from '../logger';
 
 export const requestExport = functions.https.onRequest(async (req, res) => {

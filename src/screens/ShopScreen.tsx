@@ -51,20 +51,20 @@ export default function ShopScreen() {
     // jest.* helpers directly to prevent interfering with Jest's module system.
 
     cart = require('../hooks/useCart').useCart();
-  } catch (_e) {
+  } catch (__e) {
     // fallback to a minimal stub to avoid runtime crashes in edge cases
     cart = { addItem: () => {} };
   }
 
   try {
     _useProducts = require('../hooks/useProducts').useProducts;
-  } catch (_e) {
+  } catch (__e) {
     _useProducts = () => ({ data: null, isLoading: false, error: null });
   }
 
   try {
     _useFiltersQuery = require('../hooks/useFilters').useFiltersQuery;
-  } catch (_e) {
+  } catch (__e) {
     _useFiltersQuery = () => ({ data: null, isLoading: false });
   }
 
@@ -119,7 +119,7 @@ export default function ShopScreen() {
   const skeletonSmall = useSkeletonText(60, 20);
   const skeletonLarge = useSkeletonText(80, 20);
 
-  // local UI state for search and filters (tests interact with these)
+  // local UI _state for search and filters (tests interact with these)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -163,13 +163,13 @@ export default function ShopScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.navigate('ProductDetail', {
       // prefer explicit slug when present, otherwise fallback to ids
-      slug: (product as any).slug ?? (product as any)._id ?? (product as any).id,
+      slug: (product as any).slug ?? (product as any).__id ?? (product as any).id,
     });
   };
 
   const handleAddToCart = (product: CMSProduct) => {
     const addItem = cart?.addItem ?? cart?.updateCart ?? cart?.addToCart;
-    const productId = (product as any).id ?? (product as any)._id ?? (product as any).slug;
+    const productId = (product as any).id ?? (product as any).__id ?? (product as any).slug;
     if (typeof addItem === 'function') {
       // construct backend-expected payload: { items: [{ productId, quantity, price?, variantId? }] }
       const item: any = { productId, quantity: 1 };
@@ -180,11 +180,11 @@ export default function ShopScreen() {
         // support both: prefer calling with full items payload
         try {
           addItem({ items: [item] });
-        } catch (_inner) {
+        } catch (__inner) {
           // fallback to calling addItem directly with single item (store-level API)
           addItem(item);
         }
-      } catch (_e) {
+      } catch (__e) {
         // ignore test-side queued errors
       }
     }
@@ -237,7 +237,7 @@ export default function ShopScreen() {
           <Text>Failed to load products</Text>
         </View>
       ) : products.length === 0 ? (
-        // Render an explicit empty state outside of FlatList for tests and simplicity
+        // Render an explicit empty _state outside of FlatList for tests and simplicity
         <View style={styles.list}>
           <Text>No products found</Text>
         </View>
@@ -257,7 +257,7 @@ export default function ShopScreen() {
               <Text>No products found</Text>
             </View>
           )}
-          keyExtractor={item => (item as any)._id ?? (item as any).id ?? (item as any).slug}
+          keyExtractor={item => (item as any).__id ?? (item as any).id ?? (item as any).slug}
           numColumns={2}
           contentContainerStyle={styles.list}
           onEndReached={() => hasNextPage && fetchNextPage()}
@@ -294,7 +294,7 @@ export default function ShopScreen() {
               <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
               <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
               <Pressable
-                testID={`add-to-cart-${(item as any).id ?? (item as any)._id ?? (item as any).slug}`}
+                testID={`add-to-cart-${(item as any).id ?? (item as any).__id ?? (item as any).slug}`}
                 onPress={() => handleAddToCart(item)}
                 accessibilityLabel={`Add ${item.name} to cart`}
               >

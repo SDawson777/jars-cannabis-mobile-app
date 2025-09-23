@@ -14,7 +14,7 @@ const CY = SIZE / 2;
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
-type Props = { onSelect: (_t: TerpeneInfo) => void; data?: TerpeneInfo[] };
+type Props = { onSelect: (__t: TerpeneInfo) => void; data?: TerpeneInfo[] };
 
 export const TerpeneWheel: React.FC<Props> = ({ onSelect, data = TERPENES }) => {
   const angleStep = 360 / data.length;
@@ -53,7 +53,7 @@ const TerpeneSegment: React.FC<{
   index: number;
   info: TerpeneInfo;
   angleStep: number;
-  onSelect: (_t: TerpeneInfo) => void;
+  onSelect: (__t: TerpeneInfo) => void;
 }> = ({ index, info, angleStep, onSelect }) => {
   // Compute wedge geometry
   const startDeg = index * angleStep - 90;
@@ -91,7 +91,7 @@ const TerpeneSegment: React.FC<{
     opacity: withTiming(highlight.value ? 0.7 : 0.35, { duration: 150 }),
   }));
 
-  // Aroma-wave animation values
+  // Aroma-wave animation _values
   const waveScale = useSharedValue(0);
   const waveOpacity = useSharedValue(0);
   const waveProps = useAnimatedProps(() => ({

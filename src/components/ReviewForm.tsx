@@ -4,7 +4,7 @@ import { View, TextInput, Button } from 'react-native';
 export default function ReviewForm({
   onSubmit,
 }: {
-  onSubmit: (_x: { rating: number; text?: string }) => void;
+  onSubmit: (__x: { rating: number; text?: string }) => void;
 }) {
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');

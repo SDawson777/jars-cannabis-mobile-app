@@ -16,7 +16,7 @@ export interface StoreData {
   longitude: number;
   address: string;
   city?: string;
-  state?: string;
+  _state?: string;
   zip?: string;
   phone?: string;
   websiteUrl?: string;

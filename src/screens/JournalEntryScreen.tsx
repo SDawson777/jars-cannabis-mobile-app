@@ -20,7 +20,7 @@ export default function JournalEntryScreen() {
   const navigation = useNavigation<NavProp>();
   const { jarsPrimary } = React.useContext(ThemeContext);
 
-  const [values, setValues] = React.useState(
+  const [_values, setValues] = React.useState(
     LABELS.reduce<Record<string, number>>((acc, l) => ({ ...acc, [l]: 0 }), {})
   );
   const [notes, setNotes] = React.useState('');
@@ -29,20 +29,17 @@ export default function JournalEntryScreen() {
     setValues(v => ({ ...v, [label]: val }));
   };
 
-
-
   const saveEntry = async () => {
     hapticLight();
     try {
-      const rating =
-        Object.values(values).reduce((a, b) => a + b, 0) / LABELS.length;
+      const rating = Object.values(_values).reduce((a, b) => a + b, 0) / LABELS.length;
       await addJournal({
         productId: params.item.id,
         rating,
         notes,
-        tags: LABELS.filter(l => values[l] > 0),
+        tags: LABELS.filter(l => _values[l] > 0),
       });
-    } catch (_e) {
+    } catch (__e) {
       // ignore
     }
     navigation.goBack();
@@ -60,11 +57,11 @@ export default function JournalEntryScreen() {
             minimumValue={0}
             maximumValue={10}
             step={1}
-            value={values[label]}
+            value={_values[label]}
             minimumTrackTintColor={jarsPrimary}
             onValueChange={v => handleChange(label, v)}
           />
-          <Text style={styles.sliderValue}>{values[label]}</Text>
+          <Text style={styles.sliderValue}>{_values[label]}</Text>
         </View>
       ))}
       <TextInput

@@ -136,7 +136,7 @@ describe('Profile Basic Features', () => {
   });
 
   describe('EditProfileScreen', () => {
-    it('should render edit profile form with current values', () => {
+    it('should render edit profile form with current _values', () => {
       const { getByDisplayValue, getByPlaceholderText } = render(
         <TestWrapper>
           <EditProfileScreen />

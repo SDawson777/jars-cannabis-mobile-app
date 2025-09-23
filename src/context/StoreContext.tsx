@@ -6,7 +6,7 @@ import { usePreferredStore } from '../state/store';
 
 interface StoreContextState {
   preferredStore?: StoreData;
-  setPreferredStore(_store: StoreData): void;
+  setPreferredStore(__store: StoreData): void;
 }
 
 const StoreContext = createContext<StoreContextState>({

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">43.24% </span>
+                <span class="strong">38.09% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/37</span>
+                <span class='fraction'>16/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">16.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/12</span>
+                <span class='fraction'>4/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">27.27% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>3/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.44% </span>
+                <span class="strong">39.02% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/36</span>
+                <span class='fraction'>16/41</span>
             </div>
         
             
@@ -156,7 +156,23 @@
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
 <a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -189,6 +205,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -210,10 +228,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -243,6 +265,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,8 +308,8 @@ export function useCart() {
   const [loadingFromCache, setLoadingFromCache] = useState(false);
 &nbsp;
   const fetchCart = async (): Promise&lt;Cart&gt; =&gt; {
-    const state = await NetInfo.fetch();
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (!state.isConnected) {
+    const _state = await NetInfo.fetch();
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (!_state.isConnected) {
       const cached = await AsyncStorage.getItem('cart');
       <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) {
         setLoadingFromCache(true);
@@ -286,8 +318,10 @@ export function useCart() {
 <span class="cstat-no" title="statement not covered" >      throw new Error('Offline');</span>
     }
     const { data } = <span class="cstat-no" title="statement not covered" >await phase4Client.get('/cart');</span>
-<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem('cart', JSON.stringify(data));</span>
-<span class="cstat-no" title="statement not covered" >    return data;</span>
+    // backend returns { cart: { items: [...], total } }
+    const cartPayload = <span class="cstat-no" title="statement not covered" >data?.cart ?? data;</span>
+<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));</span>
+<span class="cstat-no" title="statement not covered" >    return cartPayload;</span>
   };
 &nbsp;
   const query = useQuery&lt;Cart, Error&gt;({
@@ -301,13 +335,17 @@ export function useCart() {
 &nbsp;
   const mutation = useMutation&lt;Cart, Error, Partial&lt;Cart&gt;&gt;({
     mutationFn: <span class="fstat-no" title="function not covered" >as</span>ync body =&gt; {
-      const state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
-<span class="cstat-no" title="statement not covered" >      if (!state.isConnected) {</span>
-<span class="cstat-no" title="statement not covered" >        await queueAction({ endpoint: '/cart/update', payload: body });</span>
+      const _state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
+<span class="cstat-no" title="statement not covered" >      if (!_state.isConnected) {</span>
+        // ensure payload matches backend expectation: { items: [...] }
+        const payload = <span class="cstat-no" title="statement not covered" >body.items ? body : { items: (body as any).items ?? [] };</span>
+<span class="cstat-no" title="statement not covered" >        await queueAction({ endpoint: '/cart/update', payload });</span>
 <span class="cstat-no" title="statement not covered" >        throw new Error('queued');</span>
       }
-      const { data } = <span class="cstat-no" title="statement not covered" >await phase4Client.post('/cart/update', body);</span>
-<span class="cstat-no" title="statement not covered" >      return data;</span>
+      const payload = <span class="cstat-no" title="statement not covered" >body.items ? body : { items: (body as any).items ?? [] };</span>
+      const { data } = <span class="cstat-no" title="statement not covered" >await phase4Client.post('/cart/update', payload);</span>
+      // backend returns { cart: {...} }
+<span class="cstat-no" title="statement not covered" >      return data?.cart ?? data;</span>
     },
     onMutate: <span class="fstat-no" title="function not covered" >as</span>ync vars =&gt; {
 <span class="cstat-no" title="statement not covered" >      await queryClient.cancelQueries({ queryKey: ['cart'] });</span>
@@ -337,6 +375,16 @@ export function useCart() {
     isFetching: query.isFetching,
     error: query.error,
     updateCart: mutation.mutateAsync,
+    // convenience helper to send an array of items: { items: [...] }
+    addItems: <span class="fstat-no" title="function not covered" >as</span>ync (items: Partial&lt;CartItem&gt;[]) =&gt; {
+<span class="cstat-no" title="statement not covered" >      return mutation.mutateAsync({ items } as any);</span>
+    },
+    // convenience helper to add a single item (keeps backwards compatibility)
+    addItem: <span class="fstat-no" title="function not covered" >as</span>ync (item: Partial&lt;CartItem&gt;) =&gt; {
+      // If caller passes legacy shape { productId, quantity } copy into item.id
+      // The server expects productId in items; preserve caller fields (productId/quantity/price/variantId)
+<span class="cstat-no" title="statement not covered" >      return mutation.mutateAsync({ items: [item] } as any);</span>
+    },
     applyPromo,
     refetchCart: query.refetch,
     hasPending: pending,
@@ -349,7 +397,7 @@ export function useCart() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-10T05:52:02.365Z
+                at 2025-09-23T18:45:22.147Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -26,7 +26,6 @@ qaRouter.get('/diag/env', (_req, res) => {
 });
 
 // 2) OpenAI ping
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 qaRouter.post('/diag/openai', async (req, res) => {
   if (!guard(req, res)) return;
   try {
@@ -50,7 +49,6 @@ qaRouter.post('/diag/openai', async (req, res) => {
 });
 
 // 3) Firebase write test
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 qaRouter.post('/diag/firebase', async (req, res) => {
   if (!guard(req, res)) return;
   try {
@@ -66,7 +64,6 @@ qaRouter.post('/diag/firebase', async (req, res) => {
 });
 
 // 4) QA bootstrap: ensures store + product(+variant); returns fresh email for Register
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 qaRouter.post('/diag/bootstrap', async (req, res) => {
   if (!guard(req, res)) return;
   const ts = Date.now();

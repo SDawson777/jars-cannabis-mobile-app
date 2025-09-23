@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  preset: 'react-native',
   testEnvironment: 'jsdom',
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|react-native-reanimated|react-native-gesture-handler|expo|@expo|expo-modules-core)/)'
@@ -35,9 +34,7 @@ module.exports = {
     '^expo$': '<rootDir>/tests/__mocks__/expo.js',
     '^expo-linking$': '<rootDir>/tests/__mocks__/expo-linking.js',
     '^expo-constants$': '<rootDir>/tests/__mocks__/expo-constants.js',
-    '^react-native/jest/mock$': '<rootDir>/tests/__mocks__/reactNativeMock.js',
-    '^react-native/jest/mock.js$': '<rootDir>/tests/__mocks__/reactNativeMock.js',
-    '^react-native/jest/mock.*': '<rootDir>/tests/__mocks__/reactNativeMock.js',
+  '^react-native/jest/(mock|mock.js|.*mock.*)$': '<rootDir>/tests/__mocks__/reactNativeMock.js',
     '^react-native/jest/setup$': '<rootDir>/tests/__mocks__/reactNativeSetup.js',
     '^react-native/jest/setup.js$': '<rootDir>/tests/__mocks__/reactNativeSetup.js',
     '^react-native/jest/.*': '<rootDir>/tests/__mocks__/reactNativeMock.js',

@@ -6,7 +6,6 @@ import { admin, initFirebase } from '../bootstrap/firebase-admin';
 export const dataRouter = Router();
 
 // Start a data export job and upload results to Firebase Storage
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 dataRouter.post('/data-transparency/export', authRequired, async (req, res, next) => {
   try {
     const uid = (req as any).user.userId as string;
@@ -56,7 +55,6 @@ dataRouter.post('/data-transparency/export', authRequired, async (req, res, next
 });
 
 // Retrieve status of a previously requested data export
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 dataRouter.get('/data-transparency/export/:exportId', authRequired, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const d = await prisma.dataExport.findFirst({ where: { id: req.params.exportId, userId: uid } });

@@ -1,9 +1,9 @@
-import { 
-  parseDeepLink, 
-  buildDeepLink, 
-  isJarsDeepLink, 
-  getAvailableRoutes, 
-  validateRoutePattern 
+import {
+  parseDeepLink,
+  buildDeepLink,
+  isJarsDeepLink,
+  getAvailableRoutes,
+  validateRoutePattern,
 } from '../utils/deepLinkUtils';
 
 describe('Deep Link Utilities', () => {
@@ -168,7 +168,7 @@ describe('Deep Link Utilities', () => {
   describe('getAvailableRoutes', () => {
     it('should return all configured routes', () => {
       const routes = getAvailableRoutes();
-      
+
       // Check for key routes to ensure the function works
       expect(routes.HomeScreen).toBe('home');
       expect(routes.ShopScreen).toBe('shop');
@@ -183,7 +183,7 @@ describe('Deep Link Utilities', () => {
     it('should return a copy (not the original object)', () => {
       const routes1 = getAvailableRoutes();
       const routes2 = getAvailableRoutes();
-      
+
       // Modify one and ensure the other is not affected
       routes1.TestRoute = 'test';
       expect(routes2.TestRoute).toBeUndefined();
@@ -210,8 +210,8 @@ describe('Deep Link Utilities', () => {
     });
 
     it('should validate patterns with underscores in parameter names', () => {
-      expect(validateRoutePattern('item/:item_id')).toBe(true);
-      expect(validateRoutePattern('user/:user_profile_id')).toBe(true);
+      expect(validateRoutePattern('item/:item__id')).toBe(true);
+      expect(validateRoutePattern('user/:user_profile__id')).toBe(true);
     });
 
     it('should validate patterns with numbers in parameter names', () => {
@@ -237,7 +237,7 @@ describe('Deep Link Utilities', () => {
     it('should round-trip build and parse for simple routes', () => {
       const built = buildDeepLink('ShopScreen');
       const parsed = parseDeepLink(built);
-      
+
       expect(parsed).toEqual({
         routeName: 'ShopScreen',
         params: {},
@@ -247,7 +247,7 @@ describe('Deep Link Utilities', () => {
     it('should round-trip build and parse for parameterized routes', () => {
       const built = buildDeepLink('ProductDetail', { slug: 'test-product' });
       const parsed = parseDeepLink(built);
-      
+
       expect(parsed).toEqual({
         routeName: 'ProductDetail',
         params: { slug: 'test-product' },
@@ -257,7 +257,7 @@ describe('Deep Link Utilities', () => {
     it('should round-trip build and parse for complex routes', () => {
       const built = buildDeepLink('EditAddress', { addressId: 'addr-123-abc' });
       const parsed = parseDeepLink(built);
-      
+
       expect(parsed).toEqual({
         routeName: 'EditAddress',
         params: { addressId: 'addr-123-abc' },

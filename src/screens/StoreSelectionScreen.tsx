@@ -81,7 +81,7 @@ export default function StoreSelectionScreen() {
           }
         }
       }
-    } catch (_e) {
+    } catch (__e) {
       hapticHeavy();
     } finally {
       setLoading(false);
@@ -139,10 +139,10 @@ export default function StoreSelectionScreen() {
         <View style={styles.emptyContainer}>
           <Image source={Illustration} style={styles.illustration} />
           <Text style={styles.emptyText}>No nearby stores</Text>
-          <AudioPlayer 
-            audioKey="empty_state_sigh" 
-            source={require('../../assets/audio/empty_state_sigh.mp3')} 
-            play={true} 
+          <AudioPlayer
+            audioKey="empty_state_sigh"
+            source={require('../../assets/audio/empty_state_sigh.mp3')}
+            play={true}
           />
           <Pressable onPress={() => navigation.navigate('StoreLocator')}>
             <Text style={styles.link}>Search All Locations</Text>

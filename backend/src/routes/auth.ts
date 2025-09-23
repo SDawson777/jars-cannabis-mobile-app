@@ -43,7 +43,7 @@ authRouter.post('/auth/login', async (req, res) => {
 			}
 			const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 			return res.json({ token, user: { id: user.id, email: user.email } });
-		} catch (_e) {
+		} catch {
 			return res.status(401).json({ error: 'Invalid idToken' });
 		}
 	}
@@ -73,7 +73,7 @@ authRouter.post('/auth/refresh', async (req, res) => {
 		if (!payload?.userId) return res.status(401).json({ error: 'Invalid token' });
 		const token = (jwt as any).sign({ userId: payload.userId }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 		return res.json({ token });
-	} catch (_e) {
+	} catch {
 		return res.status(401).json({ error: 'Invalid token' });
 	}
 });

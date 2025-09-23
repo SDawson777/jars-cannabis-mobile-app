@@ -20,7 +20,7 @@ export default function LegalDisclaimerModal({ visible, onClose }: Props) {
             <Text style={[styles.title, { color: jarsPrimary }]}>Legal Disclaimer</Text>
             <Text style={[styles.body, { color: jarsSecondary }]}>
               This app is intended for use only by adults 21 years of age or older. All purchases
-              must comply with applicable state and local laws. Please consume responsibly.
+              must comply with applicable _state and local laws. Please consume responsibly.
             </Text>
           </ScrollView>
           <Pressable

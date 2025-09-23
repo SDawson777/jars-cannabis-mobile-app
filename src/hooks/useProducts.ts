@@ -26,9 +26,9 @@ export function useProducts(storeId?: string, filter?: string) {
     queryKey: ['products', storeId, filter],
     queryFn: async ({ pageParam = 1 }) => {
       const cacheKey = `products:${storeId || 'all'}:${filter || 'all'}:${pageParam}`;
-      const state = await NetInfo.fetch();
+      const _state = await NetInfo.fetch();
 
-      if (!state.isConnected) {
+      if (!_state.isConnected) {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached) return JSON.parse(cached) as ProductPage;
         throw new Error('Offline');

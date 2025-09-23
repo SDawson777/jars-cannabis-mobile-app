@@ -76,7 +76,7 @@ describe('AudioPlayer', () => {
     expect(audio.stop).toHaveBeenCalledWith('test');
   });
 
-  it('should use default values for optional props', () => {
+  it('should use default _values for optional props', () => {
     render(<AudioPlayer audioKey="test" source={mockSource} play={true} />);
 
     expect(audio.play).toHaveBeenCalledWith('test', mockSource, {

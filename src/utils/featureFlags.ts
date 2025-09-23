@@ -21,7 +21,7 @@ const defaultFeatureFlags: FeatureFlags = {
 };
 
 /**
- * Get the current feature flag values
+ * Get the current feature flag _values
  * In the future, this could be enhanced to fetch from:
  * - Remote config service (Firebase Remote Config)
  * - A/B testing platform

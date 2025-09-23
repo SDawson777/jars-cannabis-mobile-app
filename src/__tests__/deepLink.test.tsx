@@ -31,7 +31,7 @@ beforeEach(() => {
   SecureStore.setItemAsync.mockResolvedValue(undefined);
   SecureStore.deleteItemAsync.mockResolvedValue(undefined);
   // Ensure Linking functions on the global mock are set for this test
-  (Linking as any).addEventListener = jest.fn((_type, _cb) => ({ remove: jest.fn() }));
+  (Linking as any).addEventListener = jest.fn((__type, __cb) => ({ remove: jest.fn() }));
   (Linking as any).getInitialURL = jest.fn(() => Promise.resolve('jars://app/shop?store=midtown'));
   (Linking as any).getInitialURL = jest.fn(() => Promise.resolve('jars://shop?store=midtown'));
 });

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">13.23% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/68</span>
+                <span class='fraction'>9/68</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">14.75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/61</span>
+                <span class='fraction'>9/61</span>
             </div>
         
             
@@ -213,29 +213,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -247,7 +235,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -356,17 +356,17 @@ import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
 &nbsp;
 import logger from '../lib/logger';
-const EXPO_PUBLIC_OPENWEATHER_KEY = <span class="cstat-no" title="statement not covered" >process.env.EXPO_PUBLIC_OPENWEATHER_KEY as string;</span>
+const EXPO_PUBLIC_OPENWEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_KEY as string;
 &nbsp;
 // Tuned threshold constants
-const COOL_THRESHOLD_METRIC = <span class="cstat-no" title="statement not covered" >12;</span> // °C below which we consider it 'cool'
-const WARM_THRESHOLD_METRIC = <span class="cstat-no" title="statement not covered" >22;</span> // °C above which we consider it 'warm'
-const COOL_THRESHOLD_IMPERIAL = <span class="cstat-no" title="statement not covered" >54;</span> // °F below which we consider it 'cool'
-const WARM_THRESHOLD_IMPERIAL = <span class="cstat-no" title="statement not covered" >72;</span> // °F above which we consider it 'warm'
+const COOL_THRESHOLD_METRIC = 12; // °C below which we consider it 'cool'
+const WARM_THRESHOLD_METRIC = 22; // °C above which we consider it 'warm'
+const COOL_THRESHOLD_IMPERIAL = 54; // °F below which we consider it 'cool'
+const WARM_THRESHOLD_IMPERIAL = 72; // °F above which we consider it 'warm'
 &nbsp;
 // Cloud-cover adjustment thresholds (percent)
-const SUNNY_CLOUD_THRESHOLD = <span class="cstat-no" title="statement not covered" >30;</span> // clouds% below which we boost toward 'warm'
-const CLOUDY_CLOUD_THRESHOLD = <span class="cstat-no" title="statement not covered" >70;</span> // clouds% above which we boost toward 'cool'
+const SUNNY_CLOUD_THRESHOLD = 30; // clouds% below which we boost toward 'warm'
+const CLOUDY_CLOUD_THRESHOLD = 70; // clouds% above which we boost toward 'cool'
 &nbsp;
 type ColorTemp = 'warm' | 'neutral' | 'cool';
 &nbsp;
@@ -378,7 +378,7 @@ interface ThemeContextValue {
   loading: boolean;
 }
 &nbsp;
-export const ThemeContext = <span class="cstat-no" title="statement not covered" >createContext&lt;ThemeContextValue&gt;({</span>
+export const ThemeContext = createContext&lt;ThemeContextValue&gt;({
   colorTemp: 'neutral',
   jarsPrimary: '#2E5D46',
   jarsSecondary: '#8CD24C',
@@ -390,7 +390,7 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 &nbsp;
-export const ThemeProvider: React.FC&lt;ThemeProviderProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> children }) =&gt; {</span>
+export const ThemeProvider: React.FC&lt;ThemeProviderProps&gt; = <span class="fstat-no" title="function not covered" >({</span> children }) =&gt; {
   const [colorTemp, setColorTemp] = <span class="cstat-no" title="statement not covered" >useState&lt;ColorTemp&gt;('neutral');</span>
   const [loading, setLoading] = <span class="cstat-no" title="statement not covered" >useState&lt;boolean&gt;(true);</span>
 &nbsp;
@@ -499,7 +499,7 @@ export const ThemeProvider: React.FC&lt;ThemeProviderProps&gt; = <span class="cs
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-10T05:52:02.365Z
+                at 2025-09-23T18:45:22.147Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -62,7 +62,7 @@ export default function ArticleListScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <FlatList<CMSArticle>
         data={articles}
-        keyExtractor={item => item._id}
+        keyExtractor={item => item.__id}
         renderItem={({ item }) => (
           <Pressable style={styles.row} onPress={() => openArticle(item.slug)}>
             <Text style={[styles.title, { color: jarsPrimary }]}>{item.title}</Text>

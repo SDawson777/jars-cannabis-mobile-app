@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/19</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
@@ -112,7 +112,14 @@
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -133,6 +140,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -180,9 +192,15 @@ export interface ProductDetails {
   variants: ProductVariant[];
 }
 &nbsp;
+// The backend returns { product, relatedProducts } where product may include variants
 async function <span class="fstat-no" title="function not covered" >fetchProduct(</span>productId: string, storeId?: string): Promise&lt;ProductDetails&gt; {
   const res = <span class="cstat-no" title="statement not covered" >await phase4Client.get(`/products/${productId}`, { params: { storeId } });</span>
-<span class="cstat-no" title="statement not covered" >  return res.data;</span>
+  // normalize to { product, variants }
+  const payload = <span class="cstat-no" title="statement not covered" >res.data || {};</span>
+  const product = <span class="cstat-no" title="statement not covered" >payload.product ?? payload;</span>
+  const variants: ProductVariant[] = <span class="cstat-no" title="statement not covered" >(product &amp;&amp; (product.variants ?? product.variants) as any) || [];</span>
+  // ensure variants are in the expected shape (fallback empty)
+<span class="cstat-no" title="statement not covered" >  return { product, variants };</span>
 }
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >useProductDetails(</span>productId: string | undefined, storeId?: string) {
@@ -192,8 +210,8 @@ export function <span class="fstat-no" title="function not covered" >useProductD
     queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
 <span class="cstat-no" title="statement not covered" >      if (!productId) <span class="cstat-no" title="statement not covered" >throw new Error('Missing productId');</span></span>
       const cacheKey = <span class="cstat-no" title="statement not covered" >`productDetails:${productId}:${storeId || 'all'}`;</span>
-      const state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
-<span class="cstat-no" title="statement not covered" >      if (!state.isConnected) {</span>
+      const _state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
+<span class="cstat-no" title="statement not covered" >      if (!_state.isConnected) {</span>
         const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
 <span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as ProductDetails;</span></span>
 <span class="cstat-no" title="statement not covered" >        throw new Error('Offline');</span>
@@ -217,7 +235,7 @@ export function <span class="fstat-no" title="function not covered" >useProductD
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-10T05:52:02.365Z
+                at 2025-09-23T18:45:22.147Z
             </div>
         <script src="../prettify.js"></script>
         <script>

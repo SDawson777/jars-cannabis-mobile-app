@@ -25,8 +25,8 @@ export function useCart() {
   const [loadingFromCache, setLoadingFromCache] = useState(false);
 
   const fetchCart = async (): Promise<Cart> => {
-    const state = await NetInfo.fetch();
-    if (!state.isConnected) {
+    const _state = await NetInfo.fetch();
+    if (!_state.isConnected) {
       const cached = await AsyncStorage.getItem('cart');
       if (cached) {
         setLoadingFromCache(true);
@@ -52,8 +52,8 @@ export function useCart() {
 
   const mutation = useMutation<Cart, Error, Partial<Cart>>({
     mutationFn: async body => {
-      const state = await NetInfo.fetch();
-      if (!state.isConnected) {
+      const _state = await NetInfo.fetch();
+      if (!_state.isConnected) {
         // ensure payload matches backend expectation: { items: [...] }
         const payload = body.items ? body : { items: (body as any).items ?? [] };
         await queueAction({ endpoint: '/cart/update', payload });

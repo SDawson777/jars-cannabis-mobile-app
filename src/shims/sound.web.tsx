@@ -3,7 +3,7 @@ export default class Sound {
   constructor(_file: any, _base: any, onLoad?: () => void) {
     if (onLoad) setTimeout(onLoad, 0);
   }
-  setNumberOfLoops(_loops: number) {
+  setNumberOfLoops() {
     return this;
   }
   play() {}
@@ -12,4 +12,3 @@ export default class Sound {
   }
   release() {}
 }
-

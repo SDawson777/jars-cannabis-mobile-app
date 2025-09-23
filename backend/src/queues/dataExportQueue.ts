@@ -11,7 +11,7 @@ export const exportQueue = new Queue('exportQueue', {
 
 // Define the job processor
 exportQueue.process(async job => {
-  const { exportId, userId } = job.data as { exportId: string; userId: string };
+  const { exportId } = job.data as { exportId: string; userId: string };
 
   // Simulate data generation (e.g., CSV/ZIP creation)
   await new Promise(resolve => setTimeout(resolve, 3000));

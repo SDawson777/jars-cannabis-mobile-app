@@ -56,7 +56,7 @@ function TestApp() {
 
 describe('TerpeneWheel Navigation', () => {
   it('navigates to TerpeneWheel when CTA is pressed', () => {
-    const { getByTestId, getByText: _getByText } = render(<TestApp />);
+    const { getByTestId, getByText: __getByText } = render(<TestApp />);
 
     // Find and press the terpene wheel CTA by testID to avoid text/emoji mismatches
     const terpeneWheelCTA = getByTestId('terpene-wheel-cta');
@@ -64,7 +64,7 @@ describe('TerpeneWheel Navigation', () => {
 
     fireEvent.press(terpeneWheelCTA);
 
-    // Should navigate to TerpeneWheel screen (in a real app we'd check navigation state)
+    // Should navigate to TerpeneWheel screen (in a real app we'd check navigation _state)
     // For now, just verify the CTA exists and is pressable
   });
 

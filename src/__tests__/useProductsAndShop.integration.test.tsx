@@ -19,7 +19,7 @@ const { useProducts } = require('../hooks/useProducts');
 function makePage(page: number, count = 2) {
   const products = Array.from({ length: count }).map((_, i) => ({
     id: `p-${page}-${i}`,
-    _id: `p-${page}-${i}`,
+    __id: `p-${page}-${i}`,
     name: `Product ${page}-${i}`,
     price: 1.5 + i,
   }));

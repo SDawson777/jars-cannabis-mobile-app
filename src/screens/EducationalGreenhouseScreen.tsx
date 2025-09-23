@@ -83,7 +83,7 @@ export default function EducationalGreenhouseScreen() {
       {!isLoading && !isError && data && (
         <FlatList
           data={data}
-          keyExtractor={a => a._id}
+          keyExtractor={a => a.__id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <ArticlePreviewCard article={item} onPress={() => openArticle(item.slug)} />

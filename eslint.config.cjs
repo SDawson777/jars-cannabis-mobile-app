@@ -61,6 +61,97 @@ module.exports = [
       'testing-library': testingLibrary
     },
     rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      'no-unused-vars': 'off',
+    },
+  },
+  {
+    files: ['backend/src/**/*.{ts,tsx,js,jsx}'],
+    ignores: ['**/*.d.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: ['./backend/tsconfig.json'],
+        tsconfigRootDir: __dirname,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true }
+      },
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        __DEV__: 'readonly'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      'no-unused-vars': 'off',
+    },
+  },
+  {
+    files: ['functions/**/*.{ts,tsx,js,jsx}'],
+    ignores: ['**/*.d.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: ['./functions/tsconfig.json'],
+        tsconfigRootDir: __dirname,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true }
+      },
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        __DEV__: 'readonly'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      react,
+      'react-hooks': reactHooks,
+      'react-native': reactNative,
+      import: importPlugin,
+      jest,
+      'testing-library': testingLibrary
+    },
+    rules: {
       '@typescript-eslint/no-unused-vars': ['warn', { 
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
@@ -144,8 +235,7 @@ module.exports = [
   },
   {
     ignores: [
-        '**/*.d.ts',
-      'app.config.ts',
+      '**/*.d.ts',
       'dist/',
       'build/',
       'out/',
@@ -166,10 +256,14 @@ module.exports = [
       'ios/DerivedData/',
       'assets/splash/',
       'src/terpene_wheel/snippets/',
-      'backend/',
-      'functions/',
+      'app.config.ts',
+      'backend/jest.config.ts',
+      'backend/prisma/',
+      'backend/start-prod.js',
+      'backend/tests/',
+      'functions/lib/',
       'server/',
-      'apps/'
+      'apps/',
     ]
   }
 ];

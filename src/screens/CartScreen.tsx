@@ -36,9 +36,9 @@ const IMAGE_SIZE = 80;
 export default function CartScreen() {
   const navigation = useNavigation<CartNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const items = useCartStore(state => state.items);
-  const updateQuantity = useCartStore(state => state.updateQuantity);
-  const removeItemFromStore = useCartStore(state => state.removeItem);
+  const items = useCartStore(_state => _state.items);
+  const updateQuantity = useCartStore(_state => _state.updateQuantity);
+  const removeItemFromStore = useCartStore(_state => _state.removeItem);
   const [promo, setPromo] = useState('');
 
   const [hydrated, setHydrated] = useState(false);

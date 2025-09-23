@@ -5,15 +5,15 @@ import type { StoreData } from '../@types/store';
 
 interface PreferredStoreState {
   preferredStore?: StoreData;
-  setPreferredStore: (_store: StoreData) => void;
+  setPreferredStore: (__store: StoreData) => void;
   hydrate: () => Promise<void>;
 }
 
 export const usePreferredStore = create<PreferredStoreState>(set => ({
   preferredStore: undefined,
-  setPreferredStore: _store => {
-    set({ preferredStore: _store });
-    SecureStore.setItemAsync('preferredStore', JSON.stringify(_store)).catch(() => {});
+  setPreferredStore: __store => {
+    set({ preferredStore: __store });
+    SecureStore.setItemAsync('preferredStore', JSON.stringify(__store)).catch(() => {});
   },
   hydrate: async () => {
     try {

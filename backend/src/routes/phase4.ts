@@ -7,20 +7,20 @@ import { Router } from 'express';
 let admin: any;
 let getFirestore: any;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // require is used for dynamic import fallback
   const fb = require('@server/firebaseAdmin');
   admin = fb.admin;
   getFirestore = fb.getFirestore;
-} catch (err) {
+} catch {
   // fallback stub
   admin = { firestore: { FieldValue: { serverTimestamp: () => new Date().toISOString() } } };
   getFirestore = () => ({
-    collection: (_name: string) => ({
+    collection: () => ({
       get: async () => ({ docs: [] }),
       doc: (id?: string) => ({
         id: id || `doc-${Math.random().toString(36).slice(2,8)}`,
         get: async () => ({ exists: false, data: () => null }),
-        set: async (_d: any) => {},
+        set: async () => {},
       }),
     }),
   });

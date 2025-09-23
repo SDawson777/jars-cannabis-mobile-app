@@ -8,7 +8,7 @@ import CMSImage from './CMSImage';
 
 interface Props {
   drops: CMSDrop[];
-  onPress?: (_drop: CMSDrop) => void;
+  onPress?: (__drop: CMSDrop) => void;
 }
 
 export default function ProductDropCarousel({ drops, onPress }: Props) {
@@ -34,7 +34,7 @@ export default function ProductDropCarousel({ drops, onPress }: Props) {
     >
       {drops.map(d => (
         <Pressable
-          key={d._id}
+          key={d.__id}
           onPress={() => {
             hapticLight();
             onPress?.(d);

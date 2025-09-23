@@ -39,9 +39,10 @@ return res.status(201).json({ item, cart: refreshed, total });
 });
 
 // Accepts { items?: [{ productId, variantId?, quantity }], promo?: string, storeId?: string }
+
 cartRouter.post('/cart/update', requireAuth, async (req, res) => {
 	const uid = (req as any).user.userId as string;
-	const { items = [], promo, storeId } = req.body || {};
+	const { items = [], storeId } = req.body || {};
 	const cart = await getOrCreateCart(uid, storeId);
 
 	// If items provided, reconcile cart items to match the provided list
@@ -103,7 +104,7 @@ try {
 	const cart = await prisma.cart.findUnique({ where: { id: item.cartId }, include: { items: { include: { product: true, variant: true } } } });
 	const total = (cart?.items || []).reduce((s, it) => s + (it.unitPrice ?? 0) * (it.quantity ?? 1), 0);
 	return res.json({ item, cart, total });
-} catch (e: any) {
+} catch {
 	return res.status(404).json({ error: 'Not found' });
 }
 });
@@ -113,7 +114,7 @@ try {
 	const deleted = await prisma.cartItem.delete({ where: { id: req.params.itemId } });
 	const cart = await prisma.cart.findUnique({ where: { id: deleted.cartId }, include: { items: { include: { product: true, variant: true } } } });
 	return res.json({ message: 'item removed', cart });
-} catch (e: any) {
+} catch {
 	return res.status(404).json({ error: 'Not found' });
 }
 });

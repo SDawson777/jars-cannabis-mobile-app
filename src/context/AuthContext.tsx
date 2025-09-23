@@ -14,7 +14,7 @@ export interface User extends UserProfile {}
 
 export interface AuthContextType {
   token: string | null;
-  setToken: (_token: string) => Promise<void>;
+  setToken: (__token: string) => Promise<void>;
   clearAuth: () => Promise<void>;
   data: UserProfile | undefined;
   isLoading: boolean;

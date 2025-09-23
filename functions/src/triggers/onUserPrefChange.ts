@@ -1,5 +1,6 @@
-import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
+import * as functions from 'firebase-functions/v1';
+
 import { logger } from '../logger';
 
 export const onUserPrefChange = functions.firestore
