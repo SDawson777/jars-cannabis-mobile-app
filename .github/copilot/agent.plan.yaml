@@ -159,8 +159,10 @@ tasks:
       If `src/hooks/usePulse.ts` is used nowhere, either remove or wire into CTA buttons (Home screen cards).
       Remove `src/terpene_wheel/snippets/*` if obsolete, else move into `__examples__` with documentation.
     changes:
-      - edit: "src/screens/HomeScreen.tsx" (optional) to showcase `usePulse` for CTA focus
-      - move_or_delete: ["src/terpene_wheel/snippets/*"]
+      - edit: "src/screens/HomeScreen.tsx"
+        intent: "Showcase `usePulse` for CTA focus (optional)"
+      - move_or_delete:
+          - "src/terpene_wheel/snippets/*"
     commands:
       - "npm run lint && npm run typecheck && npm run test"
     tests:
@@ -235,7 +237,9 @@ tasks:
           - "backend/tests/cart.test.ts"
           - "backend/tests/orders.test.ts"
       - ensure_env:
-          - "backend/.env.example" includes local DB URL and JWT_SECRET placeholders
+          files:
+            - path: "backend/.env.example"
+              note: "Include local DB URL and JWT_SECRET placeholders"
     commands:
       - "npm --prefix backend install"
       - "npm --prefix backend run test:ci"
@@ -333,7 +337,8 @@ tasks:
     description: |
       Add a minimal Detox test to launch app and navigate Home → Shop → Product → Add to Cart → Checkout (mock network).
     changes:
-      - edit: "e2e/buyer.happy.path.spec.ts" (complete implementation with mocks)
+      - edit: "e2e/buyer.happy.path.spec.ts"
+        intent: "Complete implementation with mocks"
       - add: "e2e/server/mockServer.js"
         from_template: "detox_mock_server"
     commands:

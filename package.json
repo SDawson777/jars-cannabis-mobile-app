@@ -21,6 +21,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --cache",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --cache --fix",
     "format": "prettier --write .",
+    "format:ci": "prettier --check .",
     "format:fix": "prettier --write \"**/*.{ts,tsx,js,json,jsonc,json5,md}\"",
     "check-assets": "npx ts-node --esm scripts/checkAssets.ts",
     "firebase:check": "ts-node scripts/verifyFirebaseSetup.ts",
