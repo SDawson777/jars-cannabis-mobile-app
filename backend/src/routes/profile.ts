@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { requireAuth } from '../middleware/auth';
+import { z } from 'zod';
 
 export const profileRouter = Router();
 
@@ -72,6 +73,43 @@ profileRouter.put('/profile/preferences', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const data = req.body || {};
   const up = await prisma.userPreference.upsert({
+    where: { userId: uid },
+    create: { userId: uid, ...data },
+    update: data,
+  });
+  return res.json(up);
+});
+
+// Data privacy preferences: GET/PUT /profile/preferences (Data Privacy)
+const DataPrefsSchema = z
+  .object({
+    personalizedAds: z.boolean().optional(),
+    emailTracking: z.boolean().optional(),
+    shareWithPartners: z.boolean().optional(),
+  })
+  .strict();
+
+profileRouter.get('/profile/data-preferences', requireAuth, async (req, res) => {
+  const uid = (req as any).user.userId as string;
+  const prefs = await prisma.userDataPreference.findUnique({ where: { userId: uid } });
+  return res.json(
+    prefs || {
+      personalizedAds: false,
+      emailTracking: false,
+      shareWithPartners: false,
+      updatedAt: new Date().toISOString(),
+    }
+  );
+});
+
+profileRouter.put('/profile/data-preferences', requireAuth, async (req, res) => {
+  const uid = (req as any).user.userId as string;
+  const parse = DataPrefsSchema.safeParse(req.body || {});
+  if (!parse.success) {
+    return res.status(400).json({ error: 'Invalid payload', details: parse.error.flatten() });
+  }
+  const data = parse.data;
+  const up = await prisma.userDataPreference.upsert({
     where: { userId: uid },
     create: { userId: uid, ...data },
     update: data,

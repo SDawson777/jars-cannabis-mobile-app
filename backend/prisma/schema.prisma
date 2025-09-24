@@ -67,6 +67,7 @@ model User {
   loyaltyBadges  LoyaltyBadge[]
   journalEntries JournalEntry[]
   preferences    UserPreference?
+  dataPreferences UserDataPreference?
   events         UserEvent[]
   carts          Cart[]
   orders         Order[]
@@ -355,6 +356,16 @@ model UserPreference {
   highContrast    Boolean @default(false)
   personalization Boolean @default(true)
   user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Data privacy preferences (separate from accessibility/user preference toggles above)
+model UserDataPreference {
+  userId            String   @id
+  personalizedAds   Boolean  @default(false)
+  emailTracking     Boolean  @default(false)
+  shareWithPartners Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model DataExport {

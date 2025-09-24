@@ -10,9 +10,10 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import { phase4Client } from '../api/phase4Client';
+import { phase4Client, getDataPrefs, updateDataPrefs } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium } from '../utils/haptic';
+import { toast } from '../utils/toast';
 
 type Preferences = {
   personalizedAds: boolean;
@@ -37,9 +38,8 @@ export default function DataTransparencyScreen() {
   const [prefLoading, setPrefLoading] = useState<keyof Preferences | null>(null);
 
   useEffect(() => {
-    phase4Client
-      .get<Preferences>('/profile/preferences')
-      .then(res => setPrefs(res.data))
+    getDataPrefs()
+      .then(setPrefs)
       .catch(e => setError((e as Error).message));
   }, []);
 
@@ -47,12 +47,17 @@ export default function DataTransparencyScreen() {
     if (!prefs) return;
     const newVal = !prefs[key];
     setPrefLoading(key);
+    // Optimistic update with rollback on failure
+    const previous = { ...prefs };
+    const updated = { ...prefs, [key]: newVal };
+    setPrefs(updated);
     try {
-      const updated = { ...prefs, [key]: newVal };
-      await phase4Client.put('/profile/preferences', updated);
-      setPrefs(updated);
+      await updateDataPrefs(updated);
       hapticMedium();
+      const ts = new Date().toLocaleString();
+      toast(`Saved • ${ts}`);
     } catch (e) {
+      setPrefs(previous);
       setError((e as Error).message);
     } finally {
       setPrefLoading(null);

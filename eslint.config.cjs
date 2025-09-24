@@ -265,6 +265,7 @@ module.exports = [
     ignores: [
       '**/*.d.ts',
       'dist/',
+      'backend/dist/',
       'build/',
       'out/',
       '.next/',

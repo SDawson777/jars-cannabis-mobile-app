@@ -35,12 +35,14 @@ All responses follow a consistent format:
 
 ### User Profile
 
-| Method | Endpoint             | Description                | Auth Required |
-| ------ | -------------------- | -------------------------- | ------------- |
-| GET    | /profile             | Get current profile        | Yes           |
-| PUT    | /profile             | Update current profile     | Yes           |
-| GET    | /profile/preferences | Get profile preferences    | Yes           |
-| PUT    | /profile/preferences | Update profile preferences | Yes           |
+| Method | Endpoint                  | Description                     | Auth Required |
+| ------ | ------------------------- | ------------------------------- | ------------- |
+| GET    | /profile                  | Get current profile             | Yes           |
+| PUT    | /profile                  | Update current profile          | Yes           |
+| GET    | /profile/preferences      | Get profile preferences         | Yes           |
+| PUT    | /profile/preferences      | Update profile preferences      | Yes           |
+| GET    | /profile/data-preferences | Get data privacy preferences    | Yes           |
+| PUT    | /profile/data-preferences | Update data privacy preferences | Yes           |
 
 ### Products
 

@@ -97,6 +97,17 @@ export async function updatePrefs(payload: any) {
   return res.data;
 }
 
+// Data privacy preferences (separate from accessibility prefs)
+export async function getDataPrefs() {
+  const res = await phase4Client.get('/profile/data-preferences');
+  return res.data;
+}
+
+export async function updateDataPrefs(payload: any) {
+  const res = await phase4Client.put('/profile/data-preferences', payload);
+  return res.data;
+}
+
 export async function getAwardsStatus() {
   const res = await phase4Client.get('/awards/status');
   return res.data;

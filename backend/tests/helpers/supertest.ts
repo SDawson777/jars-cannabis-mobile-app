@@ -171,6 +171,8 @@ const addresses: Record<string, any> = {};
 const awardsStore: Record<string, any[]> = {};
 // In-memory loyalty status
 const loyaltyStatus: Record<string, { userId: string; points: number; tier: string }> = {};
+// In-memory user data preferences
+const dataPrefs: Record<string, any> = {};
 
 jest.mock('../../src/prismaClient', () => ({
   prisma: {
@@ -391,6 +393,27 @@ jest.mock('../../src/prismaClient', () => ({
       },
       _removeAddress: (id: string) => {
         delete addresses[id];
+      },
+    },
+    userDataPreference: {
+      findUnique: async ({ where: { userId } }: any) => dataPrefs[userId] ?? null,
+      upsert: async ({ where: { userId }, create, update }: any) => {
+        if (!dataPrefs[userId]) {
+          dataPrefs[userId] = {
+            userId,
+            personalizedAds: false,
+            emailTracking: false,
+            shareWithPartners: false,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        dataPrefs[userId] = {
+          ...dataPrefs[userId],
+          ...(Object.keys(update || {}).length ? update : create),
+          updatedAt: new Date().toISOString(),
+        };
+        const { userId: _u, ...rest } = dataPrefs[userId];
+        return { userId, ...rest };
       },
     },
     order: {
