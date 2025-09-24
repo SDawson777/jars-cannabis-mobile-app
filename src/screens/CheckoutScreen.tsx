@@ -25,6 +25,7 @@ import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { useCreateOrder } from '../hooks/useOrders';
 import { usePreferredStoreId } from '../../store/usePreferredStore';
 import { useCartStore } from '../../stores/useCartStore';
+import { parseAddress, isValidParsedAddress } from '../utils/address';
 import { toast } from '../utils/toast';
 
 // Enable LayoutAnimation on Android
@@ -53,15 +54,24 @@ export default function CheckoutScreen() {
   // Access cart store (currently only to ensure hydration; items implicitly used on backend)
   useCartStore(state => state.items);
 
+  // Access cart store for clearing after success (direct getState usage later to avoid re-renders)
+  const [apiError, setApiError] = useState<string | null>(null);
   const createOrder = useCreateOrder({
     onSuccess: order => {
       hapticMedium();
+      // Clear cart store (local) since backend empties cart
+      try {
+        const { setItems } = useCartStore.getState() as any;
+        if (setItems) setItems([]);
+      } catch {
+        // Ignore cart clear failures (non-critical)
+      }
       navigation.navigate('OrderConfirmation', { orderId: order.id } as any);
     },
     onError: err => {
       hapticHeavy();
       const msg = err?.response?.data?.error || 'Order failed';
-      Alert.alert('Order Error', msg);
+      setApiError(msg);
     },
   });
 
@@ -170,12 +180,16 @@ export default function CheckoutScreen() {
     }
 
     const deliveryMethod = method;
-    const deliveryAddress =
-      deliveryMethod === 'delivery'
-        ? // Very lightweight parsing; server only truly requires city/state/zip, but we only have one freeform string.
-          // Leave null so server doesn't attempt invalid shape; in a future iteration parse address properly.
-          null
-        : null;
+    let deliveryAddress = null as any;
+    if (deliveryMethod === 'delivery') {
+      const parsed = parseAddress(address);
+      if (!isValidParsedAddress(parsed)) {
+        hapticHeavy();
+        setApiError('Invalid delivery address format. Use: 123 Main St, City, ST 12345');
+        return;
+      }
+      deliveryAddress = parsed;
+    }
     // Build contact object
     const contact = { name: fullName, phone, email };
 
@@ -401,6 +415,12 @@ export default function CheckoutScreen() {
         )}
       </ScrollView>
 
+      {apiError ? (
+        <View style={styles.errorBar}>
+          <Text style={styles.errorText}>{apiError}</Text>
+        </View>
+      ) : null}
+
       {/* Next / Place Order */}
       <Pressable
         style={[
@@ -505,4 +525,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  errorBar: {
+    backgroundColor: '#FEE2E2',
+    padding: 12,
+    marginHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  errorText: { color: '#991B1B', fontSize: 14 },
 });
