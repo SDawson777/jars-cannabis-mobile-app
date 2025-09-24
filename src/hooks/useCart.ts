@@ -32,8 +32,8 @@ export function useCart() {
         const mapped = cartPayload.items.map((i: any) => ({
           id: i.productId ?? i.id,
           name: i.name ?? i.product?.name ?? 'Item',
-          // fallback price/qty
-          price: i.price ?? i.product?.price ?? 0,
+          // Use unitPrice from cart item, fallback to product defaultPrice
+          price: i.unitPrice ?? i.price ?? i.product?.defaultPrice ?? 0,
           quantity: i.quantity ?? 1,
           variantId: i.variantId,
           available: i.available !== false,

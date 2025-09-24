@@ -31,7 +31,9 @@ import { phase4Client } from '../api/phase4Client';
 import ForYouTodayCard from '../components/ForYouTodayCard';
 import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
 import OfflineNotice from '../components/OfflineNotice';
+import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { useStore } from '../context/StoreContext';
 import { useForYouToday } from '../hooks/useForYouToday';
 import { usePulseCTA } from '../hooks/usePulse';
 import type { RootStackParamList } from '../navigation/types';
@@ -56,7 +58,9 @@ type Way = { id: string; label: string };
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { data: forYou, isLoading } = useForYouToday('1', '1');
+  const { data: user } = useContext(AuthContext);
+  const { preferredStore } = useStore();
+  const { data: forYou, isLoading } = useForYouToday(user?.id, preferredStore?.id);
 
   // Pulse animations for key CTAs
   const terpeneWheelPulse = usePulseCTA(() => navigation.navigate('TerpeneWheel'), {

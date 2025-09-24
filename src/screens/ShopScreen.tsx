@@ -23,6 +23,7 @@ import OfflineNotice from '../components/OfflineNotice';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import useSkeletonText from '../components/useSkeletonText';
 import { ThemeContext } from '../context/ThemeContext';
+import { useStore } from '../context/StoreContext';
 // NOTE: we intentionally require hook modules inside the component so individual tests can override them with jest.doMock
 import type { RootStackParamList } from '../navigation/types';
 import type { CMSProduct } from '../types/cms';
@@ -41,6 +42,7 @@ const CARD_WIDTH = (width - 48) / 2;
 export default function ShopScreen() {
   const navigation = useNavigation<ShopNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { preferredStore } = useStore();
 
   let _useProducts: any;
   let _useFiltersQuery: any;
@@ -69,7 +71,8 @@ export default function ShopScreen() {
   }
 
   // product and pagination hooks (required at render time so tests can mock)
-  const _productsResult = typeof _useProducts === 'function' ? _useProducts('1') : null;
+  const _productsResult =
+    typeof _useProducts === 'function' ? _useProducts(preferredStore?.id) : null;
   // debug: log the shape of products result (helps tests that use jest.doMock inside tests)
 
   console.error(

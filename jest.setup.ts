@@ -106,9 +106,29 @@ try {
 
   const shouldIgnore = (args: any[]) => {
     try {
+      // Check if any argument contains XMLHttpRequest or AggregateError patterns
+      for (const arg of args) {
+        if (arg && typeof arg === 'object') {
+          // Check Error object properties
+          if (
+            arg.type === 'XMLHttpRequest' ||
+            arg.name === 'AggregateError' ||
+            (arg.message && arg.message.includes('AggregateError'))
+          ) {
+            return true;
+          }
+
+          // Check if it's an Error with XMLHttpRequest in the stack
+          if (arg.stack && arg.stack.includes('xhr-utils.js')) {
+            return true;
+          }
+        }
+      }
+
       const joined = args
         .map(a => {
           if (typeof a === 'string') return a;
+          if (a instanceof Error) return a.message + ' ' + a.stack;
           try {
             return JSON.stringify(a);
           } catch {
@@ -116,6 +136,7 @@ try {
           }
         })
         .join(' ');
+
       // React act(...) warnings
       if (
         /not wrapped in act\(/i.test(joined) ||
@@ -126,6 +147,16 @@ try {
 
       // jsdom AggregateError originating from XHR (commonly noisy in tests)
       if (/AggregateError/.test(joined) && /XMLHttpRequest/.test(joined)) {
+        return true;
+      }
+
+      // Additional XMLHttpRequest error patterns from jsdom
+      if (/dispatchError/.test(joined) && /xhr-utils\.js/.test(joined)) {
+        return true;
+      }
+
+      // More specific XMLHttpRequest noise filtering
+      if (/xhr-utils\.js.*dispatchError/.test(joined)) {
         return true;
       }
 
