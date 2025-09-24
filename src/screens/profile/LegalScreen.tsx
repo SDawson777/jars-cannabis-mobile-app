@@ -168,7 +168,10 @@ export default function LegalScreen() {
 
       {/* State-specific notice */}
       {stateNotice && (
-        <View style={{ margin: 16, padding: 12, backgroundColor: '#FFF8E1', borderRadius: 8 }}>
+        <View
+          testID="state-notice-html"
+          style={{ margin: 16, padding: 12, backgroundColor: '#FFF8E1', borderRadius: 8 }}
+        >
           <RenderHTML
             contentWidth={width - 64}
             source={{ html: stateNotice }}
