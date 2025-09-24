@@ -22,6 +22,9 @@ import { fetchPaymentSheetParams } from '../api/stripe';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
+import { useCreateOrder } from '../hooks/useOrders';
+import { usePreferredStoreId } from '../../store/usePreferredStore';
+import { useCartStore } from '../../stores/useCartStore';
 import { toast } from '../utils/toast';
 
 // Enable LayoutAnimation on Android
@@ -46,6 +49,21 @@ export default function CheckoutScreen() {
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const { preferredStoreId } = usePreferredStoreId.getState();
+  // Access cart store (currently only to ensure hydration; items implicitly used on backend)
+  useCartStore(state => state.items);
+
+  const createOrder = useCreateOrder({
+    onSuccess: order => {
+      hapticMedium();
+      navigation.navigate('OrderConfirmation', { orderId: order.id } as any);
+    },
+    onError: err => {
+      hapticHeavy();
+      const msg = err?.response?.data?.error || 'Order failed';
+      Alert.alert('Order Error', msg);
+    },
+  });
 
   // animate on any _state change
   useEffect(() => {
@@ -141,18 +159,34 @@ export default function CheckoutScreen() {
     if (step < steps.length - 1) {
       hapticMedium();
       setStep(step + 1);
-    } else {
-      if (payment === 'online') {
-        const success = await openPaymentSheet();
-        if (success) {
-          hapticMedium();
-          navigation.navigate('OrderConfirmation');
-        }
-      } else {
-        hapticMedium();
-        navigation.navigate('OrderConfirmation');
-      }
+      return;
     }
+
+    // Final step: place order via API
+    let paymentMethod: 'card' | 'pay_at_pickup' = payment === 'online' ? 'card' : 'pay_at_pickup';
+    if (payment === 'online') {
+      const success = await openPaymentSheet();
+      if (!success) return; // abort if payment failed/cancelled
+    }
+
+    const deliveryMethod = method;
+    const deliveryAddress =
+      deliveryMethod === 'delivery'
+        ? // Very lightweight parsing; server only truly requires city/state/zip, but we only have one freeform string.
+          // Leave null so server doesn't attempt invalid shape; in a future iteration parse address properly.
+          null
+        : null;
+    // Build contact object
+    const contact = { name: fullName, phone, email };
+
+    // Kick off mutation; navigation happens in onSuccess
+    createOrder.mutate({
+      storeId: preferredStoreId,
+      deliveryMethod: deliveryMethod as any,
+      deliveryAddress,
+      contact,
+      paymentMethod,
+    });
   };
 
   const nextDisabled =
@@ -373,14 +407,18 @@ export default function CheckoutScreen() {
           styles.nextBtn,
           { backgroundColor: jarsPrimary },
           glowStyle,
-          nextDisabled && styles.nextBtnDisabled,
+          (nextDisabled || createOrder.isPending) && styles.nextBtnDisabled,
         ]}
         onPress={onNext}
-        disabled={nextDisabled}
+        disabled={nextDisabled || createOrder.isPending}
         accessibilityLabel={step < steps.length - 1 ? 'Continue to next step' : 'Place order'}
       >
         <Text style={styles.nextBtnText}>
-          {step < steps.length - 1 ? 'Continue' : 'Place Order'}
+          {createOrder.isPending
+            ? 'Placing...'
+            : step < steps.length - 1
+              ? 'Continue'
+              : 'Place Order'}
         </Text>
       </Pressable>
     </SafeAreaView>

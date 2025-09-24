@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
-import type { OrdersResponse } from '../types/order';
+import type { OrdersResponse, Order } from '../types/order';
 import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
 
@@ -36,4 +36,27 @@ export async function fetchOrders(page = 1): Promise<OrdersResponse> {
   const orders = d.orders ?? d.data?.orders ?? [];
   const nextPage = d.pagination?.nextPage ?? d.data?.pagination?.nextPage ?? undefined;
   return { orders, nextPage };
+}
+
+// Payload contract for creating an order. This mirrors backend expectations in
+// backend/src/routes/orders.ts (storeId required unless cart contains one; if
+// deliveryMethod === 'delivery' deliveryAddress.{city,state,zipCode} required.)
+export interface CreateOrderPayload {
+  storeId?: string; // allow backend inference when omitted
+  deliveryMethod: 'pickup' | 'delivery';
+  deliveryAddress?: {
+    line1?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  } | null;
+  contact: { name: string; phone: string; email: string };
+  paymentMethod: 'card' | 'pay_at_pickup';
+  notes?: string;
+}
+
+export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
+  const res = await orderClient.post('/orders', payload);
+  // API responds with { order }
+  return (res.data?.order || res.data?.data?.order) as Order;
 }
