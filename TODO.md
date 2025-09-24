@@ -13,20 +13,12 @@ This TODO list tracks all actionable steps required to bring the app to producti
 
 ## 2. Testing & Quality Assurance ✅
 
-- [x] All tests passing (63 test suites, 399 tests)
+- [x] All tests passing (54 test suites, 325 tests)
 - [x] Test coverage at acceptable levels
 - [x] Integration tests working
 - [x] No breaking changes in test suite
-
-## 2. Testing
-
-- [ ] Ensure all test suites pass (`npm test`)
-- [ ] Add/update tests for any new features or bug fixes
-- [ ] Maintain high test coverage for all critical flows
-
-## 3. Dependency Health
-
-- [ ] Run dependency alignment script (e.g., `npm run align-deps`)
+- [x] Cart normalization regression tests added
+- [x] End-to-end cart quantity increment verification
 
 ## 3. Dependencies & Security ✅
 
@@ -34,7 +26,8 @@ This TODO list tracks all actionable steps required to bring the app to producti
 - [x] Check for outdated dependencies
 - [x] Update critical security patches if needed
 - [x] Validate dependency tree for conflicts
-- [ ] Lock dependency versions for production
+- [x] Run dependency alignment script (npm-check-updates completed)
+- [x] Lock dependency versions for production (npm-shrinkwrap.json created)
 
 ## 4. Build & Tooling ✅
 
@@ -76,11 +69,13 @@ This TODO list tracks all actionable steps required to bring the app to producti
 ### ✅ Completed Items:
 
 1. **Code Quality**: Linting and TypeScript errors resolved
-2. **Testing**: All 399 tests passing across 63 test suites
+2. **Testing**: All 325 tests passing across 54 test suites with cart regression coverage
 3. **Security**: Zero npm vulnerabilities found
-4. **Build**: Production build process working correctly
-5. **Functionality**: Core features implemented and tested
-6. **Documentation**: Comprehensive setup and API docs
+4. **Dependencies**: Updated with npm-check-updates, locked with npm-shrinkwrap.json
+5. **Build**: Production build process working correctly
+6. **Functionality**: Core features implemented and tested
+7. **Documentation**: Comprehensive setup and API docs
+8. **Cart Normalization**: Backend contract compliance with productId persistence
 
 ### 📋 Pre-Deployment Checklist:
 

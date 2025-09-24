@@ -1,6 +1,5 @@
 Problems reported by npm ls:
 - invalid: react@18.3.1 /workspaces/jars-cannabis-mobile-app/node_modules/react
-- invalid: @react-native-masked-view/masked-view@0.3.2 /workspaces/jars-cannabis-mobile-app/node_modules/@react-native-masked-view/masked-view
 - invalid: @types/react@18.3.24 /workspaces/jars-cannabis-mobile-app/node_modules/@types/react
 - invalid: ajv@8.17.1 /workspaces/jars-cannabis-mobile-app/node_modules/ajv
 - invalid: picomatch@2.3.1 /workspaces/jars-cannabis-mobile-app/node_modules/picomatch

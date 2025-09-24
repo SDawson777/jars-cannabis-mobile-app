@@ -56,7 +56,7 @@
         "lucide-react-native": "^0.544.0",
         "nativewind": "^4.2.1",
         "prisma": "^6.16.2",
-        "react": "18.2.0",
+        "react": "18.3.1",
         "react-hook-form": "^7.63.0",
         "react-native": "0.81.4",
         "react-native-animatable": "^1.4.0",
@@ -76,7 +76,7 @@
         "react-native-svg": "15.13.0",
         "react-native-web": "^0.21.1",
         "rtl-detect": "^1.1.2",
-        "stripe": "^16.0.0",
+        "stripe": "^16.12.0",
         "yup": "^1.7.1",
         "zustand": "^4.5.7"
       },
@@ -105,8 +105,8 @@
         "@types/jest": "^30.0.0",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^24.5.2",
-        "@types/react": "18.2.62",
-        "@types/react-dom": "18.2.21",
+        "@types/react": "18.3.24",
+        "@types/react-dom": "18.3.7",
         "@types/react-native": "^0.72.8",
         "@types/react-native-dotenv": "^0.2.2",
         "@types/react-test-renderer": "^18.3.1",
@@ -126,7 +126,7 @@
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-native": "^5.0.0",
-        "eslint-plugin-testing-library": "^7.9.1",
+        "eslint-plugin-testing-library": "^7.9.2",
         "firebase-tools": "^14.17.0",
         "globals": "^16.4.0",
         "husky": "^8.0.3",
@@ -136,8 +136,8 @@
         "jsonc-eslint-parser": "^2.4.1",
         "lint-staged": "^13.3.0",
         "prettier": "^3.6.2",
-        "react-dom": "18.2.0",
-        "react-test-renderer": "18.2.0",
+        "react-dom": "18.3.1",
+        "react-test-renderer": "18.3.1",
         "supertest": "^7.1.4",
         "tailwindcss": "^3.4.17",
         "ts-jest": "^29.4.4",
@@ -8086,13 +8086,9 @@
       "version": "3.0.3",
       "resolved": "https://registry.npmjs.org/@msgpackr-extract/msgpackr-extract-linux-x64/-/msgpackr-extract-linux-x64-3.0.3.tgz",
       "integrity": "sha512-cvwNfbP07pKUfq1uH+S6KJ7dT9K8WOE4ZiAcsrSes+UY55E/0jLYc+vq+DO7jlmqRb5zAggExKm0H7O/CBaesg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "optional": true,
-      "os": [
-        "linux"
-      ]
+      "os": ["linux"]
     },
     "node_modules/@noble/hashes": {
       "version": "1.8.0",
@@ -10090,16 +10086,10 @@
       "version": "2.53.0",
       "resolved": "https://registry.npmjs.org/@sentry/cli-linux-x64/-/cli-linux-x64-2.53.0.tgz",
       "integrity": "sha512-9UGJL+Vy5N/YL1EWPZ/dyXLkShlNaDNrzxx4G7mTS9ywjg+BIuemo6rnN7w43K1NOjObTVO6zY0FwumJ1pCyLg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "license": "BSD-3-Clause",
       "optional": true,
-      "os": [
-        "linux",
-        "freebsd",
-        "android"
-      ],
+      "os": ["linux", "freebsd", "android"],
       "engines": {
         "node": ">=10"
       }
@@ -10607,10 +10597,7 @@
       "version": "9.0.1",
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
       "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
+      "funding": ["https://github.com/sponsors/broofa", "https://github.com/sponsors/ctavan"],
       "bin": {
         "uuid": "dist/bin/uuid"
       }
@@ -11966,23 +11953,22 @@
       "integrity": "sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ=="
     },
     "node_modules/@types/react": {
-      "version": "18.2.62",
-      "resolved": "https://registry.npmjs.org/@types/react/-/react-18.2.62.tgz",
-      "integrity": "sha512-l3f57BbaEKP0xcFzf+5qRG8/PXykZiuVM6eEoPtqBPCp6dxO3HhDkLIgIyXPhPKNAeXn3KO2pEaNgzaEo/asaw==",
+      "version": "18.3.24",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-18.3.24.tgz",
+      "integrity": "sha512-0dLEBsA1kI3OezMBF8nSsb7Nk19ZnsyE1LLhB8r27KbgU5H4pvuqZLdtE+aUkJVoXgTVuA+iLIwmZ0TuK4tx6A==",
       "dev": true,
       "dependencies": {
         "@types/prop-types": "*",
-        "@types/scheduler": "*",
         "csstype": "^3.0.2"
       }
     },
     "node_modules/@types/react-dom": {
-      "version": "18.2.21",
-      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.2.21.tgz",
-      "integrity": "sha512-gnvBA/21SA4xxqNXEwNiVcP0xSGHh/gi1VhWv9Bl46a0ItbTT5nFY+G9VSQpaG/8N/qdJpJ+vftQ4zflTtnjLw==",
+      "version": "18.3.7",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.7.tgz",
+      "integrity": "sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==",
       "dev": true,
-      "dependencies": {
-        "@types/react": "*"
+      "peerDependencies": {
+        "@types/react": "^18.0.0"
       }
     },
     "node_modules/@types/react-native": {
@@ -12035,12 +12021,6 @@
       "version": "0.12.2",
       "resolved": "https://registry.npmjs.org/@types/retry/-/retry-0.12.2.tgz",
       "integrity": "sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow=="
-    },
-    "node_modules/@types/scheduler": {
-      "version": "0.26.0",
-      "resolved": "https://registry.npmjs.org/@types/scheduler/-/scheduler-0.26.0.tgz",
-      "integrity": "sha512-WFHp9YUJQ6CKshqoC37iOlHnQSmxNc795UhB26CyBBttrN9svdIrUjl/NjnNmfcwtncN0h/0PPAFWv9ovP8mLA==",
-      "dev": true
     },
     "node_modules/@types/send": {
       "version": "0.17.5",
@@ -12791,9 +12771,7 @@
       "version": "0.0.8",
       "resolved": "https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz",
       "integrity": "sha512-1APHAyr3+PCamwNw3bXCPp4HFLONZt/yIH0sZp0/469KWNTEy+qN5jQ3GVX6DMZ1UXAi34yVwtTeaG/HpBuuzw==",
-      "engines": [
-        "node >= 0.8.0"
-      ],
+      "engines": ["node >= 0.8.0"],
       "bin": {
         "ansi-html": "bin/ansi-html"
       }
@@ -13377,9 +13355,7 @@
       "integrity": "sha512-D8Z6Qm8jCvVXtIRkBnqNHX0zJ37rQcFJ9u8WOS6tkYOsRdHBzypCstaxWiu5ZIlqQtviRYbgnRLSoCEvjqcqbA==",
       "dev": true,
       "license": "BSD-3-Clause",
-      "workspaces": [
-        "test/babel-8"
-      ],
+      "workspaces": ["test/babel-8"],
       "dependencies": {
         "@babel/helper-plugin-utils": "^7.0.0",
         "@istanbuljs/load-nyc-config": "^1.0.0",
@@ -17306,9 +17282,9 @@
       }
     },
     "node_modules/eslint-plugin-testing-library": {
-      "version": "7.9.1",
-      "resolved": "https://registry.npmjs.org/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.9.1.tgz",
-      "integrity": "sha512-VOJ0YBun15IaKSbcovxkwtBzdPFXoqlk/MXmJdPZ9mxMWm7bNFWDYC1WnoHloSIN4dSzxygMa2yp/54EcC/JvQ==",
+      "version": "7.9.2",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.9.2.tgz",
+      "integrity": "sha512-69InVKMoNfKhRlokBE8sivGgN9fIpaqk5+INeOamekOtQNxp6YFswGM5lO1kFO6O6zqhYsBxXR9NMffOj4mMkw==",
       "dev": true,
       "dependencies": {
         "@typescript-eslint/scope-manager": "^8.15.0",
@@ -20064,10 +20040,7 @@
       "version": "9.0.1",
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
       "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
+      "funding": ["https://github.com/sponsors/broofa", "https://github.com/sponsors/ctavan"],
       "bin": {
         "uuid": "dist/bin/uuid"
       }
@@ -20438,10 +20411,7 @@
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
       "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
       "devOptional": true,
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
+      "funding": ["https://github.com/sponsors/broofa", "https://github.com/sponsors/ctavan"],
       "bin": {
         "uuid": "dist/bin/uuid"
       }
@@ -23634,6 +23604,26 @@
         "node": "^14.15.0 || ^16.10.0 || >=18.0.0"
       }
     },
+    "node_modules/jest-expo/node_modules/react-is": {
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
+      "integrity": "sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==",
+      "dev": true
+    },
+    "node_modules/jest-expo/node_modules/react-test-renderer": {
+      "version": "18.2.0",
+      "resolved": "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-18.2.0.tgz",
+      "integrity": "sha512-JWD+aQ0lh2gvh4NM3bBM42Kx+XybOxCpgYK7F8ugAlpaTSnWsX+39Z4XkOykGZAHrjwwTZT3x3KxswVWxHPUqA==",
+      "dev": true,
+      "dependencies": {
+        "react-is": "^18.2.0",
+        "react-shallow-renderer": "^16.15.0",
+        "scheduler": "^0.23.0"
+      },
+      "peerDependencies": {
+        "react": "^18.2.0"
+      }
+    },
     "node_modules/jest-expo/node_modules/signal-exit": {
       "version": "3.0.7",
       "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.7.tgz",
@@ -26097,13 +26087,9 @@
       "version": "1.19.0",
       "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.19.0.tgz",
       "integrity": "sha512-0AFQKvVzXf9byrXUq9z0anMGLdZJS+XSDqidyijI5njIwj6MdbvX2UZK/c4FfNmeRa2N/8ngTffoIuOUit5eIQ==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 12.0.0"
       },
@@ -26116,13 +26102,9 @@
       "version": "1.19.0",
       "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.19.0.tgz",
       "integrity": "sha512-SJoM8CLPt6ECCgSuWe+g0qo8dqQYVcPiW2s19dxkmSI5+Uu1GIRzyKA0b7QqmEXolA+oSJhQqCmJpzjY4CuZAg==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 12.0.0"
       },
@@ -31381,9 +31363,9 @@
       }
     },
     "node_modules/react": {
-      "version": "18.2.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-18.2.0.tgz",
-      "integrity": "sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==",
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
+      "integrity": "sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==",
       "dependencies": {
         "loose-envify": "^1.1.0"
       },
@@ -31423,16 +31405,16 @@
       }
     },
     "node_modules/react-dom": {
-      "version": "18.2.0",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz",
-      "integrity": "sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==",
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz",
+      "integrity": "sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==",
       "dev": true,
       "dependencies": {
         "loose-envify": "^1.1.0",
-        "scheduler": "^0.23.0"
+        "scheduler": "^0.23.2"
       },
       "peerDependencies": {
-        "react": "^18.2.0"
+        "react": "^18.3.1"
       }
     },
     "node_modules/react-fast-compare": {
@@ -31601,13 +31583,9 @@
       "version": "1.27.0",
       "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.27.0.tgz",
       "integrity": "sha512-Dk/jovSI7qqhJDiUibvaikNKI2x6kWPN79AQiD/E/KeQWMjdGe9kw51RAgoWFDi0coP4jinaH14Nrt/J8z3U4A==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 12.0.0"
       },
@@ -31620,13 +31598,9 @@
       "version": "1.27.0",
       "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.27.0.tgz",
       "integrity": "sha512-QKjTxXm8A9s6v9Tg3Fk0gscCQA1t/HMoF7Woy1u68wCk5kS4fR+q3vXa1p3++REW784cRAtkYKrPy6JKibrEZA==",
-      "cpu": [
-        "x64"
-      ],
+      "cpu": ["x64"],
       "optional": true,
-      "os": [
-        "linux"
-      ],
+      "os": ["linux"],
       "engines": {
         "node": ">= 12.0.0"
       },
@@ -32333,17 +32307,17 @@
       }
     },
     "node_modules/react-test-renderer": {
-      "version": "18.2.0",
-      "resolved": "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-18.2.0.tgz",
-      "integrity": "sha512-JWD+aQ0lh2gvh4NM3bBM42Kx+XybOxCpgYK7F8ugAlpaTSnWsX+39Z4XkOykGZAHrjwwTZT3x3KxswVWxHPUqA==",
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react-test-renderer/-/react-test-renderer-18.3.1.tgz",
+      "integrity": "sha512-KkAgygexHUkQqtvvx/otwxtuFu5cVjfzTCtjXLH9boS19/Nbtg84zS7wIQn39G8IlrhThBpQsMKkq5ZHZIYFXA==",
       "dev": true,
       "dependencies": {
-        "react-is": "^18.2.0",
+        "react-is": "^18.3.1",
         "react-shallow-renderer": "^16.15.0",
-        "scheduler": "^0.23.0"
+        "scheduler": "^0.23.2"
       },
       "peerDependencies": {
-        "react": "^18.2.0"
+        "react": "^18.3.1"
       }
     },
     "node_modules/react-test-renderer/node_modules/react-is": {
@@ -34803,10 +34777,7 @@
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
       "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
       "devOptional": true,
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
+      "funding": ["https://github.com/sponsors/broofa", "https://github.com/sponsors/ctavan"],
       "bin": {
         "uuid": "dist/bin/uuid"
       }
@@ -36084,10 +36055,7 @@
       "version": "11.1.0",
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-11.1.0.tgz",
       "integrity": "sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==",
-      "funding": [
-        "https://github.com/sponsors/broofa",
-        "https://github.com/sponsors/ctavan"
-      ],
+      "funding": ["https://github.com/sponsors/broofa", "https://github.com/sponsors/ctavan"],
       "bin": {
         "uuid": "dist/esm/bin/uuid"
       }
