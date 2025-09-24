@@ -1,10 +1,11 @@
-import React from 'react';
-import { Dimensions, Pressable } from 'react-native';
+import React, { useRef } from 'react';
+import { Dimensions } from 'react-native';
 import Animated, { useSharedValue, withTiming, useAnimatedProps } from 'react-native-reanimated';
-import Svg, { Circle, Line, Text as SvgText, Path } from 'react-native-svg';
+import Svg, { Circle, Line, Text as SvgText, Path, G } from 'react-native-svg';
 
 import haptics from '../../lib/haptics';
 import { TERPENES, TerpeneInfo } from '../data/terpenes';
+import { AnimatedSoundPlayer, type AnimatedSoundPlayerHandle } from './AnimatedSoundPlayer';
 
 const { width } = Dimensions.get('window');
 const SIZE = Math.min(width - 32, 320);
@@ -18,34 +19,52 @@ type Props = { onSelect: (__t: TerpeneInfo) => void; data?: TerpeneInfo[] };
 
 export const TerpeneWheel: React.FC<Props> = ({ onSelect, data = TERPENES }) => {
   const angleStep = 360 / data.length;
+  const soundPlayerRef = useRef<AnimatedSoundPlayerHandle>(null);
+
+  const handleTerpeneSelect = async (terpene: TerpeneInfo) => {
+    await soundPlayerRef.current?.play();
+    onSelect(terpene);
+  };
 
   return (
-    <Svg width={SIZE} height={SIZE}>
-      {/* Outer ring */}
-      <Circle cx={CX} cy={CY} r={R} stroke="#2E5D46" strokeWidth={2} fill="none" />
+    <>
+      <AnimatedSoundPlayer
+        ref={soundPlayerRef}
+        source={require('../../../assets/audio/rustle_leaves_swipe.mp3')}
+      />
+      <Svg width={SIZE} height={SIZE}>
+        {/* Outer ring */}
+        <Circle cx={CX} cy={CY} r={R} stroke="#2E5D46" strokeWidth={2} fill="none" />
 
-      {/* Radial lines */}
-      {data.map((_, i) => {
-        const a = ((i * angleStep - 90) * Math.PI) / 180;
-        return (
-          <Line
-            key={`rad-${i}`}
-            x1={CX}
-            y1={CY}
-            x2={CX + R * Math.cos(a)}
-            y2={CY + R * Math.sin(a)}
-            stroke="#2E5D46"
-            strokeWidth={1}
-            opacity={0.25}
+        {/* Radial lines */}
+        {data.map((_, i) => {
+          const a = ((i * angleStep - 90) * Math.PI) / 180;
+          return (
+            <Line
+              key={`rad-${i}`}
+              x1={CX}
+              y1={CY}
+              x2={CX + R * Math.cos(a)}
+              y2={CY + R * Math.sin(a)}
+              stroke="#2E5D46"
+              strokeWidth={1}
+              opacity={0.25}
+            />
+          );
+        })}
+
+        {/* Segments */}
+        {data.map((t, i) => (
+          <TerpeneSegment
+            key={t.key}
+            index={i}
+            info={t}
+            angleStep={angleStep}
+            onSelect={handleTerpeneSelect}
           />
-        );
-      })}
-
-      {/* Segments */}
-      {data.map((t, i) => (
-        <TerpeneSegment key={t.key} index={i} info={t} angleStep={angleStep} onSelect={onSelect} />
-      ))}
-    </Svg>
+        ))}
+      </Svg>
+    </>
   );
 };
 
@@ -91,11 +110,13 @@ const TerpeneSegment: React.FC<{
     opacity: withTiming(highlight.value ? 0.7 : 0.35, { duration: 150 }),
   }));
 
-  // Aroma-wave animation _values
-  const waveScale = useSharedValue(0);
+  // Aroma-wave animation values
+  const waveScale = useSharedValue(1);
   const waveOpacity = useSharedValue(0);
   const waveProps = useAnimatedProps(() => ({
-    transform: [{ scale: waveScale.value }],
+    // Convert React Native transform to SVG transform string
+    transform: `scale(${waveScale.value})`,
+    transformOrigin: `${CX}px ${CY}px`,
     opacity: waveOpacity.value,
   }));
 
@@ -122,7 +143,7 @@ const TerpeneSegment: React.FC<{
   const labelY = CY + (R + 18) * Math.sin((midDeg * Math.PI) / 180);
 
   return (
-    <Pressable onPress={handlePress}>
+    <G>
       {/* Wave overlay */}
       <AnimatedPath
         animatedProps={waveProps}
@@ -130,6 +151,7 @@ const TerpeneSegment: React.FC<{
         stroke={info.waveColor}
         strokeWidth={4}
         fill="none"
+        onPress={handlePress}
       />
 
       {/* Segment fill */}
@@ -139,6 +161,7 @@ const TerpeneSegment: React.FC<{
         fill="#8CD24C"
         stroke="#2E5D46"
         strokeWidth={highlight.value ? 1 : 0}
+        onPress={handlePress}
       />
 
       {/* Label */}
@@ -149,10 +172,11 @@ const TerpeneSegment: React.FC<{
         fontFamily="Inter-Medium"
         fill="#333"
         textAnchor="middle"
+        onPress={handlePress}
       >
         {info.name}
       </SvgText>
-    </Pressable>
+    </G>
   );
 };
 
