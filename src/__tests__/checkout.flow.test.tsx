@@ -383,6 +383,7 @@ describe('Checkout Flow', () => {
       useCartStore.setState({
         items: mockCartItems.map(i => ({
           id: i.id,
+          productId: i.id, // Use id as productId for test
           name: (i as any).productName ?? (i as any).name,
           price: i.price,
           quantity: i.quantity,

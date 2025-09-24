@@ -37,20 +37,21 @@ export function useCart() {
       if (Array.isArray(cartPayload?.items)) {
         const mapped = cartPayload.items.map((i: any) => ({
           id: i.productId ?? i.id,
+          productId: i.productId ?? i.id, // always persist productId for future updates
           name: i.name ?? i.product?.name ?? 'Item',
-          // Use unitPrice from cart item, fallback to product defaultPrice
           price: i.unitPrice ?? i.price ?? i.product?.defaultPrice ?? 0,
           quantity: i.quantity ?? 1,
           variantId: i.variantId,
           available: i.available !== false,
-          // Include image data from product
           image: i.image ?? i.imageUrl ?? i.product?.imageUrl ?? i.product?.image,
         }));
         setItems(mapped);
       }
-      // Handle applied coupon from cart payload
+      // Handle applied coupon from cart payload (support both keys)
       if (cartPayload?.appliedCoupon !== undefined) {
         setAppliedCoupon(cartPayload.appliedCoupon);
+      } else if (cartPayload?.coupon !== undefined) {
+        setAppliedCoupon(cartPayload.coupon);
       }
     } catch (_e) {
       // Non-fatal: if mapping fails we leave the store unchanged.
@@ -89,19 +90,33 @@ export function useCart() {
   const mutation = useMutation<Cart, Error, any>({
     mutationFn: async body => {
       const _state = await NetInfo.fetch();
-      const isItemsPayload = Array.isArray(body?.items);
+      // Always normalize items payload to backend contract
+      let items: any[] = [];
+      if (Array.isArray(body?.items)) {
+        items = body.items.map((item: any) => ({
+          productId: item.productId ?? item.id,
+          variantId: item.variantId,
+          quantity: item.quantity ?? 1,
+          price: item.price,
+        }));
+      } else if (body?.productId || body?.id) {
+        items = [
+          {
+            productId: body.productId ?? body.id,
+            variantId: body.variantId,
+            quantity: body.quantity ?? 1,
+            price: body.price,
+          },
+        ];
+      }
       const isPromoPayload = 'promo' in (body || {});
-      const payload = isItemsPayload
-        ? { items: body.items }
-        : isPromoPayload
-          ? { promo: (body as any).promo }
-          : body;
+      const payload =
+        items.length > 0 ? { items } : isPromoPayload ? { promo: (body as any).promo } : body;
       if (!_state.isConnected) {
         await queueAction({ endpoint: '/cart/update', payload });
         throw new Error('queued');
       }
       const { data } = await phase4Client.post('/cart/update', payload);
-      // backend returns { cart: {...} }
       return data?.cart ?? data;
     },
     onMutate: async vars => {
@@ -150,7 +165,7 @@ export function useCart() {
     onSuccess: data => {
       queryClient.setQueryData(['cart'], data);
       setStoreItems(data);
-      AsyncStorage.setItem('cart', JSON.stringify(data)).catch(() => {});
+      Promise.resolve(AsyncStorage.setItem('cart', JSON.stringify(data))).catch(() => {});
     },
   });
 
@@ -180,14 +195,22 @@ export function useCart() {
     error: query.error,
     updateCart: mutation.mutateAsync,
     // convenience helper to send an array of items: { items: [...] }
-    addItems: async (items: any[]) => mutation.mutateAsync({ items }),
-    addItem: async (item: any) => {
-      // Normalize legacy shape id -> productId if needed
-      const normalized = {
+    addItems: async (items: any[]) => {
+      // Always normalize items for backend
+      const normalized = items.map(item => ({
         productId: item.productId ?? item.id,
+        variantId: item.variantId,
         quantity: item.quantity ?? 1,
         price: item.price,
+      }));
+      return mutation.mutateAsync({ items: normalized });
+    },
+    addItem: async (item: any) => {
+      const normalized = {
+        productId: item.productId ?? item.id,
         variantId: item.variantId,
+        quantity: item.quantity ?? 1,
+        price: item.price,
       };
       return mutation.mutateAsync({ items: [normalized] });
     },
