@@ -5,43 +5,21 @@ import { phase4Client } from '../phase4Client';
 
 interface RewardPayload {
   id: string;
-  points: number;
 }
 
 async function redeemReward(reward: RewardPayload) {
-  // New awards contract: POST /awards/:id/redeem
-  await phase4Client.post(`/awards/${reward.id}/redeem`);
+  return phase4Client.post(`/awards/${reward.id}/redeem`).then(r => r.data);
 }
 
 export function useRedeemReward() {
   const queryClient = useQueryClient();
-
-  const optimisticRollback = async (
-    reward: RewardPayload
-  ): Promise<{ previous: any | undefined }> => {
-    await queryClient.cancelQueries({ queryKey: ['loyaltyStatus'] });
-    const previous = queryClient.getQueryData(['loyaltyStatus']);
-    queryClient.setQueryData(['loyaltyStatus'], (old: any) => {
-      if (!old) return old;
-      return { ...old, points: old.points - reward.points };
-    });
-    return { previous };
-  };
-
-  const rollback = (err: Error, _reward: RewardPayload, context?: { previous?: any }) => {
-    if (context?.previous) {
-      queryClient.setQueryData(['loyaltyStatus'], context.previous);
-    }
-    toast(err.message);
-  };
-
-  return useMutation<void, Error, RewardPayload, { previous?: any }>({
+  return useMutation<any, Error, RewardPayload>({
     mutationFn: redeemReward,
-    onMutate: optimisticRollback,
-    onError: rollback,
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['awards'] });
+      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
+      toast('Reward redeemed');
     },
+    onError: (err: Error) => toast(err.message),
   });
 }

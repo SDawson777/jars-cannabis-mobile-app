@@ -40,6 +40,14 @@ interface Award {
   earnedDate: string;
 }
 
+interface RewardItem {
+  id: string;
+  title: string;
+  description: string;
+  iconUrl: string;
+  cost: number;
+}
+
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -51,7 +59,11 @@ export default function AwardsScreen() {
 
   // Fetch awards with React Query
   const { data, isLoading, isError, error, refetch } = useQuery<
-    { user: { name: string; points: number; tier: string; progress: number }; awards: Award[] },
+    {
+      user: { name: string; points: number; tier: string; progress: number };
+      awards: Award[];
+      rewards: RewardItem[];
+    },
     Error
   >({
     queryKey: ['awards'],
@@ -62,6 +74,7 @@ export default function AwardsScreen() {
   });
 
   const awards = data?.awards ?? [];
+  const rewards = data?.rewards ?? [];
 
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const bgColor =
@@ -72,11 +85,7 @@ export default function AwardsScreen() {
 
   const user = data?.user ?? { name: '---', tier: '', points: 0, progress: 0 };
   const progressAnim = useRef(new Animated.Value(user.progress)).current;
-  const REWARDS = [
-    { id: '1', title: '10% Off', points: 100, image: '' },
-    { id: '2', title: 'Free Pre-roll', points: 200, image: '' },
-    { id: '3', title: 'VIP Event', points: 500, image: '' },
-  ];
+  // Rewards now provided by API via `rewards` list
 
   const prevAwardsCount = useRef(awards.length);
 
@@ -120,19 +129,16 @@ export default function AwardsScreen() {
 
   const redeemMutation = useRedeemReward();
 
-  const redeemReward = (reward: (typeof REWARDS)[0]) => {
-    if (user.points < reward.points) {
+  const redeemReward = (reward: RewardItem) => {
+    if (user.points < reward.cost) {
       hapticLight();
       toast('Not enough points');
       return;
     }
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    trackEvent('award_item_tap', { id: reward.id });
-    redeemMutation.mutate(
-      { id: reward.id, points: reward.points },
-      { onSuccess: () => toast('Reward redeemed') }
-    );
+    trackEvent('reward_redeem_tap', { id: reward.id });
+    redeemMutation.mutate({ id: reward.id });
   };
 
   const openFa_q = () => {
@@ -253,7 +259,7 @@ export default function AwardsScreen() {
         {/* Rewards Carousel */}
         <Text style={[styles.sectionTitle, { color: jarsPrimary }]}>Available Rewards</Text>
         <FlatList
-          data={REWARDS}
+          data={rewards}
           keyExtractor={r => r.id}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -267,9 +273,9 @@ export default function AwardsScreen() {
               accessibilityLabel={`Redeem ${item.title}`}
               accessible
             >
-              {item.image ? (
+              {item.iconUrl ? (
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: item.iconUrl }}
                   style={styles.rewardImage}
                   accessibilityLabel={`${item.title} image`}
                   accessible
@@ -282,7 +288,7 @@ export default function AwardsScreen() {
                 />
               )}
               <Text style={[styles.rewardTitle, { color: jarsPrimary }]}>{item.title}</Text>
-              <Text style={styles.rewardPoints}>{item.points} pts</Text>
+              <Text style={styles.rewardPoints}>{item.cost} pts</Text>
             </Pressable>
           )}
         />

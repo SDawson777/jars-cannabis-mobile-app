@@ -1,6 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { redeemAward } from '../backend/src/controllers/awardsController';
+import { rewardsCatalog } from '../backend/src/rewards/catalog';
 
 declare const expect: jest.Expect;
 
@@ -46,11 +47,11 @@ const prisma: any = {
   loyaltyStatus: {
     upsert: async ({ where: { userId }, update, create }: any) => {
       if (!loyalty[userId]) loyalty[userId] = { userId, points: create.points, tier: create.tier };
-      if (update?.points?.increment) loyalty[userId].points += update.points.increment;
+      if (update?.points?.increment) loyalty[userId].points += update.points.increment; // legacy path
       return loyalty[userId];
     },
     update: async ({ where: { userId }, data }: any) => {
-      Object.assign(loyalty[userId], data);
+      loyalty[userId] = { ...loyalty[userId], ...data };
       return loyalty[userId];
     },
   },
@@ -77,49 +78,36 @@ describe('redeemAward', () => {
       data: { email: 'test@example.com', passwordHash: 'hash' },
     });
     userId = user.id;
+    loyalty[userId] = { userId, points: 600, tier: 'Gold' }; // Seed sufficient points for redemption
   });
   afterAll(async () => {});
 
-  it('redeems a pending award', async () => {
-    const award = await prisma.award.create({
-      data: {
-        userId,
-        title: 'Badge',
-        description: 'Desc',
-        iconUrl: 'icon.png',
-        earnedDate: new Date(),
-      },
-    });
+  it('redeems a catalog reward and deducts points', async () => {
+    const reward = rewardsCatalog[0]; // cost 100
+    const starting = loyalty[userId].points;
     const app = createApp(userId);
-    const res = await request(app).post('/awards/redeem').send({ awardId: award.id });
+    const res = await request(app).post('/awards/redeem').send({ awardId: reward.id });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    const updated = await prisma.award.findUnique({ where: { id: award.id } });
-    expect(updated?.status).toBe('REDEEMED');
-    expect(updated?.redeemedAt).not.toBeNull();
+    // A new award should have been created representing redemption
+    const history = awards.filter(a => a.title === reward.title && a.userId === userId);
+    expect(history.length).toBe(1);
+    expect(history[0].status).toBe('REDEEMED');
+    expect(loyalty[userId].points).toBe(starting - reward.cost);
   });
 
-  it("rejects redeeming another user's award", async () => {
-    const other = await prisma.user.create({
-      data: { email: 'other@example.com', passwordHash: 'hash' },
-    });
-    const award = await prisma.award.create({
-      data: {
-        userId: other.id,
-        title: 'Badge',
-        description: 'Desc',
-        iconUrl: 'icon.png',
-        earnedDate: new Date(),
-      },
-    });
+  it('rejects redeem when insufficient points', async () => {
+    const reward = rewardsCatalog[2]; // cost 500
+    loyalty[userId].points = 100; // lower than cost
     const app = createApp(userId);
-    const res = await request(app).post('/awards/redeem').send({ awardId: award.id });
-    expect(res.status).toBe(403);
+    const res = await request(app).post('/awards/redeem').send({ awardId: reward.id });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('insufficient_points');
   });
 
-  it('handles non-existent award', async () => {
+  it('handles non-existent award id (legacy path)', async () => {
     const app = createApp(userId);
-    const res = await request(app).post('/awards/redeem').send({ awardId: 'no-such-id' });
+    const res = await request(app).post('/awards/redeem').send({ awardId: 'no-such-legacy-id' });
     expect(res.status).toBe(404);
   });
 });

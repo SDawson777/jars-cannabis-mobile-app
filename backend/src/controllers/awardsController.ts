@@ -2,6 +2,7 @@
 
 import { prisma } from '../prismaClient';
 import { Request, Response } from 'express';
+import { findRewardInCatalog } from '../rewards/catalog';
 
 // We assume authMiddleware has already run and attached `user` to req.
 type AuthReq = Request & { user: { id?: string; userId?: string } };
@@ -34,8 +35,44 @@ export async function redeemAward(req: Request, res: Response) {
   }
 
   try {
-    // Ensure the award exists and belongs to this user
     const client: any = (req as any).prisma || prisma;
+    // First attempt to treat awardId as a reward catalog redemption.
+    const reward = findRewardInCatalog(awardId);
+    if (reward) {
+      // Load or create loyalty status
+      const loyalty = await client.loyaltyStatus.upsert({
+        where: { userId: uid },
+        update: {},
+        create: { userId: uid, points: 0, tier: 'Bronze' },
+      });
+      if (loyalty.points < reward.cost) {
+        return res.status(400).json({ error: 'insufficient_points' });
+      }
+      // Deduct cost
+      const updatedLoyalty = await client.loyaltyStatus.update({
+        where: { userId: uid },
+        data: { points: loyalty.points - reward.cost },
+      });
+
+      // Recalculate tier (points decreased, tier might downgrade—decide policy).
+      // Policy: tiers persist (no downgrade) unless explicitly decided. We keep existing tier if points drop below threshold.
+      // If future requirement to downgrade tiers arises, implement here.
+
+      const createdAward = await client.award.create({
+        data: {
+          userId: uid,
+          // Store redemption as an Award history entry
+          title: reward.title,
+          description: reward.description,
+          iconUrl: reward.iconUrl,
+          status: 'REDEEMED',
+          redeemedAt: new Date(),
+        },
+      });
+      return res.json({ success: true, award: createdAward, points: updatedLoyalty.points });
+    }
+
+    // Fallback: legacy behavior for existing Award entity redemption (achievements)
     const award = await client.award.findUnique({ where: { id: awardId } });
     if (!award) {
       return res.status(404).json({ error: 'Award not found' });
@@ -51,25 +88,6 @@ export async function redeemAward(req: Request, res: Response) {
       where: { id: awardId },
       data: { status: 'REDEEMED', redeemedAt: new Date() },
     });
-
-    // Simple loyalty integration: increment points and adjust tier thresholds
-    const increment = 50; // flat increment per redemption for now
-    const loyalty = await client.loyaltyStatus.upsert({
-      where: { userId: uid },
-      update: { points: { increment } },
-      create: { userId: uid, points: increment, tier: 'Bronze' },
-    });
-
-    // Recalculate tier if thresholds crossed
-    let newTier = loyalty.tier;
-    const pts = loyalty.points;
-    if (pts >= 1000) newTier = 'Platinum';
-    else if (pts >= 500) newTier = 'Gold';
-    else if (pts >= 250) newTier = 'Silver';
-    else newTier = 'Bronze';
-    if (newTier !== loyalty.tier) {
-      await client.loyaltyStatus.update({ where: { userId: uid }, data: { tier: newTier } });
-    }
 
     return res.json({ success: true, award: updated });
   } catch (err) {

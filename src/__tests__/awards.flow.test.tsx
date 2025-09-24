@@ -61,12 +61,21 @@ import { toast } from '../utils/toast';
 jest.mock('../utils/toast');
 
 describe('Awards flow', () => {
+  beforeEach(() => {
+    (phase4Client.get as jest.Mock).mockReset();
+    (phase4Client.post as jest.Mock).mockReset();
+    (toast as jest.Mock).mockReset();
+  });
   it('loads awards and redeems a reward', async () => {
     (phase4Client.get as jest.Mock).mockResolvedValue({
       data: {
         user: { name: 'Test', points: 500, tier: 'Gold', progress: 0.5 },
         awards: [
           { id: 'a1', title: 'Badge', description: 'Desc', iconUrl: '', earnedDate: '2025-01-01' },
+        ],
+        rewards: [
+          { id: 'R1', title: '10% Off Coupon', description: 'Save', iconUrl: '', cost: 100 },
+          { id: 'R2', title: 'VIP', description: 'Event', iconUrl: '', cost: 500 },
         ],
       },
     });
@@ -104,7 +113,41 @@ describe('Awards flow', () => {
       await new Promise(r => setTimeout(r, 0));
     });
 
-    expect(phase4Client.post).toHaveBeenCalled();
+    expect(phase4Client.post).toHaveBeenCalledWith('/awards/R1/redeem');
+    expect(toast).toHaveBeenCalled();
+  });
+
+  it('prevents redemption when insufficient points (client-side)', async () => {
+    (phase4Client.get as jest.Mock).mockResolvedValueOnce({
+      data: {
+        user: { name: 'Low', points: 50, tier: 'Bronze', progress: 0.2 },
+        awards: [],
+        rewards: [
+          { id: 'R1', title: '10% Off Coupon', description: 'Save', iconUrl: '', cost: 100 },
+        ],
+      },
+    });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    let tree: renderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      tree = renderer.create(
+        <QueryClientProvider client={client}>
+          <AwardsScreen />
+        </QueryClientProvider>
+      );
+      await new Promise(r => setTimeout(r, 0));
+      await new Promise(r => setTimeout(r, 0));
+    });
+    const buttons = tree!.root.findAllByType('button' as any);
+    const redeemButton = buttons.find((b: any) =>
+      (b.props.accessibilityLabel || '').startsWith('Redeem')
+    );
+    await act(async () => {
+      redeemButton!.props.onClick();
+      await new Promise(r => setTimeout(r, 0));
+    });
+    // Ensure no redemption attempted
+    expect(phase4Client.post).not.toHaveBeenCalled();
     expect(toast).toHaveBeenCalled();
   });
 });

@@ -24,5 +24,15 @@ describe('GET /api/awards', () => {
     expect(res.body.user.progress).toBeLessThanOrEqual(1);
     expect(res.body).toHaveProperty('awards');
     expect(Array.isArray(res.body.awards)).toBe(true);
+    expect(res.body).toHaveProperty('rewards');
+    expect(Array.isArray(res.body.rewards)).toBe(true);
+    if (res.body.rewards.length) {
+      const r = res.body.rewards[0];
+      expect(r).toHaveProperty('id');
+      expect(r).toHaveProperty('title');
+      expect(r).toHaveProperty('description');
+      expect(r).toHaveProperty('iconUrl');
+      expect(r).toHaveProperty('cost');
+    }
   });
 });

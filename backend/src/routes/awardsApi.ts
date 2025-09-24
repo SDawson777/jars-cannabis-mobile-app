@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { redeemAward, getAwardById } from '../controllers/awardsController';
 import { prisma } from '../prismaClient';
 import { requireAuth } from '../middleware/auth';
+import { rewardsCatalog } from '../rewards/catalog';
 
 export const awardsApiRouter = Router();
 
@@ -41,6 +42,13 @@ awardsApiRouter.get('/awards', requireAuth, async (req, res) => {
         progress,
       },
       awards,
+      rewards: rewardsCatalog.map(r => ({
+        id: r.id,
+        title: r.title,
+        description: r.description,
+        iconUrl: r.iconUrl,
+        cost: r.cost,
+      })),
     });
   } catch (err) {
     console.error('Error in awards route:', err);
