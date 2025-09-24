@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1758742807003" clover="3.2.0">
-  <project timestamp="1758742807003" name="All files">
-    <metrics statements="2954" coveredstatements="1044" conditionals="1826" coveredconditionals="597" methods="915" coveredmethods="270" elements="5695" coveredelements="1911" complexity="0" loc="2954" ncloc="2954" packages="26" files="208" classes="208"/>
+<coverage generated="1758748169397" clover="3.2.0">
+  <project timestamp="1758748169397" name="All files">
+    <metrics statements="2978" coveredstatements="1045" conditionals="1866" coveredconditionals="599" methods="918" coveredmethods="270" elements="5762" coveredelements="1914" complexity="0" loc="2978" ncloc="2978" packages="26" files="208" classes="208"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="declarations.d.ts" path="/workspaces/jars-cannabis-mobile-app/src/@types/declarations.d.ts">
@@ -540,7 +540,7 @@
         <line num="181" count="10" type="cond" truecount="2" falsecount="0"/>
         <line num="182" count="9" type="cond" truecount="2" falsecount="0"/>
         <line num="183" count="8" type="cond" truecount="2" falsecount="0"/>
-        <line num="184" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="184" count="7" type="cond" truecount="2" falsecount="0"/>
         <line num="185" count="3" type="cond" truecount="2" falsecount="0"/>
         <line num="186" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="187" count="1" type="cond" truecount="1" falsecount="1"/>
@@ -867,10 +867,10 @@
         <line num="26" count="9" type="stmt"/>
         <line num="29" count="0" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
-        <line num="32" count="8" type="stmt"/>
-        <line num="33" count="8" type="cond" truecount="1" falsecount="1"/>
+        <line num="32" count="9" type="stmt"/>
+        <line num="33" count="9" type="cond" truecount="1" falsecount="1"/>
         <line num="34" count="0" type="stmt"/>
-        <line num="36" count="8" type="stmt"/>
+        <line num="36" count="9" type="stmt"/>
       </file>
       <file name="useCMSProducts.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/useCMSProducts.ts">
         <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
@@ -1488,7 +1488,7 @@
       </file>
     </package>
     <package name="screens">
-      <metrics statements="1544" coveredstatements="434" conditionals="1043" coveredconditionals="262" methods="461" coveredmethods="108"/>
+      <metrics statements="1544" coveredstatements="435" conditionals="1043" coveredconditionals="264" methods="461" coveredmethods="108"/>
       <file name="AccessibilitySettingsScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/AccessibilitySettingsScreen.tsx">
         <metrics statements="49" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="12" coveredmethods="0"/>
         <line num="27" count="0" type="cond" truecount="0" falsecount="4"/>
@@ -2323,7 +2323,7 @@
         <line num="109" count="0" type="stmt"/>
       </file>
       <file name="HomeScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/HomeScreen.tsx">
-        <metrics statements="84" coveredstatements="56" conditionals="73" coveredconditionals="41" methods="41" coveredmethods="19"/>
+        <metrics statements="84" coveredstatements="57" conditionals="73" coveredconditionals="43" methods="41" coveredmethods="19"/>
         <line num="45" count="1" type="cond" truecount="3" falsecount="1"/>
         <line num="46" count="1" type="stmt"/>
         <line num="62" count="7" type="stmt"/>
@@ -2350,7 +2350,7 @@
         <line num="98" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="99" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="100" count="2" type="cond" truecount="3" falsecount="1"/>
-        <line num="101" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="101" count="2" type="cond" truecount="2" falsecount="2"/>
         <line num="102" count="2" type="stmt"/>
         <line num="105" count="6" type="stmt"/>
         <line num="106" count="2" type="stmt"/>
@@ -3315,26 +3315,50 @@
       </file>
     </package>
     <package name="screens.profile">
-      <metrics statements="17" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="8" coveredmethods="0"/>
+      <metrics statements="41" coveredstatements="0" conditionals="44" coveredconditionals="0" methods="11" coveredmethods="0"/>
       <file name="LegalScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/profile/LegalScreen.tsx">
-        <metrics statements="17" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="8" coveredmethods="0"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
+        <metrics statements="41" coveredstatements="0" conditionals="44" coveredconditionals="0" methods="11" coveredmethods="0"/>
         <line num="28" count="0" type="stmt"/>
-        <line num="31" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
         <line num="54" count="0" type="stmt"/>
         <line num="55" count="0" type="stmt"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="66" count="0" type="stmt"/>
-        <line num="69" count="0" type="stmt"/>
-        <line num="81" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="63" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="66" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="74" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="78" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="81" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="82" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="85" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="86" count="0" type="stmt"/>
+        <line num="87" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="88" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="95" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="96" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="99" count="0" type="stmt"/>
+        <line num="101" count="0" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="118" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="137" count="0" type="stmt"/>
+        <line num="141" count="0" type="stmt"/>
+        <line num="195" count="0" type="stmt"/>
       </file>
     </package>
     <package name="shims">
