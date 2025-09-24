@@ -169,6 +169,8 @@ const paymentMethods: Record<string, any> = {};
 const addresses: Record<string, any> = {};
 // In-memory awards keyed by userId
 const awardsStore: Record<string, any[]> = {};
+// In-memory loyalty status
+const loyaltyStatus: Record<string, { userId: string; points: number; tier: string }> = {};
 
 jest.mock('../../src/prismaClient', () => ({
   prisma: {
@@ -188,20 +190,43 @@ jest.mock('../../src/prismaClient', () => ({
       update: async ({ where: { id }, data }: any) => {
         for (const list of Object.values(awardsStore)) {
           const idx = (list as any[]).findIndex(a => a.id === id);
-            if (idx >= 0) {
-              Object.assign((list as any[])[idx], data);
-              return (list as any[])[idx];
-            }
+          if (idx >= 0) {
+            Object.assign((list as any[])[idx], data);
+            return (list as any[])[idx];
+          }
         }
         throw new Error('Not found');
       },
       create: async ({ data }: any) => {
-        const id = data.id || `awd-${Math.random().toString(36).slice(2,9)}`;
+        const id = data.id || `awd-${Math.random().toString(36).slice(2, 9)}`;
         const award = { id, status: 'PENDING', redeemedAt: null, ...data };
         awardsStore[data.userId] = awardsStore[data.userId] || [];
         awardsStore[data.userId].push(award);
         return award;
-      }
+      },
+    },
+    loyaltyStatus: {
+      upsert: async ({ where: { userId }, update, create }: any) => {
+        if (!loyaltyStatus[userId]) {
+          loyaltyStatus[userId] = {
+            userId,
+            points: create?.points ?? 0,
+            tier: create?.tier || 'Bronze',
+          };
+        }
+        if (update) {
+          if (update.points && typeof update.points.increment === 'number') {
+            loyaltyStatus[userId].points += update.points.increment;
+          }
+          if (typeof update.tier === 'string') loyaltyStatus[userId].tier = update.tier;
+        }
+        return loyaltyStatus[userId];
+      },
+      update: async ({ where: { userId }, data }: any) => {
+        if (!loyaltyStatus[userId]) throw new Error('not found');
+        Object.assign(loyaltyStatus[userId], data);
+        return loyaltyStatus[userId];
+      },
     },
     user: {
       create: async ({ data }: any) => {

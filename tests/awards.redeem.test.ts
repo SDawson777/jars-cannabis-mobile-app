@@ -1,12 +1,60 @@
-import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import request from 'supertest';
-
 import { redeemAward } from '../backend/src/controllers/awardsController';
 
 declare const expect: jest.Expect;
 
-const prisma = new PrismaClient();
+// In-memory stubs
+const users: any[] = [];
+const awards: any[] = [];
+const loyalty: Record<string, { userId: string; points: number; tier: string }> = {};
+
+const prisma: any = {
+  user: {
+    create: async ({ data }: any) => {
+      const u = { id: data.id || `u-${Math.random().toString(36).slice(2, 9)}`, ...data };
+      users.push(u);
+      return u;
+    },
+    deleteMany: async () => {
+      users.length = 0;
+    },
+  },
+  award: {
+    create: async ({ data }: any) => {
+      const a = {
+        id: data.id || `a-${Math.random().toString(36).slice(2, 9)}`,
+        status: 'PENDING',
+        redeemedAt: null,
+        earnedDate: new Date(),
+        ...data,
+      };
+      awards.push(a);
+      return a;
+    },
+    findUnique: async ({ where: { id } }: any) => awards.find(a => a.id === id) || null,
+    update: async ({ where: { id }, data }: any) => {
+      const idx = awards.findIndex(a => a.id === id);
+      if (idx < 0) throw new Error('Not found');
+      awards[idx] = { ...awards[idx], ...data };
+      return awards[idx];
+    },
+    deleteMany: async () => {
+      awards.length = 0;
+    },
+  },
+  loyaltyStatus: {
+    upsert: async ({ where: { userId }, update, create }: any) => {
+      if (!loyalty[userId]) loyalty[userId] = { userId, points: create.points, tier: create.tier };
+      if (update?.points?.increment) loyalty[userId].points += update.points.increment;
+      return loyalty[userId];
+    },
+    update: async ({ where: { userId }, data }: any) => {
+      Object.assign(loyalty[userId], data);
+      return loyalty[userId];
+    },
+  },
+};
 
 function createApp(userId: string) {
   const app = express();
@@ -22,9 +70,6 @@ function createApp(userId: string) {
 
 describe('redeemAward', () => {
   let userId: string;
-  beforeAll(async () => {
-    await prisma.$connect();
-  });
   beforeEach(async () => {
     await prisma.award.deleteMany();
     await prisma.user.deleteMany();
@@ -33,9 +78,7 @@ describe('redeemAward', () => {
     });
     userId = user.id;
   });
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  afterAll(async () => {});
 
   it('redeems a pending award', async () => {
     const award = await prisma.award.create({

@@ -10,16 +10,36 @@ awardsApiRouter.get('/awards', requireAuth, async (req, res) => {
   try {
     const authUser = (req as any).user as { userId: string };
     const userId = authUser.userId;
-    const awards = await prisma.award.findMany({ where: { userId } });
+    const [awards, loyalty] = await Promise.all([
+      prisma.award.findMany({ where: { userId } }),
+      prisma.loyaltyStatus.upsert({
+        where: { userId },
+        update: {},
+        create: { userId, points: 0, tier: 'Bronze' },
+      }),
+    ]);
 
-    // In a future iteration we could derive points/tier from aggregate tables.
-    // For now, compute simple sums + placeholder tier logic.
-    const points = awards.reduce((s: number, a: any) => s + (a.pointsValue || 0), 0);
-    const tier = points >= 1000 ? 'Platinum' : points >= 500 ? 'Gold' : points >= 250 ? 'Silver' : 'Bronze';
-    const progress = Math.min(1, points / 1000);
+    // Determine progress toward next tier based on static thresholds
+    const thresholds = [
+      { tier: 'Bronze', min: 0, next: 250 },
+      { tier: 'Silver', min: 250, next: 500 },
+      { tier: 'Gold', min: 500, next: 1000 },
+      { tier: 'Platinum', min: 1000, next: null },
+    ];
+    const current = thresholds.find(t => t.tier === loyalty.tier) || thresholds[0];
+    let progress = 1;
+    if (current.next) {
+      const span = current.next - current.min;
+      progress = Math.min(1, (loyalty.points - current.min) / span);
+    }
 
     return res.json({
-      user: { id: userId, name: 'You', points, tier, progress },
+      user: {
+        id: userId,
+        points: loyalty.points,
+        tier: loyalty.tier,
+        progress,
+      },
       awards,
     });
   } catch (err) {
@@ -35,6 +55,8 @@ awardsApiRouter.post('/awards/:id/redeem', requireAuth, async (req, res) => {
 });
 
 // GET single award
-awardsApiRouter.get('/awards/:id', requireAuth, async (req, res) => getAwardById(req as any, res as any));
+awardsApiRouter.get('/awards/:id', requireAuth, async (req, res) =>
+  getAwardById(req as any, res as any)
+);
 
 export default awardsApiRouter;

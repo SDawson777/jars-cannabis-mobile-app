@@ -19,6 +19,9 @@ describe('GET /api/awards', () => {
     expect(res.body.user).toHaveProperty('points');
     expect(res.body.user).toHaveProperty('tier');
     expect(res.body.user).toHaveProperty('progress');
+    expect(typeof res.body.user.points).toBe('number');
+    expect(res.body.user.progress).toBeGreaterThanOrEqual(0);
+    expect(res.body.user.progress).toBeLessThanOrEqual(1);
     expect(res.body).toHaveProperty('awards');
     expect(Array.isArray(res.body.awards)).toBe(true);
   });
