@@ -43,7 +43,7 @@ export const useCartStore = create<CartState>()(
       setItems: _items => set({ items: _items }),
     }),
     {
-      name: 'cart',
+      name: 'cartStore',
       version: 1,
       storage: createJSONStorage(() => AsyncStorage),
       migrate: persisted => persisted as CartState,

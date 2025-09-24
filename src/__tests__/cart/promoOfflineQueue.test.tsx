@@ -89,8 +89,8 @@ describe('promo code offline queue', () => {
     expect(queueRaw).toBeTruthy();
     const parsed = JSON.parse(queueRaw);
     expect(Array.isArray(parsed)).toBe(true);
-    expect(parsed[0].endpoint).toBe('/cart/update');
-    // Critical assertion: promo object preserved exactly
-    expect(parsed[0].payload).toEqual({ promo: promoCode });
+    expect(parsed[0].endpoint).toBe('/cart/apply-coupon');
+    // Critical assertion: code object preserved exactly
+    expect(parsed[0].payload).toEqual({ code: promoCode });
   });
 });

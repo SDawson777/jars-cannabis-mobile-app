@@ -19,8 +19,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import { useCartStore, hydrateCartStore } from '../../stores/useCartStore';
 import { ThemeContext } from '../context/ThemeContext';
+import { useCart } from '../hooks/useCart';
 import { useCartValidation } from '../hooks/useCartValidation';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy, hapticError } from '../utils/haptic';
@@ -36,17 +36,14 @@ const IMAGE_SIZE = 80;
 export default function CartScreen() {
   const navigation = useNavigation<CartNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const items = useCartStore(_state => _state.items);
-  const updateQuantity = useCartStore(_state => _state.updateQuantity);
-  const removeItemFromStore = useCartStore(_state => _state.removeItem);
+
+  // Use cart from useCart hook instead of Zustand directly
+  const { cart, updateCart, applyPromo, isLoading } = useCart();
+  const items = cart?.items ?? [];
+
   const [promo, setPromo] = useState('');
 
-  const [hydrated, setHydrated] = useState(false);
   const { validating } = useCartValidation();
-
-  useEffect(() => {
-    Promise.resolve(hydrateCartStore()).then(() => setHydrated(true));
-  }, []);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -76,7 +73,7 @@ export default function CartScreen() {
           }
         : {};
 
-  if (!hydrated || validating) {
+  if (isLoading || validating) {
     return (
       <SafeAreaView
         style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}
@@ -87,21 +84,24 @@ export default function CartScreen() {
     );
   }
 
-  const subtotal =
-    items.reduce(
-      (sum, item) => (item.available === false ? sum : sum + item.price * item.quantity),
-      0
-    ) || 0;
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
   const discount = 0;
   const taxes = (subtotal - discount) * 0.07;
   const total = subtotal - discount + taxes;
 
-  const updateQty = (id: string, delta: number) => {
+  const updateQty = async (id: string, delta: number) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const item = items.find(i => i.id === id);
     if (item) {
-      updateQuantity(id, Math.max(1, item.quantity + delta));
+      const newQuantity = Math.max(1, item.quantity + delta);
+      const updatedItems = items.map(i => (i.id === id ? { ...i, quantity: newQuantity } : i));
+      try {
+        await updateCart({ items: updatedItems });
+      } catch (error) {
+        // Error handling - could show toast or retry
+        console.error('Failed to update cart:', error);
+      }
     }
   };
 
@@ -112,17 +112,36 @@ export default function CartScreen() {
       {
         text: 'Remove',
         style: 'destructive',
-        onPress: () => {
+        onPress: async () => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          removeItemFromStore(id);
+          const updatedItems = items.filter(i => i.id !== id);
+          try {
+            await updateCart({ items: updatedItems });
+          } catch (error) {
+            console.error('Failed to remove item:', error);
+          }
         },
       },
     ]);
   };
 
   const applyPromoCode = async () => {
-    hapticError();
-    Alert.alert('Promo codes are unavailable offline.');
+    if (!promo.trim()) {
+      hapticError();
+      Alert.alert('Please enter a promo code');
+      return;
+    }
+
+    try {
+      hapticMedium();
+      await applyPromo(promo.trim());
+      setPromo(''); // Clear the input on success
+      Alert.alert('Success', 'Promo code applied!');
+    } catch (error) {
+      hapticError();
+      const message = error instanceof Error ? error.message : 'Failed to apply promo code';
+      Alert.alert('Error', message);
+    }
   };
 
   const goToHelp = () => {
@@ -156,62 +175,45 @@ export default function CartScreen() {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) =>
-          item.available === false ? (
-            <View style={styles.card} accessibilityLabel={`${item.name} unavailable`}>
-              <View style={styles.info}>
-                <Text style={[styles.name, { color: jarsPrimary }]}>Item unavailable</Text>
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={{ uri: (item as any).image ?? (item as any).imageUrl }}
+              style={styles.image}
+            />
+            <View style={styles.info}>
+              <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
+              <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
+              <View style={styles.qtyRow}>
+                <Pressable
+                  onPress={() => updateQty(item.id, -1)}
+                  style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                  testID={`decrease-quantity-${item.id}`}
+                  accessibilityLabel={`Decrease quantity of ${item.name}`}
+                >
+                  <Text style={styles.qtyBtnText}>−</Text>
+                </Pressable>
+                <Text style={[styles.qty, { color: jarsPrimary }]}>{item.quantity}</Text>
+                <Pressable
+                  onPress={() => updateQty(item.id, 1)}
+                  style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
+                  testID={`increase-quantity-${item.id}`}
+                  accessibilityLabel={`Increase quantity of ${item.name}`}
+                >
+                  <Text style={styles.qtyBtnText}>+</Text>
+                </Pressable>
                 <Pressable
                   onPress={() => removeItem(item.id)}
+                  style={styles.remove}
+                  testID={`remove-item-${item.id}`}
                   accessibilityLabel={`Remove ${item.name} from cart`}
-                  style={[styles.qtyBtn, { marginTop: 8 }]}
                 >
-                  <Text style={styles.qtyBtnText}>Remove</Text>
+                  <Trash2 color={jarsPrimary} size={20} />
                 </Pressable>
               </View>
             </View>
-          ) : (
-            <View style={styles.card}>
-              <Image
-                source={{ uri: (item as any).image ?? (item as any).imageUrl }}
-                style={styles.image}
-              />
-              <View style={styles.info}>
-                <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
-                <Text style={[styles.price, { color: jarsSecondary }]}>
-                  ${item.price.toFixed(2)}
-                </Text>
-                <View style={styles.qtyRow}>
-                  <Pressable
-                    onPress={() => updateQty(item.id, -1)}
-                    style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
-                    testID={`decrease-quantity-${item.id}`}
-                    accessibilityLabel={`Decrease quantity of ${item.name}`}
-                  >
-                    <Text style={styles.qtyBtnText}>−</Text>
-                  </Pressable>
-                  <Text style={[styles.qty, { color: jarsPrimary }]}>{item.quantity}</Text>
-                  <Pressable
-                    onPress={() => updateQty(item.id, 1)}
-                    style={[styles.qtyBtn, { backgroundColor: jarsSecondary + '20' }]}
-                    testID={`increase-quantity-${item.id}`}
-                    accessibilityLabel={`Increase quantity of ${item.name}`}
-                  >
-                    <Text style={styles.qtyBtnText}>+</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => removeItem(item.id)}
-                    style={styles.remove}
-                    testID={`remove-item-${item.id}`}
-                    accessibilityLabel={`Remove ${item.name} from cart`}
-                  >
-                    <Trash2 color={jarsPrimary} size={20} />
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          )
-        }
+          </View>
+        )}
       />
 
       {/* Promo Code */}

@@ -19,7 +19,7 @@ jest.mock('@react-native-community/netinfo', () => ({
   addEventListener: jest.fn(() => () => {}),
 }));
 
-const mockPost = jest.fn(async (_endpoint: string, payload: any) => {
+const mockPost = jest.fn(async (endpoint: string, payload: any) => {
   // Echo back a cart response similar to backend shape
   if (payload.items) {
     return {
@@ -31,13 +31,13 @@ const mockPost = jest.fn(async (_endpoint: string, payload: any) => {
       },
     };
   }
-  if (payload.promo) {
+  if (payload.code && endpoint === '/cart/apply-coupon') {
     return {
       data: {
         cart: {
           items: [{ productId: 'p1', quantity: 2, price: 10 }],
           total: 20,
-          promo: payload.promo,
+          appliedCoupon: payload.code,
         },
       },
     };
@@ -95,7 +95,7 @@ describe('useCart optimistic merge', () => {
     await waitFor(() => {
       const items = api.cart?.items;
       expect(items?.[0]?.quantity).toBe(2); // merged
-      expect((api.cart as any)?.promo).toBe('SAVE20');
+      expect((api.cart as any)?.appliedCoupon).toBe('SAVE20');
     });
 
     expect(mockPost).toHaveBeenCalled();

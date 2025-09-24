@@ -143,7 +143,17 @@ export function useCart() {
   });
 
   const applyPromo = async (code: string) => {
-    await mutation.mutateAsync({ promo: code } as any);
+    const _state = await NetInfo.fetch();
+    if (!_state.isConnected) {
+      await queueAction({ endpoint: '/cart/apply-coupon', payload: { code } });
+      throw new Error('queued');
+    }
+    const { data } = await phase4Client.post('/cart/apply-coupon', { code });
+    const cartPayload = data?.cart ?? data;
+    queryClient.setQueryData(['cart'], cartPayload);
+    setStoreItems(cartPayload);
+    await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
+    return cartPayload;
   };
 
   return {
