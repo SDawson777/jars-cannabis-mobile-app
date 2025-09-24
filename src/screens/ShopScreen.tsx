@@ -26,6 +26,9 @@ import { ThemeContext } from '../context/ThemeContext';
 import { useStore } from '../context/StoreContext';
 // NOTE: we intentionally require hook modules inside the component so individual tests can override them with jest.doMock
 import type { RootStackParamList } from '../navigation/types';
+import WeatherForYouRail from '../components/WeatherForYouRail';
+import { useWeatherFilterParam } from '../hooks/useWeatherFilterParam';
+import { useWeatherRecommendationsPreference } from '../hooks/useWeatherRecommendationsPreference';
 import type { CMSProduct } from '../types/cms';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
@@ -41,8 +44,11 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
 export default function ShopScreen() {
   const navigation = useNavigation<ShopNavProp>();
+  const weatherFilter = useWeatherFilterParam(navigation);
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const { preferredStore } = useStore();
+  const [weatherPrefEnabled, _setWeatherPrefEnabled, weatherPrefHydrated] =
+    useWeatherRecommendationsPreference();
 
   let _useProducts: any;
   let _useFiltersQuery: any;
@@ -190,6 +196,14 @@ export default function ShopScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       <OfflineNotice />
+      {weatherPrefHydrated && weatherPrefEnabled && weatherFilter && (
+        <WeatherForYouRail
+          condition={weatherFilter}
+          limit={8}
+          onSelectProduct={pid => navigation.navigate('ProductDetail', { slug: pid })}
+          showEmptyState={false}
+        />
+      )}
       <View style={styles.filterRow}>
         {filtersLoading && (
           <>

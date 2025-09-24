@@ -30,6 +30,9 @@ import Animated from 'react-native-reanimated';
 import { phase4Client } from '../api/phase4Client';
 import ForYouTodayCard from '../components/ForYouTodayCard';
 import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
+import WeatherForYouRail from '../components/WeatherForYouRail';
+import { mapWeatherCondition } from '../hooks/useWeatherRecommendations';
+import { useWeatherRecommendationsPreference } from '../hooks/useWeatherRecommendationsPreference';
 import OfflineNotice from '../components/OfflineNotice';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
@@ -79,6 +82,25 @@ export default function HomeScreen() {
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [ways, setWays] = useState<Way[]>([]);
   const [waysLoading, setWaysLoading] = useState(true);
+  // Basic lightweight weather condition placeholder. In future, integrate real weather API.
+  const [weatherCondition, setWeatherCondition] = useState<string | null>(null);
+  const [weatherPrefEnabled, _setWeatherPrefEnabled, weatherPrefHydrated] =
+    useWeatherRecommendationsPreference();
+
+  // Derive a pseudo-condition from time of day to avoid external dependencies and keep clutter low.
+  useEffect(() => {
+    if (!weatherPrefEnabled) {
+      setWeatherCondition(null);
+      return;
+    }
+    const hour = new Date().getHours();
+    let derived = 'clear';
+    if (hour >= 6 && hour < 11) derived = 'partly cloudy';
+    else if (hour >= 11 && hour < 16) derived = 'sunny';
+    else if (hour >= 16 && hour < 20) derived = 'cloudy';
+    else if (hour >= 20 || hour < 6) derived = 'overcast';
+    setWeatherCondition(mapWeatherCondition(derived));
+  }, [weatherPrefEnabled]);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -209,6 +231,16 @@ export default function HomeScreen() {
             data={forYou}
             onSelectProduct={id => navigation.navigate('ProductDetail', { slug: id })}
             onSeeAll={() => navigation.navigate('ShopScreen')}
+          />
+        )}
+
+        {/* Weather-aware recommendations (minimal footprint) */}
+        {weatherPrefHydrated && weatherPrefEnabled && weatherCondition && (
+          <WeatherForYouRail
+            condition={weatherCondition}
+            limit={8}
+            onSelectProduct={id => navigation.navigate('ProductDetail', { slug: id })}
+            onSeeAll={() => navigation.navigate('ShopScreen', { weatherFilter: weatherCondition })}
           />
         )}
 

@@ -23,7 +23,8 @@ export type RootStackParamList = {
   OTPScreen: undefined;
   StoreSelection: undefined;
   HomeScreen: undefined;
-  ShopScreen: undefined;
+  // Allow optional weather-based filtering when navigating from Weather rail
+  ShopScreen: { weatherFilter?: string } | undefined;
   ProductList: undefined;
   ProductDetail: { slug: string };
   CartScreen: undefined;

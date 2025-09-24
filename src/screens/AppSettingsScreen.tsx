@@ -17,9 +17,12 @@ import {
 } from 'react-native';
 
 import { useSettings } from '../context/SettingsContext';
+import { useWeatherRecommendationsPreference } from '../hooks/useWeatherRecommendationsPreference';
+import { logEvent } from '../utils/analytics';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
 import { t } from '../utils/i18n';
+import logger from '../lib/logger';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -33,6 +36,7 @@ export default function AppSettingsScreen() {
   const [visitAlerts, setVisitAlerts] = useState(false);
   const [personalOffers, setPersonalOffers] = useState(false);
   const { biometricEnabled, setBiometricEnabled, locale } = useSettings();
+  const [weatherRecsEnabled, setWeatherRecsEnabled] = useWeatherRecommendationsPreference();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -70,6 +74,19 @@ export default function AppSettingsScreen() {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setBiometricEnabled(val);
+  };
+
+  const toggleWeatherRecs = (val: boolean) => {
+    hapticLight();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setWeatherRecsEnabled(val);
+    try {
+      logEvent('weather_recs_pref_change', { enabled: val });
+    } catch (err) {
+      logger.warn('Failed to log weather_recs_pref_change', {
+        error: (err as any)?.message || String(err),
+      });
+    }
   };
 
   const bgColor =
@@ -115,6 +132,17 @@ export default function AppSettingsScreen() {
           <Switch
             value={personalOffers}
             onValueChange={togglePersonalOffers}
+            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        {/* Weather Recommendations */}
+        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
+          <Text style={[styles.label, { color: jarsPrimary }]}>Show Weather Recommendations</Text>
+          <Switch
+            value={weatherRecsEnabled}
+            onValueChange={toggleWeatherRecs}
             trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
             thumbColor="#FFFFFF"
           />

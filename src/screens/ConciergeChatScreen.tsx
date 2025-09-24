@@ -1,7 +1,7 @@
 // src/screens/ConciergeChatScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Send } from 'lucide-react-native';
+import { Send, RefreshCw } from 'lucide-react-native';
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -15,10 +15,12 @@ import {
   StyleSheet,
   LayoutAnimation,
   UIManager,
+  Alert,
+  ToastAndroid,
 } from 'react-native';
 
-import { conciergeChat } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
+import { useConcierge } from '../hooks/useConcierge';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 
@@ -26,6 +28,9 @@ interface Message {
   id: string;
   text: string;
   sender: 'user' | 'bot';
+  timestamp?: number;
+  isOptimistic?: boolean;
+  error?: boolean;
 }
 
 // Enable LayoutAnimation on Android
@@ -38,16 +43,13 @@ type ChatNavProp = NativeStackNavigationProp<RootStackParamList, 'ConciergeChat'
 export default function ConciergeChatScreen() {
   const navigation = useNavigation<ChatNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { messages, loading, sendMessage, retryMessage } = useConcierge();
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
 
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', text: 'Hi, how can I assist you today?', sender: 'bot' },
-  ]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [lastUserMessage, setLastUserMessage] = useState('');
   const listRef = useRef<FlatList<Message>>(null);
 
   useEffect(() => {
@@ -58,45 +60,49 @@ export default function ConciergeChatScreen() {
     listRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
-  const sendMessage = async () => {
+  const showToast = (message: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      Alert.alert('Notice', message);
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (!input.trim() || loading) return;
+
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     hapticMedium();
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      text: input,
-      sender: 'user',
-    };
-    const history = messages.map(m => ({
-      role: m.sender === 'user' ? 'user' : 'assistant',
-      content: m.text,
-    }));
-    setMessages(prev => [...prev, userMsg]);
+
+    const messageText = input.trim();
+    setLastUserMessage(messageText);
     setInput('');
-    setLoading(true);
-    setError('');
-    try {
-      const res = await conciergeChat({ message: userMsg.text, history });
-      setMessages(prev => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          text: res.reply,
-          sender: 'bot',
-        },
-      ]);
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          text: 'Failed to fetch response.',
-          sender: 'bot',
-        },
-      ]);
-      setError('Network error');
-    } finally {
-      setLoading(false);
+
+    const result = await sendMessage(messageText);
+
+    if (!result.success && result.error) {
+      const { code, message: errorMessage, retryAfter } = result.error;
+
+      if (code === 'rate_limit' && retryAfter) {
+        showToast(`Too many requests. Try again in ${retryAfter}s.`);
+      } else if (code === 'timeout') {
+        showToast('Request timed out. Please try again.');
+      } else if (code === 'network') {
+        showToast('Network error. Check your connection and tap to retry.');
+      } else {
+        showToast(errorMessage || 'Something went wrong. Tap to retry.');
+      }
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!lastUserMessage || loading) return;
+
+    hapticMedium();
+    const result = await retryMessage(lastUserMessage);
+
+    if (!result.success && result.error) {
+      showToast(result.error.message || 'Still having trouble. Please try again later.');
     }
   };
 
@@ -135,17 +141,35 @@ export default function ConciergeChatScreen() {
                 styles.messageBubble,
                 item.sender === 'user'
                   ? [styles.userBubble, { backgroundColor: jarsPrimary }]
-                  : [styles.botBubble, { backgroundColor: jarsBackground }],
+                  : [
+                      styles.botBubble,
+                      {
+                        backgroundColor: item.error ? '#ffebee' : jarsBackground,
+                        borderColor: item.error ? '#f44336' : 'transparent',
+                        borderWidth: item.error ? 1 : 0,
+                      },
+                    ],
               ]}
             >
               <Text
                 style={[
                   styles.messageText,
-                  item.sender === 'user' ? { color: '#FFFFFF' } : { color: jarsPrimary },
+                  item.sender === 'user'
+                    ? { color: '#FFFFFF' }
+                    : {
+                        color: item.error ? '#f44336' : jarsPrimary,
+                        fontStyle: item.isOptimistic ? 'italic' : 'normal',
+                      },
                 ]}
               >
                 {item.text}
               </Text>
+              {item.error && (
+                <Pressable style={styles.retryButton} onPress={handleRetry}>
+                  <RefreshCw size={16} color="#f44336" />
+                  <Text style={[styles.retryText, { color: '#f44336' }]}>Retry</Text>
+                </Pressable>
+              )}
             </View>
           )}
         />
@@ -153,7 +177,6 @@ export default function ConciergeChatScreen() {
         {loading && (
           <Text style={[styles.statusText, { color: jarsSecondary }]}>Bot is typing...</Text>
         )}
-        {error ? <Text style={[styles.error, { color: 'red' }]}>{error}</Text> : null}
 
         {/* Input */}
         <View
@@ -177,7 +200,7 @@ export default function ConciergeChatScreen() {
               styles.sendButton,
               { backgroundColor: jarsPrimary, opacity: loading ? 0.5 : 1 },
             ]}
-            onPress={sendMessage}
+            onPress={handleSendMessage}
             disabled={loading}
           >
             <Send size={20} color="#FFFFFF" />
@@ -234,4 +257,17 @@ const styles = StyleSheet.create({
   },
   statusText: { textAlign: 'center', marginBottom: 8 },
   error: { textAlign: 'center', marginBottom: 8 },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: 'transparent',
+  },
+  retryText: {
+    marginLeft: 4,
+    fontSize: 14,
+    fontWeight: '500',
+  },
 });

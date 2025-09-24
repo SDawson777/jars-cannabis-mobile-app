@@ -95,10 +95,39 @@ All responses follow a consistent format:
 
 ### Recommendations
 
-| Method | Endpoint                            | Description                     | Auth Required |
-| ------ | ----------------------------------- | ------------------------------- | ------------- |
-| GET    | /recommendations/for-you            | Personalized recommendations    | Yes           |
-| GET    | /recommendations/related/:productId | Related product recommendations | No            |
+| Method | Endpoint                            | Description                                | Auth Required |
+| ------ | ----------------------------------- | ------------------------------------------ | ------------- |
+| GET    | /recommendations/for-you            | Personalized recommendations               | Yes           |
+| GET    | /recommendations/related/:productId | Related product recommendations            | No            |
+| GET    | /recommendations/weather            | Weather-based product recommendations      | No            |
+| GET    | /recommendations/weather/auto       | Auto-detect weather and recommend products | No            |
+
+#### Weather Recommendations Provider (Backend)
+
+The `/recommendations/weather/auto` endpoint can use a real external weather API if configured via environment variables. If not configured, it falls back to time-of-day or provided metrics.
+
+**Environment Variables:**
+
+- `WEATHER_API_URL` — (optional) External weather API endpoint (must accept `lat` and `lon` query params)
+- `WEATHER_API_KEY` — (optional) Bearer token for the weather API
+- `WEATHER_CACHE_TTL_MS` — (optional) Cache TTL for weather lookups in ms (default: 300000)
+
+**Example usage:**
+
+```sh
+curl "http://localhost:3000/api/v1/recommendations/weather/auto?lat=42.3314&lon=-83.0458&limit=3"
+```
+
+**Response:**
+
+```json
+{
+	"condition": "sunny",
+	"derived": true,
+	"criteria": { ... },
+	"products": [ ... ]
+}
+```
 
 ### Loyalty & Gamification
 
