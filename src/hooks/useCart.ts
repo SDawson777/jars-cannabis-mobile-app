@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 
 import { phase4Client } from '../api/phase4Client';
+import { useCartStore } from '../../stores/useCartStore';
 
 import { useOfflineCartQueue } from './useOfflineCartQueue';
 
@@ -24,13 +25,34 @@ export function useCart() {
   const { queueAction, pending } = useOfflineCartQueue();
   const [loadingFromCache, setLoadingFromCache] = useState(false);
 
+  const setStoreItems = (cartPayload: any) => {
+    try {
+      if (Array.isArray(cartPayload?.items)) {
+        const mapped = cartPayload.items.map((i: any) => ({
+          id: i.productId ?? i.id,
+          name: i.name ?? i.product?.name ?? 'Item',
+          // fallback price/qty
+          price: i.price ?? i.product?.price ?? 0,
+          quantity: i.quantity ?? 1,
+          variantId: i.variantId,
+          available: i.available !== false,
+        }));
+        useCartStore.getState().setItems(mapped);
+      }
+    } catch (_e) {
+      // Non-fatal: if mapping fails we leave the store unchanged.
+    }
+  };
+
   const fetchCart = async (): Promise<Cart> => {
     const _state = await NetInfo.fetch();
     if (!_state.isConnected) {
       const cached = await AsyncStorage.getItem('cart');
       if (cached) {
         setLoadingFromCache(true);
-        return JSON.parse(cached) as Cart;
+        const parsed = JSON.parse(cached) as Cart;
+        setStoreItems(parsed);
+        return parsed;
       }
       throw new Error('Offline');
     }
@@ -38,6 +60,7 @@ export function useCart() {
     // backend returns { cart: { items: [...], total } }
     const cartPayload = data?.cart ?? data;
     await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
+    setStoreItems(cartPayload);
     return cartPayload;
   };
 
@@ -50,16 +73,20 @@ export function useCart() {
     setLoadingFromCache(false);
   }, [query.data]);
 
-  const mutation = useMutation<Cart, Error, Partial<Cart>>({
+  const mutation = useMutation<Cart, Error, any>({
     mutationFn: async body => {
       const _state = await NetInfo.fetch();
+      const isItemsPayload = Array.isArray(body?.items);
+      const isPromoPayload = 'promo' in (body || {});
+      const payload = isItemsPayload
+        ? { items: body.items }
+        : isPromoPayload
+          ? { promo: (body as any).promo }
+          : body;
       if (!_state.isConnected) {
-        // ensure payload matches backend expectation: { items: [...] }
-        const payload = body.items ? body : { items: (body as any).items ?? [] };
         await queueAction({ endpoint: '/cart/update', payload });
         throw new Error('queued');
       }
-      const payload = body.items ? body : { items: (body as any).items ?? [] };
       const { data } = await phase4Client.post('/cart/update', payload);
       // backend returns { cart: {...} }
       return data?.cart ?? data;
@@ -78,6 +105,7 @@ export function useCart() {
     },
     onSuccess: data => {
       queryClient.setQueryData(['cart'], data);
+      setStoreItems(data);
       AsyncStorage.setItem('cart', JSON.stringify(data)).catch(() => {});
     },
   });
@@ -93,14 +121,16 @@ export function useCart() {
     error: query.error,
     updateCart: mutation.mutateAsync,
     // convenience helper to send an array of items: { items: [...] }
-    addItems: async (items: Partial<CartItem>[]) => {
-      return mutation.mutateAsync({ items } as any);
-    },
-    // convenience helper to add a single item (keeps backwards compatibility)
-    addItem: async (item: Partial<CartItem>) => {
-      // If caller passes legacy shape { productId, quantity } copy into item.id
-      // The server expects productId in items; preserve caller fields (productId/quantity/price/variantId)
-      return mutation.mutateAsync({ items: [item] } as any);
+    addItems: async (items: any[]) => mutation.mutateAsync({ items }),
+    addItem: async (item: any) => {
+      // Normalize legacy shape id -> productId if needed
+      const normalized = {
+        productId: item.productId ?? item.id,
+        quantity: item.quantity ?? 1,
+        price: item.price,
+        variantId: item.variantId,
+      };
+      return mutation.mutateAsync({ items: [normalized] });
     },
     applyPromo,
     refetchCart: query.refetch,
