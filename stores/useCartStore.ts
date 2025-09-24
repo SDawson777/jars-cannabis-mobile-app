@@ -9,20 +9,24 @@ export interface CartItem {
   quantity: number;
   variantId?: string;
   available?: boolean;
+  image?: string;
 }
 
 interface CartState {
   items: CartItem[];
+  appliedCoupon?: string;
   addItem: (_item: CartItem) => void;
   updateQuantity: (_id: string, _quantity: number) => void;
   removeItem: (_id: string) => void;
   setItems: (_items: CartItem[]) => void;
+  setAppliedCoupon: (_coupon?: string) => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      appliedCoupon: undefined,
       addItem: _item => {
         const existing = get().items.find(
           i => i.id === _item.id && i.variantId === _item.variantId
@@ -41,6 +45,7 @@ export const useCartStore = create<CartState>()(
         set({ items: get().items.map(i => (i.id === _id ? { ...i, quantity: _quantity } : i)) }),
       removeItem: _id => set({ items: get().items.filter(i => i.id !== _id) }),
       setItems: _items => set({ items: _items }),
+      setAppliedCoupon: _coupon => set({ appliedCoupon: _coupon }),
     }),
     {
       name: 'cartStore',

@@ -26,6 +26,12 @@ export function useCart() {
   const { queueAction, pending } = useOfflineCartQueue();
   const [loadingFromCache, setLoadingFromCache] = useState(false);
 
+  // Get normalized cart items from Zustand store
+  const storeItems = useCartStore(state => state.items);
+  const appliedCoupon = useCartStore(state => state.appliedCoupon);
+  const setItems = useCartStore(state => state.setItems);
+  const setAppliedCoupon = useCartStore(state => state.setAppliedCoupon);
+
   const setStoreItems = (cartPayload: any) => {
     try {
       if (Array.isArray(cartPayload?.items)) {
@@ -37,8 +43,14 @@ export function useCart() {
           quantity: i.quantity ?? 1,
           variantId: i.variantId,
           available: i.available !== false,
+          // Include image data from product
+          image: i.image ?? i.imageUrl ?? i.product?.imageUrl ?? i.product?.image,
         }));
-        useCartStore.getState().setItems(mapped);
+        setItems(mapped);
+      }
+      // Handle applied coupon from cart payload
+      if (cartPayload?.appliedCoupon !== undefined) {
+        setAppliedCoupon(cartPayload.appliedCoupon);
       }
     } catch (_e) {
       // Non-fatal: if mapping fails we leave the store unchanged.
@@ -157,7 +169,12 @@ export function useCart() {
   };
 
   return {
-    cart: query.data,
+    // Return normalized cart with items from store and calculated total
+    cart: {
+      items: storeItems,
+      total: storeItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      appliedCoupon,
+    },
     isLoading: query.isLoading && !loadingFromCache,
     isFetching: query.isFetching,
     error: query.error,
