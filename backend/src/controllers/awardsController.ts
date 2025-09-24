@@ -1,12 +1,11 @@
 // backend/src/controllers/awardsController.ts
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 import { Request, Response } from 'express';
 
-const prisma = new PrismaClient();
 
 // We assume authMiddleware has already run and attached `user` to req.
-type AuthReq = Request & { user: { id: string } };
+type AuthReq = Request & { user: { id?: string; userId?: string } };
 
 /**
  * GET /api/awards
@@ -14,7 +13,10 @@ type AuthReq = Request & { user: { id: string } };
  */
 export async function getAwards(req: Request, res: Response) {
   const { user } = req as AuthReq;
-  const awards = await prisma.award.findMany({ where: { userId: user.id } });
+  const uid = user.userId || user.id;
+  if (!uid) return res.status(401).json({ error: 'unauthorized' });
+  const client: any = (req as any).prisma || prisma;
+  const awards = await client.award.findMany({ where: { userId: uid } });
   res.json(awards);
 }
 
@@ -25,6 +27,8 @@ export async function getAwards(req: Request, res: Response) {
  */
 export async function redeemAward(req: Request, res: Response) {
   const { user } = req as AuthReq;
+  const uid = user.userId || user.id;
+  if (!uid) return res.status(401).json({ error: 'unauthorized' });
   const { awardId } = req.body as { awardId: string };
   if (!awardId) {
     return res.status(400).json({ error: 'awardId is required' });
@@ -32,18 +36,19 @@ export async function redeemAward(req: Request, res: Response) {
 
   try {
     // Ensure the award exists and belongs to this user
-    const award = await prisma.award.findUnique({ where: { id: awardId } });
+  const client: any = (req as any).prisma || prisma;
+  const award = await client.award.findUnique({ where: { id: awardId } });
     if (!award) {
       return res.status(404).json({ error: 'Award not found' });
     }
-    if (award.userId !== user.id) {
+    if (award.userId !== uid) {
       return res.status(403).json({ error: 'Award does not belong to user' });
     }
     if (award.status === 'REDEEMED') {
       return res.status(400).json({ error: 'Award already redeemed' });
     }
 
-    const updated = await prisma.award.update({
+    const updated = await client.award.update({
       where: { id: awardId },
       data: { status: 'REDEEMED', redeemedAt: new Date() },
     });
@@ -59,8 +64,11 @@ export async function redeemAward(req: Request, res: Response) {
  * Public: fetch a single award by ID.
  */
 export async function getAwardById(req: Request, res: Response) {
-  const { awardId } = req.params as { awardId: string };
-  const award = await prisma.award.findUnique({ where: { id: awardId } });
+  const { id, awardId } = req.params as { id?: string; awardId?: string };
+  const lookupId = awardId || id; // support either param name
+  if (!lookupId) return res.status(400).json({ error: 'awardId required' });
+  const client: any = (req as any).prisma || prisma;
+  const award = await client.award.findUnique({ where: { id: lookupId } });
   if (!award) return res.status(404).json({ error: 'Award not found' });
   res.json(award);
 }

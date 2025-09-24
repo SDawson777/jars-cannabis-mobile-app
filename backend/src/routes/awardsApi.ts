@@ -1,24 +1,25 @@
 import { Router } from 'express';
 import { redeemAward, getAwardById } from '../controllers/awardsController';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../prismaClient';
+import { requireAuth } from '../middleware/auth';
 
 export const awardsApiRouter = Router();
 
-// GET /awards -> { user, awards }
-awardsApiRouter.get('/awards', async (req, res) => {
+// GET /awards (authenticated) -> { user, awards }
+awardsApiRouter.get('/awards', requireAuth, async (req, res) => {
   try {
-    const user = (req as any).user || { id: 'anonymous', name: 'You' };
-    const awards = await prisma.award.findMany({ where: { userId: user.id } });
+    const authUser = (req as any).user as { userId: string };
+    const userId = authUser.userId;
+    const awards = await prisma.award.findMany({ where: { userId } });
+
+    // In a future iteration we could derive points/tier from aggregate tables.
+    // For now, compute simple sums + placeholder tier logic.
+    const points = awards.reduce((s: number, a: any) => s + (a.pointsValue || 0), 0);
+    const tier = points >= 1000 ? 'Platinum' : points >= 500 ? 'Gold' : points >= 250 ? 'Silver' : 'Bronze';
+    const progress = Math.min(1, points / 1000);
+
     return res.json({
-      user: {
-        id: user.id,
-        name: (user.name as string) || 'You',
-        points: (user.points as number) || 0,
-        tier: (user.tier as string) || '',
-        progress: (user.progress as number) || 0,
-      },
+      user: { id: userId, name: 'You', points, tier, progress },
       awards,
     });
   } catch (err) {
@@ -28,13 +29,12 @@ awardsApiRouter.get('/awards', async (req, res) => {
 });
 
 // POST /awards/:id/redeem -> { success, award }
-awardsApiRouter.post('/awards/:id/redeem', async (req, res) => {
-  // Normalize to controller's expected body shape: { awardId }
+awardsApiRouter.post('/awards/:id/redeem', requireAuth, async (req, res) => {
   req.body = { awardId: req.params.id } as any;
   return redeemAward(req as any, res as any);
 });
 
 // GET single award
-awardsApiRouter.get('/awards/:id', async (req, res) => getAwardById(req as any, res as any));
+awardsApiRouter.get('/awards/:id', requireAuth, async (req, res) => getAwardById(req as any, res as any));
 
 export default awardsApiRouter;

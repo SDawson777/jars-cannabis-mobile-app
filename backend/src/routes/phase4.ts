@@ -32,7 +32,9 @@ export const phase4Router = Router();
 // ——————————————
 // Awards (already in place)
 // ——————————————
-phase4Router.get('/awards', async (_req, res) => {
+// Legacy Firestore awards endpoint (deprecated). Keeping under /awards/legacy to avoid
+// clashing with normalized authenticated awards API.
+phase4Router.get('/awards/legacy', async (_req, res) => {
   try {
     const snapshot = await db.collection('awards').get();
     const awards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

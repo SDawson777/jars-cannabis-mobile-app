@@ -13,6 +13,7 @@ function createApp(userId: string) {
   app.use(express.json());
   app.use((req, _res, next) => {
     (req as any).user = { id: userId };
+    (req as any).prisma = prisma; // inject shared prisma for controller compatibility
     next();
   });
   app.post('/awards/redeem', (req, res) => redeemAward(req as any, res as any));
