@@ -9,9 +9,9 @@ const prisma = new PrismaClient();
 type GetSettingsQuery = { userId: string };
 type UpdateBody = {
   userId: string;
-  textSize: string;
-  colorContrast: string;
-  animationsEnabled: boolean;
+  textSize: 'system' | 'sm' | 'md' | 'lg' | 'xl';
+  highContrast: boolean;
+  reduceMotion: boolean;
 };
 
 /**
@@ -40,12 +40,12 @@ export async function getAccessibilitySettings(req: Request, res: Response) {
  * Creates or updates the user’s accessibility settings.
  */
 export async function updateAccessibilitySettings(req: Request, res: Response) {
-  const { userId, textSize, colorContrast, animationsEnabled } = req.body as UpdateBody;
+  const { userId, textSize, highContrast, reduceMotion } = req.body as UpdateBody;
 
   const updated = await prisma.accessibilitySetting.upsert({
     where: { userId },
-    create: { userId, textSize, colorContrast, animationsEnabled },
-    update: { textSize, colorContrast, animationsEnabled },
+    create: { userId, textSize, highContrast, reduceMotion },
+    update: { textSize, highContrast, reduceMotion },
   });
   res.json(updated);
 }

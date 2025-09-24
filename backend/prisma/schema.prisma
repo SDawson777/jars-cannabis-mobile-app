@@ -341,12 +341,20 @@ model LoyaltyBadge {
   @@index([userId])
 }
 
+enum AccessibilityTextSize {
+  system
+  sm
+  md
+  lg
+  xl
+}
+
 model AccessibilitySetting {
-  userId            String  @id
-  textSize          String  @default("medium")
-  colorContrast     String  @default("normal")
-  animationsEnabled Boolean @default(true)
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String                 @id
+  textSize      AccessibilityTextSize @default(system)
+  highContrast  Boolean                @default(false)
+  reduceMotion  Boolean                @default(false)
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserPreference {

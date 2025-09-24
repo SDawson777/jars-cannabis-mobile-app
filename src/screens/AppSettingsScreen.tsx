@@ -1,186 +1,137 @@
-// src/screens/AppSettingsScreen.tsx
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { ChevronLeft } from 'lucide-react-native';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   Switch,
   ScrollView,
   Pressable,
+  SafeAreaView,
   StyleSheet,
-  Platform,
   LayoutAnimation,
-  UIManager,
 } from 'react-native';
-
-import { useSettings } from '../context/SettingsContext';
-import { useWeatherRecommendationsPreference } from '../hooks/useWeatherRecommendationsPreference';
-import { logEvent } from '../utils/analytics';
+import { useAccessibilityStore } from '../state/accessibilityStore';
+import { useTextScaling } from '../hooks/useTextScaling';
 import { ThemeContext } from '../context/ThemeContext';
-import { hapticLight } from '../utils/haptic';
-import { t } from '../utils/i18n';
-import logger from '../lib/logger';
-
-// Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 export default function AppSettingsScreen() {
-  const navigation = useNavigation();
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const [darkMode, setDarkMode] = useState(false);
-  const [visitAlerts, setVisitAlerts] = useState(false);
-  const [personalOffers, setPersonalOffers] = useState(false);
-  const { biometricEnabled, setBiometricEnabled, locale } = useSettings();
-  const [weatherRecsEnabled, setWeatherRecsEnabled] = useWeatherRecommendationsPreference();
+  const { jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { scaleSize } = useTextScaling();
+  const { textSize, setTextSize, highContrast, setHighContrast, reduceMotion, setReduceMotion } =
+    useAccessibilityStore();
 
-  useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    AsyncStorage.getItem('visitAlerts').then(v => setVisitAlerts(v === 'true'));
-    AsyncStorage.getItem('personalOffers').then(v => setPersonalOffers(v === 'true'));
-  }, []);
-
-  const handleBack = () => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.goBack();
-  };
-
-  const toggleDarkMode = (val: boolean) => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setDarkMode(val);
-  };
-
-  const toggleVisitAlerts = (val: boolean) => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setVisitAlerts(val);
-    AsyncStorage.setItem('visitAlerts', String(val));
-  };
-
-  const togglePersonalOffers = (val: boolean) => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPersonalOffers(val);
-    AsyncStorage.setItem('personalOffers', String(val));
-  };
-
-  const toggleBiometric = (val: boolean) => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setBiometricEnabled(val);
-  };
-
-  const toggleWeatherRecs = (val: boolean) => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setWeatherRecsEnabled(val);
-    try {
-      logEvent('weather_recs_pref_change', { enabled: val });
-    } catch (err) {
-      logger.warn('Failed to log weather_recs_pref_change', {
-        error: (err as any)?.message || String(err),
-      });
+  const handleTextSizeCycle = () => {
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
+    const sizes = ['system', 'sm', 'md', 'lg', 'xl'] as const;
+    const idx = sizes.indexOf(textSize);
+    setTextSize(sizes[(idx + 1) % sizes.length]);
   };
 
-  const bgColor =
-    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;
+  const handleHighContrastToggle = (value: boolean) => {
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+    setHighContrast(value);
+  };
+
+  const handleReduceMotionToggle = (value: boolean) => {
+    // Don't animate the toggle that disables animations
+    setReduceMotion(value);
+  };
+
+  const textColor = highContrast ? '#000000' : jarsPrimary;
+  const backgroundColor = highContrast ? '#FFFFFF' : jarsBackground;
+  const accentColor = highContrast ? '#0000FF' : jarsSecondary;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
-        <Pressable onPress={handleBack}>
-          <ChevronLeft color={jarsPrimary} size={24} />
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: jarsPrimary }]}>App Settings</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Dark Mode */}
-        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Dark Mode</Text>
-          <Switch
-            value={darkMode}
-            onValueChange={toggleDarkMode}
-            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
-            thumbColor="#FFFFFF"
-          />
-        </View>
-
-        {/* Store Visit Alerts */}
-        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Store Visit Alerts</Text>
-          <Switch
-            value={visitAlerts}
-            onValueChange={toggleVisitAlerts}
-            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
-            thumbColor="#FFFFFF"
-          />
-        </View>
-
-        {/* Personalized Offers */}
-        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Personalized Offers</Text>
-          <Switch
-            value={personalOffers}
-            onValueChange={togglePersonalOffers}
-            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
-            thumbColor="#FFFFFF"
-          />
-        </View>
-
-        {/* Weather Recommendations */}
-        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Show Weather Recommendations</Text>
-          <Switch
-            value={weatherRecsEnabled}
-            onValueChange={toggleWeatherRecs}
-            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
-            thumbColor="#FFFFFF"
-          />
-        </View>
-
-        <Text style={[styles.section, { color: jarsSecondary }]}>Privacy &amp; Security</Text>
-        <View style={[styles.row, { borderBottomColor: jarsSecondary }]}>
-          <Text style={[styles.label, { color: jarsPrimary }]}>Enable Face ID / Touch ID</Text>
-          <Switch
-            value={biometricEnabled}
-            onValueChange={toggleBiometric}
-            trackColor={{ false: '#EEEEEE', true: jarsSecondary }}
-            thumbColor="#FFFFFF"
-          />
-        </View>
-
-        {/* Language */}
-        <Pressable
-          style={[styles.row, { borderBottomColor: jarsSecondary }]}
-          onPress={() => {
-            hapticLight();
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            // typed navigation
-            navigation.navigate('LanguageSelection' as never);
-          }}
+        <Text
+          style={[
+            styles.section,
+            {
+              color: textColor,
+              fontSize: scaleSize(18),
+            },
+          ]}
         >
-          <Text style={[styles.label, { color: jarsPrimary }]}>{t('language')}</Text>
-          <Text style={[styles.value, { color: jarsSecondary }]}>
-            {locale === 'es' ? t('spanish') : t('english')}
-          </Text>
-        </Pressable>
+          Accessibility
+        </Text>
 
-        {/* About App */}
-        <View style={[styles.row, { borderBottomWidth: 0 }]}>
-          <View>
-            <Text style={[styles.label, { color: jarsPrimary }]}>About App</Text>
-            <Text style={[styles.subLabel, { color: jarsSecondary }]}>Version 1.0.0 (Build 1)</Text>
-          </View>
+        <View style={styles.row}>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: textColor,
+                fontSize: scaleSize(16),
+              },
+            ]}
+          >
+            Text Size
+          </Text>
+          <Pressable
+            style={[
+              styles.textSizeButton,
+              {
+                backgroundColor: highContrast ? '#E0E0E0' : '#F0F0F0',
+              },
+            ]}
+            onPress={handleTextSizeCycle}
+          >
+            <Text
+              style={[
+                styles.textSizeText,
+                {
+                  color: textColor,
+                  fontSize: scaleSize(14),
+                },
+              ]}
+            >
+              {textSize.toUpperCase()}
+            </Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.row}>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: textColor,
+                fontSize: scaleSize(16),
+              },
+            ]}
+          >
+            High Contrast
+          </Text>
+          <Switch
+            value={highContrast}
+            onValueChange={handleHighContrastToggle}
+            trackColor={{ false: '#E0E0E0', true: accentColor }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        <View style={styles.row}>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: textColor,
+                fontSize: scaleSize(16),
+              },
+            ]}
+          >
+            Reduce Motion
+          </Text>
+          <Switch
+            value={reduceMotion}
+            onValueChange={handleReduceMotionToggle}
+            trackColor={{ false: '#E0E0E0', true: accentColor }}
+            thumbColor="#FFFFFF"
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -189,24 +140,22 @@ export default function AppSettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  headerTitle: { fontSize: 20, fontWeight: '600' },
   content: { padding: 16 },
+  section: { fontWeight: 'bold', marginBottom: 16 },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
-  label: { fontSize: 16 },
-  value: { fontSize: 16 },
-  subLabel: { fontSize: 14, marginTop: 4 },
-  section: { fontSize: 14, fontWeight: '600', marginTop: 24, marginBottom: 8 },
+  label: { flex: 1 },
+  textSizeButton: {
+    padding: 8,
+    borderRadius: 6,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  textSizeText: { fontWeight: '500' },
 });
