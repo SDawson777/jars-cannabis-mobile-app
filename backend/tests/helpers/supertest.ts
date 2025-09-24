@@ -167,9 +167,42 @@ const journalEntries: Record<string, any> = {};
 const paymentMethods: Record<string, any> = {};
 // In-memory addresses store keyed by id
 const addresses: Record<string, any> = {};
+// In-memory awards keyed by userId
+const awardsStore: Record<string, any[]> = {};
 
 jest.mock('../../src/prismaClient', () => ({
   prisma: {
+    award: {
+      findMany: async ({ where: { userId } = { userId: undefined } }: any) => {
+        // simple in-memory awards keyed by userId
+        if (!awardsStore[userId]) return [];
+        return awardsStore[userId];
+      },
+      findUnique: async ({ where: { id } }: any) => {
+        for (const list of Object.values(awardsStore)) {
+          const found = (list as any[]).find(a => a.id === id);
+          if (found) return found;
+        }
+        return null;
+      },
+      update: async ({ where: { id }, data }: any) => {
+        for (const list of Object.values(awardsStore)) {
+          const idx = (list as any[]).findIndex(a => a.id === id);
+            if (idx >= 0) {
+              Object.assign((list as any[])[idx], data);
+              return (list as any[])[idx];
+            }
+        }
+        throw new Error('Not found');
+      },
+      create: async ({ data }: any) => {
+        const id = data.id || `awd-${Math.random().toString(36).slice(2,9)}`;
+        const award = { id, status: 'PENDING', redeemedAt: null, ...data };
+        awardsStore[data.userId] = awardsStore[data.userId] || [];
+        awardsStore[data.userId].push(award);
+        return award;
+      }
+    },
     user: {
       create: async ({ data }: any) => {
         const id = data.id || `user-${Math.random().toString(36).slice(2, 9)}`;
