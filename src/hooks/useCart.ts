@@ -13,6 +13,7 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  variantId?: string;
 }
 
 export interface Cart {
@@ -94,9 +95,40 @@ export function useCart() {
     onMutate: async vars => {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
       const prev = queryClient.getQueryData<Cart>(['cart']);
-      if (prev) {
-        const optim = { ...prev, ...vars } as Cart;
-        queryClient.setQueryData(['cart'], optim);
+      // Build an optimistic cart snapshot
+      let next: Cart | undefined = prev ? { ...prev, items: [...(prev.items || [])] } : undefined;
+      if (vars?.items && Array.isArray(vars.items)) {
+        // Merge each incoming item by productId / id + variantId
+        for (const incoming of vars.items) {
+          const incomingId = incoming.productId ?? incoming.id;
+          // fallback quantity
+          const qty = incoming.quantity ?? 1;
+          if (!next) {
+            next = { items: [], total: 0 } as Cart;
+          }
+          const existing = next.items.find(
+            (i: any) =>
+              (i.id === incomingId || i.productId === incomingId) &&
+              (i.variantId ?? null) === (incoming.variantId ?? null)
+          );
+          if (existing) {
+            existing.quantity += qty;
+          } else {
+            next.items.push({
+              id: incomingId,
+              name: incoming.name ?? 'Item',
+              price: incoming.price ?? 0,
+              quantity: qty,
+              variantId: incoming.variantId,
+            });
+          }
+        }
+      } else if ('promo' in (vars || {})) {
+        // Preserve items, attach promo field optimistically (without altering totals logic here)
+        if (next) (next as any).promo = (vars as any).promo;
+      }
+      if (next) {
+        queryClient.setQueryData(['cart'], next);
       }
       return { prev };
     },

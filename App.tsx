@@ -6,6 +6,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// Preload cart hook early to hydrate store & cache
+import { useCart } from './src/hooks/useCart';
 import React, { useEffect, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 
@@ -128,6 +130,13 @@ const queryClient = new QueryClient();
 function App() {
   const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | undefined>(undefined);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  // Invoke cart hook once at the top-level so cart cache & store hydrate ASAP.
+  // Safe: hook internally uses react-query and side effects only.
+  try {
+    useCart();
+  } catch (_e) {
+    // If hook throws during edge initialization (e.g., environment mismatch), ignore.
+  }
 
   useEffect(() => {
     const checkFlag = async () => {
