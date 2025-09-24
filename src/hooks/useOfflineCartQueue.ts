@@ -32,10 +32,38 @@ export function useOfflineCartQueue() {
       setPending(false);
     };
     processQueue();
-    const unsub = NetInfo.addEventListener(_state => {
+    const subscription: unknown = NetInfo.addEventListener(_state => {
       if (_state.isConnected) processQueue();
     });
-    return () => unsub();
+    return () => {
+      // Defensively handle different unsubscribe shapes or bad mocks
+      if (typeof subscription === 'function') {
+        // NetInfo returns an unsubscribe function in React Native
+        try {
+          (subscription as () => void)();
+        } catch {
+          // no-op
+        }
+        return;
+      }
+      const subAny = subscription as any;
+      if (subAny && typeof subAny.unsubscribe === 'function') {
+        try {
+          subAny.unsubscribe();
+        } catch {
+          // no-op
+        }
+        return;
+      }
+      if (subAny && typeof subAny.remove === 'function') {
+        try {
+          subAny.remove();
+        } catch {
+          // no-op
+        }
+      }
+      // Otherwise nothing to clean up
+    };
   }, []);
 
   const queueAction = async (action: CartAction) => {
