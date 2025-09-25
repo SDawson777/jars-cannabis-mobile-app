@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -105,26 +105,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -138,27 +138,27 @@ import { View, Text, StyleSheet } from 'react-native';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { useStore } from '../context/StoreContext';
 &nbsp;
-export default function WelcomeBanner() {
-  const { data } = useContext(LoyaltyContext);
-  const { preferredStore } = useStore();
-  const loyaltyLevel = data?.level;
-  const promo = preferredStore?.promo;
+export default function <span class="fstat-no" title="function not covered" >WelcomeBanner(</span>) {
+  const { data } = <span class="cstat-no" title="statement not covered" >useContext(LoyaltyContext);</span>
+  const { preferredStore } = <span class="cstat-no" title="statement not covered" >useStore();</span>
+  const loyaltyLevel = <span class="cstat-no" title="statement not covered" >data?.level;</span>
+  const promo = <span class="cstat-no" title="statement not covered" >preferredStore?.promo;</span>
 &nbsp;
-  let message = 'Welcome!';
-  if (loyaltyLevel === 'Gold') {
-    message = 'Gold Tier Perk: Double Points This Week';
-  } else if (promo &amp;&amp; preferredStore?.name) {
-    message = `${preferredStore.name} Exclusive: ${promo}`;
+  let message = <span class="cstat-no" title="statement not covered" >'Welcome!';</span>
+<span class="cstat-no" title="statement not covered" >  if (loyaltyLevel === 'Gold') {</span>
+<span class="cstat-no" title="statement not covered" >    message = 'Gold Tier Perk: Double Points This Week';</span>
+  } else <span class="cstat-no" title="statement not covered" >if (promo &amp;&amp; preferredStore?.name) {</span>
+<span class="cstat-no" title="statement not covered" >    message = `${preferredStore.name} Exclusive: ${promo}`;</span>
   }
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;View style={styles.container} accessible accessibilityRole="header"&gt;
       &lt;Text style={styles.text}&gt;{message}&lt;/Text&gt;
     &lt;/View&gt;
   );
 }
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   container: {
     padding: 12,
     alignItems: 'center',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-24T22:42:37.191Z
+                at 2025-09-25T00:36:06.297Z
             </div>
         <script src="../prettify.js"></script>
         <script>

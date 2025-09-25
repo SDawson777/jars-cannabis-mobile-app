@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for navigation/linking.ts</title>
+    <title>Code coverage report for hooks/useOfflineJournalQueue.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">navigation</a> linking.ts</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">hooks</a> useOfflineJournalQueue.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">96.36% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>53/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>24/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">96.29% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>52/54</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -143,7 +143,42 @@
 <a name='L78'></a><a href='#L78'>78</a>
 <a name='L79'></a><a href='#L79'>79</a>
 <a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -161,39 +196,86 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -201,108 +283,131 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export const linking = <span class="cstat-no" title="statement not covered" >{</span>
-  prefixes: ['jars://', 'https://jars.app/', 'https://www.jars.app/'],
-  config: {
-    screens: {
-      // Onboarding &amp; Auth flows
-      SplashScreen: '',
-      Onboarding: 'onboarding',
-      AgeVerification: 'age-verification',
-      LoginSignUpDecision: 'auth',
-      Login: 'auth/login',
-      SignUp: 'auth/signup',
-      ForgotPassword: 'auth/forgot-password',
-      OTPScreen: 'auth/verify',
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { useEffect, useState } from 'react';
 &nbsp;
-      // Store Selection &amp; Home
-      StoreSelection: 'stores',
-      HomeScreen: 'home',
+import { addJournal, updateJournal } from '../api/phase4Client';
 &nbsp;
-      // Shop flows
-      ShopScreen: 'shop',
-      ProductList: 'shop/products',
-      ProductDetail: 'shop/product/:slug',
+interface JournalAction {
+  type: 'create' | 'update';
+  id?: string; // For updates
+  payload: {
+    productId: string;
+    rating?: number;
+    notes?: string;
+    tags?: string[];
+  };
+}
 &nbsp;
-      // Cart &amp; Checkout flows
-      CartScreen: 'cart',
-      Checkout: 'checkout',
-      OrderConfirmation: 'order/confirmation',
-      OrderTracking: 'order/tracking',
-      OrderHistory: 'orders',
-      OrderDetails: 'order/:orderId',
+export function useOfflineJournalQueue() {
+  const [pending, setPending] = useState(false);
 &nbsp;
-      // Store Locator flows
-      StoreLocator: 'stores/locator',
-      StoreLocatorMap: 'stores/map',
-      StoreLocatorList: 'stores/list',
-      StoreDetails: 'store/:storeId',
+  useEffect(() =&gt; {
+    const processQueue = async () =&gt; {
+      try {
+        const state = await NetInfo.fetch();
+        if (!state.isConnected) return;
 &nbsp;
-      // Profile &amp; Account flows
-      Profile: 'profile',
-      EditProfile: 'profile/edit',
-      Favorites: 'profile/favorites',
-      SavedAddresses: 'profile/addresses',
-      AddAddress: 'profile/addresses/add',
-      EditAddress: 'profile/addresses/edit/:addressId',
-      SavedPayments: 'profile/payments',
-      AddPayment: 'profile/payments/add',
-      EditPayment: 'profile/payments/edit/:paymentId',
-      LoyaltyProgram: 'profile/loyalty',
-      Notifications: 'profile/notifications',
-      PrivacySettings: 'profile/privacy',
-      AppSettings: 'profile/settings',
-      AccessibilitySettings: 'profile/accessibility',
+        const raw = await AsyncStorage.getItem('journalQueue');
+        if (!raw) {
+          setPending(false);
+          return;
+        }
 &nbsp;
-      // Educational &amp; Content flows
-      EducationalGreenhouse: 'education',
-      ArticleList: 'education/articles',
-      ArticleDetail: 'education/article/:slug',
-      TerpeneWheel: 'education/terpenes',
-      CommunityGarden: 'community',
-      DataTransparency: 'transparency',
-      PrivacyIntelligence: 'privacy-intelligence',
+        const queue: JournalAction[] = JSON.parse(raw);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (queue.length === 0) {
+<span class="cstat-no" title="statement not covered" >          setPending(false);</span>
+<span class="cstat-no" title="statement not covered" >          return;</span>
+        }
 &nbsp;
-      // JARS specific flows
-      MyJars: 'jars',
-      JournalEntry: 'jars/journal/:itemId',
-      MyJarsInsights: 'jars/insights',
-      Awards: 'awards',
-      EthicalAIDashboard: 'ethical-ai',
+        const processedActions: JournalAction[] = [];
 &nbsp;
-      // Support &amp; Help
-      HelpFAQ: 'help',
-      ContactUs: 'contact',
-      ConciergeChat: 'chat',
-      Legal: 'legal',
-      LanguageSelection: 'language',
-    },
-  },
-};
+        for (const action of queue) {
+          try {
+            if (action.type === 'create') {
+              await addJournal(action.payload);
+            } else <span class="missing-if-branch" title="else path not taken" >E</span>if (action.type === 'update' &amp;&amp; action.id) {
+              await updateJournal(action.id, action.payload);
+            }
+            processedActions.push(action);
+          } catch (_error) {
+            // If one fails, stop processing and keep remaining items in queue
+            break;
+          }
+        }
 &nbsp;
-export default linking;
+        // Remove successfully processed actions from queue
+        const remainingQueue = queue.slice(processedActions.length);
+        if (remainingQueue.length === 0) {
+          await AsyncStorage.removeItem('journalQueue');
+          setPending(false);
+        } else {
+          await AsyncStorage.setItem('journalQueue', JSON.stringify(remainingQueue));
+          setPending(remainingQueue.length &gt; 0);
+        }
+      } catch (_error) {
+        // Handle any errors gracefully
+        setPending(false);
+      }
+    };
+&nbsp;
+    processQueue();
+&nbsp;
+    const subscription = NetInfo.addEventListener(state =&gt; {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (state.isConnected) {
+        processQueue();
+      }
+    });
+&nbsp;
+    return () =&gt; {
+      if (typeof subscription === 'function') {
+        try {
+          subscription();
+        } catch {
+          // no-op
+        }
+        return;
+      }
+      const subAny = subscription as any;
+      if (subAny &amp;&amp; typeof subAny.unsubscribe === 'function') {
+        try {
+          subAny.unsubscribe();
+        } catch {
+          // no-op
+        }
+        return;
+      }
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (subAny &amp;&amp; typeof subAny.remove === 'function') {
+        try {
+          subAny.remove();
+        } catch {
+          // no-op
+        }
+      }
+    };
+  }, []);
+&nbsp;
+  const queueJournalAction = async (action: JournalAction) =&gt; {
+    const raw = await AsyncStorage.getItem('journalQueue');
+    const queue: JournalAction[] = raw ? JSON.parse(raw) : [];
+    queue.push(action);
+    await AsyncStorage.setItem('journalQueue', JSON.stringify(queue));
+    setPending(true);
+  };
+&nbsp;
+  return { queueJournalAction, pending };
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

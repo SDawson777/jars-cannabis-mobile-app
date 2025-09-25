@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.44% </span>
+                <span class="strong">5.55% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/18</span>
+                <span class='fraction'>1/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.66% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>11/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">6.25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/16</span>
+                <span class='fraction'>1/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -106,36 +106,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,35 +146,35 @@
 type Meta = unknown;
 &nbsp;
 export const logger = {
-  log: (m: string, meta?: Meta) =&gt; {
-    if (meta === undefined) {
-      console.log(m);
+  log: <span class="fstat-no" title="function not covered" >(m</span>: string, meta?: Meta) =&gt; {
+<span class="cstat-no" title="statement not covered" >    if (meta === undefined) {</span>
+<span class="cstat-no" title="statement not covered" >      console.log(m);</span>
     } else {
       // Explicitly stringify metadata so tests see a deterministic message
-      console.log(`${m} :: ${JSON.stringify(meta)}`);
+<span class="cstat-no" title="statement not covered" >      console.log(`${m} :: ${JSON.stringify(meta)}`);</span>
     }
   },
-  warn: (m: string, meta?: Meta) =&gt; {
-    if (meta === undefined) {
-      console.warn(m);
+  warn: <span class="fstat-no" title="function not covered" >(m</span>: string, meta?: Meta) =&gt; {
+<span class="cstat-no" title="statement not covered" >    if (meta === undefined) {</span>
+<span class="cstat-no" title="statement not covered" >      console.warn(m);</span>
     } else {
-      console.warn(`${m} :: ${JSON.stringify(meta)}`);
+<span class="cstat-no" title="statement not covered" >      console.warn(`${m} :: ${JSON.stringify(meta)}`);</span>
     }
   },
-  error: (m: string, meta?: Meta, err?: unknown) =&gt; {
-    const formatted = meta === undefined ? undefined : `${m} :: ${JSON.stringify(meta)}`;
-    if (err) {
-      try {
-        Sentry.captureException(err);
-        if (formatted) console.error(formatted);
-        else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="else path not taken" >E</span>console.error(m);</span>
+  error: <span class="fstat-no" title="function not covered" >(m</span>: string, meta?: Meta, err?: unknown) =&gt; {
+    const formatted = <span class="cstat-no" title="statement not covered" >meta === undefined ? undefined : `${m} :: ${JSON.stringify(meta)}`;</span>
+<span class="cstat-no" title="statement not covered" >    if (err) {</span>
+<span class="cstat-no" title="statement not covered" >      try {</span>
+<span class="cstat-no" title="statement not covered" >        Sentry.captureException(err);</span>
+<span class="cstat-no" title="statement not covered" >        if (formatted) <span class="cstat-no" title="statement not covered" >console.error(formatted);</span></span>
+        else <span class="cstat-no" title="statement not covered" >console.error(m);</span>
       } catch (__e) {
         // On Sentry failure we intentionally log only the message (no metadata)
-        console.error(m);
+<span class="cstat-no" title="statement not covered" >        console.error(m);</span>
       }
     } else {
-      if (formatted) console.error(formatted);
-      else console.error(m);
+<span class="cstat-no" title="statement not covered" >      if (formatted) <span class="cstat-no" title="statement not covered" >console.error(formatted);</span></span>
+      else <span class="cstat-no" title="statement not covered" >console.error(m);</span>
     }
   },
 };
@@ -187,7 +187,7 @@ export default logger;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-24T22:42:37.191Z
+                at 2025-09-25T00:36:06.297Z
             </div>
         <script src="../prettify.js"></script>
         <script>
