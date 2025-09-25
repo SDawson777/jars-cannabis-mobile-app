@@ -76,7 +76,9 @@ function toCMSArticle(a: any) {
     title: a.title,
     slug: a.slug,
     publishedAt:
-      typeof a.publishedAt === 'string' ? a.publishedAt : a.publishedAt?.toISOString?.() || new Date().toISOString(),
+      typeof a.publishedAt === 'string'
+        ? a.publishedAt
+        : a.publishedAt?.toISOString?.() || new Date().toISOString(),
     body,
     ...(a.mainImage ? { mainImage: a.mainImage } : {}),
   };
@@ -148,8 +150,7 @@ contentRouter.get('/content/articles/:slug', async (req, res) => {
         type: 'paragraph',
         children: [
           {
-            text:
-              'This is a placeholder article served by the backend when no database is configured.',
+            text: 'This is a placeholder article served by the backend when no database is configured.',
           },
         ],
       },

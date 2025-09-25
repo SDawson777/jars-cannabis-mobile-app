@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1758814874475" clover="3.2.0">
-  <project timestamp="1758814874475" name="All files">
-    <metrics statements="3182" coveredstatements="1194" conditionals="2050" coveredconditionals="718" methods="947" coveredmethods="298" elements="6179" coveredelements="2210" complexity="0" loc="3182" ncloc="3182" packages="26" files="213" classes="213"/>
+<coverage generated="1758816597552" clover="3.2.0">
+  <project timestamp="1758816597553" name="All files">
+    <metrics statements="3182" coveredstatements="1195" conditionals="2050" coveredconditionals="721" methods="947" coveredmethods="298" elements="6179" coveredelements="2214" complexity="0" loc="3182" ncloc="3182" packages="26" files="213" classes="213"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="declarations.d.ts" path="/workspaces/jars-cannabis-mobile-app/src/@types/declarations.d.ts">
@@ -569,9 +569,9 @@
         <line num="179" count="0" type="stmt"/>
         <line num="197" count="26" type="stmt"/>
         <line num="199" count="26" type="cond" truecount="4" falsecount="0"/>
-        <line num="200" count="14" type="cond" truecount="2" falsecount="0"/>
-        <line num="201" count="13" type="cond" truecount="2" falsecount="0"/>
-        <line num="202" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="200" count="17" type="cond" truecount="2" falsecount="0"/>
+        <line num="201" count="16" type="cond" truecount="2" falsecount="0"/>
+        <line num="202" count="15" type="cond" truecount="2" falsecount="0"/>
         <line num="203" count="10" type="cond" truecount="2" falsecount="0"/>
         <line num="204" count="9" type="cond" truecount="2" falsecount="0"/>
         <line num="205" count="3" type="cond" truecount="2" falsecount="0"/>
@@ -1506,13 +1506,13 @@
         <line num="76" count="15" type="stmt"/>
         <line num="86" count="20" type="stmt"/>
         <line num="88" count="20" type="cond" truecount="4" falsecount="0"/>
-        <line num="89" count="5" type="stmt"/>
-        <line num="91" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="89" count="3" type="stmt"/>
+        <line num="91" count="17" type="cond" truecount="2" falsecount="0"/>
         <line num="92" count="2" type="stmt"/>
-        <line num="94" count="13" type="cond" truecount="4" falsecount="0"/>
+        <line num="94" count="15" type="cond" truecount="4" falsecount="0"/>
         <line num="95" count="3" type="stmt"/>
-        <line num="97" count="10" type="cond" truecount="4" falsecount="0"/>
-        <line num="98" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="97" count="12" type="cond" truecount="4" falsecount="0"/>
+        <line num="98" count="4" type="cond" truecount="2" falsecount="0"/>
         <line num="100" count="8" type="cond" truecount="4" falsecount="0"/>
         <line num="101" count="2" type="stmt"/>
         <line num="103" count="6" type="cond" truecount="2" falsecount="0"/>
@@ -1681,7 +1681,7 @@
       </file>
     </package>
     <package name="screens">
-      <metrics statements="1554" coveredstatements="445" conditionals="1101" coveredconditionals="279" methods="461" coveredmethods="111"/>
+      <metrics statements="1554" coveredstatements="446" conditionals="1101" coveredconditionals="282" methods="461" coveredmethods="111"/>
       <file name="AccessibilitySettingsScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/AccessibilitySettingsScreen.tsx">
         <metrics statements="49" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="12" coveredmethods="0"/>
         <line num="27" count="0" type="cond" truecount="0" falsecount="4"/>
@@ -2515,7 +2515,7 @@
         <line num="109" count="0" type="stmt"/>
       </file>
       <file name="HomeScreen.tsx" path="/workspaces/jars-cannabis-mobile-app/src/screens/HomeScreen.tsx">
-        <metrics statements="84" coveredstatements="55" conditionals="73" coveredconditionals="38" methods="41" coveredmethods="19"/>
+        <metrics statements="84" coveredstatements="56" conditionals="73" coveredconditionals="41" methods="41" coveredmethods="19"/>
         <line num="45" count="1" type="cond" truecount="3" falsecount="1"/>
         <line num="46" count="1" type="stmt"/>
         <line num="62" count="7" type="stmt"/>
@@ -2541,7 +2541,7 @@
         <line num="97" count="2" type="stmt"/>
         <line num="98" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="99" count="2" type="cond" truecount="3" falsecount="1"/>
-        <line num="100" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="100" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="101" count="0" type="cond" truecount="0" falsecount="4"/>
         <line num="102" count="2" type="stmt"/>
         <line num="105" count="6" type="stmt"/>

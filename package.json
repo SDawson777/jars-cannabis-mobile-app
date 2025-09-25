@@ -16,6 +16,7 @@
     "vercel-build": "mkdir -p dist && echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Placeholder</title></head><body></body></html>' > dist/index.html",
     "build:backend": "npm --prefix backend run build",
     "start:backend": "npm --prefix backend run start",
+    "start:backend:local": "npm --prefix backend run start:local",
     "build": "npm run build:backend",
     "precommit": "npm run lint && npm run typecheck && npm run test:ci",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --cache",

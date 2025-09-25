@@ -12,6 +12,8 @@
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "prestart": "npm run build && prisma migrate deploy",
     "start": "node dist/index.js",
+    "start:compiled": "node dist/index.js",
+    "start:local": "NODE_ENV=test node dist/index.js",
     "mock": "prism mock openapi.yml --port 4000",
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",
