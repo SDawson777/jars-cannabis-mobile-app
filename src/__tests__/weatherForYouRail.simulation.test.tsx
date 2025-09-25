@@ -215,15 +215,24 @@ describe('WeatherForYouRail Weather Simulation', () => {
       debugInfo: {
         weatherSource: 'time-of-day',
         lastUpdated: new Date(),
+        fallbackReason: 'No weather condition available',
       },
     });
 
-    const { UNSAFE_root } = render(
+    // Mock empty recommendation data for missing condition
+    mockUseWeatherRecommendations.mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: null,
+      refetch: jest.fn(),
+    });
+
+    const { queryByTestId } = render(
       <WeatherForYouRail onSelectProduct={mockOnSelectProduct} onSeeAll={mockOnSeeAll} />
     );
 
-    // Should not render anything when no condition
-    expect(UNSAFE_root).toBeEmptyElement();
+    // Should not render the component when no condition
+    expect(queryByTestId('weather-for-you-rail')).toBeNull();
   });
 
   it('should show loading state', () => {

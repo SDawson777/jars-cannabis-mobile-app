@@ -17,7 +17,7 @@
     "generate": "prisma generate",
     "postinstall": "prisma generate",
     "seed": "ts-node --transpile-only prisma/seed.ts",
-    "test:ci": "node --max-old-space-size=4096 node_modules/.bin/jest --config jest.config.cjs --runInBand"
+    "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --runInBand"
   },
   "keywords": [],
   "author": "",

@@ -14,7 +14,7 @@ export function useWeatherCondition() {
   }
 
   // Otherwise, use actual weather condition if available
-  if (debugInfo.actualCondition && debugInfo.weatherSource === 'openweather') {
+  if (debugInfo?.actualCondition && debugInfo?.weatherSource === 'openweather') {
     return {
       condition: debugInfo.actualCondition,
       isSimulated: false,
