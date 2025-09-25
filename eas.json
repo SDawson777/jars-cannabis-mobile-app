@@ -5,13 +5,16 @@
   },
   "build": {
     "development": {
+      "node": "20.11.1",
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
+      "node": "20.11.1",
       "distribution": "internal"
     },
     "production": {
+      "node": "20.11.1",
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://api.jarscannabis.com"
