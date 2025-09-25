@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">29.41% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>5/17</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">20% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>1/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">29.41% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>5/17</span>
             </div>
         
             
@@ -131,29 +131,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -193,15 +193,15 @@ import type { OrdersResponse, Order } from '../types/order';
 import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
 &nbsp;
-const BASE_URL = <span class="cstat-no" title="statement not covered" >API_BASE_URL;</span>
+const BASE_URL = API_BASE_URL;
 &nbsp;
-function <span class="fstat-no" title="function not covered" >createOrderClient(</span>): AxiosInstance {
-  const client = <span class="cstat-no" title="statement not covered" >axios.create({</span>
+function createOrderClient(): AxiosInstance {
+  const client = axios.create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' } as any,
   });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  client.interceptors.request.use(</span>
+  client.interceptors.request.use(
 <span class="fstat-no" title="function not covered" >    as</span>ync (config: InternalAxiosRequestConfig) =&gt; {
       const token = <span class="cstat-no" title="statement not covered" >await getAuthToken();</span>
 <span class="cstat-no" title="statement not covered" >      if (token &amp;&amp; config.headers) {</span>
@@ -212,10 +212,10 @@ function <span class="fstat-no" title="function not covered" >createOrderClient(
 <span class="fstat-no" title="function not covered" >    er</span>ror =&gt; <span class="cstat-no" title="statement not covered" >Promise.reject(error)</span>
   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return client;</span>
+  return client;
 }
 &nbsp;
-export const orderClient = <span class="cstat-no" title="statement not covered" >createOrderClient();</span>
+export const orderClient = createOrderClient();
 &nbsp;
 export async function <span class="fstat-no" title="function not covered" >fetchOrders(</span>page = <span class="branch-0 cbranch-no" title="branch not covered" >1)</span>: Promise&lt;OrdersResponse&gt; {
   const res = <span class="cstat-no" title="statement not covered" >await orderClient.get('/orders', { params: { page } });</span>
@@ -256,7 +256,7 @@ export async function <span class="fstat-no" title="function not covered" >creat
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T00:36:06.297Z
+                at 2025-09-25T15:41:14.193Z
             </div>
         <script src="../prettify.js"></script>
         <script>

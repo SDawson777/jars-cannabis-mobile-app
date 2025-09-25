@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -113,16 +113,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,18 +146,18 @@ interface AccessibilityStore extends AccessibilitySettings {
   hydrate: (settings: AccessibilitySettings) =&gt; void;
 }
 &nbsp;
-export const useAccessibilityStore = <span class="cstat-no" title="statement not covered" >create&lt;AccessibilityStore&gt;(<span class="fstat-no" title="function not covered" >se</span>t =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+export const useAccessibilityStore = create&lt;AccessibilityStore&gt;(set =&gt; ({
   textSize: 'system',
   highContrast: false,
   reduceMotion: false,
-  setTextSize: <span class="fstat-no" title="function not covered" >si</span>ze =&gt; <span class="cstat-no" title="statement not covered" >set({ textSize: size }),</span>
-  setHighContrast: <span class="fstat-no" title="function not covered" >en</span>abled =&gt; <span class="cstat-no" title="statement not covered" >set({ highContrast: enabled }),</span>
-  setReduceMotion: <span class="fstat-no" title="function not covered" >en</span>abled =&gt; <span class="cstat-no" title="statement not covered" >set({ reduceMotion: enabled }),</span>
-  hydrate: <span class="fstat-no" title="function not covered" >se</span>ttings =&gt; {
-    const validTextSizes = <span class="cstat-no" title="statement not covered" >['system', 'sm', 'md', 'lg', 'xl'];</span>
-<span class="cstat-no" title="statement not covered" >    set({</span>
+  setTextSize: size =&gt; set({ textSize: size }),
+  setHighContrast: enabled =&gt; set({ highContrast: enabled }),
+  setReduceMotion: enabled =&gt; set({ reduceMotion: enabled }),
+  hydrate: settings =&gt; {
+    const validTextSizes = ['system', 'sm', 'md', 'lg', 'xl'];
+    set({
       textSize: validTextSizes.includes(settings.textSize) ? settings.textSize : 'md',
-      highContrast: settings.highContrast ?? false,
+      highContrast: settings.highContrast ?? <span class="branch-1 cbranch-no" title="branch not covered" >false,</span>
       reduceMotion: settings.reduceMotion ?? false,
     });
   },
@@ -169,7 +169,7 @@ export const useAccessibilityStore = <span class="cstat-no" title="statement not
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T00:36:06.297Z
+                at 2025-09-25T15:41:14.193Z
             </div>
         <script src="../prettify.js"></script>
         <script>

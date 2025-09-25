@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -142,7 +142,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -159,15 +159,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -179,15 +179,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Feature flags for experimental and optional app features
@@ -205,7 +205,7 @@ export interface FeatureFlags {
  * Default feature flag configuration
  * These can be overridden by remote config, A/B testing, or user preferences
  */
-const defaultFeatureFlags: FeatureFlags = <span class="cstat-no" title="statement not covered" >{</span>
+const defaultFeatureFlags: FeatureFlags = {
   enableCtaPulseAnimation: true, // Enable by default for a polished feel
   enableEnhancedHaptics: true,
   enableTerpeneAnimations: false, // Keep disabled until fully tested
@@ -219,38 +219,38 @@ const defaultFeatureFlags: FeatureFlags = <span class="cstat-no" title="statemen
  * - User preferences/settings
  * - Environment variables
  */
-export function <span class="fstat-no" title="function not covered" >getFeatureFlags(</span>): FeatureFlags {
+export function getFeatureFlags(): FeatureFlags {
   // For now, return the defaults
   // TODO: Add remote config integration
-<span class="cstat-no" title="statement not covered" >  return { ...defaultFeatureFlags };</span>
+  return { ...defaultFeatureFlags };
 }
 &nbsp;
 /**
  * Check if a specific feature flag is enabled
  */
-export function <span class="fstat-no" title="function not covered" >isFeatureEnabled(</span>flag: keyof FeatureFlags): boolean {
-  const flags = <span class="cstat-no" title="statement not covered" >getFeatureFlags();</span>
-<span class="cstat-no" title="statement not covered" >  return flags[flag];</span>
+export function isFeatureEnabled(flag: keyof FeatureFlags): boolean {
+  const flags = getFeatureFlags();
+  return flags[flag];
 }
 &nbsp;
 /**
  * Hook to get feature flags in React components
  */
-export function <span class="fstat-no" title="function not covered" >useFeatureFlags(</span>): FeatureFlags {
+export function useFeatureFlags(): FeatureFlags {
   // For now, just return the flags directly
   // In the future, this could be enhanced to:
   // - Subscribe to remote config updates
   // - Handle loading states
   // - Cache flags for performance
-<span class="cstat-no" title="statement not covered" >  return getFeatureFlags();</span>
+  return getFeatureFlags();
 }
 &nbsp;
 /**
  * Hook to check if a specific feature is enabled
  */
-export function <span class="fstat-no" title="function not covered" >useFeatureFlag(</span>flag: keyof FeatureFlags): boolean {
-  const flags = <span class="cstat-no" title="statement not covered" >useFeatureFlags();</span>
-<span class="cstat-no" title="statement not covered" >  return flags[flag];</span>
+export function useFeatureFlag(flag: keyof FeatureFlags): boolean {
+  const flags = useFeatureFlags();
+  return flags[flag];
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -259,7 +259,7 @@ export function <span class="fstat-no" title="function not covered" >useFeatureF
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T00:36:06.297Z
+                at 2025-09-25T15:41:14.193Z
             </div>
         <script src="../prettify.js"></script>
         <script>

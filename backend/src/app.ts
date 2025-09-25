@@ -13,6 +13,7 @@ import { authRouter } from './routes/auth';
 import { cartRouter } from './routes/cart';
 import { conciergeRouter } from './routes/concierge';
 import { contentRouter } from './routes/content';
+import { communityRouter } from './routes/community';
 import { dataRouter } from './routes/data';
 import { homeRouter } from './routes/home';
 import { journalRouter } from './routes/journal';
@@ -56,6 +57,7 @@ const routers = [
   cartRouter,
   ordersRouter,
   contentRouter,
+  communityRouter,
   loyaltyRouter,
   journalRouter,
   recommendationsRouter,

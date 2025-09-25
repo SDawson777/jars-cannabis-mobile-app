@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -98,19 +98,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -122,20 +122,20 @@ interface RewardPayload {
   id: string;
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >redeemReward(</span>reward: RewardPayload) {
-<span class="cstat-no" title="statement not covered" >  return phase4Client.post(`/awards/${reward.id}/redeem`).then(<span class="fstat-no" title="function not covered" >r </span>=&gt; <span class="cstat-no" title="statement not covered" >r.data)</span>;</span>
+async function redeemReward(reward: RewardPayload) {
+  return phase4Client.post(`/awards/${reward.id}/redeem`).then(r =&gt; r.data);
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useRedeemReward(</span>) {
-  const queryClient = <span class="cstat-no" title="statement not covered" >useQueryClient();</span>
-<span class="cstat-no" title="statement not covered" >  return useMutation&lt;any, Error, RewardPayload&gt;({</span>
+export function useRedeemReward() {
+  const queryClient = useQueryClient();
+  return useMutation&lt;any, Error, RewardPayload&gt;({
     mutationFn: redeemReward,
-    onSuccess: <span class="fstat-no" title="function not covered" >()</span> =&gt; {
-<span class="cstat-no" title="statement not covered" >      queryClient.invalidateQueries({ queryKey: ['awards'] });</span>
-<span class="cstat-no" title="statement not covered" >      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });</span>
-<span class="cstat-no" title="statement not covered" >      toast('Reward redeemed');</span>
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: ['awards'] });
+      queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
+      toast('Reward redeemed');
     },
-    onError: <span class="fstat-no" title="function not covered" >(e</span>rr: Error) =&gt; <span class="cstat-no" title="statement not covered" >toast(err.message),</span>
+    onError: (err: Error) =&gt; toast(err.message),
   });
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -145,7 +145,7 @@ export function <span class="fstat-no" title="function not covered" >useRedeemRe
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T00:36:06.297Z
+                at 2025-09-25T15:41:14.193Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

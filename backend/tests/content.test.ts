@@ -12,3 +12,34 @@ describe('GET /api/content/legal', () => {
     expect(typeof res.body.lastUpdated).toBe('object');
   });
 });
+
+describe('GET /api/content/articles', () => {
+  it('returns an array of CMS-like articles', async () => {
+    const res = await api().get('/api/content/articles').expect(200);
+    const items = res.body.items || res.body; // support both shapes
+    expect(Array.isArray(items)).toBe(true);
+    expect(items.length).toBeGreaterThan(0);
+    const a = items[0];
+    expect(a).toHaveProperty('__id');
+    expect(a).toHaveProperty('title');
+    expect(a).toHaveProperty('slug');
+    expect(a).toHaveProperty('publishedAt');
+    expect(a).toHaveProperty('body');
+  });
+});
+
+describe('GET /api/content/articles/:slug', () => {
+  it('returns a single CMS-like article', async () => {
+    const res = await api().get('/api/content/articles/demo-article').expect(200);
+    const a = res.body;
+    expect(a).toHaveProperty('__id');
+    expect(a).toHaveProperty('title');
+    expect(a).toHaveProperty('slug', 'demo-article');
+    expect(a).toHaveProperty('publishedAt');
+    expect(a).toHaveProperty('body');
+  });
+
+  it('supports preview header without error', async () => {
+    await api().get('/api/content/articles/preview-article').set('X-Preview', 'true').expect(200);
+  });
+});
