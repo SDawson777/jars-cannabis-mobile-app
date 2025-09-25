@@ -8,13 +8,21 @@ import {
   SafeAreaView,
   StyleSheet,
   LayoutAnimation,
+  Alert,
 } from 'react-native';
 import { useAccessibilityStore } from '../state/accessibilityStore';
 import { useTextScaling } from '../hooks/useTextScaling';
 import { ThemeContext } from '../context/ThemeContext';
 
 export default function AppSettingsScreen() {
-  const { jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const {
+    jarsPrimary,
+    jarsSecondary,
+    jarsBackground,
+    debugInfo,
+    weatherSimulation,
+    setWeatherSimulation,
+  } = useContext(ThemeContext);
   const { scaleSize } = useTextScaling();
   const { textSize, setTextSize, highContrast, setHighContrast, reduceMotion, setReduceMotion } =
     useAccessibilityStore();
@@ -38,6 +46,72 @@ export default function AppSettingsScreen() {
   const handleReduceMotionToggle = (value: boolean) => {
     // Don't animate the toggle that disables animations
     setReduceMotion(value);
+  };
+
+  const handleWeatherSimulationToggle = (enabled: boolean) => {
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+    setWeatherSimulation({
+      ...weatherSimulation,
+      enabled,
+    });
+  };
+
+  const handleWeatherConditionChange = () => {
+    const conditions: Array<'rain' | 'sunny' | 'cloudy' | 'snow' | null> = [
+      null,
+      'sunny',
+      'cloudy',
+      'rain',
+      'snow',
+    ];
+    const currentIndex = conditions.indexOf(weatherSimulation.condition);
+    const nextCondition = conditions[(currentIndex + 1) % conditions.length];
+
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+
+    setWeatherSimulation({
+      ...weatherSimulation,
+      condition: nextCondition,
+    });
+  };
+
+  const showDebugInfoAlert = () => {
+    const debugText = `
+Weather Source: ${debugInfo.weatherSource}
+Last Updated: ${debugInfo.lastUpdated.toLocaleString()}
+${debugInfo.fallbackReason ? `Fallback Reason: ${debugInfo.fallbackReason}` : ''}
+${debugInfo.actualTemperature ? `Temperature: ${debugInfo.actualTemperature}°` : ''}
+${debugInfo.actualCondition ? `Condition: ${debugInfo.actualCondition}` : ''}
+${debugInfo.cloudCover !== undefined ? `Cloud Cover: ${debugInfo.cloudCover}%` : ''}
+${debugInfo.location ? `Location: ${debugInfo.location.lat.toFixed(4)}, ${debugInfo.location.lon.toFixed(4)}` : ''}
+${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation.condition} (enabled)` : 'Simulation: disabled'}
+    `.trim();
+
+    Alert.alert('Weather Debug Info', debugText, [{ text: 'OK' }]);
+  };
+
+  const getConditionDisplayName = (condition: 'rain' | 'sunny' | 'cloudy' | 'snow' | null) => {
+    if (!condition) return 'None';
+    return condition.charAt(0).toUpperCase() + condition.slice(1);
+  };
+
+  const getConditionEmoji = (condition: 'rain' | 'sunny' | 'cloudy' | 'snow' | null) => {
+    switch (condition) {
+      case 'sunny':
+        return '☀️';
+      case 'cloudy':
+        return '☁️';
+      case 'rain':
+        return '🌧️';
+      case 'snow':
+        return '❄️';
+      default:
+        return '🌤️';
+    }
   };
 
   const textColor = highContrast ? '#000000' : jarsPrimary;
@@ -133,6 +207,113 @@ export default function AppSettingsScreen() {
             thumbColor="#FFFFFF"
           />
         </View>
+
+        <Text
+          style={[
+            styles.section,
+            {
+              color: textColor,
+              fontSize: scaleSize(18),
+            },
+          ]}
+        >
+          Weather Theme (Dev)
+        </Text>
+
+        <View style={styles.row}>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: textColor,
+                fontSize: scaleSize(16),
+              },
+            ]}
+          >
+            Simulate Weather
+          </Text>
+          <Switch
+            value={weatherSimulation.enabled}
+            onValueChange={handleWeatherSimulationToggle}
+            trackColor={{ false: '#E0E0E0', true: accentColor }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        {weatherSimulation.enabled && (
+          <View style={styles.row}>
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: textColor,
+                  fontSize: scaleSize(16),
+                },
+              ]}
+            >
+              Weather Condition
+            </Text>
+            <Pressable
+              style={[
+                styles.conditionButton,
+                {
+                  backgroundColor: highContrast ? '#E0E0E0' : '#F0F0F0',
+                },
+              ]}
+              onPress={handleWeatherConditionChange}
+            >
+              <Text style={styles.conditionEmoji}>
+                {getConditionEmoji(weatherSimulation.condition)}
+              </Text>
+              <Text
+                style={[
+                  styles.conditionText,
+                  {
+                    color: textColor,
+                    fontSize: scaleSize(14),
+                  },
+                ]}
+              >
+                {getConditionDisplayName(weatherSimulation.condition)}
+              </Text>
+            </Pressable>
+          </View>
+        )}
+
+        <View style={styles.row}>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: textColor,
+                fontSize: scaleSize(16),
+              },
+            ]}
+          >
+            Weather Debug Info
+          </Text>
+          <Pressable
+            style={[
+              styles.debugButton,
+              {
+                backgroundColor: highContrast ? '#E0E0E0' : '#F0F0F0',
+              },
+            ]}
+            onPress={showDebugInfoAlert}
+          >
+            <Text
+              style={[
+                styles.debugButtonText,
+                {
+                  color: textColor,
+                  fontSize: scaleSize(14),
+                },
+              ]}
+            >
+              View
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -158,4 +339,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textSizeText: { fontWeight: '500' },
+  conditionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 6,
+    minWidth: 100,
+    justifyContent: 'center',
+    gap: 6,
+  },
+  conditionEmoji: {
+    fontSize: 16,
+  },
+  conditionText: {
+    fontWeight: '500',
+  },
+  debugButton: {
+    padding: 8,
+    borderRadius: 6,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  debugButtonText: {
+    fontWeight: '500',
+  },
 });

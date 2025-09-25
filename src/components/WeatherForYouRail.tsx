@@ -2,6 +2,7 @@ import React, { useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 
 import { useWeatherRecommendations } from '../hooks/useWeatherRecommendations';
+import { useWeatherCondition } from '../hooks/useWeatherCondition';
 import { hapticLight } from '../utils/haptic';
 import { logEvent } from '../utils/analytics';
 import type { CMSProduct } from '../types/cms';
@@ -26,12 +27,17 @@ export default function WeatherForYouRail({
   onSeeAll,
   showEmptyState = true,
 }: WeatherForYouRailProps) {
+  const { condition: weatherCondition, isSimulated } = useWeatherCondition();
+
+  // Use the provided condition or fallback to detected/simulated weather
+  const effectiveCondition = condition || weatherCondition;
+
   const { data, isLoading, error, refetch } = useWeatherRecommendations({
-    condition,
+    condition: effectiveCondition,
     city,
     state,
     limit,
-    enabled: !!condition,
+    enabled: !!effectiveCondition,
   });
 
   // Convert CMSProduct to ForYouTodayItem format expected by ProductCardMini
@@ -51,10 +57,11 @@ export default function WeatherForYouRail({
 
     // Track "See All" click event
     logEvent('weather_recs_view_all', {
-      weather_condition: condition,
+      weather_condition: effectiveCondition,
       location: city && state ? `${city}, ${state}` : undefined,
       product_count: data?.products?.length || 0,
       tags: data?.tags || [],
+      is_simulated: isSimulated,
     });
 
     onSeeAll?.();
@@ -65,13 +72,14 @@ export default function WeatherForYouRail({
 
     // Track product click event
     logEvent('weather_recs_click', {
-      weather_condition: condition,
+      weather_condition: effectiveCondition,
       product_id: productId,
       product_name: product?.name,
       product_type: product?.type,
       product_price: product?.price,
       location: city && state ? `${city}, ${state}` : undefined,
       tags: data?.tags || [],
+      is_simulated: isSimulated,
     });
 
     onSelectProduct(productId);
@@ -81,17 +89,18 @@ export default function WeatherForYouRail({
   useEffect(() => {
     if (data && data.products && data.products.length > 0) {
       logEvent('weather_recs_view', {
-        weather_condition: condition,
+        weather_condition: effectiveCondition,
         location: city && state ? `${city}, ${state}` : undefined,
         product_count: data.products.length,
         tags: data.tags || [],
         description: data.description,
+        is_simulated: isSimulated,
       });
     }
-  }, [data, condition, city, state]);
+  }, [data, effectiveCondition, city, state, isSimulated]);
 
-  // Don't render if no condition provided
-  if (!condition) {
+  // Don't render if no condition provided or detected
+  if (!effectiveCondition) {
     return null;
   }
 
@@ -105,8 +114,8 @@ export default function WeatherForYouRail({
     return null;
   }
 
-  const weatherEmoji = getWeatherEmoji(condition);
-  const title = data?.description || `Weather picks for ${condition}`;
+  const weatherEmoji = getWeatherEmoji(effectiveCondition);
+  const title = data?.description || `Weather picks for ${effectiveCondition}`;
 
   return (
     <View style={styles.container} testID="weather-for-you-rail">
@@ -114,6 +123,11 @@ export default function WeatherForYouRail({
         <View style={styles.titleRow}>
           <Text style={styles.emoji}>{weatherEmoji}</Text>
           <Text style={styles.title}>{title}</Text>
+          {isSimulated && (
+            <View style={styles.simulationBadge}>
+              <Text style={styles.simulationText}>SIM</Text>
+            </View>
+          )}
         </View>
         {data?.products && data.products.length > 0 && onSeeAll && (
           <Pressable onPress={handleSeeAll} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -167,7 +181,9 @@ export default function WeatherForYouRail({
 
       {!isLoading && !error && formattedProducts.length === 0 && showEmptyState && (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No recommendations available for {condition} weather</Text>
+          <Text style={styles.emptyText}>
+            No recommendations available for {effectiveCondition} weather
+          </Text>
         </View>
       )}
     </View>
@@ -289,5 +305,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
+  },
+  simulationBadge: {
+    backgroundColor: '#FF6B35',
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 8,
+  },
+  simulationText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
 });

@@ -3,10 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react-native';
 
 import WeatherForYouRail from '../WeatherForYouRail';
 
-// Mock the hook
+// Mock the hooks
 jest.mock('../../hooks/useWeatherRecommendations');
+jest.mock('../../hooks/useWeatherCondition');
+
 const mockUseWeatherRecommendations = require('../../hooks/useWeatherRecommendations')
   .useWeatherRecommendations as jest.Mock;
+const mockUseWeatherCondition = require('../../hooks/useWeatherCondition')
+  .useWeatherCondition as jest.Mock;
 
 // Mock haptic feedback
 jest.mock('../../utils/haptic', () => ({
@@ -19,6 +23,16 @@ describe('WeatherForYouRail', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Default mock for useWeatherCondition
+    mockUseWeatherCondition.mockReturnValue({
+      condition: 'sunny',
+      isSimulated: false,
+      debugInfo: {
+        weatherSource: 'openweather',
+        lastUpdated: new Date(),
+      },
+    });
   });
 
   it('should render loading state', () => {
@@ -138,6 +152,16 @@ describe('WeatherForYouRail', () => {
   });
 
   it('should not render when no condition is provided', () => {
+    // Mock no condition from useWeatherCondition
+    mockUseWeatherCondition.mockReturnValue({
+      condition: '', // Empty condition
+      isSimulated: false,
+      debugInfo: {
+        weatherSource: 'time-of-day',
+        lastUpdated: new Date(),
+      },
+    });
+
     mockUseWeatherRecommendations.mockReturnValue({
       data: null,
       isLoading: false,

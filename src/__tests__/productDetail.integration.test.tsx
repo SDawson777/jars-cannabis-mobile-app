@@ -52,6 +52,15 @@ describe('ProductDetailScreen integration', () => {
       jarsSecondary: '#666',
       jarsBackground: '#fff',
       loading: false,
+      debugInfo: {
+        weatherSource: 'time-of-day' as const,
+        lastUpdated: new Date(),
+      },
+      weatherSimulation: {
+        enabled: false,
+        condition: 'sunny' as const,
+      },
+      setWeatherSimulation: jest.fn(),
     };
 
     const { getByText } = render(
