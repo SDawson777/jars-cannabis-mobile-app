@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { logger } from '../utils/logger';
 import { v4 as uuidv4 } from 'uuid';
+import { env } from '../env';
 const rateLimitMap = new Map<string, { count: number; reset: number }>();
 export const conciergeRouter = Router();
 
@@ -43,7 +44,7 @@ async function withBackoff<T>(fn: () => Promise<T>, maxRetries = 2): Promise<T> 
 }
 
 conciergeRouter.post('/concierge/chat', async (req, res) => {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = env.OPENAI_API_KEY;
   const { message, history = [] } = req.body || {};
   // Accept user id from req.user (if present), x-user-id header, or fallback to IP
   const userId = (req as any).user?.id || req.headers['x-user-id'] || req.ip;

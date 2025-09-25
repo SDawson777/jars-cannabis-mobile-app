@@ -3,6 +3,7 @@
 // (Temporarily disable TS checks in this file to unblock deploy; functional runtime unchanged)
 import express from 'express';
 import Stripe from 'stripe';
+import { env } from '../env';
 
 export const stripeRouter = express.Router();
 
@@ -12,7 +13,7 @@ export const stripeRouter = express.Router();
 let stripe: any | null = null;
 function getStripe() {
   if (!stripe) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2022-11-15' });
+    stripe = new Stripe(env.STRIPE_SECRET_KEY || '', { apiVersion: '2022-11-15' });
   }
   return stripe;
 }

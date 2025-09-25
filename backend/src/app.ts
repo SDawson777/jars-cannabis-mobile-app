@@ -1,5 +1,8 @@
 import 'dotenv/config';
 
+// Validate environment variables early - will throw if missing critical vars
+import { env, isDebugEnabled } from './env';
+
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -31,7 +34,7 @@ import { logger } from './utils/logger';
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(helmet());
-app.use(cors({ origin: (process.env.CORS_ORIGIN?.split(',') as any) || '*' }));
+app.use(cors({ origin: (env.CORS_ORIGIN?.split(',') as any) || '*' }));
 
 app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
 
@@ -69,7 +72,7 @@ for (const r of routers) {
   app.use('/api', r);
   app.use('/api/v1', r);
 }
-if (process.env.DEBUG_DIAG === '1') app.use('/api/v1', qaRouter);
+if (isDebugEnabled) app.use('/api/v1', qaRouter);
 
 // Global error handler so nothing crashes
 app.use((err: any, _req: any, res: any) => {

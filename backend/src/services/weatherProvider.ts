@@ -47,9 +47,11 @@ export async function getCurrentWeatherCondition(
   // 1) Use external API if configured (guarded by env) with simple in-memory caching.
   //    This is best-effort only. Any failure should gracefully fall back to local inference.
   try {
-    const url = process.env.WEATHER_API_URL;
-    const apiKey = process.env.WEATHER_API_KEY;
-    const ttl = Number(process.env.WEATHER_CACHE_TTL_MS || 5 * 60 * 1000);
+    // Lazy import to avoid circulars for tests
+    const { env } = await import('../env');
+    const url = env.WEATHER_API_URL;
+    const apiKey = env.WEATHER_API_KEY;
+    const ttl = Number(env.WEATHER_CACHE_TTL_MS || '300000');
     if (url && _lat != null && _lon != null) {
       const cacheKey = `${Math.round(_lat * 100) / 100},${Math.round(_lon * 100) / 100}`;
       const cached = getCachedCondition(cacheKey);

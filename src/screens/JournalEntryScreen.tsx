@@ -5,8 +5,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
 
-import { addJournal } from '../api/phase4Client';
+import { addJournal, updateJournal } from '../api/phase4Client';
 import { ThemeContext } from '../context/ThemeContext';
+import { useOfflineJournalQueue } from '../hooks/useOfflineJournalQueue';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
 
@@ -19,11 +20,25 @@ export default function JournalEntryScreen() {
   const { params } = useRoute<RouteProps>();
   const navigation = useNavigation<NavProp>();
   const { jarsPrimary } = React.useContext(ThemeContext);
+  const { queueJournalAction } = useOfflineJournalQueue();
 
-  const [_values, setValues] = React.useState(
-    LABELS.reduce<Record<string, number>>((acc, l) => ({ ...acc, [l]: 0 }), {})
-  );
-  const [notes, setNotes] = React.useState('');
+  const isEditMode = !!params.journalEntry;
+  const existingEntry = params.journalEntry;
+
+  const [_values, setValues] = React.useState(() => {
+    if (isEditMode && existingEntry?.tags) {
+      return LABELS.reduce<Record<string, number>>(
+        (acc, label) => ({
+          ...acc,
+          [label]: existingEntry.tags.includes(label) ? 5 : 0, // Default to 5 for existing tags
+        }),
+        {}
+      );
+    }
+    return LABELS.reduce<Record<string, number>>((acc, l) => ({ ...acc, [l]: 0 }), {});
+  });
+
+  const [notes, setNotes] = React.useState(existingEntry?.notes || '');
 
   const handleChange = (label: string, val: number) => {
     setValues(v => ({ ...v, [label]: val }));
@@ -31,23 +46,40 @@ export default function JournalEntryScreen() {
 
   const saveEntry = async () => {
     hapticLight();
+
+    const rating = Object.values(_values).reduce((a, b) => a + b, 0) / LABELS.length;
+    const payload = {
+      productId: params.item.id,
+      rating,
+      notes,
+      tags: LABELS.filter(l => _values[l] > 0),
+    };
+
     try {
-      const rating = Object.values(_values).reduce((a, b) => a + b, 0) / LABELS.length;
-      await addJournal({
-        productId: params.item.id,
-        rating,
-        notes,
-        tags: LABELS.filter(l => _values[l] > 0),
-      });
+      if (isEditMode) {
+        // Try direct API update first
+        await updateJournal(existingEntry.id, payload);
+      } else {
+        // Try direct API create first
+        await addJournal(payload);
+      }
     } catch (__e) {
-      // ignore
+      // If online call fails, queue for offline processing
+      await queueJournalAction({
+        type: isEditMode ? 'update' : 'create',
+        id: isEditMode ? existingEntry.id : undefined,
+        payload,
+      });
     }
+
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: jarsPrimary }]}>Journal Entry</Text>
+      <Text style={[styles.title, { color: jarsPrimary }]}>
+        {isEditMode ? 'Edit Journal Entry' : 'Journal Entry'}
+      </Text>
       <Text style={styles.meta}>{params.item.name}</Text>
       {LABELS.map(label => (
         <View key={label} style={styles.sliderRow}>

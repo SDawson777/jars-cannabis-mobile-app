@@ -3,11 +3,12 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs'; // or: import * as bcrypt from 'bcryptjs'
+import { env } from '../env';
 
 const prisma = new PrismaClient();
 
 function getJwtSecret(): string {
-  const s = process.env.JWT_SECRET;
+  const s = env.JWT_SECRET;
   if (!s) throw new Error('JWT_SECRET is not set');
   return s;
 }

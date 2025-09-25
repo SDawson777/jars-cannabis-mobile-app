@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
+import { env } from '../env';
 
 export const personalizationRouter = Router();
 
@@ -10,7 +11,7 @@ personalizationRouter.get('/personalization/home', async (req, res) => {
   const limit = Math.min(24, parseInt(((req.query as any).limit as any) || '6', 10));
 
   // If no DB is configured, skip touching the lazy prisma proxy which throws in demo mode.
-  if (process.env.DATABASE_URL) {
+  if (env.DATABASE_URL) {
     try {
       // Prefer DB-driven products if the Prisma client is available
       const items = await prisma.product.findMany({

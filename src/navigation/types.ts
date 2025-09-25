@@ -66,7 +66,7 @@ export type RootStackParamList = {
   /** New Legal route */
   Legal: undefined;
   MyJars: undefined;
-  JournalEntry: { item: import('../@types/jars').StashItem };
+  JournalEntry: { item: import('../@types/jars').StashItem; journalEntry?: any };
   MyJarsInsights: undefined;
   EthicalAIDashboard: undefined;
   LanguageSelection: undefined;

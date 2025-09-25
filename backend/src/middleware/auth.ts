@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { admin } from '../bootstrap/firebase-admin';
+import { env } from '../env';
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const h = req.headers.authorization || '';
   const token = h.startsWith('Bearer ') ? h.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Missing token' });
   try {
-    (req as any).user = jwt.verify(token, process.env.JWT_SECRET!);
+    (req as any).user = jwt.verify(token, env.JWT_SECRET);
     return next();
   } catch {
     // Try verifying as a Firebase ID token (if firebase admin is available)

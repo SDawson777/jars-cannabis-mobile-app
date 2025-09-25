@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { admin, initFirebase } from '../bootstrap/firebase-admin';
+import { env } from '../env';
 
 export const qaRouter = Router();
 
@@ -14,13 +15,13 @@ function guard(req: any, res: any) {
 
 // 1) Quick env visibility (no secrets)
 qaRouter.get('/diag/env', (_req, res) => {
-  const k = process.env.OPENAI_API_KEY || '';
+  const k = env.OPENAI_API_KEY || '';
   res.json({
     node: process.version,
     has_OPENAI_API_KEY: !!k,
     openai_prefix: k ? k.slice(0, 8) + '…' : null,
-    has_FIREBASE_PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
-    has_FIREBASE_SERVICE_ACCOUNT_BASE64: !!process.env.FIREBASE_SERVICE_ACCOUNT_BASE64,
+    has_FIREBASE_PROJECT_ID: !!env.FIREBASE_PROJECT_ID,
+    has_FIREBASE_SERVICE_ACCOUNT_BASE64: !!env.FIREBASE_SERVICE_ACCOUNT_BASE64,
     debug_diag: process.env.DEBUG_DIAG === '1',
   });
 });
@@ -30,7 +31,7 @@ qaRouter.post('/diag/openai', async (req, res) => {
   if (!guard(req, res)) return;
   try {
     const { default: OpenAI } = await import('openai');
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
     const r = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: 'ping' }],

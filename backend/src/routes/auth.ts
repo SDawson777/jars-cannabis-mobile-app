@@ -3,6 +3,7 @@ import { prisma } from '../prismaClient';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { requireAuth } from '../middleware/auth';
+import { env } from '../env';
 
 const authRouter = Router();
 
@@ -17,7 +18,7 @@ authRouter.post('/auth/register', async (req, res) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({ data: { email, passwordHash } });
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, { expiresIn: '1h' });
     return res.status(201).json({ token, user: { id: user.id, email: user.email } });
   } catch (err: any) {
     if (err?.code === 'P2002') return res.status(409).json({ error: 'Email already registered' });
@@ -45,7 +46,7 @@ authRouter.post('/auth/login', async (req, res) => {
           data: { id: uid, email: decoded.email ?? undefined } as any,
         });
       }
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, { expiresIn: '1h' });
       return res.json({ token, user: { id: user.id, email: user.email } });
     } catch {
       return res.status(401).json({ error: 'Invalid idToken' });
@@ -57,7 +58,7 @@ authRouter.post('/auth/login', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Invalid credentials' });
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+  const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, { expiresIn: '1h' });
   return res.json({ token, user: { id: user.id, email: user.email } });
 });
 
@@ -73,9 +74,9 @@ authRouter.post('/auth/refresh', async (req, res) => {
   if (!refreshToken) return res.status(401).json({ error: 'Missing token' });
   try {
     // Use the top-level jwt import (mocked in tests) instead of dynamic import
-    const payload: any = (jwt as any).verify(refreshToken, process.env.JWT_SECRET!);
+    const payload: any = (jwt as any).verify(refreshToken, env.JWT_SECRET);
     if (!payload?.userId) return res.status(401).json({ error: 'Invalid token' });
-    const token = (jwt as any).sign({ userId: payload.userId }, process.env.JWT_SECRET!, {
+    const token = (jwt as any).sign({ userId: payload.userId }, env.JWT_SECRET, {
       expiresIn: '1h',
     });
     return res.json({ token });

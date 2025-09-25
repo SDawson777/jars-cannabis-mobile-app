@@ -267,8 +267,12 @@ jest.mock('../../src/prismaClient', () => ({
         const all = Object.values(journalEntries).filter(
           (e: any) => !where.userId || e.userId === where.userId
         );
-        // simple ordering by createdAt desc
-        all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
+        // Sort by updatedAt desc or createdAt desc as fallback
+        if (orderBy.updatedAt === 'desc') {
+          all.sort((a: any, b: any) => (a.updatedAt < b.updatedAt ? 1 : -1));
+        } else {
+          all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
+        }
         const s = skip || 0;
         const t = take || all.length;
         return all.slice(s, s + t);
@@ -277,14 +281,16 @@ jest.mock('../../src/prismaClient', () => ({
       create: async ({ data }: any) => {
         const id = `je-${Math.random().toString(36).slice(2, 9)}`;
         const createdAt = new Date().toISOString();
-        const e = { id, createdAt, ...data };
+        const updatedAt = createdAt;
+        const e = { id, createdAt, updatedAt, ...data };
         journalEntries[id] = e;
         return e;
       },
       update: async ({ where: { id }, data }: any) => {
         const existing = journalEntries[id];
         if (!existing) throw new Error('Not found');
-        Object.assign(existing, data);
+        const updatedAt = new Date().toISOString();
+        Object.assign(existing, { ...data, updatedAt });
         return existing;
       },
     },

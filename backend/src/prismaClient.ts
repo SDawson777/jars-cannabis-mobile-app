@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { env } from './env';
 
 // Lazily create the Prisma client so the backend can boot in demo mode without a DB.
 // The actual connection is only attempted when a route first accesses the client.
@@ -7,7 +8,7 @@ let prismaInstance: PrismaClient | null = null;
 function getPrismaInstance(): PrismaClient {
   if (!prismaInstance) {
     // If DATABASE_URL is missing, defer throwing until a DB-backed route is called.
-    if (!process.env.DATABASE_URL) {
+    if (!env.DATABASE_URL) {
       throw new Error(
         'DATABASE_URL is not set. Database-backed endpoints are unavailable in demo mode.'
       );

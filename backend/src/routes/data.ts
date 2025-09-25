@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { authRequired } from '../util/auth';
 import { admin, initFirebase } from '../bootstrap/firebase-admin';
+import { env } from '../env';
 
 export const dataRouter = Router();
 
@@ -12,7 +13,7 @@ dataRouter.post('/data-transparency/export', authRequired, async (req, res, next
     const job = await prisma.dataExport.create({ data: { userId: uid, status: 'pending' } });
 
     // Early env validation for clearer errors
-    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
+    if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
       if (process.env.DEBUG_DIAG === '1') {
         return res.status(500).json({
           error: 'Firebase env missing',

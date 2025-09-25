@@ -2,6 +2,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { env } from '../env';
 
 interface JwtPayload {
   userId: string;
@@ -15,8 +16,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 
   const token = authHeader.substring(7); // remove 'Bearer '
   try {
-    const secret = process.env.JWT_SECRET!;
-    const payload = jwt.verify(token, secret) as JwtPayload;
+    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
     // Attach to req.user for downstream handlers
     (req as any).user = { id: payload.userId };
     next();

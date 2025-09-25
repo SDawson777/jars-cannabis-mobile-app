@@ -10,7 +10,7 @@ journalRouter.get('/journal/entries', requireAuth, async (req, res) => {
   const limit = Math.min(100, parseInt((req.query.limit as string) || '24'));
   const items = await prisma.journalEntry.findMany({
     where: { userId: uid },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { updatedAt: 'desc' },
     take: limit,
     skip: (page - 1) * limit,
   });

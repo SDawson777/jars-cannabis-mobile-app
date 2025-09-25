@@ -1,12 +1,13 @@
 // backend/src/firebaseAdmin.ts
 import admin from 'firebase-admin';
 import type { firestore as FirebaseFirestoreNS } from 'firebase-admin';
+import { env } from './env';
 type FirebaseFirestore = typeof FirebaseFirestoreNS;
 
 let app: admin.app.App | null = null;
 
 function serviceAccountFromEnv(): admin.ServiceAccount {
-  const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+  const b64 = env.FIREBASE_SERVICE_ACCOUNT_BASE64;
   if (!b64) throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 missing');
 
   const json = Buffer.from(b64, 'base64').toString('utf8');
