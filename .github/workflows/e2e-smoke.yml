@@ -49,7 +49,20 @@ jobs:
             exit 1
           fi
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-34;google_apis;x86_64"
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force --name "Pixel_7_API_34" --device "pixel_7" --package "system-images;android-34;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
+
+          # Create AVD with proper parameters - use generic device instead of pixel_7 which may not exist
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
+            --force \
+            --name "Pixel_7_API_34" \
+            --package "system-images;android-34;google_apis;x86_64" \
+            --tag "google_apis" \
+            --abi "x86_64" \
+            --device "pixel_xl"
+
+          # Verify AVD was created
+          $ANDROID_HOME/emulator/emulator -list-avds
 
       - name: 🤖 Start Android emulator
         run: |

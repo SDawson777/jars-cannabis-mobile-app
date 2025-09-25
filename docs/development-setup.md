@@ -35,7 +35,7 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # 3. Install system image and create AVD
 $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "system-images;android-34;google_apis;x86_64"
-$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force --name "Pixel_7_API_34" --device "pixel_7" --package "system-images;android-34;google_apis;x86_64"
+$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force --name "Pixel_7_API_34" --device "pixel_xl" --package "system-images;android-34;google_apis;x86_64"
 
 # 4. Verify setup
 $ANDROID_HOME/emulator/emulator -list-avds  # Should show Pixel_7_API_34
@@ -56,3 +56,25 @@ If local Android setup is complex, rely on the automated CI workflow:
 ### Dev Container Limitations
 
 The current dev container environment does not include Android SDK tools. This is intentional to keep the container lightweight, as E2E testing is primarily handled in CI.
+
+### Troubleshooting
+
+#### Common AVD Issues
+
+**"Unknown AVD name" error:**
+
+- Verify AVD was created: `$ANDROID_HOME/emulator/emulator -list-avds`
+- List available device profiles: `$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device`
+- Recreate AVD with different device profile if needed
+
+**AVD creation fails:**
+
+- Ensure system image is installed: `$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list`
+- Try using a different device profile like "pixel_xl" or omit the `--device` parameter
+- Check available devices: `$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list device`
+
+**Emulator won't start:**
+
+- Ensure hardware acceleration is available (Intel HAXM or AMD-V)
+- Try adding `-no-accel` flag for software-only emulation
+- Check disk space and RAM requirements
