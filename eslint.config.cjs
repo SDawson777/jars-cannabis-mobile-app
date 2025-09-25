@@ -196,6 +196,8 @@ module.exports = [
       'jest.setup.ts',
       'e2e/**/*.spec.*',
       'e2e/**/*.test.*',
+      'e2e/**/*.e2e.*',
+      'e2e/setup.ts',
     ],
     plugins: {
       jest,
@@ -264,6 +266,7 @@ module.exports = [
   {
     ignores: [
       '**/*.d.ts',
+      '**/*.skip',
       'dist/',
       'backend/dist/',
       'build/',

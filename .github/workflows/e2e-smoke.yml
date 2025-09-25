@@ -1,0 +1,96 @@
+name: E2E Smoke Tests (Detox)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: 🏗 Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🏗 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗 Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🤖 Create Android emulator
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-34;google_apis;x86_64"
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force --name "Pixel_7_API_34" --device "pixel_7" --package "system-images;android-34;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+
+      - name: 🤖 Start Android emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd Pixel_7_API_34 -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
+          $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
+
+      - name: 🏗 Build app for E2E
+        run: |
+          npm run build:e2e:android
+        env:
+          EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
+          CI: true
+
+      - name: 🚀 Start backend server
+        run: |
+          cd backend
+          npm ci
+          npm start &
+          # Wait for server to be ready
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
+        env:
+          NODE_ENV: test
+          DATABASE_URL: file:./test.db
+          JWT_SECRET: test-secret-key
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: 🧪 Run Detox E2E tests
+        run: npm run test:e2e:android
+        env:
+          DETOX_CONFIGURATION: android.emu.debug
+          EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
+
+      - name: 📱 Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: detox-artifacts
+          path: |
+            artifacts/
+            e2e/screenshots/
+            e2e/videos/
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            e2e/test-results/
+            coverage/

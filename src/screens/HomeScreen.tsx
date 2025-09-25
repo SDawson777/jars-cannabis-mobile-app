@@ -176,7 +176,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="home-screen">
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
@@ -377,23 +377,35 @@ export default function HomeScreen() {
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
-        <Pressable onPress={() => navigation.navigate('HomeScreen')} style={styles.navItem}>
+        <Pressable
+          onPress={() => navigation.navigate('HomeScreen')}
+          style={styles.navItem}
+          testID="home-tab"
+        >
           <Home color={jarsPrimary} size={24} />
           <Text style={[styles.navLabel, { color: jarsPrimary }]}>Home</Text>
         </Pressable>
-        <Pressable onPress={() => navigation.navigate('ShopScreen')} style={styles.navItem}>
+        <Pressable
+          onPress={() => navigation.navigate('ShopScreen')}
+          style={styles.navItem}
+          testID="shop-tab"
+        >
           <Menu color="#666" size={24} />
           <Text style={styles.navLabel}>Shop</Text>
         </Pressable>
-        <Pressable onPress={() => navigation.navigate('Favorites')} style={styles.navItem}>
+        <Pressable
+          onPress={() => navigation.navigate('Favorites')}
+          style={styles.navItem}
+          testID="deals-tab"
+        >
           <Heart color="#666" size={24} />
           <Text style={styles.navLabel}>Deals</Text>
         </Pressable>
-        <Pressable onPress={openCart} style={styles.navItem}>
+        <Pressable onPress={openCart} style={styles.navItem} testID="cart-tab">
           <ShoppingCart color="#666" size={24} />
           <Text style={styles.navLabel}>Cart</Text>
         </Pressable>
-        <Pressable onPress={openProfile} style={styles.navItem}>
+        <Pressable onPress={openProfile} style={styles.navItem} testID="profile-tab">
           <User color="#666" size={24} />
           <Text style={styles.navLabel}>Profile</Text>
         </Pressable>

@@ -194,7 +194,7 @@ export default function ShopScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="shop-screen">
       <OfflineNotice />
       {weatherPrefHydrated && weatherPrefEnabled && weatherFilter && (
         <WeatherForYouRail
@@ -254,6 +254,7 @@ export default function ShopScreen() {
         </View>
       ) : (
         <FlatList
+          testID="product-list"
           data={products.filter((p: any) => {
             const matchesCategory = selectedCategory
               ? (p as any).category === selectedCategory
@@ -287,6 +288,7 @@ export default function ShopScreen() {
           }
           renderItem={({ item }) => (
             <Pressable
+              testID={`product-item-${(item as any).id ?? (item as any).__id ?? (item as any).slug}`}
               style={[
                 styles.card,
                 { borderColor: jarsPrimary, backgroundColor: '#FFF' },

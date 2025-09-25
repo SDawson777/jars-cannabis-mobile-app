@@ -151,7 +151,7 @@ export default function CartScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="cart-screen">
       {/* Header */}
       <View style={styles.header}>
         <Pressable
@@ -171,12 +171,13 @@ export default function CartScreen() {
 
       {/* Cart Items */}
       <FlatList
+        testID="cart-items"
         data={items}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View style={styles.card} testID={`cart-item-${item.id}`}>
             <Image
               source={{ uri: (item as any).image ?? (item as any).imageUrl }}
               style={styles.image}
@@ -235,7 +236,7 @@ export default function CartScreen() {
       </View>
 
       {/* Order Summary */}
-      <View style={[styles.summary, { backgroundColor: '#FFF' }]}>
+      <View style={[styles.summary, { backgroundColor: '#FFF' }]} testID="cart-total">
         <Text style={[styles.summaryTitle, { color: jarsPrimary }]}>Order Summary</Text>
         <View style={styles.line}>
           <Text style={styles.lineLabel}>Subtotal</Text>
@@ -257,6 +258,7 @@ export default function CartScreen() {
 
       {/* Proceed to Checkout */}
       <Pressable
+        testID="checkout-button"
         style={[styles.checkoutBtn, { backgroundColor: jarsPrimary }, glowStyle]}
         onPress={() => {
           hapticMedium();

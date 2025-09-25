@@ -223,98 +223,112 @@ function App() {
                         </View>
                       )}
                       <NavigationContainer>
-                        <Stack.Navigator
-                          initialRouteName={initialRoute}
-                          screenOptions={{ headerShown: false }}
-                        >
-                          <Stack.Screen name="SplashScreen" component={SplashScreenWrapper} />
-                          <Stack.Screen name="Onboarding" component={OnboardingPager} />
-                          <Stack.Screen name="AgeVerification" component={AgeVerificationScreen} />
-                          <Stack.Screen
-                            name="LoginSignUpDecision"
-                            component={LoginSignUpDecisionScreen}
-                          />
-                          <Stack.Screen name="Login" component={LoginScreen} />
-                          <Stack.Screen name="SignUp" component={SignUpScreen} />
-                          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-                          <Stack.Screen name="OTPScreen" component={OTPScreen} />
-                          <Stack.Screen name="StoreSelection" component={StoreSelectionScreen} />
-                          <Stack.Screen name="HomeScreen" component={HomeScreen} />
-                          <Stack.Screen name="ShopScreen" component={ShopScreen} />
-                          <Stack.Screen name="ProductList" component={ProductListScreen} />
-                          <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-                          <Stack.Screen name="CartScreen" component={CartScreen} />
-                          <Stack.Screen name="Checkout" component={CheckoutScreen} />
-                          <Stack.Screen
-                            name="OrderConfirmation"
-                            component={OrderConfirmationScreen}
-                          />
-                          <Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
-                          <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-                          <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
-                          <Stack.Screen name="StoreLocator" component={StoreLocatorScreen} />
-                          <Stack.Screen name="StoreLocatorMap" component={StoreLocatorMapScreen} />
-                          <Stack.Screen
-                            name="StoreLocatorList"
-                            component={StoreLocatorListScreen}
-                          />
-                          <Stack.Screen name="StoreDetails" component={StoreDetailsScreen} />
-                          <Stack.Screen name="Profile" component={ProfileScreen} />
-                          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-                          <Stack.Screen name="Favorites" component={FavoritesScreen} />
-                          <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
-                          <Stack.Screen name="AddAddress" component={AddAddressScreen} />
-                          <Stack.Screen name="EditAddress" component={EditAddressScreen} />
-                          <Stack.Screen name="SavedPayments" component={SavedPaymentsScreen} />
-                          <Stack.Screen name="AddPayment" component={AddPaymentScreen} />
-                          <Stack.Screen name="EditPayment" component={EditPaymentScreen} />
-                          <Stack.Screen
-                            name="LoyaltyProgram"
-                            component={LoyaltyProgramDetailsScreen}
-                          />
-                          <Stack.Screen
-                            name="Notifications"
-                            component={NotificationSettingsScreen}
-                          />
-                          <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
-                          <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
-                          <Stack.Screen
-                            name="LanguageSelection"
-                            component={LanguageSelectionScreen}
-                          />
-                          <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
-                          <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-                          <Stack.Screen
-                            name="EducationalGreenhouse"
-                            component={EducationalGreenhouseScreen}
-                          />
-                          <Stack.Screen name="ArticleList" component={ArticleListScreen} />
-                          <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
-                          <Stack.Screen name="TerpeneWheel" component={TerpeneWheelScreen} />
-                          <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
-                          <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
-                          <Stack.Screen
-                            name="DataTransparency"
-                            component={DataTransparencyScreen}
-                          />
-                          <Stack.Screen
-                            name="PrivacyIntelligence"
-                            component={PrivacyIntelligenceScreen}
-                          />
-                          <Stack.Screen
-                            name="AccessibilitySettings"
-                            component={AccessibilitySettingsScreen}
-                          />
-                          <Stack.Screen name="Awards" component={AwardsScreen} />
-                          <Stack.Screen name="Legal" component={LegalScreen} />
-                          <Stack.Screen name="MyJars" component={MyJarsScreen} />
-                          <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
-                          <Stack.Screen name="MyJarsInsights" component={MyJarsInsightsScreen} />
-                          <Stack.Screen
-                            name="EthicalAIDashboard"
-                            component={EthicalAIDashboardScreen}
-                          />
-                        </Stack.Navigator>
+                        <View testID="app-root" style={{ flex: 1 }}>
+                          <Stack.Navigator
+                            initialRouteName={initialRoute}
+                            screenOptions={{ headerShown: false }}
+                          >
+                            <Stack.Screen name="SplashScreen" component={SplashScreenWrapper} />
+                            <Stack.Screen name="Onboarding" component={OnboardingPager} />
+                            <Stack.Screen
+                              name="AgeVerification"
+                              component={AgeVerificationScreen}
+                            />
+                            <Stack.Screen
+                              name="LoginSignUpDecision"
+                              component={LoginSignUpDecisionScreen}
+                            />
+                            <Stack.Screen name="Login" component={LoginScreen} />
+                            <Stack.Screen name="SignUp" component={SignUpScreen} />
+                            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+                            <Stack.Screen name="OTPScreen" component={OTPScreen} />
+                            <Stack.Screen name="StoreSelection" component={StoreSelectionScreen} />
+                            <Stack.Screen name="HomeScreen" component={HomeScreen} />
+                            <Stack.Screen name="ShopScreen" component={ShopScreen} />
+                            <Stack.Screen name="ProductList" component={ProductListScreen} />
+                            <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+                            <Stack.Screen name="CartScreen" component={CartScreen} />
+                            <Stack.Screen name="Checkout" component={CheckoutScreen} />
+                            <Stack.Screen
+                              name="OrderConfirmation"
+                              component={OrderConfirmationScreen}
+                            />
+                            <Stack.Screen name="OrderTracking" component={OrderTrackingScreen} />
+                            <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+                            <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+                            <Stack.Screen name="StoreLocator" component={StoreLocatorScreen} />
+                            <Stack.Screen
+                              name="StoreLocatorMap"
+                              component={StoreLocatorMapScreen}
+                            />
+                            <Stack.Screen
+                              name="StoreLocatorList"
+                              component={StoreLocatorListScreen}
+                            />
+                            <Stack.Screen name="StoreDetails" component={StoreDetailsScreen} />
+                            <Stack.Screen name="Profile" component={ProfileScreen} />
+                            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+                            <Stack.Screen name="Favorites" component={FavoritesScreen} />
+                            <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
+                            <Stack.Screen name="AddAddress" component={AddAddressScreen} />
+                            <Stack.Screen name="EditAddress" component={EditAddressScreen} />
+                            <Stack.Screen name="SavedPayments" component={SavedPaymentsScreen} />
+                            <Stack.Screen name="AddPayment" component={AddPaymentScreen} />
+                            <Stack.Screen name="EditPayment" component={EditPaymentScreen} />
+                            <Stack.Screen
+                              name="LoyaltyProgram"
+                              component={LoyaltyProgramDetailsScreen}
+                            />
+                            <Stack.Screen
+                              name="Notifications"
+                              component={NotificationSettingsScreen}
+                            />
+                            <Stack.Screen
+                              name="PrivacySettings"
+                              component={PrivacySettingsScreen}
+                            />
+                            <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
+                            <Stack.Screen
+                              name="LanguageSelection"
+                              component={LanguageSelectionScreen}
+                            />
+                            <Stack.Screen name="HelpFAQ" component={HelpFAQScreen} />
+                            <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+                            <Stack.Screen
+                              name="EducationalGreenhouse"
+                              component={EducationalGreenhouseScreen}
+                            />
+                            <Stack.Screen name="ArticleList" component={ArticleListScreen} />
+                            <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+                            <Stack.Screen name="TerpeneWheel" component={TerpeneWheelScreen} />
+                            <Stack.Screen
+                              name="CommunityGarden"
+                              component={CommunityGardenScreen}
+                            />
+                            <Stack.Screen name="ConciergeChat" component={ConciergeChatScreen} />
+                            <Stack.Screen
+                              name="DataTransparency"
+                              component={DataTransparencyScreen}
+                            />
+                            <Stack.Screen
+                              name="PrivacyIntelligence"
+                              component={PrivacyIntelligenceScreen}
+                            />
+                            <Stack.Screen
+                              name="AccessibilitySettings"
+                              component={AccessibilitySettingsScreen}
+                            />
+                            <Stack.Screen name="Awards" component={AwardsScreen} />
+                            <Stack.Screen name="Legal" component={LegalScreen} />
+                            <Stack.Screen name="MyJars" component={MyJarsScreen} />
+                            <Stack.Screen name="JournalEntry" component={JournalEntryScreen} />
+                            <Stack.Screen name="MyJarsInsights" component={MyJarsInsightsScreen} />
+                            <Stack.Screen
+                              name="EthicalAIDashboard"
+                              component={EthicalAIDashboardScreen}
+                            />
+                          </Stack.Navigator>
+                        </View>
                       </NavigationContainer>
                     </QueryClientProvider>
                   </AuthProvider>

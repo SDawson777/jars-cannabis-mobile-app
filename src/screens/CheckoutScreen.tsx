@@ -209,7 +209,7 @@ export default function CheckoutScreen() {
     (step === 3 && !termsAccepted);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="checkout-screen">
       {/* Test helpers - keep labels and testIDs available for unit tests */}
       <Text style={{ display: 'none' }} accessibilityElementsHidden>
         Delivery Information
@@ -423,6 +423,7 @@ export default function CheckoutScreen() {
 
       {/* Next / Place Order */}
       <Pressable
+        testID="place-order-button"
         style={[
           styles.nextBtn,
           { backgroundColor: jarsPrimary },

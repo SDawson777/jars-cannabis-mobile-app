@@ -113,7 +113,10 @@ export default function ConciergeChatScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: bgColor }]}
+      testID="concierge-chat-screen"
+    >
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.select({ ios: 'padding', android: undefined })}
@@ -131,12 +134,14 @@ export default function ConciergeChatScreen() {
 
         {/* Messages */}
         <FlatList
+          testID="chat-messages"
           ref={listRef}
           data={messages}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.chatContainer}
           renderItem={({ item }) => (
             <View
+              testID={item.sender === 'bot' ? 'bot-message' : 'user-message'}
               style={[
                 styles.messageBubble,
                 item.sender === 'user'
@@ -186,6 +191,7 @@ export default function ConciergeChatScreen() {
           ]}
         >
           <TextInput
+            testID="message-input"
             style={[styles.input, { backgroundColor: jarsBackground, color: jarsPrimary }]}
             placeholder="Type your message..."
             placeholderTextColor={jarsSecondary}
@@ -196,6 +202,7 @@ export default function ConciergeChatScreen() {
             }}
           />
           <Pressable
+            testID="send-button"
             style={[
               styles.sendButton,
               { backgroundColor: jarsPrimary, opacity: loading ? 0.5 : 1 },

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { conciergeChat } from '../api/phase4Client';
+import { logEvent } from '../utils/analytics';
 
 interface Message {
   id: string;
@@ -95,6 +96,14 @@ export function useConcierge() {
 
         const res = await conciergeChat({ message: text.trim(), history });
 
+        // Track analytics event for concierge message sent
+        logEvent('concierge_message_sent', {
+          messageLength: text.trim().length,
+          hasHistory: history.length > 0,
+          historySize: history.length,
+          timestamp: Date.now(),
+        });
+
         // Replace optimistic message with actual response
         const botMsg: Message = {
           id: (Date.now() + 2).toString(),
@@ -109,6 +118,12 @@ export function useConcierge() {
 
         return { success: true };
       } catch (error: any) {
+        // Track analytics event for concierge message error
+        logEvent('concierge_message_error', {
+          messageLength: text.trim().length,
+          errorCode: error?.response?.status || error?.code || 'unknown',
+          timestamp: Date.now(),
+        });
         // Remove optimistic message and add error message
         const errorMsg: Message = {
           id: (Date.now() + 2).toString(),

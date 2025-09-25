@@ -29,6 +29,7 @@ import { paymentMethodsRouter } from './routes/paymentMethods';
 import { addressesRouter } from './routes/addresses';
 import { storesRouter } from './routes/stores';
 import { phase4Router } from './routes/phase4';
+import { analyticsRouter } from './routes/analytics';
 import { logger } from './utils/logger';
 
 const app = express();
@@ -60,6 +61,7 @@ const routers = [
   recommendationsRouter,
   dataRouter,
   conciergeRouter,
+  analyticsRouter,
   arRouter,
   homeRouter,
   phase4Router,

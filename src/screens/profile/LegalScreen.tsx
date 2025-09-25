@@ -99,7 +99,7 @@ export default function LegalScreen() {
   const showOutdatedBanner = offline;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="legal-screen">
       <View style={[styles.header, { borderBottomColor: jarsSecondary }]}>
         <Pressable
           onPress={() => {
@@ -117,6 +117,7 @@ export default function LegalScreen() {
         {LEGAL_LINKS.map(item => (
           <Pressable
             key={item.id}
+            testID={`legal-terms-link-${item.id}`}
             style={[styles.row, { borderBottomColor: jarsSecondary }]}
             onPress={() => {
               hapticLight();

@@ -121,7 +121,9 @@ export default function WeatherForYouRail({
     <View style={styles.container} testID="weather-for-you-rail">
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <Text style={styles.emoji}>{weatherEmoji}</Text>
+          <Text style={styles.emoji} testID="weather-condition">
+            {weatherEmoji}
+          </Text>
           <Text style={styles.title}>{title}</Text>
           {isSimulated && (
             <View style={styles.simulationBadge}>
@@ -168,6 +170,7 @@ export default function WeatherForYouRail({
           showsHorizontalScrollIndicator={false}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
+          testID="weather-recommendations"
         >
           {formattedProducts.map(product => (
             <ProductCardMini
