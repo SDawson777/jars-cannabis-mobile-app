@@ -137,6 +137,40 @@ PORT=3000
 DATABASE_URL=your-postgres-url
 ```
 
+### 🚨 Production environment variables
+
+When deploying the backend (for example on Railway/Render), the following variables are required and validated on startup. Missing or invalid values will cause the server to fail fast with a clear error message.
+
+Required in production:
+
+- JWT_SECRET: cryptographically strong secret, at least 32 characters (used to sign/verify JWTs)
+- DATABASE_URL: database connection string (e.g., Postgres)
+- FIREBASE_PROJECT_ID: Firebase project ID
+- FIREBASE_SERVICE_ACCOUNT_BASE64: base64-encoded Firebase service account JSON
+- STRIPE_SECRET_KEY: Stripe secret key
+- OPENAI_API_KEY: OpenAI API key (used by the concierge route)
+- OPENWEATHER_API_KEY: OpenWeather API key (used by weather integrations)
+
+Optional (defaults exist):
+
+- PORT: default 8080
+- CORS_ORIGIN: allowed origin(s) for CORS
+- WEATHER_API_URL: default https://api.openweathermap.org/data/2.5
+- WEATHER_CACHE_TTL_MS: default 300000 (5 minutes)
+- DEBUG_DIAG: '0' or '1'
+
+Generate a strong JWT secret (copy the output and set JWT_SECRET):
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+Or using OpenSSL:
+
+```bash
+openssl rand -base64 48
+```
+
 Frontend (`.env`):
 
 ```env
