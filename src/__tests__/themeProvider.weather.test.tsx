@@ -36,7 +36,7 @@ const TestComponent = () => {
     <>
       <Text testID="colorTemp">{colorTemp}</Text>
       <Text testID="weatherSource">{debugInfo.weatherSource}</Text>
-      <Text testID="simulationEnabled">{weatherSimulation.enabled ? 'true' : 'false'}</Text>
+      <Text testID="simulationEnabled">{weatherSimulation?.enabled ? 'true' : 'false'}</Text>
       <Text testID="loading">{loading ? 'true' : 'false'}</Text>
       {debugInfo.fallbackReason && <Text testID="fallbackReason">{debugInfo.fallbackReason}</Text>}
     </>

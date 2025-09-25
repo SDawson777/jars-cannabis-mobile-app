@@ -88,7 +88,7 @@ ${debugInfo.actualTemperature ? `Temperature: ${debugInfo.actualTemperature}°` 
 ${debugInfo.actualCondition ? `Condition: ${debugInfo.actualCondition}` : ''}
 ${debugInfo.cloudCover !== undefined ? `Cloud Cover: ${debugInfo.cloudCover}%` : ''}
 ${debugInfo.location ? `Location: ${debugInfo.location.lat.toFixed(4)}, ${debugInfo.location.lon.toFixed(4)}` : ''}
-${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation.condition} (enabled)` : 'Simulation: disabled'}
+${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation?.condition ?? 'unknown'} (enabled)` : 'Simulation: disabled'}
     `.trim();
 
     Alert.alert('Weather Debug Info', debugText, [{ text: 'OK' }]);
@@ -233,14 +233,14 @@ ${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation.condition}
             Simulate Weather
           </Text>
           <Switch
-            value={weatherSimulation.enabled}
+            value={!!weatherSimulation?.enabled}
             onValueChange={handleWeatherSimulationToggle}
             trackColor={{ false: '#E0E0E0', true: accentColor }}
             thumbColor="#FFFFFF"
           />
         </View>
 
-        {weatherSimulation.enabled && (
+        {weatherSimulation?.enabled && (
           <View style={styles.row}>
             <Text
               style={[
@@ -263,7 +263,7 @@ ${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation.condition}
               onPress={handleWeatherConditionChange}
             >
               <Text style={styles.conditionEmoji}>
-                {getConditionEmoji(weatherSimulation.condition)}
+                {getConditionEmoji(weatherSimulation?.condition ?? null)}
               </Text>
               <Text
                 style={[
@@ -274,7 +274,7 @@ ${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation.condition}
                   },
                 ]}
               >
-                {getConditionDisplayName(weatherSimulation.condition)}
+                {getConditionDisplayName(weatherSimulation?.condition ?? null)}
               </Text>
             </Pressable>
           </View>

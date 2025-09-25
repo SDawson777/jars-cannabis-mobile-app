@@ -69,7 +69,8 @@ export async function conciergeChat(payload: { message: string; history?: any[] 
 
 export async function getJournal() {
   const res = await phase4Client.get('/journal/entries');
-  return res.data;
+  // Ensure React Query never receives undefined
+  return res.data ?? [];
 }
 
 export async function addJournal(payload: {

@@ -12,37 +12,43 @@ interface AccessibilityLottieProps {
   testID?: string;
 }
 
-export const AccessibilityLottie: React.FC<AccessibilityLottieProps> = ({
-  autoPlay = true,
-  loop = true,
-  staticFrame = 0,
-  ...props
-}) => {
-  const { reduceMotion } = useAccessibilityStore();
-  const animationRef = useRef<any>(null);
+export const AccessibilityLottie = React.forwardRef<any, AccessibilityLottieProps>(
+  ({ autoPlay = true, loop = true, staticFrame = 0, ...props }, ref) => {
+    const { reduceMotion } = useAccessibilityStore();
+    const animationRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (reduceMotion && animationRef.current) {
-      // Stop animation and show static frame
-      animationRef.current.pause();
-      if (staticFrame !== undefined) {
-        animationRef.current.play(staticFrame, staticFrame);
+    useEffect(() => {
+      if (reduceMotion && animationRef.current) {
+        // Stop animation and show static frame
+        animationRef.current.pause();
+        if (staticFrame !== undefined) {
+          animationRef.current.play(staticFrame, staticFrame);
+        }
+      } else if (!reduceMotion && animationRef.current && autoPlay) {
+        // Resume animation
+        animationRef.current.play();
       }
-    } else if (!reduceMotion && animationRef.current && autoPlay) {
-      // Resume animation
-      animationRef.current.play();
-    }
-  }, [reduceMotion, autoPlay, staticFrame]);
+    }, [reduceMotion, autoPlay, staticFrame]);
 
-  return (
-    <LottieView
-      ref={animationRef}
-      autoPlay={!reduceMotion && autoPlay}
-      loop={!reduceMotion && loop}
-      {...props}
-    />
-  );
-};
+    // Merge forwarded ref with local ref used for controlling frames
+    const setRefs = (node: any) => {
+      (animationRef as any).current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref && typeof ref === 'object') (ref as any).current = node;
+    };
+
+    return (
+      <LottieView
+        ref={setRefs}
+        autoPlay={!reduceMotion && autoPlay}
+        loop={!reduceMotion && loop}
+        {...props}
+      />
+    );
+  }
+);
+
+AccessibilityLottie.displayName = 'AccessibilityLottie';
 
 interface AccessibilityAnimatedViewProps extends ViewProps {
   children: React.ReactNode;
@@ -50,20 +56,23 @@ interface AccessibilityAnimatedViewProps extends ViewProps {
   onAnimationComplete?: () => void;
 }
 
-export const AccessibilityAnimatedView: React.FC<AccessibilityAnimatedViewProps> = ({
-  children,
-  duration: _duration = 300,
-  onAnimationComplete,
-  ...viewProps
-}) => {
-  const { reduceMotion } = useAccessibilityStore();
+export const AccessibilityAnimatedView = React.forwardRef<View, AccessibilityAnimatedViewProps>(
+  ({ children, duration: _duration = 300, onAnimationComplete, ...viewProps }, ref) => {
+    const { reduceMotion } = useAccessibilityStore();
 
-  useEffect(() => {
-    if (reduceMotion && onAnimationComplete) {
-      // Skip animation, call completion immediately
-      onAnimationComplete();
-    }
-  }, [reduceMotion, onAnimationComplete]);
+    useEffect(() => {
+      if (reduceMotion && onAnimationComplete) {
+        // Skip animation, call completion immediately
+        onAnimationComplete();
+      }
+    }, [reduceMotion, onAnimationComplete]);
 
-  return <View {...viewProps}>{children}</View>;
-};
+    return (
+      <View ref={ref} {...viewProps}>
+        {children}
+      </View>
+    );
+  }
+);
+
+AccessibilityAnimatedView.displayName = 'AccessibilityAnimatedView';

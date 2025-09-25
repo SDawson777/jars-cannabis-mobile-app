@@ -115,7 +115,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     baseTemp: ColorTemp,
     baseInfo: DebugInfo
   ): { temp: ColorTemp; info: DebugInfo } => {
-    if (!weatherSimulation.enabled || !weatherSimulation.condition) {
+    if (!weatherSimulation?.enabled || !weatherSimulation.condition) {
       return { temp: baseTemp, info: baseInfo };
     }
 

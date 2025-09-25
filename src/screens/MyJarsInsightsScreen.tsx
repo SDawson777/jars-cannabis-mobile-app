@@ -8,7 +8,11 @@ import { ThemeContext } from '../context/ThemeContext';
 
 export default function MyJarsInsightsScreen() {
   const { jarsPrimary } = React.useContext(ThemeContext);
-  const { data, isLoading } = useQuery({ queryKey: ['journal'], queryFn: getJournal });
+  const { data, isLoading } = useQuery({
+    queryKey: ['journal'],
+    // Always return a defined value, even if the API/mocks return undefined
+    queryFn: async () => (await getJournal()) ?? [],
+  });
 
   if (isLoading) {
     return (

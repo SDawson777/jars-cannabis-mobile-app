@@ -5,7 +5,7 @@ export function useWeatherCondition() {
   const { debugInfo, weatherSimulation } = useContext(ThemeContext);
 
   // If simulation is enabled, use simulated condition
-  if (weatherSimulation.enabled && weatherSimulation.condition) {
+  if (weatherSimulation?.enabled && weatherSimulation?.condition) {
     return {
       condition: weatherSimulation.condition,
       isSimulated: true,
