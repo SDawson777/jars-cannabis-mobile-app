@@ -43,11 +43,21 @@ jobs:
 
       - name: 🤖 Create Android emulator
         run: |
+          # Verify Android SDK is properly installed
+          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            echo "Android SDK tools not found. Ensure android-actions/setup-android@v3 succeeded."
+            exit 1
+          fi
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-34;google_apis;x86_64"
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force --name "Pixel_7_API_34" --device "pixel_7" --package "system-images;android-34;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
 
       - name: 🤖 Start Android emulator
         run: |
+          # Verify emulator binary exists
+          if [ ! -f "$ANDROID_HOME/emulator/emulator" ]; then
+            echo "Android emulator binary not found at $ANDROID_HOME/emulator/emulator"
+            exit 1
+          fi
           $ANDROID_HOME/emulator/emulator -avd Pixel_7_API_34 -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
           $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
 

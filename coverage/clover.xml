@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1758816597552" clover="3.2.0">
-  <project timestamp="1758816597553" name="All files">
-    <metrics statements="3182" coveredstatements="1195" conditionals="2050" coveredconditionals="721" methods="947" coveredmethods="298" elements="6179" coveredelements="2214" complexity="0" loc="3182" ncloc="3182" packages="26" files="213" classes="213"/>
+<coverage generated="1758819825344" clover="3.2.0">
+  <project timestamp="1758819825344" name="All files">
+    <metrics statements="3182" coveredstatements="1194" conditionals="2050" coveredconditionals="719" methods="947" coveredmethods="298" elements="6179" coveredelements="2211" complexity="0" loc="3182" ncloc="3182" packages="26" files="213" classes="213"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="declarations.d.ts" path="/workspaces/jars-cannabis-mobile-app/src/@types/declarations.d.ts">
@@ -871,7 +871,7 @@
       </file>
     </package>
     <package name="hooks">
-      <metrics statements="584" coveredstatements="352" conditionals="399" coveredconditionals="209" methods="121" coveredmethods="66"/>
+      <metrics statements="584" coveredstatements="351" conditionals="399" coveredconditionals="207" methods="121" coveredmethods="66"/>
       <file name="useArticleBySlug.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/useArticleBySlug.ts">
         <metrics statements="14" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
@@ -1448,7 +1448,7 @@
         <line num="26" count="8" type="stmt"/>
       </file>
       <file name="useWeatherCondition.ts" path="/workspaces/jars-cannabis-mobile-app/src/hooks/useWeatherCondition.ts">
-        <metrics statements="15" coveredstatements="10" conditionals="20" coveredconditionals="12" methods="1" coveredmethods="1"/>
+        <metrics statements="15" coveredstatements="9" conditionals="20" coveredconditionals="10" methods="1" coveredmethods="1"/>
         <line num="5" count="3" type="stmt"/>
         <line num="8" count="3" type="cond" truecount="2" falsecount="2"/>
         <line num="9" count="0" type="stmt"/>
@@ -1458,10 +1458,10 @@
         <line num="27" count="3" type="stmt"/>
         <line num="29" count="3" type="cond" truecount="3" falsecount="1"/>
         <line num="30" count="0" type="stmt"/>
-        <line num="31" count="3" type="cond" truecount="2" falsecount="2"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="33" count="3" type="cond" truecount="3" falsecount="1"/>
-        <line num="34" count="3" type="stmt"/>
+        <line num="31" count="3" type="cond" truecount="3" falsecount="1"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="33" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="34" count="0" type="stmt"/>
         <line num="36" count="0" type="stmt"/>
         <line num="39" count="3" type="stmt"/>
       </file>
