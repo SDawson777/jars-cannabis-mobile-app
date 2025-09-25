@@ -52,10 +52,10 @@ jobs:
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
 
-          # Create AVD with proper parameters - use generic device instead of pixel_7 which may not exist
+          # Create AVD with proper parameters - use pixel_xl device profile for better compatibility
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
             --force \
-            --name "Pixel_7_API_34" \
+            --name "Pixel_XL_API_34" \
             --package "system-images;android-34;google_apis;x86_64" \
             --tag "google_apis" \
             --abi "x86_64" \
@@ -71,7 +71,7 @@ jobs:
             echo "Android emulator binary not found at $ANDROID_HOME/emulator/emulator"
             exit 1
           fi
-          $ANDROID_HOME/emulator/emulator -avd Pixel_7_API_34 -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
+          $ANDROID_HOME/emulator/emulator -avd Pixel_XL_API_34 -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
           $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
 
       - name: 🏗 Build app for E2E
