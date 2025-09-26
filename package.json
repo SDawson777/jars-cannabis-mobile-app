@@ -8,8 +8,6 @@
     "demo:web": "cross-env VITE_API_BASE_URL=http://localhost:8080/api/v1 npm --prefix apps/demo-web run dev",
     "clean:modules": "rm -rf node_modules package-lock.json && npm cache verify",
     "fix:deps": "bash scripts/fix-dependencies.sh",
-    "install:all": "bash scripts/install-dependencies.sh",
-    "upgrade:expo-web": "bash scripts/upgrade-expo-web.sh",
     "prepare": "sh -c 'if [ -n \"$CI\" ]; then exit 0; fi; if [ -x ./node_modules/.bin/husky ]; then ./node_modules/.bin/husky install; fi'",
     "start": "expo start",
     "android": "expo start --android",
@@ -22,7 +20,7 @@
     "start:backend:local": "npm --prefix backend run start:local",
     "build": "npm run build:backend",
     "precommit": "npm run lint && npm run typecheck && npm run test:ci",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --cache",
+    "lint": "eslint .",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --cache --fix",
     "format": "prettier --write .",
     "format:ci": "prettier --check .",
@@ -38,7 +36,6 @@
     "dev:expo": "expo start",
     "dev:server": "nodemon src/index.ts",
     "dev:emulators": "firebase emulators:start --only firestore,functions,auth",
-    "typecheck": "tsc --noEmit",
     "test": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs",
     "test:watch": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --watch",
     "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --coverage --ci --watchAll=false",
@@ -51,7 +48,11 @@
     "smoke": "newman run qa/collection.json -e qa/env.staging.json --reporters cli,junit --reporter-junit-export ./reports/newman-smoke.xml",
     "format:check": "prettier --check .",
     "postinstall": "node scripts/make-splash.js",
-    "align-deps": "bash scripts/align-deps.sh"
+    "align-deps": "bash scripts/align-deps.sh",
+    "install:all": "npm ci && (cd backend && npm ci)",
+    "typecheck": "tsc -p tsconfig.json",
+    "backend:lint": "npm run lint --prefix backend",
+    "backend:typecheck": "npm run typecheck --prefix backend"
   },
   "lint-staged": {
     "{*,src/**,!src/terpene_wheel/snippets/**}/*.{js,jsx,ts,tsx}": [
