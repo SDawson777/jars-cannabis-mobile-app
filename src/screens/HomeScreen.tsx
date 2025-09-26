@@ -110,7 +110,7 @@ export default function HomeScreen() {
     let mounted = true;
     phase4Client
       .get<Category[]>('/home/categories')
-      .then(res => {
+      .then((res: { data: Category[] }) => {
         if (mounted) setCategories(res.data || []);
       })
       .catch(() => {
@@ -128,7 +128,7 @@ export default function HomeScreen() {
     let mounted = true;
     phase4Client
       .get<FeaturedProduct[]>('/home/featured')
-      .then(res => {
+      .then((res: { data: FeaturedProduct[] }) => {
         if (mounted) setFeatured(res.data || []);
       })
       .catch(() => {
@@ -146,7 +146,7 @@ export default function HomeScreen() {
     let mounted = true;
     phase4Client
       .get<Way[]>('/home/ways')
-      .then(res => {
+      .then((res: { data: Way[] }) => {
         if (mounted) setWays(res.data || []);
       })
       .catch(() => {

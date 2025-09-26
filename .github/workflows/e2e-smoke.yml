@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: '--max-old-space-size=4096'
 
     steps:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: 🔍 Preflight - Verify lockfiles exist
         run: |
           test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)

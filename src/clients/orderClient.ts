@@ -9,18 +9,18 @@ const BASE_URL = API_BASE_URL;
 function createOrderClient(): AxiosInstance {
   const client = axios.create({
     baseURL: BASE_URL,
-    headers: { 'Content-Type': 'application/json' } as any,
+    headers: { 'Content-Type': 'application/json' },
   });
 
   client.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
-      const token = await getAuthToken();
+      const token: string | null = await getAuthToken();
       if (token && config.headers) {
-        (config.headers as any).Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
     },
-    error => Promise.reject(error)
+    (error: unknown) => Promise.reject(error)
   );
 
   return client;
@@ -29,13 +29,21 @@ function createOrderClient(): AxiosInstance {
 export const orderClient = createOrderClient();
 
 export async function fetchOrders(page = 1): Promise<OrdersResponse> {
-  const res = await orderClient.get('/orders', { params: { page } });
-  // Backend returns { orders, pagination: { page, limit, nextPage } }
-  // Normalize to OrdersResponse: { orders, nextPage }
-  const d: any = res.data ?? {};
-  const orders = d.orders ?? d.data?.orders ?? [];
-  const nextPage = d.pagination?.nextPage ?? d.data?.pagination?.nextPage ?? undefined;
-  return { orders, nextPage };
+  interface RawOrdersResponse {
+    orders?: Order[];
+    pagination?: { page?: number; limit?: number; nextPage?: number };
+    data?: {
+      orders?: Order[];
+      pagination?: { page?: number; limit?: number; nextPage?: number };
+    };
+  }
+  const res = await orderClient.get<RawOrdersResponse>('/orders', { params: { page } });
+  const payload = res.data || {};
+  const root = payload.data ?? payload;
+  return {
+    orders: root.orders ?? [],
+    nextPage: root.pagination?.nextPage,
+  };
 }
 
 // Payload contract for creating an order. This mirrors backend expectations in
@@ -56,7 +64,10 @@ export interface CreateOrderPayload {
 }
 
 export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
-  const res = await orderClient.post('/orders', payload);
-  // API responds with { order }
-  return (res.data?.order || res.data?.data?.order) as Order;
+  interface RawCreateOrderResponse {
+    order?: Order;
+    data?: { order?: Order };
+  }
+  const res = await orderClient.post<RawCreateOrderResponse>('/orders', payload);
+  return res.data.order ?? (res.data.data?.order as Order);
 }

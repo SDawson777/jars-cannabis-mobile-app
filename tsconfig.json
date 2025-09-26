@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "esnext",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext"],
     "jsx": "react-jsx",
     "allowJs": true,
     "noEmit": true,
@@ -19,7 +19,7 @@
       "react-native/jest/*": ["tests/__mocks__/reactNativeMock.js"]
     }
   },
-  "include": ["src", "app", "**/*.ts", "**/*.tsx", "e2e/global.d.ts"],
+  "include": ["src", "app", "**/*.ts", "**/*.tsx", "e2e/global.d.ts", "src/@types"],
   "exclude": [
     "node_modules",
     "babel.config.js",

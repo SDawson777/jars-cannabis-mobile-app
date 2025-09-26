@@ -24,12 +24,39 @@ interface CartState {
   clearCart: () => void;
 }
 
+interface _AddItemFn {
+  (_item: CartItem): void;
+}
+
+interface _UpdateQuantityFn {
+  (_id: string, _quantity: number): void;
+}
+
+interface _RemoveItemFn {
+  (_id: string): void;
+}
+
+interface _SetItemsFn {
+  (_items: CartItem[]): void;
+}
+
+interface _SetAppliedCouponFn {
+  (_coupon?: string): void;
+}
+
+interface _ClearCartFn {
+  (): void;
+}
+
 export const useCartStore = create<CartState>()(
-  persist(
-    (set, get) => ({
+  persist<CartState>(
+    (
+      set: (partial: Partial<CartState>, replace?: boolean | undefined) => void,
+      get: () => CartState
+    ): CartState => ({
       items: [],
       appliedCoupon: undefined,
-      addItem: _item => {
+      addItem: (_item: CartItem) => {
         const existing = get().items.find(
           i =>
             (i.id === _item.id || i.productId === _item.productId) &&
@@ -50,19 +77,19 @@ export const useCartStore = create<CartState>()(
           });
         }
       },
-      updateQuantity: (_id, _quantity) =>
+      updateQuantity: (_id: string, _quantity: number) =>
         set({ items: get().items.map(i => (i.id === _id ? { ...i, quantity: _quantity } : i)) }),
-      removeItem: _id => set({ items: get().items.filter(i => i.id !== _id) }),
-      setItems: _items =>
+      removeItem: (_id: string) => set({ items: get().items.filter(i => i.id !== _id) }),
+      setItems: (_items: CartItem[]) =>
         set({ items: _items.map(i => ({ ...i, productId: i.productId ?? i.id })) }),
-      setAppliedCoupon: _coupon => set({ appliedCoupon: _coupon }),
+      setAppliedCoupon: (_coupon?: string) => set({ appliedCoupon: _coupon }),
       clearCart: () => set({ items: [], appliedCoupon: undefined }),
     }),
     {
       name: 'cartStore',
       version: 1,
       storage: createJSONStorage(() => AsyncStorage),
-      migrate: persisted => persisted as CartState,
+      migrate: (persisted: unknown) => persisted as CartState,
     }
   )
 );

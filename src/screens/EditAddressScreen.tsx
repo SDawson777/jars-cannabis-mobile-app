@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import type { Resolver } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -41,7 +40,8 @@ export default function EditAddressScreen() {
   // Address object is expected to already use `state`.
   const normalizedAddr = addr;
   const { control, handleSubmit } = useForm<AddressFormValues>({
-    resolver: yupResolver(addressSchema) as unknown as Resolver<AddressFormValues, any>,
+    // cast to any to avoid missing type declarations if @types/react-hook-form not installed
+    resolver: yupResolver(addressSchema) as any,
     defaultValues: {
       fullName: normalizedAddr.fullName,
       phone: normalizedAddr.phone,
@@ -112,25 +112,35 @@ export default function EditAddressScreen() {
             <Controller
               control={control}
               name={name as keyof AddressFormValues}
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                <>
-                  <TextInput
-                    style={[styles.input, { borderColor: jarsSecondary }]}
-                    value={(value ?? '') as string}
-                    onBlur={onBlur}
-                    onChangeText={t => {
-                      hapticLight();
-                      onChange(t);
-                    }}
-                    placeholder={placeholder}
-                    placeholderTextColor={jarsSecondary}
-                    keyboardType={keyboard as any}
-                    accessibilityLabel={placeholder}
-                    accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
-                  />
-                  {error && <Text style={styles.error}>{error.message}</Text>}
-                </>
-              )}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: { onChange: (value: string) => void; onBlur: () => void; value: string };
+                fieldState: { error?: { message?: string } };
+              }) => {
+                const { onChange, onBlur, value } = field; // keeps type inference intact
+                const { error } = fieldState;
+                return (
+                  <>
+                    <TextInput
+                      style={[styles.input, { borderColor: jarsSecondary }]}
+                      value={(value ?? '') as string}
+                      onBlur={onBlur}
+                      onChangeText={t => {
+                        hapticLight();
+                        onChange(t);
+                      }}
+                      placeholder={placeholder}
+                      placeholderTextColor={jarsSecondary}
+                      keyboardType={keyboard as any}
+                      accessibilityLabel={placeholder}
+                      accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
+                    />
+                    {error && <Text style={styles.error}>{error.message}</Text>}
+                  </>
+                );
+              }}
             />
           </View>
         ))}

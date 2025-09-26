@@ -7,15 +7,15 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     env:
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: '--max-old-space-size=4096'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: 🔍 Preflight - Verify lockfiles exist
         run: |
           test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
           echo "✅ Root lockfile present"
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'

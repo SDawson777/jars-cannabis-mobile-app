@@ -57,7 +57,7 @@ export default function LegalScreen() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const { data, isLoading, isError } = useLegal();
   const { width } = useWindowDimensions();
-  const preferredStore = usePreferredStore(state => state.preferredStore);
+  const preferredStore = usePreferredStore((state: any) => state.preferredStore);
   const userState = preferredStore?.state?.toUpperCase() || null;
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;

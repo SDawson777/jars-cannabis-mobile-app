@@ -139,6 +139,7 @@
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.9.3",
+    "@babel/core": "^7.28.4",
     "@babel/plugin-transform-async-generator-functions": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
@@ -147,6 +148,7 @@
     "@babel/plugin-transform-optional-catch-binding": "^7.27.1",
     "@babel/plugin-transform-optional-chaining": "^7.27.1",
     "@babel/preset-flow": "^7.27.1",
+    "@babel/types": "^7.28.4",
     "@eslint/css": "^0.11.1",
     "@eslint/js": "^9.36.0",
     "@eslint/json": "^0.13.2",
@@ -204,7 +206,7 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": "20.11.1",
+    "node": "20.19.4",
     "npm": ">=9"
   },
   "expo": {

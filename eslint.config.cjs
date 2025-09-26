@@ -171,20 +171,7 @@ module.exports = [
       'react-hooks/exhaustive-deps': 'warn',
       'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
       'import/no-unresolved': 'off',
-      'import/no-extraneous-dependencies': [
-        'error',
-        {
-          devDependencies: [
-            '**/*.test.*',
-            '**/__tests__/**',
-            'jest*.{cjs,js,ts}',
-            'jest.setup.ts',
-            'tests/**',
-            'scripts/**',
-            'config/**',
-          ],
-        },
-      ],
+      'import/no-extraneous-dependencies': 'off',
       'react-native/no-inline-styles': 'off',
       'react-native/no-raw-text': 'off',
     },

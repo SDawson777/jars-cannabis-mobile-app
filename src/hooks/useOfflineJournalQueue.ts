@@ -76,30 +76,7 @@ export function useOfflineJournalQueue() {
     });
 
     return () => {
-      if (typeof subscription === 'function') {
-        try {
-          subscription();
-        } catch {
-          // no-op
-        }
-        return;
-      }
-      const subAny = subscription as any;
-      if (subAny && typeof subAny.unsubscribe === 'function') {
-        try {
-          subAny.unsubscribe();
-        } catch {
-          // no-op
-        }
-        return;
-      }
-      if (subAny && typeof subAny.remove === 'function') {
-        try {
-          subAny.remove();
-        } catch {
-          // no-op
-        }
-      }
+      subscription.remove();
     };
   }, []);
 

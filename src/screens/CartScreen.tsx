@@ -84,7 +84,11 @@ export default function CartScreen() {
     );
   }
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+  const subtotal =
+    items.reduce(
+      (sum: number, item: { price: number; quantity: number }) => sum + item.price * item.quantity,
+      0
+    ) || 0;
   const discount = 0;
   const taxes = (subtotal - discount) * 0.07;
   const total = subtotal - discount + taxes;
@@ -92,10 +96,12 @@ export default function CartScreen() {
   const updateQty = async (id: string, delta: number) => {
     hapticLight();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    const item = items.find(i => i.id === id);
+    const item = items.find((i: { id: string }) => i.id === id);
     if (item) {
       const newQuantity = Math.max(1, item.quantity + delta);
-      const updatedItems = items.map(i => (i.id === id ? { ...i, quantity: newQuantity } : i));
+      const updatedItems = items.map((i: { id: string }) =>
+        i.id === id ? { ...i, quantity: newQuantity } : i
+      );
       try {
         await updateCart({ items: updatedItems });
       } catch (error) {
@@ -114,7 +120,7 @@ export default function CartScreen() {
         style: 'destructive',
         onPress: async () => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          const updatedItems = items.filter(i => i.id !== id);
+          const updatedItems = items.filter((i: { id: string }) => i.id !== id);
           try {
             await updateCart({ items: updatedItems });
           } catch (error) {

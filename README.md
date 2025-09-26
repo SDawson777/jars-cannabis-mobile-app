@@ -73,6 +73,7 @@ This project uses a monorepo structure with dual lockfile management:
 - **npm-only Workflow**: Configured for Expo GitHub Action with `packager: npm`
 
 **Installation Commands:**
+
 ```bash
 # Install all dependencies (root + backend)
 npm run install:all
@@ -252,12 +253,14 @@ when you want to use the terpene wheel module.
 ### GitHub Actions Workflows
 
 **Main CI (`ci.yml`)**
+
 - Triggers: Push to main, Pull Requests
 - Node.js 20.11.1 with 4GB memory allocation
 - Runs: lint → format → typecheck → tests → backend tests → audit
 - Caches: npm cache, backend node_modules
 
 **E2E Smoke Tests (`e2e-smoke.yml`)**
+
 - Android emulator with API 34 (Pixel XL)
 - EAS Build integration for app compilation
 - Comprehensive Android SDK caching
@@ -265,15 +268,18 @@ when you want to use the terpene wheel module.
 - Detox test suite: Auth → Cart → Checkout → Concierge → Awards → Weather → Legal
 
 **Lint & Format (`lint-and-format.yml`)**
+
 - Fast formatting and linting checks
 - Fails build on format violations
 
 **Newman Smoke Tests (`newman-smoke.yml`)**
+
 - API endpoint testing with Postman collections
 
 ### Memory Optimization
 
 All workflows include `NODE_OPTIONS: "--max-old-space-size=4096"` to prevent memory exhaustion during:
+
 - Dependency installation (`npm ci --legacy-peer-deps`)
 - ESLint execution with large codebases
 - TypeScript compilation
@@ -288,6 +294,7 @@ All workflows include `NODE_OPTIONS: "--max-old-space-size=4096"` to prevent mem
 ### Build Artifacts
 
 E2E tests upload artifacts on failure:
+
 - Detox screenshots and videos
 - Test execution logs
 - Device/emulator state dumps
@@ -297,20 +304,23 @@ E2E tests upload artifacts on failure:
 ### Run Detox E2E Tests Locally
 
 1. **Setup Android Emulator**
+
    ```bash
    # Create AVD (if not exists)
    avdmanager create avd --force --name "Pixel_XL_API_34" --package "system-images;android-34;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
-   
+
    # Start emulator
    emulator -avd Pixel_XL_API_34 -no-snapshot -no-window
    ```
 
 2. **Build E2E App**
+
    ```bash
    npm run build:e2e:android
    ```
 
 3. **Start Backend (separate terminal)**
+
    ```bash
    cd backend
    NODE_ENV=test npm start
@@ -333,7 +343,7 @@ npm run clean:modules
 # Start development servers
 npm run start                    # Expo dev server
 npm run android                 # Android-specific
-npm run ios                     # iOS-specific  
+npm run ios                     # iOS-specific
 npm run demo:web               # Web demo
 npm run start:backend          # Express API server
 ```

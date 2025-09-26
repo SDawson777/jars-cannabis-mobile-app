@@ -10,21 +10,21 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     env:
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: '--max-old-space-size=4096'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: 🔍 Preflight - Verify lockfiles exist
         run: |
           test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
           test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
           echo "✅ All required lockfiles present"
-      
+
       - uses: actions/setup-node@v4
-        with: 
+        with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      
+
       - name: 📦 Cache npm (root)
         uses: actions/cache@v4
         with:
@@ -32,7 +32,7 @@ jobs:
           key: npm-cache-root-${{ hashFiles('npm-shrinkwrap.json') }}
           restore-keys: |
             npm-cache-root-
-      
+
       - name: 📦 Cache npm (backend)
         uses: actions/cache@v4
         with:
@@ -40,7 +40,7 @@ jobs:
           key: npm-cache-backend-${{ hashFiles('backend/package-lock.json') }}
           restore-keys: |
             npm-cache-backend-
-      
+
       - name: 🔧 Install deps (root)
         run: npm ci --legacy-peer-deps
       - name: Lint
@@ -51,19 +51,19 @@ jobs:
         run: npm run typecheck
       - name: Unit & Integration Tests (frontend)
         run: npm run test:ci
-      
+
       - name: 🔧 Install deps (backend)
         run: npm ci --legacy-peer-deps
         working-directory: backend
-      
+
       - name: Backend Lint
         run: npm run lint
         working-directory: backend
-      
+
       - name: Backend Typecheck
         run: npm run typecheck
         working-directory: backend
-        
+
       - name: Backend Tests
         run: npm run test:ci
         working-directory: backend

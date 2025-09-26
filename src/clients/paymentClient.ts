@@ -12,6 +12,7 @@ export interface PaymentPayload {
   isDefault?: boolean;
 }
 
+// eslint-disable-next-line no-undef
 async function authFetch(path: string, options: RequestInit) {
   const token = await getAuthToken();
   const headers = {

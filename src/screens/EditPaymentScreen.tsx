@@ -31,7 +31,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 type EditPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'EditPayment'>;
 type EditPaymentRouteProp = RouteProp<RootStackParamList, 'EditPayment'>;
-type FormData = {
+type EditPaymentFormData = {
   holderName: string;
   cardBrand: string;
   cardLast4: string;
@@ -40,7 +40,7 @@ type FormData = {
 };
 
 type FieldDescriptor = {
-  name: keyof FormData;
+  name: keyof EditPaymentFormData;
   label: string;
   keyboard: any;
   secure: boolean;
@@ -62,11 +62,7 @@ export default function EditPaymentScreen() {
 
   const pm = route.params?.payment || {};
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm<FormData>({
+  const form = useForm<EditPaymentFormData>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
@@ -77,6 +73,9 @@ export default function EditPaymentScreen() {
       isDefault: !!pm.isDefault,
     },
   });
+
+  const { control, handleSubmit } = form;
+  const { errors, isValid, isSubmitting } = (form as any).formState;
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -110,7 +109,7 @@ export default function EditPaymentScreen() {
     navigation.goBack();
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: EditPaymentFormData) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
@@ -178,7 +177,11 @@ export default function EditPaymentScreen() {
               <Controller
                 control={control}
                 name={f.name}
-                render={({ field: { value, onChange } }) => (
+                render={({
+                  field: { value, onChange },
+                }: {
+                  field: { value: boolean; onChange: (value: boolean) => void };
+                }) => (
                   <Pressable
                     onPress={() => onChange(!value)}
                     style={[
@@ -200,7 +203,11 @@ export default function EditPaymentScreen() {
               <Controller
                 control={control}
                 name={f.name}
-                render={({ field: { onChange, onBlur, value } }) => (
+                render={({
+                  field: { onChange, onBlur, value },
+                }: {
+                  field: { onChange: (value: string) => void; onBlur: () => void; value: string };
+                }) => (
                   <TextInput
                     style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
                     placeholder={f.label}
@@ -209,7 +216,7 @@ export default function EditPaymentScreen() {
                     secureTextEntry={f.secure}
                     onBlur={onBlur}
                     value={value as string}
-                    onChangeText={t => {
+                    onChangeText={(t: string) => {
                       hapticLight();
                       onChange(t);
                     }}
@@ -219,9 +226,9 @@ export default function EditPaymentScreen() {
                 )}
               />
             )}
-            {errors[f.name as keyof FormData] && (
+            {errors[f.name as keyof EditPaymentFormData] && (
               <Text style={styles.error} accessibilityRole="alert">
-                {errors[f.name as keyof FormData]?.message}
+                {errors[f.name as keyof EditPaymentFormData]?.message}
               </Text>
             )}
           </View>
