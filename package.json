@@ -2,6 +2,7 @@
   "name": "jars-cannabis-mobile-app",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.8.2",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "demo:web": "cross-env VITE_API_BASE_URL=http://localhost:8080/api/v1 npm --prefix apps/demo-web run dev",
@@ -199,7 +200,7 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=18 <=22",
+    "node": "20.11.1",
     "npm": ">=9"
   },
   "expo": {
