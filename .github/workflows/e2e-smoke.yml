@@ -17,6 +17,12 @@ jobs:
     steps:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v4
+      
+      - name: 🔍 Preflight - Verify lockfiles exist
+        run: |
+          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
+          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+          echo "✅ All required lockfiles present"
 
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
@@ -50,13 +56,16 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: 🏗 Setup Expo
+      - name: 🔐 Verify Expo token
+        run: test -n "${{ secrets.EXPO_TOKEN }}" || (echo "❌ Missing EXPO_TOKEN secret"; exit 1)
+
+      - name: 🏗 Setup Expo & EAS (npm-only)
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
           packager: npm
-          token: ${{ secrets.EXPO_TOKEN || '' }}
-        continue-on-error: true
 
       - name: 🤖 Create Android emulator
         env:
@@ -110,7 +119,10 @@ jobs:
           $ANDROID_HOME/emulator/emulator -avd "$AVD_NAME" -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
           $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
 
-      - name: 🏗 Build app for E2E
+      - name: � Expo Web export test
+        run: npx expo export --platform web --non-interactive
+
+      - name: �🏗 Build app for E2E
         run: |
           npm run build:e2e:android
         env:
@@ -119,11 +131,11 @@ jobs:
 
       - name: 🚀 Start backend server
         run: |
-          cd backend
           npm ci --legacy-peer-deps
           npm start &
           # Wait for server to be ready
           timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
+        working-directory: backend
         env:
           NODE_ENV: test
           DATABASE_URL: file:./test.db

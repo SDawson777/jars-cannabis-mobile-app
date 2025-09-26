@@ -13,18 +13,36 @@ jobs:
       NODE_OPTIONS: "--max-old-space-size=4096"
     steps:
       - uses: actions/checkout@v4
+      
+      - name: 🔍 Preflight - Verify lockfiles exist
+        run: |
+          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
+          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+          echo "✅ All required lockfiles present"
+      
       - uses: actions/setup-node@v4
         with: 
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - name: Install root deps (legacy peer deps for RN/@types/react mismatch)
-        run: |
-          # Try npm ci first, fall back to npm install if needed
-          if [ -f package-lock.json ]; then
-            npm ci --legacy-peer-deps --no-audit || npm install --legacy-peer-deps --no-audit
-          else
-            npm install --legacy-peer-deps --no-audit
-          fi
+      
+      - name: 📦 Cache npm (root)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache-root-${{ hashFiles('npm-shrinkwrap.json') }}
+          restore-keys: |
+            npm-cache-root-
+      
+      - name: 📦 Cache npm (backend)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache-backend-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            npm-cache-backend-
+      
+      - name: 🔧 Install deps (root)
+        run: npm ci --legacy-peer-deps
       - name: Lint
         run: npm run lint
       - name: Format Check
@@ -33,26 +51,22 @@ jobs:
         run: npm run typecheck
       - name: Unit & Integration Tests (frontend)
         run: npm run test:ci
-      - name: Cache backend node_modules
-        uses: actions/cache@v4
-        with:
-          path: backend/node_modules
-          key: backend-node-modules-${{ runner.os }}-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            backend-node-modules-${{ runner.os }}-
       
-      - name: Backend deps (legacy peer deps)
-        run: |
-          # Try npm ci first, fall back to npm install if needed
-          if [ -f backend/package-lock.json ]; then
-            npm --prefix backend ci --legacy-peer-deps --no-audit || npm --prefix backend install --legacy-peer-deps --no-audit
-          else
-            npm --prefix backend install --legacy-peer-deps --no-audit
-          fi
+      - name: 🔧 Install deps (backend)
+        run: npm ci --legacy-peer-deps
+        working-directory: backend
+      
+      - name: Backend Lint
+        run: npm run lint
+        working-directory: backend
+      
       - name: Backend Typecheck
-        run: npm --prefix backend run typecheck || echo "skip if not configured"
+        run: npm run typecheck
+        working-directory: backend
+        
       - name: Backend Tests
-        run: npm --prefix backend run test:ci || echo "no backend tests yet"
+        run: npm run test:ci
+        working-directory: backend
         env:
           NODE_ENV: test
           DATABASE_URL: file:./test.db

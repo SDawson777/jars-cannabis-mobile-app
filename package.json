@@ -185,6 +185,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-native": "^5.0.0",
     "eslint-plugin-testing-library": "^7.9.2",
+    "expo-pwa": "^0.0.127",
     "firebase-tools": "^14.17.0",
     "globals": "^16.4.0",
     "husky": "^8.0.3",

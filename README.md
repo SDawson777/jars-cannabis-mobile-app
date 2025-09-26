@@ -63,6 +63,25 @@ Fast local setup and test
 - **Memory**: 8GB+ recommended for dependency installation
 - **Mobile Development**: Expo CLI, Android Studio (for emulator), Xcode (for iOS)
 
+## 🏗️ Monorepo Structure
+
+This project uses a monorepo structure with dual lockfile management:
+
+- **Root App** (React Native/Expo): Uses `npm-shrinkwrap.json` for deterministic installs
+- **Backend** (Node.js/Express): Uses `package-lock.json` for backend-specific dependencies
+- **Lockfile Policy**: Both lockfiles must be committed - CI will fail if either is missing
+- **npm-only Workflow**: Configured for Expo GitHub Action with `packager: npm`
+
+**Installation Commands:**
+```bash
+# Install all dependencies (root + backend)
+npm run install:all
+
+# Manual installation
+npm ci                    # Root dependencies (uses npm-shrinkwrap.json)
+cd backend && npm ci      # Backend dependencies (uses package-lock.json)
+```
+
 ⚡️ Quickstart
 
 1. Clone the repository
