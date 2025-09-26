@@ -23,6 +23,14 @@ jobs:
         run: npm run typecheck
       - name: Unit & Integration Tests (frontend)
         run: npm run test:ci
+      - name: Cache backend node_modules
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: backend-node-modules-${{ runner.os }}-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            backend-node-modules-${{ runner.os }}-
+      
       - name: Backend deps (legacy peer deps)
         run: npm --prefix backend ci --legacy-peer-deps || npm --prefix backend install --legacy-peer-deps
       - name: Backend Typecheck

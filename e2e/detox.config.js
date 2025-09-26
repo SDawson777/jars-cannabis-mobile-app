@@ -5,13 +5,13 @@ module.exports = {
   apps: {
     'ios.debug': {
       type: 'ios.app',
-      build: 'expo build:ios --local --simulator',
-      binaryPath: 'bin/jars-app-ios.app',
+      build: 'eas build --platform ios --profile development --local --wait',
+      binaryPath: 'dist/jars-app-ios.app',
     },
     'android.debug': {
       type: 'android.apk',
-      build: 'expo build:android --local --no-publish --clear-cache',
-      binaryPath: 'bin/jars-app-android.apk',
+      build: 'eas build --platform android --profile development --local --wait',
+      binaryPath: 'dist/jars-app-android.apk',
     },
   },
   devices: {
