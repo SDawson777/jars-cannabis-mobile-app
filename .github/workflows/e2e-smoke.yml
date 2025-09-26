@@ -67,57 +67,60 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
           packager: npm
 
-      - name: 🤖 Create Android emulator
+      - name: 🛠️ Install modern Android cmdline-tools (schema v4 aware)
+        run: |
+          set -euo pipefail
+          # Install latest cmdline-tools using the legacy bootstrap if needed
+          "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" "cmdline-tools;latest" || true
+
+          # Use the newly installed 'latest' for all subsequent commands
+          export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
+
+          # Show versions for diagnostics
+          sdkmanager --version || true
+          avdmanager --help 2>&1 | head -n 1 || true
+
+          # Accept licenses and make sure required packages are present
+          yes | sdkmanager --licenses
+          sdkmanager --install \
+            "platform-tools" \
+            "emulator" \
+            "platforms;android-34" \
+            "system-images;android-34;google_apis;x86_64"
+
+      - name: 🤖 Create / verify AVD (Pixel_XL_API_34)
         env:
           AVD_NAME: Pixel_XL_API_34
+          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
         run: |
-          # Verify Android SDK is properly installed
-          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "Android SDK tools not found. Ensure android-actions/setup-android@v3 succeeded."
-            exit 1
-          fi
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-34;google_apis;x86_64"
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
+          set -euo pipefail
+          export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
 
-          # Remove and recreate AVD if config is missing or corrupt
-          if [ ! -f "$HOME/.android/avd/$AVD_NAME.ini" ]; then
-            echo "AVD config missing, recreating $AVD_NAME"
-            $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager delete avd --name "$AVD_NAME" || true
-            echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
-              --force \
-              --name "$AVD_NAME" \
-              --package "system-images;android-34;google_apis;x86_64" \
-              --tag "google_apis" \
-              --abi "x86_64" \
-              --device "pixel_xl"
-          fi
+          # Clean up any stale AVD entry
+          avdmanager delete avd --name "${AVD_NAME}" || true
 
-          # Verify AVD was created
-          $ANDROID_HOME/emulator/emulator -list-avds
+          # Create with schema-v4 aware avdmanager
+          echo "no" | avdmanager create avd \
+            --force \
+            --name "${AVD_NAME}" \
+            --package "system-images;android-34;google_apis;x86_64" \
+            --tag "google_apis" \
+            --abi "x86_64" \
+            --device "pixel_xl"
+
+          ls -la "$HOME/.android/avd"
+          grep -n "." "$HOME/.android/avd/${AVD_NAME}.ini"
 
       - name: 🤖 Start Android emulator
         env:
           AVD_NAME: Pixel_XL_API_34
+          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
         run: |
-          # Verify emulator binary exists
-          if [ ! -f "$ANDROID_HOME/emulator/emulator" ]; then
-            echo "Android emulator binary not found at $ANDROID_HOME/emulator/emulator"
-            exit 1
-          fi
-          if [ ! -f "$HOME/.android/avd/$AVD_NAME.ini" ]; then
-            echo "AVD config missing, recreating $AVD_NAME before launch"
-            $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager delete avd --name "$AVD_NAME" || true
-            echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
-              --force \
-              --name "$AVD_NAME" \
-              --package "system-images;android-34;google_apis;x86_64" \
-              --tag "google_apis" \
-              --abi "x86_64" \
-              --device "pixel_xl"
-          fi
-          $ANDROID_HOME/emulator/emulator -avd "$AVD_NAME" -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
-          $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
+          "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" \
+            -no-snapshot -no-window -camera-back none -camera-front none \
+            -selinux permissive -qemu -m 2048 &
+          "${ANDROID_HOME}/platform-tools/adb" wait-for-device shell \
+            'while [[ -z $(getprop sys.boot_completed | tr -d "\r") ]]; do sleep 1; done; input keyevent 82'
 
       - name: � Expo Web export test
         run: npx expo export --platform web --non-interactive
