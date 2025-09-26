@@ -18,7 +18,13 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - name: Install root deps (legacy peer deps for RN/@types/react mismatch)
-        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+        run: |
+          # Try npm ci first, fall back to npm install if needed
+          if [ -f package-lock.json ]; then
+            npm ci --legacy-peer-deps --no-audit || npm install --legacy-peer-deps --no-audit
+          else
+            npm install --legacy-peer-deps --no-audit
+          fi
       - name: Lint
         run: npm run lint
       - name: Typecheck
@@ -34,7 +40,13 @@ jobs:
             backend-node-modules-${{ runner.os }}-
       
       - name: Backend deps (legacy peer deps)
-        run: npm --prefix backend ci --legacy-peer-deps || npm --prefix backend install --legacy-peer-deps
+        run: |
+          # Try npm ci first, fall back to npm install if needed
+          if [ -f backend/package-lock.json ]; then
+            npm --prefix backend ci --legacy-peer-deps --no-audit || npm --prefix backend install --legacy-peer-deps --no-audit
+          else
+            npm --prefix backend install --legacy-peer-deps --no-audit
+          fi
       - name: Backend Typecheck
         run: npm --prefix backend run typecheck || echo "skip if not configured"
       - name: Backend Tests
