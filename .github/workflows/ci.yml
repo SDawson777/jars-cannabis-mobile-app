@@ -27,6 +27,8 @@ jobs:
           fi
       - name: Lint
         run: npm run lint
+      - name: Format Check
+        run: npm run format:ci
       - name: Typecheck
         run: npm run typecheck
       - name: Unit & Integration Tests (frontend)
@@ -51,5 +53,11 @@ jobs:
         run: npm --prefix backend run typecheck || echo "skip if not configured"
       - name: Backend Tests
         run: npm --prefix backend run test:ci || echo "no backend tests yet"
+        env:
+          NODE_ENV: test
+          DATABASE_URL: file:./test.db
+          JWT_SECRET: test-secret-key
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
       - name: Audit (no fail on warn)
         run: npm audit --production --audit-level=high || true

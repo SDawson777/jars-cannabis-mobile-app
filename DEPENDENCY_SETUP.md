@@ -58,7 +58,13 @@ npm run typecheck
 npm run test:ci
 ```
 
-### 6. Commit Generated Lockfiles
+### 6. Upgrade Expo Web Dependencies (Optional)
+```bash
+# Upgrade vulnerable Expo Web dependencies
+npm run upgrade:expo-web
+```
+
+### 7. Commit Generated Lockfiles
 ```bash
 git add package-lock.json backend/package-lock.json functions/package-lock.json apps/demo-web/package-lock.json
 git commit -m "Add generated package-lock.json files for deterministic builds
@@ -94,6 +100,29 @@ After completing these steps:
 2. **CI Stability**: GitHub Actions should complete without memory exhaustion
 3. **Expo/Android**: E2E tests should have proper dependencies for emulator setup
 4. **Deterministic Builds**: Lockfiles ensure consistent dependency resolution
+5. **Web Build**: Modern `expo export:web` command replaces deprecated `expo build:web`
+6. **Firebase Integration**: Backend tests can access Firebase Admin services in CI
+
+## Firebase Admin Setup
+
+For production deployment and full backend functionality:
+
+1. **GitHub Secrets**: Add these to repository settings → Secrets and variables → Actions:
+   - `FIREBASE_SERVICE_ACCOUNT_BASE64`: Base64-encoded Firebase service account JSON
+   - `FIREBASE_PROJECT_ID`: Your Firebase project ID
+
+2. **Local Development**: 
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Add your Firebase credentials to .env
+   ```
+
+3. **Service Account JSON**: 
+   ```bash
+   # Convert your service account JSON to base64:
+   cat path/to/service-account.json | base64 -w 0
+   ```
 
 ## Quality Gate Verification
 

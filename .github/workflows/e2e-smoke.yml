@@ -54,6 +54,7 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
+          packager: npm
           token: ${{ secrets.EXPO_TOKEN || '' }}
         continue-on-error: true
 
@@ -128,6 +129,8 @@ jobs:
           DATABASE_URL: file:./test.db
           JWT_SECRET: test-secret-key
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
 
       - name: 🧪 Run Detox E2E tests
         run: npm run test:e2e:android
