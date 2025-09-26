@@ -224,6 +224,10 @@
     }
   },
   "overrides": {
+    "minimatch": "9.0.5",
+    "eslint-plugin-import": {
+      "minimatch": "9.0.5"
+    },
     "micromatch": "^4.0.8",
     "metro": "0.83.1",
     "metro-config": "0.83.1",
