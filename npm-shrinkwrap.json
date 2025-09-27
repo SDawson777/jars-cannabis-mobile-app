@@ -9579,6 +9579,7 @@
       "version": "6.21.0",
       "resolved": "https://registry.npmjs.org/@sentry/react-native/-/react-native-6.21.0.tgz",
       "integrity": "sha512-r8kroioyJCwDtfAgyPGRSLzfNIjNBF0d28+ZHkm0q9fbvcuBlXN3wtDBR+J+0JEbcZrFpYm2QtZWws/2TzP3NQ==",
+      "license": "MIT",
       "dependencies": {
         "@sentry/babel-plugin-component-annotate": "4.2.0",
         "@sentry/browser": "8.55.0",
@@ -10695,6 +10696,7 @@
       "version": "0.53.1",
       "resolved": "https://registry.npmjs.org/@stripe/stripe-react-native/-/stripe-react-native-0.53.1.tgz",
       "integrity": "sha512-RAqEnAJ7IJSFfoDPQSDntLAoyJNGCl2bSacnd+x74tCmPjWsMcQ4HH1+mAUKJOqPlaGc5RIy+HxYw/S1EkMlXQ==",
+      "license": "MIT",
       "peerDependencies": {
         "expo": ">=46.0.9",
         "react": "*",

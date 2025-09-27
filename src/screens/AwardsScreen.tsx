@@ -58,16 +58,13 @@ export default function AwardsScreen() {
   const navigation = useNavigation<AwardsNavProp>();
 
   // Fetch awards with React Query
-  const { data, isLoading, isError, error, refetch } = useQuery<
-    {
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['awards'],
+    queryFn: async (): Promise<{
       user: { name: string; points: number; tier: string; progress: number };
       awards: Award[];
       rewards: RewardItem[];
-    },
-    Error
-  >({
-    queryKey: ['awards'],
-    queryFn: async () => {
+    }> => {
       const res = await phase4Client.get('/awards');
       return res.data;
     },

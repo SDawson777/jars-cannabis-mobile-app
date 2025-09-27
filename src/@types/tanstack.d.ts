@@ -1,4 +1,5 @@
 declare module '@tanstack/react-query' {
+  import { ReactNode } from 'react';
   export * from '@tanstack/query-core';
 
   // QueryClient class definition
@@ -26,14 +27,16 @@ declare module '@tanstack/react-query' {
   // Re-export commonly used types and functions
   export interface QueryClientProviderProps {
     client: QueryClient;
-    children: React.ReactNode;
+    children: ReactNode;
   }
 
   export const QueryClientProvider: React.ComponentType<QueryClientProviderProps>;
   export const useQueryClient: () => QueryClient;
-  export const useQuery: (options: any) => any;
-  export const useInfiniteQuery: (options: any) => any;
-  export const useMutation: (options: any) => any;
+  export function useQuery<TData = unknown, TError = Error>(options: any): any;
+  export function useInfiniteQuery<TData = unknown, TError = Error>(options: any): any;
+  export function useMutation<TData = unknown, TError = Error, TVariables = void>(
+    options: any
+  ): any;
   export const HydrationBoundary: React.ComponentType<any>;
   export const QueryErrorResetBoundary: React.ComponentType<any>;
   export const useIsFetching: () => number;

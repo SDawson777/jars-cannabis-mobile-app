@@ -10,6 +10,7 @@ declare module 'expo-av' {
 
       loadAsync(source: any, initialStatus?: any): Promise<any>;
       playAsync(): Promise<any>;
+      replayAsync(): Promise<any>;
       pauseAsync(): Promise<any>;
       stopAsync(): Promise<any>;
       unloadAsync(): Promise<any>;

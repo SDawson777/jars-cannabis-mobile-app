@@ -44,7 +44,7 @@ interface Address {
 export default function SavedAddressesScreen() {
   const navigation = useNavigation<SavedAddressesNavProp>();
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
-  const { data: addresses = [] } = useQuery<Address[], Error>({
+  const { data: addresses = [] } = useQuery({
     queryKey: ['addresses'],
     queryFn: getAddresses,
   });
