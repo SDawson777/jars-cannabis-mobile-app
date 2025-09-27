@@ -49,7 +49,7 @@
     "format:check": "prettier --check .",
     "postinstall": "node scripts/make-splash.js",
     "align-deps": "bash scripts/align-deps.sh",
-    "install:all": "npm ci && (cd backend && npm ci)",
+    "install:all": "npm ci --legacy-peer-deps && (cd backend && npm ci --legacy-peer-deps)",
     "typecheck": "tsc -p tsconfig.json",
     "backend:lint": "npm run lint --prefix backend",
     "backend:typecheck": "npm run typecheck --prefix backend"
@@ -156,6 +156,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/react-native": "^13.3.3",
     "@types/aws-lambda": "^8.10.152",
+    "@types/axios": "^0.9.36",
     "@types/bull": "^3.15.9",
     "@types/express": "4.17.23",
     "@types/hammerjs": "^2.0.46",
