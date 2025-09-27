@@ -19,7 +19,9 @@
     "generate": "prisma generate",
     "postinstall": "prisma generate",
     "seed": "ts-node --transpile-only prisma/seed.ts",
-    "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --runInBand"
+    "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --runInBand",
+    "lint": "echo 'Backend lint: No ESLint config - using root lint rules'",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "keywords": [],
   "author": "",

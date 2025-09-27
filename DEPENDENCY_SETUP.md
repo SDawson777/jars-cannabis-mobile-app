@@ -50,8 +50,16 @@ NODE_OPTIONS="--max-old-space-size=4096" npm install --legacy-peer-deps
 ### 3. Use Monorepo Helper Scripts
 
 ```bash
-# Install all dependencies (root + backend)
+# Install all dependencies (root + backend) - for CI and local development
 npm run install:all
+
+# Individual installations
+npm ci                    # Root app (uses npm-shrinkwrap.json)
+cd backend && npm ci      # Backend (uses package-lock.json)
+
+# Lockfile regeneration (when adding/updating dependencies)
+npm install && npm shrinkwrap              # Regenerate root npm-shrinkwrap.json
+cd backend && npm install                  # Regenerate backend package-lock.json
 
 # Lint entire monorepo
 npm run lint

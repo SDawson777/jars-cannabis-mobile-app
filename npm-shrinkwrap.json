@@ -4256,6 +4256,8 @@
     },
     "node_modules/@expo/webpack-config": {
       "version": "19.0.1",
+      "resolved": "https://registry.npmjs.org/@expo/webpack-config/-/webpack-config-19.0.1.tgz",
+      "integrity": "sha512-5bSxXTUd/DCF44+1dSyU23YKLOOYCr9pMJ+C5Vw7PAi6v6OEyNp4uOVMk2x5DAEpXtvOsJCxvNZdmtY/IqmO/A==",
       "license": "MIT",
       "dependencies": {
         "@babel/core": "^7.20.2",
@@ -17901,6 +17903,7 @@
       "version": "0.0.127",
       "resolved": "https://registry.npmjs.org/expo-pwa/-/expo-pwa-0.0.127.tgz",
       "integrity": "sha512-8D9wEDkEXG9r6TPvAFpWt27IiP1cLm/4RWVRUHzFZflbWYLi8GkYArj5LHbbfokybRm1GVAanSrrYFEqHoIUiA==",
+      "license": "MIT",
       "dependencies": {
         "@expo/image-utils": "0.3.23",
         "chalk": "^4.0.0",

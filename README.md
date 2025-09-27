@@ -72,6 +72,15 @@ This project uses a monorepo structure with dual lockfile management:
 - **Lockfile Policy**: Both lockfiles must be committed - CI will fail if either is missing
 - **npm-only Workflow**: Configured for Expo GitHub Action with `packager: npm`
 
+### CI/CD Pipeline Overview
+
+- **Dual npm ci Installs**: Root and backend dependencies installed separately for optimal caching
+- **Cache Strategy**: Keyed to both `npm-shrinkwrap.json` and `backend/package-lock.json`
+- **Memory Optimization**: `NODE_OPTIONS=--max-old-space-size=4096` for large dependency trees
+- **Quality Gates**: Lint, TypeScript, format checks, comprehensive test suites (frontend + backend)
+- **Android E2E**: Schema v4-aware AVD setup with cmdline-tools;latest for reliable emulator testing
+- **Web Export**: Non-blocking Expo web export validation
+
 **Installation Commands:**
 
 ```bash
@@ -81,6 +90,10 @@ npm run install:all
 # Manual installation
 npm ci                    # Root dependencies (uses npm-shrinkwrap.json)
 cd backend && npm ci      # Backend dependencies (uses package-lock.json)
+
+# Lockfile regeneration (when adding dependencies)
+npm install && npm shrinkwrap        # Root shrinkwrap update
+cd backend && npm install            # Backend package-lock update
 ```
 
 ⚡️ Quickstart

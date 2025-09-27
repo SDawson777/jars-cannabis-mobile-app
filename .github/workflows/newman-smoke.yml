@@ -14,12 +14,17 @@ jobs:
       - name: 🔍 Preflight - Verify lockfiles exist
         run: |
           test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
-          echo "✅ Root lockfile present"
+          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+          echo "✅ All required lockfiles present"
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - run: npm ci --legacy-peer-deps
+          cache: 'npm'
+          cache-dependency-path: |
+            npm-shrinkwrap.json
+            backend/package-lock.json
+      - run: npm ci
       - run: npm run smoke
       - uses: actions/upload-artifact@v4
         with:
