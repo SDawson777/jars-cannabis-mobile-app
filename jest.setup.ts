@@ -166,6 +166,9 @@ try {
       if (/^CheckoutScreenMock/.test(joined)) return true;
       if (/^Analytics Event:/.test(joined)) return true;
 
+      // Analytics tracking failures (common in test env without real backends)
+      if (/Analytics tracking failed/.test(joined)) return true;
+
       return false;
     } catch {
       return false;

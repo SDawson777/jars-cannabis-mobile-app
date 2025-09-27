@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 
-interface RateBucket { count: number; first: number }
+interface RateBucket {
+  count: number;
+  first: number;
+}
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
 const rateMap = new Map<string, RateBucket>();
 
@@ -15,9 +18,8 @@ export function rateLimit(routeId: string, max = 60, windowMs = RATE_LIMIT_WINDO
       ''
     );
     const auth = req.headers['authorization'];
-    const tokenPart = typeof auth === 'string' && auth.startsWith('Bearer ')
-      ? auth.slice(7)
-      : undefined;
+    const tokenPart =
+      typeof auth === 'string' && auth.startsWith('Bearer ') ? auth.slice(7) : undefined;
     const k = key(ip, routeId, tokenPart);
     const now = Date.now();
     let bucket = rateMap.get(k);
@@ -36,4 +38,6 @@ export function rateLimit(routeId: string, max = 60, windowMs = RATE_LIMIT_WINDO
 }
 
 // For tests to reset state if needed
-export function _rateLimitReset() { rateMap.clear(); }
+export function _rateLimitReset() {
+  rateMap.clear();
+}

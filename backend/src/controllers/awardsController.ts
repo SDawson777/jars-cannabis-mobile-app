@@ -64,7 +64,10 @@ export async function redeemAward(req: Request, res: Response) {
         create: { userId: uid, points: 0, tier: 'Bronze' },
       });
       if (loyalty.points < reward.cost) {
-        return res.status(400).json({ error: 'insufficient_points', details: { needed: reward.cost, current: loyalty.points } });
+        return res.status(400).json({
+          error: 'insufficient_points',
+          details: { needed: reward.cost, current: loyalty.points },
+        });
       }
       // Deduct cost
       const updatedLoyalty = await client.loyaltyStatus.update({
@@ -110,7 +113,9 @@ export async function redeemAward(req: Request, res: Response) {
 
     return res.json({ success: true, award: updated });
   } catch (err) {
-    return res.status(500).json({ error: 'server_error', details: { message: (err as Error).message } });
+    return res
+      .status(500)
+      .json({ error: 'server_error', details: { message: (err as Error).message } });
   }
 }
 

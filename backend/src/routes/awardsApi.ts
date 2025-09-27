@@ -59,10 +59,15 @@ awardsApiRouter.get('/awards', requireAuth, async (req, res) => {
 
 // POST /awards/:id/redeem -> { success, award }
 // Redemption is susceptible to abuse; apply tight rate limit
-awardsApiRouter.post('/awards/:id/redeem', requireAuth, rateLimit('awards:redeem', 5, 60_000), async (req, res) => {
-  req.body = { awardId: req.params.id } as any;
-  return redeemAward(req as any, res as any);
-});
+awardsApiRouter.post(
+  '/awards/:id/redeem',
+  requireAuth,
+  rateLimit('awards:redeem', 5, 60_000),
+  async (req, res) => {
+    req.body = { awardId: req.params.id } as any;
+    return redeemAward(req as any, res as any);
+  }
+);
 
 // GET single award
 awardsApiRouter.get('/awards/:id', requireAuth, async (req, res) =>
