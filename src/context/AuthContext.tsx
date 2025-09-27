@@ -9,6 +9,7 @@ import { useUserProfile, UserProfile } from '../api/hooks/useUserProfile';
 import logger from '../lib/logger';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
+import { authClient } from '../clients/authClient';
 
 export interface User extends UserProfile {}
 
@@ -67,6 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
+    let cancelled = false;
     const loadAuth = async () => {
       try {
         const storedToken = await getSecure('jwtToken');
@@ -77,42 +79,67 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           } else {
             const pref = await getSecure('useBiometricAuth');
             if (pref !== 'false') {
-              const hasHardware = await LocalAuthentication.hasHardwareAsync();
-              const enrolled = await LocalAuthentication.isEnrolledAsync();
-              if (hasHardware && enrolled) {
-                const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-                const useFace = types.includes(
-                  LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
-                );
-                const usePrint = types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT);
-                const promptMessage = useFace
-                  ? 'Unlock Jars with Face ID'
-                  : usePrint
-                    ? 'Unlock Jars with Touch ID'
-                    : 'Unlock Jars';
-                hapticLight();
-                const authPromise = LocalAuthentication.authenticateAsync({
-                  promptMessage,
-                  disableDeviceFallback: true,
-                  cancelLabel: 'Cancel',
-                });
-                const result = await Promise.race([
-                  authPromise,
-                  new Promise<LocalAuthentication.LocalAuthenticationResult>(res =>
-                    setTimeout(() => res({ success: false } as any), 10000)
-                  ),
-                ]);
-                if (result.success) {
-                  hapticMedium();
-                  setTokenState(storedToken);
-                  return;
+              try {
+                const hasHardware = await LocalAuthentication.hasHardwareAsync();
+                const enrolled = await LocalAuthentication.isEnrolledAsync();
+                if (hasHardware && enrolled) {
+                  const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+                  const useFace = types.includes(
+                    LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION
+                  );
+                  const usePrint = types.includes(
+                    LocalAuthentication.AuthenticationType.FINGERPRINT
+                  );
+                  const promptMessage = useFace
+                    ? 'Unlock Jars with Face ID'
+                    : usePrint
+                      ? 'Unlock Jars with Touch ID'
+                      : 'Unlock Jars';
+                  hapticLight();
+                  const authPromise = LocalAuthentication.authenticateAsync({
+                    promptMessage,
+                    disableDeviceFallback: true,
+                    cancelLabel: 'Cancel',
+                  });
+                  const result = await Promise.race([
+                    authPromise,
+                    new Promise<LocalAuthentication.LocalAuthenticationResult>(res =>
+                      setTimeout(() => res({ success: false } as any), 10000)
+                    ),
+                  ]);
+                  if (result.success) {
+                    if (!cancelled) {
+                      hapticMedium();
+                      setTokenState(storedToken);
+                    }
+                    return;
+                  }
+                  hapticHeavy();
+                } else if (!hasHardware) {
+                  Alert.alert('Biometric unlock not available on this device.');
                 }
-                hapticHeavy();
-              } else if (!hasHardware) {
-                Alert.alert('Biometric unlock not available on this device.');
+              } catch (bioErr) {
+                logger.warn('Biometric prompt failed / skipped', { error: bioErr });
               }
             }
-            setTokenState(storedToken);
+            if (!cancelled) setTokenState(storedToken);
+          }
+          return; // done handling stored token path
+        }
+
+        // Normalization: if no stored server token but a Firebase user exists, exchange its ID token
+        const fbUser = auth()?.currentUser;
+        if (fbUser) {
+          try {
+            const idToken = await fbUser.getIdToken();
+            const resp = await authClient.post('/auth/login', { idToken });
+            const serverToken = resp?.data?.token as string | undefined;
+            if (serverToken && !isExpired(serverToken)) {
+              if (!cancelled) await setToken(serverToken); // setToken persists to secure storage
+              return;
+            }
+          } catch (ex) {
+            logger.warn('Firebase ID token exchange failed', { error: ex });
           }
         }
       } catch (e) {
@@ -120,6 +147,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
     loadAuth();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const { data, isLoading, isError, error } = useUserProfile();

@@ -69,14 +69,29 @@ export function useOfflineJournalQueue() {
 
     processQueue();
 
-    const subscription = NetInfo.addEventListener(state => {
+    // NetInfo.addEventListener (current versions) returns an unsubscribe function.
+    // Some legacy / mocked implementations may return an object with a remove() method.
+    const netInfoSubscription = NetInfo.addEventListener(state => {
       if (state.isConnected) {
         processQueue();
       }
     });
 
     return () => {
-      subscription.remove();
+      if (typeof netInfoSubscription === 'function') {
+        // New API shape returns unsubscribe function
+        try {
+          (netInfoSubscription as any)();
+        } catch (_e) {
+          // no-op
+        }
+      } else if (netInfoSubscription && typeof (netInfoSubscription as any).remove === 'function') {
+        try {
+          (netInfoSubscription as any).remove();
+        } catch (_e) {
+          // no-op
+        }
+      }
     };
   }, []);
 

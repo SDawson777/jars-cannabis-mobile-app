@@ -9,6 +9,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!token) return res.status(401).json({ error: 'Missing token' });
   try {
     (req as any).user = jwt.verify(token, env.JWT_SECRET);
+    const uid = (req as any).user?.userId || (req as any).user?.id;
+    if (uid && (req as any).log && typeof (req as any).log.child === 'function') {
+      (req as any).log = (req as any).log.child({ userId: uid });
+    }
     return next();
   } catch {
     // Try verifying as a Firebase ID token (if firebase admin is available)
@@ -18,8 +22,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
           .auth()
           .verifyIdToken(token)
           .then((p: any) => {
-            // normalize to { userId }
             (req as any).user = { userId: p.uid };
+            if ((req as any).log && typeof (req as any).log.child === 'function') {
+              (req as any).log = (req as any).log.child({ userId: p.uid });
+            }
             return next();
           })
           .catch(() => res.status(401).json({ error: 'Invalid token' }));

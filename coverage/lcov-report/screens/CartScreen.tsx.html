@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/67</span>
+                <span class='fraction'>0/69</span>
             </div>
         
             
@@ -425,7 +425,13 @@
 <a name='L360'></a><a href='#L360'>360</a>
 <a name='L361'></a><a href='#L361'>361</a>
 <a name='L362'></a><a href='#L362'>362</a>
-<a name='L363'></a><a href='#L363'>363</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -511,7 +517,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -523,6 +533,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -873,7 +885,11 @@ export default function <span class="fstat-no" title="function not covered" >Car
     );
   }
 &nbsp;
-  const subtotal = <span class="cstat-no" title="statement not covered" >items.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, item) =&gt; <span class="cstat-no" title="statement not covered" >sum + item.price * item.quantity,</span> 0) || 0;</span>
+  const subtotal =
+<span class="cstat-no" title="statement not covered" >    items.reduce(</span>
+<span class="fstat-no" title="function not covered" >      (s</span>um: number, item: { price: number; quantity: number }) =&gt; <span class="cstat-no" title="statement not covered" >sum + item.price * item.quantity,</span>
+      0
+    ) || 0;
   const discount = <span class="cstat-no" title="statement not covered" >0;</span>
   const taxes = <span class="cstat-no" title="statement not covered" >(subtotal - discount) * 0.07;</span>
   const total = <span class="cstat-no" title="statement not covered" >subtotal - discount + taxes;</span>
@@ -881,10 +897,12 @@ export default function <span class="fstat-no" title="function not covered" >Car
   const updateQty = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (id: string, delta: number) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    hapticLight();</span>
 <span class="cstat-no" title="statement not covered" >    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);</span>
-    const item = <span class="cstat-no" title="statement not covered" >items.find(<span class="fstat-no" title="function not covered" >i </span>=&gt; <span class="cstat-no" title="statement not covered" >i.id === id)</span>;</span>
+    const item = <span class="cstat-no" title="statement not covered" >items.find(<span class="fstat-no" title="function not covered" >(i</span>: { id: string }) =&gt; <span class="cstat-no" title="statement not covered" >i.id === id)</span>;</span>
 <span class="cstat-no" title="statement not covered" >    if (item) {</span>
       const newQuantity = <span class="cstat-no" title="statement not covered" >Math.max(1, item.quantity + delta);</span>
-      const updatedItems = <span class="cstat-no" title="statement not covered" >items.map(<span class="fstat-no" title="function not covered" >i </span>=&gt; (<span class="cstat-no" title="statement not covered" >i.id === id ? { ...i, quantity: newQuantity } : i)</span>);</span>
+      const updatedItems = <span class="cstat-no" title="statement not covered" >items.map(<span class="fstat-no" title="function not covered" >(i</span>: { id: string }) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >        i.id === id ? { ...i, quantity: newQuantity } : i</span>
+      );
 <span class="cstat-no" title="statement not covered" >      try {</span>
 <span class="cstat-no" title="statement not covered" >        await updateCart({ items: updatedItems });</span>
       } catch (error) {
@@ -903,7 +921,7 @@ export default function <span class="fstat-no" title="function not covered" >Car
         style: 'destructive',
         onPress: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
 <span class="cstat-no" title="statement not covered" >          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);</span>
-          const updatedItems = <span class="cstat-no" title="statement not covered" >items.filter(<span class="fstat-no" title="function not covered" >i </span>=&gt; <span class="cstat-no" title="statement not covered" >i.id !== id)</span>;</span>
+          const updatedItems = <span class="cstat-no" title="statement not covered" >items.filter(<span class="fstat-no" title="function not covered" >(i</span>: { id: string }) =&gt; <span class="cstat-no" title="statement not covered" >i.id !== id)</span>;</span>
 <span class="cstat-no" title="statement not covered" >          try {</span>
 <span class="cstat-no" title="statement not covered" >            await updateCart({ items: updatedItems });</span>
           } catch (error) {
@@ -1156,7 +1174,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T18:14:47.207Z
+                at 2025-09-26T21:23:34.492Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.11% </span>
+                <span class="strong">86.84% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>31/36</span>
+                <span class='fraction'>33/38</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.57% </span>
+                <span class="strong">89.18% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>31/35</span>
+                <span class='fraction'>33/37</span>
             </div>
         
             
@@ -258,8 +258,17 @@
 <a name='L193'></a><a href='#L193'>193</a>
 <a name='L194'></a><a href='#L194'>194</a>
 <a name='L195'></a><a href='#L195'>195</a>
-<a name='L196'></a><a href='#L196'>196</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,6 +310,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -373,14 +383,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">96x</span>
+<span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -460,7 +480,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useEffect, useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import type { Resolver } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -496,7 +515,8 @@ export default function EditAddressScreen() {
   // Address object is expected to already use `state`.
   const normalizedAddr = addr;
   const { control, handleSubmit } = useForm&lt;AddressFormValues&gt;({
-    resolver: yupResolver(addressSchema) as unknown as Resolver&lt;AddressFormValues, any&gt;,
+    // cast to any to avoid missing type declarations if @types/react-hook-form not installed
+    resolver: yupResolver(addressSchema) as any,
     defaultValues: {
       fullName: normalizedAddr.fullName,
       phone: normalizedAddr.phone,
@@ -567,25 +587,35 @@ export default function EditAddressScreen() {
             &lt;Controller
               control={control}
               name={name as keyof AddressFormValues}
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) =&gt; (
-                &lt;&gt;
-                  &lt;TextInput
-                    style={[styles.input, { borderColor: jarsSecondary }]}
-                    value={(value ?? <span class="branch-1 cbranch-no" title="branch not covered" >'')</span> as string}
-                    onBlur={onBlur}
-                    onChangeText={t =&gt; {
-                      hapticLight();
-                      onChange(t);
-                    }}
-                    placeholder={placeholder}
-                    placeholderTextColor={jarsSecondary}
-                    keyboardType={keyboard as any}
-                    accessibilityLabel={placeholder}
-                    accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
-                  /&gt;
-                  {error &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >&lt;Text style={styles.error}&gt;{error.message}&lt;/Text&gt;}</span>
-                &lt;/&gt;
-              )}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: { onChange: (value: string) =&gt; void; onBlur: () =&gt; void; value: string };
+                fieldState: { error?: { message?: string } };
+              }) =&gt; {
+                const { onChange, onBlur, value } = field; // keeps type inference intact
+                const { error } = fieldState;
+                return (
+                  &lt;&gt;
+                    &lt;TextInput
+                      style={[styles.input, { borderColor: jarsSecondary }]}
+                      value={(value ?? <span class="branch-1 cbranch-no" title="branch not covered" >'')</span> as string}
+                      onBlur={onBlur}
+                      onChangeText={t =&gt; {
+                        hapticLight();
+                        onChange(t);
+                      }}
+                      placeholder={placeholder}
+                      placeholderTextColor={jarsSecondary}
+                      keyboardType={keyboard as any}
+                      accessibilityLabel={placeholder}
+                      accessibilityHint={`Enter ${placeholder.toLowerCase()}`}
+                    /&gt;
+                    {error &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >&lt;Text style={styles.error}&gt;{error.message}&lt;/Text&gt;}</span>
+                  &lt;/&gt;
+                );
+              }}
             /&gt;
           &lt;/View&gt;
         ))}
@@ -655,7 +685,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T18:14:47.207Z
+                at 2025-09-26T21:23:34.492Z
             </div>
         <script src="../prettify.js"></script>
         <script>

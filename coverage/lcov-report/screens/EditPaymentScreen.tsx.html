@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.85% </span>
+                <span class="strong">83.78% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>29/35</span>
+                <span class='fraction'>31/37</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.85% </span>
+                <span class="strong">83.78% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>29/35</span>
+                <span class='fraction'>31/37</span>
             </div>
         
             
@@ -352,7 +352,14 @@
 <a name='L287'></a><a href='#L287'>287</a>
 <a name='L288'></a><a href='#L288'>288</a>
 <a name='L289'></a><a href='#L289'>289</a>
-<a name='L290'></a><a href='#L290'>290</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -416,10 +423,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -431,6 +434,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -533,8 +539,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -674,7 +688,7 @@ import { toast } from '../utils/toast';
 &nbsp;
 type EditPaymentNavProp = NativeStackNavigationProp&lt;RootStackParamList, 'EditPayment'&gt;;
 type EditPaymentRouteProp = RouteProp&lt;RootStackParamList, 'EditPayment'&gt;;
-type FormData = {
+type EditPaymentFormData = {
   holderName: string;
   cardBrand: string;
   cardLast4: string;
@@ -683,7 +697,7 @@ type FormData = {
 };
 &nbsp;
 type FieldDescriptor = {
-  name: keyof FormData;
+  name: keyof EditPaymentFormData;
   label: string;
   keyboard: any;
   secure: boolean;
@@ -705,11 +719,7 @@ export default function EditPaymentScreen() {
 &nbsp;
   const pm = route.params?.payment || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
 &nbsp;
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm&lt;FormData&gt;({
+  const form = useForm&lt;EditPaymentFormData&gt;({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: {
@@ -720,6 +730,9 @@ export default function EditPaymentScreen() {
       isDefault: !!pm.isDefault,
     },
   });
+&nbsp;
+  const { control, handleSubmit } = form;
+  const { errors, isValid, isSubmitting } = (form as any).formState;
 &nbsp;
   useEffect(() =&gt; {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -753,7 +766,7 @@ export default function EditPaymentScreen() {
 <span class="cstat-no" title="statement not covered" >    navigation.goBack();</span>
   };
 &nbsp;
-  const onSubmit = async (data: FormData) =&gt; {
+  const onSubmit = async (data: EditPaymentFormData) =&gt; {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
@@ -821,7 +834,11 @@ export default function EditPaymentScreen() {
 <span class="branch-0 cbranch-no" title="branch not covered" >              &lt;Controller</span>
                 control={control}
                 name={f.name}
-                render={<span class="fstat-no" title="function not covered" >({</span> field: { value, onChange } }) =&gt; (
+                render={<span class="fstat-no" title="function not covered" >({</span>
+                  field: { value, onChange },
+                }: {
+                  field: { value: boolean; onChange: (value: boolean) =&gt; void };
+                }) =&gt; (
 <span class="cstat-no" title="statement not covered" >                  &lt;Pressable</span>
                     onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >onChange(!value)}</span>
                     style={[
@@ -843,7 +860,11 @@ export default function EditPaymentScreen() {
               &lt;Controller
                 control={control}
                 name={f.name}
-                render={({ field: { onChange, onBlur, value } }) =&gt; (
+                render={({
+                  field: { onChange, onBlur, value },
+                }: {
+                  field: { onChange: (value: string) =&gt; void; onBlur: () =&gt; void; value: string };
+                }) =&gt; (
                   &lt;TextInput
                     style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
                     placeholder={f.label}
@@ -852,7 +873,7 @@ export default function EditPaymentScreen() {
                     secureTextEntry={f.secure}
                     onBlur={onBlur}
                     value={value as string}
-                    onChangeText={t =&gt; {
+                    onChangeText={(t: string) =&gt; {
                       hapticLight();
                       onChange(t);
                     }}
@@ -862,9 +883,9 @@ export default function EditPaymentScreen() {
                 )}
               /&gt;
             )}
-            {errors[f.name as keyof FormData] &amp;&amp; (
+            {errors[f.name as keyof EditPaymentFormData] &amp;&amp; (
 <span class="branch-1 cbranch-no" title="branch not covered" >              &lt;Text style={styles.error} accessibilityRole="alert"&gt;</span>
-                {errors[f.name as keyof FormData]?.message}
+                {errors[f.name as keyof EditPaymentFormData]?.message}
               &lt;/Text&gt;
             )}
           &lt;/View&gt;
@@ -937,7 +958,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T18:14:47.207Z
+                at 2025-09-26T21:23:34.492Z
             </div>
         <script src="../prettify.js"></script>
         <script>

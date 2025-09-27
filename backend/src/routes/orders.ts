@@ -1,12 +1,33 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { requireAuth } from '../middleware/auth';
+import { z } from 'zod';
+import { rateLimit } from '../middleware/rateLimit';
 
 export const ordersRouter = Router();
 
-ordersRouter.post('/orders', requireAuth, async (req, res) => {
+// Schema for optional contact fields (light validation now, can extend later)
+const contactSchema = z
+  .object({
+    name: z.string().min(1).max(100).optional(),
+    phone: z.string().min(7).max(20).optional(),
+    email: z.string().email().optional(),
+  })
+  .partial();
+
+// Apply stricter rate limit: ordering is a high-value operation
+ordersRouter.post('/orders', requireAuth, rateLimit('orders:create', 10, 60_000), async (req, res) => {
   const uid = (req as any).user.userId as string;
   let { storeId, contact, paymentMethod = 'pay_at_pickup', notes } = req.body || {};
+
+  // Basic payload validation (non-fatal): validate contact shape if provided
+  if (contact) {
+    const parsed = contactSchema.safeParse(contact);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'invalid_payload', details: parsed.error.flatten() });
+    }
+    contact = parsed.data;
+  }
 
   // If storeId not provided, try to infer from the user's cart
   const preCart = await prisma.cart.findFirst({ where: { userId: uid }, include: { items: true } });
@@ -33,9 +54,36 @@ ordersRouter.post('/orders', requireAuth, async (req, res) => {
     preCart || (await prisma.cart.findFirst({ where: { userId: uid }, include: { items: true } }));
   if (!cart || cart.items.length === 0) return res.status(400).json({ error: 'cart is empty' });
 
+  // Pricing integrity: for each cart item fetch current authoritative price and ensure match
+  // If mismatch -> conflict so client must refresh cart
+  for (const ci of cart.items) {
+    const product = await prisma.product.findUnique({ where: { id: ci.productId } });
+    const variant = ci.variantId
+      ? await prisma.productVariant.findUnique({ where: { id: ci.variantId } })
+      : null;
+    const currentPrice = (variant?.price ?? product?.defaultPrice ?? 0) as number;
+    // Allow minor floating drift (<= 0.005) but not material changes
+    if (Math.abs((ci.unitPrice ?? 0) - currentPrice) > 0.005) {
+      return res.status(409).json({
+        error: 'pricing_changed',
+        details: {
+          productId: ci.productId,
+          variantId: ci.variantId,
+          previous: ci.unitPrice,
+          current: currentPrice,
+        },
+      });
+    }
+  }
+
   const itemsToCreate = await Promise.all(
     cart.items.map(async ci => {
-      const price = (ci.unitPrice ?? 0) as number;
+      // Recompute authoritative price again (ensures race safety between validation loop and creation)
+      const product = await prisma.product.findUnique({ where: { id: ci.productId } });
+      const variant = ci.variantId
+        ? await prisma.productVariant.findUnique({ where: { id: ci.variantId } })
+        : null;
+      const price = (variant?.price ?? product?.defaultPrice ?? ci.unitPrice ?? 0) as number;
       return {
         productId: ci.productId,
         variantId: ci.variantId || undefined,

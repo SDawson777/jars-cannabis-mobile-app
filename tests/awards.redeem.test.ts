@@ -28,10 +28,15 @@ const prisma: any = {
         status: 'PENDING',
         redeemedAt: null,
         earnedDate: new Date(),
+        rewardId: data.rewardId,
         ...data,
       };
       awards.push(a);
       return a;
+    },
+    findMany: async ({ where }: any = {}) => {
+      if (!where || !where.userId) return [...awards];
+      return awards.filter(a => a.userId === where.userId);
     },
     findUnique: async ({ where: { id } }: any) => awards.find(a => a.id === id) || null,
     update: async ({ where: { id }, data }: any) => {
@@ -103,11 +108,23 @@ describe('redeemAward', () => {
     const res = await request(app).post('/awards/redeem').send({ awardId: reward.id });
     expect(res.status).toBe(400);
     expect(res.body.error).toBe('insufficient_points');
+    expect(res.body.details).toEqual(expect.objectContaining({ current: 100 }));
   });
 
   it('handles non-existent award id (legacy path)', async () => {
     const app = createApp(userId);
     const res = await request(app).post('/awards/redeem').send({ awardId: 'no-such-legacy-id' });
     expect(res.status).toBe(404);
+  });
+
+  it('guards against rapid duplicate redemption of same catalog reward', async () => {
+    const reward = rewardsCatalog[1]; // cost 250
+    loyalty[userId].points = 1000;
+    const app = createApp(userId);
+    const first = await request(app).post('/awards/redeem').send({ awardId: reward.id });
+    expect(first.status).toBe(200);
+    const second = await request(app).post('/awards/redeem').send({ awardId: reward.id });
+    expect(second.status).toBe(409);
+    expect(second.body.error).toBe('duplicate_redemption');
   });
 });

@@ -1,6 +1,22 @@
 import { api } from './helpers/supertest';
 
 describe('Addresses API', () => {
+  test('POST rejects invalid payload (bad zip/state)', async () => {
+    const bad = await api()
+      .post('/api/v1/addresses')
+      .set('Authorization', 'Bearer valid-token')
+      .send({
+        line1: '1 Bad',
+        city: 'Nowhere',
+        state: 'Colorado', // invalid length
+        zipCode: '123', // invalid
+        country: 'USA', // invalid length
+        fullName: '', // empty
+        phone: 'abc',
+      });
+    expect(bad.status).toBe(400);
+    expect(bad.body.error).toBe('invalid_payload');
+  });
   test('GET returns empty list for user with no addresses', async () => {
     const res = await api().get('/api/v1/addresses').set('Authorization', 'Bearer valid-token');
     expect(res.status).toBe(200);
@@ -50,6 +66,30 @@ describe('Addresses API', () => {
     expect(defaults.length).toBe(1);
   });
 
+  test('POST detects duplicate address and returns 409', async () => {
+    const payload = {
+      line1: '900 Dup St',
+      city: 'Denver',
+      state: 'CO',
+      zipCode: '80205',
+      country: 'US',
+      fullName: 'Dup User',
+      phone: '303-555-1616',
+      isDefault: false,
+    };
+    const first = await api()
+      .post('/api/v1/addresses')
+      .set('Authorization', 'Bearer valid-token')
+      .send(payload);
+    expect(first.status).toBe(201);
+    const dup = await api()
+      .post('/api/v1/addresses')
+      .set('Authorization', 'Bearer valid-token')
+      .send({ ...payload, line1: '900 DUP ST' }); // case-insensitive
+    expect(dup.status).toBe(409);
+    expect(dup.body.error).toBe('duplicate_address');
+  });
+
   test('PUT updates address and enforces ownership', async () => {
     const payload = {
       line1: '789 Pine St',
@@ -81,6 +121,41 @@ describe('Addresses API', () => {
       .set('Authorization', 'Bearer invalid-token')
       .send({ fullName: 'Hacker' });
     expect(bad.status).toBe(401);
+  });
+
+  test('PUT duplicate detection when modifying identifying fields', async () => {
+    const a = await api()
+      .post('/api/v1/addresses')
+      .set('Authorization', 'Bearer valid-token')
+      .send({
+        line1: '12 Alpha Rd',
+        city: 'Denver',
+        state: 'CO',
+        zipCode: '80210',
+        country: 'US',
+        fullName: 'User A',
+        phone: '3035550000',
+      });
+    expect(a.status).toBe(201);
+    const b = await api()
+      .post('/api/v1/addresses')
+      .set('Authorization', 'Bearer valid-token')
+      .send({
+        line1: '34 Beta Rd',
+        city: 'Denver',
+        state: 'CO',
+        zipCode: '80211',
+        country: 'US',
+        fullName: 'User B',
+        phone: '3035550001',
+      });
+    expect(b.status).toBe(201);
+    const upd = await api()
+      .put(`/api/v1/addresses/${b.body.id}`)
+      .set('Authorization', 'Bearer valid-token')
+      .send({ line1: '12 Alpha Rd', zipCode: '80210' });
+    expect(upd.status).toBe(409);
+    expect(upd.body.error).toBe('duplicate_address');
   });
 
   test('DELETE removes an address and enforces ownership', async () => {

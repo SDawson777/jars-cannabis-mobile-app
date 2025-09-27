@@ -4,10 +4,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { requireAuth } from '../middleware/auth';
 import { env } from '../env';
+import { rateLimit } from '../middleware/rateLimit';
 
 const authRouter = Router();
 
-authRouter.post('/auth/register', async (req, res) => {
+authRouter.post('/auth/register', rateLimit('auth_register', 30), async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
   // basic validation expected by tests
@@ -26,7 +27,7 @@ authRouter.post('/auth/register', async (req, res) => {
   }
 });
 
-authRouter.post('/auth/login', async (req, res) => {
+authRouter.post('/auth/login', rateLimit('auth_login', 60), async (req, res) => {
   const { email, password, idToken } = req.body || {};
 
   // If idToken present, verify with Firebase and find/create corresponding user
