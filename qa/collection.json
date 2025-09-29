@@ -1,16 +1,70 @@
 {
   "info": {
-    "name": "JARS – All Requests",
+    "name": "JARS API Smoke",
     "_postman_id": "b342b4d4-1234-5678-9123-abcdefabcdef",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Gemini Symbols",
+      "name": "Health Check",
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
-        "url": "{{baseUrl}}/v1/symbols"
+        "header": [],
+        "url": "{{baseUrl}}/health"
+      },
+      "response": []
+    },
+    {
+      "name": "List Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/products?limit=3"
+      },
+      "response": []
+    },
+    {
+      "name": "Community Feed",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/community/posts"
+      },
+      "response": []
+    },
+    {
+      "name": "Articles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/content/articles"
+      },
+      "response": []
+    },
+    {
+      "name": "Awards Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}" }
+        ],
+        "url": "{{baseUrl}}/awards"
+      },
+      "response": []
+    },
+    {
+      "name": "Redeem Reward",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": "{{baseUrl}}/awards/{{rewardId}}/redeem"
       },
       "response": []
     }

@@ -19,7 +19,7 @@ jobs:
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
 
       - name: 🏗 Setup Java
@@ -30,6 +30,23 @@ jobs:
 
       - name: 🏗 Setup Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: ✅ Accept Android SDK licenses
+        shell: bash
+        run: |
+          set +e
+          LICENSE_TOOL="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$LICENSE_TOOL" ]; then
+            echo "sdkmanager tool not found at $LICENSE_TOOL"
+            exit 0
+          fi
+          yes | "$LICENSE_TOOL" --licenses > /tmp/licenses.log 2>&1
+          status=$?
+          if [ "$status" -ne 0 ] && [ "$status" -ne 141 ]; then
+            cat /tmp/licenses.log
+            exit $status
+          fi
+          cat /tmp/licenses.log
 
       - name: 📦 Install dependencies
         run: npm ci --legacy-peer-deps
@@ -43,6 +60,7 @@ jobs:
 
       - name: 🤖 Create Android emulator
         run: |
+          AVD_NAME="Pixel_XL_API_34"
           # Verify Android SDK is properly installed
           if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
             echo "Android SDK tools not found. Ensure android-actions/setup-android@v3 succeeded."
@@ -55,7 +73,7 @@ jobs:
           # Create AVD with proper parameters - use pixel_xl device profile for better compatibility
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
             --force \
-            --name "Pixel_XL_API_34" \
+            --name "$AVD_NAME" \
             --package "system-images;android-34;google_apis;x86_64" \
             --tag "google_apis" \
             --abi "x86_64" \
@@ -63,16 +81,32 @@ jobs:
 
           # Verify AVD was created
           $ANDROID_HOME/emulator/emulator -list-avds
+        env:
+          AVD_NAME: Pixel_XL_API_34
 
       - name: 🤖 Start Android emulator
         run: |
+          AVD_NAME="${AVD_NAME:-Pixel_XL_API_34}"
           # Verify emulator binary exists
           if [ ! -f "$ANDROID_HOME/emulator/emulator" ]; then
             echo "Android emulator binary not found at $ANDROID_HOME/emulator/emulator"
             exit 1
           fi
-          $ANDROID_HOME/emulator/emulator -avd Pixel_XL_API_34 -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
+          if [ ! -f "$HOME/.android/avd/${AVD_NAME}.ini" ]; then
+            echo "AVD $AVD_NAME not found, recreating..."
+            mkdir -p "$HOME/.android/avd"
+            echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
+              --force \
+              --name "$AVD_NAME" \
+              --package "system-images;android-34;google_apis;x86_64" \
+              --tag "google_apis" \
+              --abi "x86_64" \
+              --device "pixel_xl"
+          fi
+          $ANDROID_HOME/emulator/emulator -avd "$AVD_NAME" -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
           $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
+        env:
+          AVD_NAME: Pixel_XL_API_34
 
       - name: 🏗 Build app for E2E
         run: |

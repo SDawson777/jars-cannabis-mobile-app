@@ -1,4 +1,4 @@
-import { act, render } from '@testing-library/react-native';
+import { act, render, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 // Use real timers by default to avoid react-test-renderer issues
@@ -89,24 +89,19 @@ describe('useOfflineCartQueue', () => {
         isConnected: true,
       });
       if (netListener) netListener({ isConnected: true });
-      // Temporarily switch to fake timers to advance any queued timeouts
-      jest.useFakeTimers();
-      try {
-        jest.runAllTimers();
-      } finally {
-        // restore real timers to avoid affecting react-test-renderer
-        jest.useRealTimers();
-      }
-      // give promises a tick
+      // give promises a couple of ticks so the async queue can flush
+      await Promise.resolve();
       await Promise.resolve();
     });
 
     // phase4Client.post should have been called with queued action and same payload shape
-    expect(mockPost).toHaveBeenCalledWith('/cart/update', queuedPayload);
+    await waitFor(() => expect(mockPost).toHaveBeenCalledWith('/cart/update', queuedPayload));
 
     // AsyncStorage.removeItem should have been called to clear queue
-    expect(require('@react-native-async-storage/async-storage').removeItem).toHaveBeenCalledWith(
-      'cartQueue'
+    await waitFor(() =>
+      expect(require('@react-native-async-storage/async-storage').removeItem).toHaveBeenCalledWith(
+        'cartQueue'
+      )
     );
   });
 });
