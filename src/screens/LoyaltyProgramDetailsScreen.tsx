@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 
 import { phase4Client } from '../api/phase4Client';
+import { clientPost } from '../api/http';
 import PointsProgressBar from '../components/PointsProgressBar';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { ThemeContext } from '../context/ThemeContext';
@@ -35,7 +36,7 @@ export default function LoyaltyProgramDetailsScreen() {
 
   const redeemMutation = useMutation({
     mutationFn: async () => {
-      await phase4Client.post('/loyalty/redeem');
+      await clientPost<void, any>(phase4Client, '/loyalty/redeem');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });

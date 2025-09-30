@@ -25,6 +25,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 
 import { useRedeemReward } from '../api/hooks/useRedeemReward';
 import { phase4Client } from '../api/phase4Client';
+import { clientGet } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { trackEvent } from '../utils/analytics'; // ensure exported in utils/analytics
@@ -65,8 +66,11 @@ export default function AwardsScreen() {
       awards: Award[];
       rewards: RewardItem[];
     }> => {
-      const res = await phase4Client.get('/awards');
-      return res.data;
+      return clientGet<{
+        user: { name: string; points: number; tier: string; progress: number };
+        awards: Award[];
+        rewards: RewardItem[];
+      }>(phase4Client, '/awards');
     },
   });
 

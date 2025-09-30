@@ -3,6 +3,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 import { phase4Client } from '../api/phase4Client';
+import { clientGet } from '../api/http';
 import type { CMSProduct } from '../types/cms';
 
 const PAGE_SIZE = 20;
@@ -14,10 +15,10 @@ interface ProductPage {
 }
 
 async function fetchPage(page: number, storeId?: string, filter?: string): Promise<ProductPage> {
-  const res = await phase4Client.get<{ products: CMSProduct[]; total?: number }>('/products', {
+  const data = await clientGet<{ products?: CMSProduct[] }>(phase4Client, '/products', {
     params: { page, limit: PAGE_SIZE, storeId, filter },
   });
-  const products = res.data.products ?? (res.data as any) ?? [];
+  const products: CMSProduct[] = data.products ?? [];
   return { products, page, hasNextPage: products.length === PAGE_SIZE };
 }
 

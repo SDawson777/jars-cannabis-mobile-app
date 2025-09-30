@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from '../../utils/toast';
 import { phase4Client } from '../phase4Client';
-import { clientGet, clientPost } from '../http';
+import { clientGet, clientPut } from '../http';
 
 export interface PrivacyPreferences {
   highContrast: boolean;
@@ -13,7 +13,7 @@ async function fetchPrefs(): Promise<PrivacyPreferences> {
 }
 
 async function updatePrefs(payload: PrivacyPreferences) {
-  return clientPost<PrivacyPreferences, PrivacyPreferences>(
+  return clientPut<PrivacyPreferences, PrivacyPreferences>(
     phase4Client,
     '/profile/preferences',
     payload
@@ -34,7 +34,7 @@ export function usePrivacyPreferences() {
     },
     onError: (err: unknown) => {
       if (err instanceof Error) toast(err.message);
-      else toast(String(err));
+      else toast('Unknown error');
     },
   });
 

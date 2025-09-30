@@ -8,11 +8,9 @@ interface RewardPayload {
 }
 
 interface RedeemRewardData {
-  // Add specific fields if known, e.g.:
-  // rewardId: string;
-  // redeemedAt: string;
-  // pointsUsed: number;
-  // etc.
+  rewardId?: string;
+  redeemedAt?: string;
+  pointsUsed?: number;
 }
 
 interface RedeemRewardResponse {
@@ -22,6 +20,7 @@ interface RedeemRewardResponse {
 }
 
 async function redeemReward(reward: RewardPayload) {
+  // Call phase4Client.post without a body to preserve existing test expectations
   return phase4Client
     .post<RedeemRewardResponse>(`/awards/${reward.id}/redeem`)
     .then((r: { data: RedeemRewardResponse }) => r.data as RedeemRewardResponse);
@@ -29,7 +28,7 @@ async function redeemReward(reward: RewardPayload) {
 
 export function useRedeemReward() {
   const queryClient = useQueryClient();
-  return useMutation<any, Error, RewardPayload>({
+  return useMutation<RedeemRewardResponse, Error, RewardPayload>({
     mutationFn: redeemReward,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['awards'] });

@@ -3,6 +3,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useQuery } from '@tanstack/react-query';
 
 import { phase4Client } from '../api/phase4Client';
+import { clientGet } from '../api/http';
 import type { CMSProduct } from '../types/cms';
 
 export interface ProductVariant {
@@ -19,13 +20,17 @@ export interface ProductDetails {
 
 // The backend returns { product, relatedProducts } where product may include variants
 async function fetchProduct(productId: string, storeId?: string): Promise<ProductDetails> {
-  const res = await phase4Client.get(`/products/${productId}`, { params: { storeId } });
+  const data = await clientGet<{ product?: CMSProduct; variants?: ProductVariant[] } | CMSProduct>(
+    phase4Client,
+    `/products/${productId}`,
+    { params: { storeId } }
+  );
   // normalize to { product, variants }
-  const payload = res.data || {};
-  const product = payload.product ?? payload;
-  const variants: ProductVariant[] =
-    (product && ((product.variants ?? product.variants) as any)) || [];
-  // ensure variants are in the expected shape (fallback empty)
+  const payload = (data as any) || {};
+  const product: CMSProduct = (payload.product ?? payload) as CMSProduct;
+  const variants: ProductVariant[] = (payload.variants ??
+    (product as any).variants ??
+    []) as ProductVariant[];
   return { product, variants };
 }
 

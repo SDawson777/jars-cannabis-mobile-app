@@ -3,6 +3,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useCallback, useEffect, useState } from 'react';
 
 import { phase4Client } from '../api/phase4Client';
+import { clientPost } from '../api/http';
 
 interface CartAction {
   endpoint: string;
@@ -27,7 +28,8 @@ export function useOfflineCartQueue() {
     }
     for (const action of queue) {
       try {
-        await phase4Client.post(action.endpoint, action.payload);
+        // Use clientPost so tests/mocks that expect phase4Client.post calls still work via the underlying client
+        await clientPost<unknown, unknown>(phase4Client, action.endpoint, action.payload);
       } catch {
         // leave queue intact so it can retry later
         setPending(true);

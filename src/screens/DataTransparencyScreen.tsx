@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { phase4Client, getDataPrefs, updateDataPrefs } from '../api/phase4Client';
+import { clientGet, clientPost } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
@@ -69,10 +70,12 @@ export default function DataTransparencyScreen() {
     setLoading(true);
     setError(null);
     try {
-      const res = await phase4Client.post<{ exportId: string }>('/data-transparency/export', {
-        userId: 'user-123',
-      });
-      setExportId(res.data.exportId);
+      const data = await clientPost<{ userId: string }, { exportId: string }>(
+        phase4Client,
+        '/data-transparency/export',
+        { userId: 'user-123' }
+      );
+      setExportId(data.exportId);
       setStatus('pending');
       hapticMedium();
     } catch (e) {
@@ -88,18 +91,18 @@ export default function DataTransparencyScreen() {
     if (exportId && status === 'pending') {
       interval = setInterval(async () => {
         try {
-          const res = await phase4Client.get<{
+          const res = await clientGet<{
             exportId: string;
             status: ExportStatus;
             downloadUrl?: string;
-          }>(`/data-transparency/export/${exportId}`);
-          setStatus(res.data.status);
-          if (res.data.status === 'completed') {
-            setDownloadUrl(res.data.downloadUrl || null);
+          }>(phase4Client, `/data-transparency/export/${exportId}`);
+          setStatus(res.status);
+          if (res.status === 'completed') {
+            setDownloadUrl(res.downloadUrl || null);
             hapticMedium();
             clearInterval(interval);
           }
-          if (res.data.status === 'failed') {
+          if (res.status === 'failed') {
             clearInterval(interval);
           }
         } catch (e) {

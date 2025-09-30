@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 
 import { phase4Client } from '../api/phase4Client';
+import { clientGet, clientPost } from '../api/http';
 import { useCartStore } from '../../stores/useCartStore';
 
 import { useOfflineCartQueue } from './useOfflineCartQueue';
@@ -20,6 +21,8 @@ export interface Cart {
   items: CartItem[];
   total: number;
 }
+
+type CartResponse = Cart | { cart: Cart };
 
 export function useCart() {
   const queryClient = useQueryClient();
@@ -70,9 +73,9 @@ export function useCart() {
       }
       throw new Error('Offline');
     }
-    const { data } = await phase4Client.get('/cart');
-    // backend returns { cart: { items: [...], total } }
-    const cartPayload = data?.cart ?? data;
+    const data = await clientGet<CartResponse | { cart?: Cart }>(phase4Client, '/cart');
+    // backend returns { cart: { items: [...], total } } or Cart directly
+    const cartPayload = (data as any)?.cart ?? (data as Cart);
     await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
     setStoreItems(cartPayload);
     return cartPayload;
@@ -123,8 +126,12 @@ export function useCart() {
         await queueAction({ endpoint: '/cart/update', payload });
         throw new Error('queued');
       }
-      const { data } = await phase4Client.post('/cart/update', payload);
-      return data?.cart ?? data;
+      const data = await clientPost<typeof payload, CartResponse | { cart?: Cart }>(
+        phase4Client,
+        '/cart/update',
+        payload
+      );
+      return (data as any)?.cart ?? (data as Cart);
     },
     onMutate: async (vars: { items: any }) => {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
@@ -182,8 +189,12 @@ export function useCart() {
       await queueAction({ endpoint: '/cart/apply-coupon', payload: { code } });
       throw new Error('queued');
     }
-    const { data } = await phase4Client.post('/cart/apply-coupon', { code });
-    const cartPayload = data?.cart ?? data;
+    const data = await clientPost<{ code: string }, CartResponse | { cart?: Cart }>(
+      phase4Client,
+      '/cart/apply-coupon',
+      { code }
+    );
+    const cartPayload = (data as any)?.cart ?? data;
     queryClient.setQueryData(['cart'], cartPayload);
     setStoreItems(cartPayload);
     await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));

@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 
 import { phase4Client } from '../api/phase4Client';
+import { clientGet } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
@@ -45,8 +46,8 @@ export default function CommunityGardenScreen() {
     setLoading(true);
     setError('');
     try {
-      const res = await phase4Client.get('/community/posts');
-      setPosts(res.data?.posts || res.data || []);
+      const data = await clientGet<{ posts?: Post[] }>(phase4Client, '/community/posts');
+      setPosts(data?.posts || (data as unknown as Post[]) || []);
     } catch {
       setError('Failed to load posts');
     } finally {

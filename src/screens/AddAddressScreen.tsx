@@ -19,7 +19,8 @@ import {
   Platform,
 } from 'react-native';
 
-import { phase4Client } from '../api/phase4Client';
+import { phase4Client, AddressShape } from '../api/phase4Client';
+import { clientPost } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
@@ -82,10 +83,14 @@ export default function AddAddressScreen() {
     try {
       setLoading(true);
       // map form _values straight through - names match server schema
-      const res = await phase4Client.post('/addresses', _values);
-      // surface server error body if present
-      if (res && res.data && res.data.error) {
-        throw new Error(res.data.error);
+      const data = await clientPost<AddressFormValues, AddressShape>(
+        phase4Client,
+        '/addresses',
+        _values
+      );
+      // surface server error body if present (server sometimes returns { error })
+      if (data && (data as any).error) {
+        throw new Error((data as any).error);
       }
       toast('Address saved');
       // invalidate addresses list so saved screen refreshes

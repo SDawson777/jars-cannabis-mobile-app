@@ -18,7 +18,8 @@ import {
   Platform,
 } from 'react-native';
 
-import { phase4Client } from '../api/phase4Client';
+import { phase4Client, AddressShape } from '../api/phase4Client';
+import { clientPut } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
@@ -73,8 +74,12 @@ export default function EditAddressScreen() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
       setLoading(true);
-      const res = await phase4Client.put(`/addresses/${addr.id}`, _values);
-      if (res && res.data && res.data.error) throw new Error(res.data.error);
+      const data = await clientPut<Partial<AddressShape>, AddressShape>(
+        phase4Client,
+        `/addresses/${addr.id}`,
+        _values as any
+      );
+      if (data && (data as any).error) throw new Error((data as any).error);
       toast('Address saved');
       queryClient.invalidateQueries({ queryKey: ['addresses'] });
       navigation.goBack();

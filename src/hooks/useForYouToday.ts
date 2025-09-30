@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { ForYouTodayPayload } from '../@types/personalization';
 import { phase4Client } from '../api/phase4Client';
+import { clientGet } from '../api/http';
 
 export function useForYouToday(userId: string | undefined, storeId: string | undefined) {
   return useQuery<ForYouTodayPayload>({
@@ -20,11 +21,12 @@ export function useForYouToday(userId: string | undefined, storeId: string | und
       }
 
       try {
-        const res = await phase4Client.get<ForYouTodayPayload>(
+        const data = await clientGet<ForYouTodayPayload>(
+          phase4Client,
           `/personalization/home?userId=${userId}&storeId=${storeId}`
         );
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));
-        return res.data;
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
+        return data;
       } catch (err) {
         const cached = await AsyncStorage.getItem(cacheKey);
         if (cached) return JSON.parse(cached) as ForYouTodayPayload;

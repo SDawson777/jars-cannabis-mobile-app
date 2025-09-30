@@ -8,6 +8,7 @@ import { View, Text, FlatList, SafeAreaView, Pressable, Image, StyleSheet } from
 import Illustration from '../../assets/svg/illustration-no-nearby-stores.svg';
 import { onProximityAlert } from '../../tasks/locationWatcher';
 import { phase4Client } from '../api/phase4Client';
+import { clientGet } from '../api/http';
 import AnimatedPulseGlow from '../components/AnimatedPulseGlow';
 import AudioPlayer from '../components/AudioPlayer';
 import LocationStatusDisplay from '../components/LocationStatusDisplay';
@@ -65,10 +66,11 @@ export default function StoreSelectionScreen() {
         accuracy: Location.Accuracy.High,
         // timeout removed - implement manually if needed
       });
-      const res = await phase4Client.get(
+      const data = await clientGet<{ stores?: ApiStore[] }>(
+        phase4Client,
         `/api/v1/stores?latitude=${coords.latitude}&longitude=${coords.longitude}&sort_by=distance&radius=50`
       );
-      const fetchedStores: ApiStore[] = res.data?.stores || [];
+      const fetchedStores: ApiStore[] = data?.stores || [];
       setStores(fetchedStores);
       hapticMedium();
 

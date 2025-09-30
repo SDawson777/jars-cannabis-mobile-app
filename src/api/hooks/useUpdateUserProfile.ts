@@ -2,10 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from '../../utils/toast';
 import { phase4Client } from '../phase4Client';
+import { clientPut } from '../http';
+import type { UserProfile } from './useUserProfile';
 
-async function updateProfile(payload: any) {
-  const res = await phase4Client.put('/profile', payload);
-  return res.data;
+async function updateProfile(payload: Partial<UserProfile>) {
+  const data = await clientPut<Partial<UserProfile>, UserProfile>(
+    phase4Client,
+    '/profile',
+    payload
+  );
+  return data;
 }
 
 export function useUpdateUserProfile() {

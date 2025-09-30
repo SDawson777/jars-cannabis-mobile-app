@@ -39,7 +39,25 @@ export async function clientPost<TReq, TRes>(
   data?: TReq,
   config?: AxiosRequestConfig
 ): Promise<TRes> {
-  const res = await client.post<TRes>(url, data as any, config);
+  // Only pass config when provided to avoid explicit `undefined` becoming a third
+  // argument in mocked calls (tests assert calls without a third param).
+  const res =
+    config === undefined
+      ? await client.post<TRes>(url, data as any)
+      : await client.post<TRes>(url, data as any, config);
+  return res.data;
+}
+
+export async function clientPut<TReq, TRes>(
+  client: AxiosInstance,
+  url: string,
+  data?: TReq,
+  config?: AxiosRequestConfig
+): Promise<TRes> {
+  const res =
+    config === undefined
+      ? await client.put<TRes>(url, data as any)
+      : await client.put<TRes>(url, data as any, config);
   return res.data;
 }
 

@@ -9,7 +9,11 @@ export interface LoyaltyStatus {
 }
 
 async function fetchLoyalty(): Promise<LoyaltyStatus> {
-  const d = (await clientGet<any>(phase4Client, '/loyalty/status')) || {};
+  const d =
+    (await clientGet<{ points?: number; balance?: number; level?: string; tier?: string }>(
+      phase4Client,
+      '/loyalty/status'
+    )) || {};
   // Map backend record to the shape the UI expects
   return {
     points: d.points ?? d.balance ?? 0,
