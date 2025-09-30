@@ -85,8 +85,11 @@ jobs:
           sdkmanager --version || true
           avdmanager --help 2>&1 | head -n 1 || true
 
-          # Accept licenses and make sure required packages are present
-          yes | sdkmanager --licenses
+          # Accept licenses robustly (avoid failing on SIGPIPE from `yes`) and make sure required packages are present
+          # Mask pipefail for the single line that uses `yes` so a closed pipe doesn't fail the job.
+          (set +o pipefail; yes | sdkmanager --licenses >/dev/null) || true
+
+          # Install required packages without piping `yes` — installs should be non-interactive once licenses are accepted
           sdkmanager --install \
             "platform-tools" \
             "emulator" \
