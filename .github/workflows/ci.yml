@@ -85,5 +85,46 @@ jobs:
       - name: 🌐 Expo Web Export Test (non-blocking)
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
 
+      - name: Bake AVD config (software-only)
+        if: runner.os == 'Linux'
+        env:
+          AVD_NAME: Pixel_XL_API_34
+        run: |
+          set -euo pipefail
+          AVD_DIR="$HOME/.android/avd/${AVD_NAME}.avd"
+          if [ -d "$AVD_DIR" ]; then
+            echo "Applying software-emulation defaults to $AVD_DIR/config.ini"
+            mkdir -p "$(dirname "$AVD_DIR/config.ini")"
+            # Append settings to favor software emulation (safe fallback)
+            echo "hw.accel=off" >> "$AVD_DIR/config.ini" || true
+            echo "hw.gpu.mode=swiftshader_indirect" >> "$AVD_DIR/config.ini" || true
+            echo "hw.gpu.enabled=yes" >> "$AVD_DIR/config.ini" || true
+          else
+            echo "AVD directory $AVD_DIR not found; skipping bake step"
+          fi
+
+      - name: Boot emulator (software)
+        if: runner.os == 'Linux'
+        env:
+          AVD_NAME: Pixel_XL_API_34
+        run: |
+          set -euo pipefail
+          echo "Starting Android emulator (software) $AVD_NAME"
+          "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" \
+            -no-window \
+            -no-snapshot \
+            -accel off \
+            -gpu swiftshader_indirect \
+            -no-audio \
+            -no-boot-anim \
+            -camera-back none \
+            -camera-front none \
+            -no-metrics \
+            -qt-hide-window \
+            -selinux permissive \
+            -qemu -m 3072 &
+          "${ANDROID_HOME}/platform-tools/adb" wait-for-device shell \
+            'while [[ -z $(getprop sys.boot_completed | tr -d "\r") ]]; do sleep 1; done; input keyevent 82'
+
       - name: Audit (no fail on warn)
         run: npm audit --production --audit-level=high || true
