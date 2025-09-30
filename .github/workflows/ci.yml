@@ -103,6 +103,25 @@ jobs:
             echo "AVD directory $AVD_DIR not found; skipping bake step"
           fi
 
+      - name: Create AVD if missing
+        if: runner.os == 'Linux'
+        env:
+          AVD_NAME: Pixel_XL_API_34
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+        run: |
+          set -euo pipefail
+          echo "Ensure required SDK components for AVD creation"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          # Install system image if missing
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "system-images;android-34;google_apis;x86_64" || true
+          AVD_DIR="$HOME/.android/avd/${AVD_NAME}.avd"
+          if [ -d "$AVD_DIR" ]; then
+            echo "AVD already exists at $AVD_DIR"
+          else
+            echo "Creating AVD $AVD_NAME"
+            echo "no" | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n "${AVD_NAME}" -k "system-images;android-34;google_apis;x86_64" -d "pixel_xl" || true
+          fi
+
       - name: Boot emulator (software)
         if: runner.os == 'Linux'
         env:
