@@ -49,10 +49,13 @@ export default function CheckoutScreen() {
   const [email, setEmail] = useState('');
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const { initPaymentSheet, presentPaymentSheet, isApplePaySupported, isGooglePaySupported } = useStripe();
+  const { initPaymentSheet, presentPaymentSheet, isApplePaySupported, isGooglePaySupported } =
+    useStripe();
   const { preferredStoreId } = usePreferredStoreId.getState();
   // Access cart store (currently only to ensure hydration; items implicitly used on backend)
-  useCartStore((state: { items: { id: string; quantity: number; [key: string]: any }[] }) => state.items);
+  useCartStore(
+    (state: { items: { id: string; quantity: number; [key: string]: any }[] }) => state.items
+  );
 
   // Access cart store for clearing after success (direct getState usage later to avoid re-renders)
   const [apiError, setApiError] = useState<string | null>(null);
@@ -119,7 +122,7 @@ export default function CheckoutScreen() {
       const params = await fetchPaymentSheetParams();
       const applePay = await isApplePaySupported();
       const googlePay = await isGooglePaySupported();
-      const walletSupported = applePay || googlePay;
+      const _walletSupported = applePay || googlePay;
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: 'Jars Cannabis',
         customerId: params.customer,
