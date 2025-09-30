@@ -88,7 +88,7 @@ export function useCart() {
   }, [query.data]);
 
   const mutation = useMutation<Cart, Error, any>({
-    mutationFn: async body => {
+    mutationFn: async (body: { items: any[]; productId: any; id: any; variantId: any; quantity: any; price: any; }) => {
       const _state = await NetInfo.fetch();
       // Always normalize items payload to backend contract
       let items: any[] = [];
@@ -119,9 +119,9 @@ export function useCart() {
       const { data } = await phase4Client.post('/cart/update', payload);
       return data?.cart ?? data;
     },
-    onMutate: async vars => {
+    onMutate: async (vars: { items: any; }) => {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
-      const prev = queryClient.getQueryData<Cart>(['cart']);
+      const prev = queryClient.getQueryData(['cart']) as Cart | undefined;
       // Build an optimistic cart snapshot
       let next: Cart | undefined = prev ? { ...prev, items: [...(prev.items || [])] } : undefined;
       if (vars?.items && Array.isArray(vars.items)) {
@@ -159,10 +159,10 @@ export function useCart() {
       }
       return { prev };
     },
-    onError: (err, vars, ctx: any) => {
+    onError: (err: any, vars: any, ctx: any) => {
       if (ctx?.prev) queryClient.setQueryData(['cart'], ctx.prev);
     },
-    onSuccess: data => {
+    onSuccess: (data: any) => {
       queryClient.setQueryData(['cart'], data);
       setStoreItems(data);
       Promise.resolve(AsyncStorage.setItem('cart', JSON.stringify(data))).catch(() => {});

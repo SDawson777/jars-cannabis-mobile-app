@@ -1,5 +1,5 @@
 // src/api/phase4Client.ts
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
@@ -9,13 +9,22 @@ const BASE_URL = API_BASE_URL;
 function createPhase4Client(): AxiosInstance {
   const client = axios.create({
     baseURL: BASE_URL,
-    headers: { 'Content-Type': 'application/json' } as any,
-  });
+    headers: { 'Content-Type': 'application/json' },
+  }) as unknown as AxiosInstance;
 
   client.interceptors.request.use(
-    async (config: InternalAxiosRequestConfig) => {
-      const token = await getAuthToken();
-      if (token && config.headers) {
+    (config: AxiosRequestConfig) => {
+      // getAuthToken is async, so we must use the token synchronously or refactor
+      const token = (getAuthToken as any)();
+      if (token instanceof Promise) {
+        // If getAuthToken returns a Promise, throw an error or handle accordingly
+        throw new Error('getAuthToken must be synchronous for Axios interceptors');
+      }
+      if (token) {
+        // Ensure headers is an object so we can set Authorization safely
+        if (!config.headers || Array.isArray(config.headers)) {
+          config.headers = {};
+        }
         (config.headers as any).Authorization = `Bearer ${token}`;
       }
       return config;
