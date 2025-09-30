@@ -103,11 +103,15 @@ jobs:
         run: |
           set -euo pipefail
           export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
+          export ANDROID_AVD_HOME="${HOME}/.android/avd"
+
+          # Ensure AVD home exists
+          mkdir -p "$ANDROID_AVD_HOME"
 
           # Clean up any stale AVD entry
           avdmanager delete avd --name "${AVD_NAME}" || true
 
-          # Create with schema-v4 aware avdmanager
+          # Create with schema-v4 aware avdmanager. Reply 'no' to hardware profile prompt.
           echo "no" | avdmanager create avd \
             --force \
             --name "${AVD_NAME}" \
@@ -115,9 +119,18 @@ jobs:
             --tag "google_apis" \
             --abi "x86_64" \
             --device "pixel_xl"
+
+          # Verify created AVD exists and fail-fast if not
+          if [ ! -f "$ANDROID_AVD_HOME/${AVD_NAME}.ini" ]; then
+            echo "AVD ini missing: $ANDROID_AVD_HOME/${AVD_NAME}.ini"
+            ls -la "$ANDROID_AVD_HOME"
+            avdmanager list avd || true
+            exit 1
+          fi
+
           # Diagnostics
-          ls -la "$HOME/.android/avd"
-          grep -n "." "$HOME/.android/avd/${AVD_NAME}.ini"
+          ls -la "$ANDROID_AVD_HOME"
+          avdmanager list avd || true
 
       - name: 🤖 Start Android emulator
         env:
