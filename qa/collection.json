@@ -45,9 +45,7 @@
       "name": "Awards Summary",
       "request": {
         "method": "GET",
-        "header": [
-          { "key": "Authorization", "value": "Bearer {{jwt}}" }
-        ],
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
         "url": "{{baseUrl}}/awards"
       },
       "response": []

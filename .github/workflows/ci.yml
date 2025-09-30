@@ -76,9 +76,9 @@ jobs:
           JWT_SECRET: test-secret-key
           FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
-      
+
       - name: 🌐 Expo Web Export Test (non-blocking)
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
-      
+
       - name: Audit (no fail on warn)
         run: npm audit --production --audit-level=high || true

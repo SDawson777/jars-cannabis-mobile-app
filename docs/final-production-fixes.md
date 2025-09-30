@@ -12,10 +12,10 @@ sync with what the user saw locally.
 
 - Refactored `useOfflineCartQueue` to centralize queue flushing in a
   `processQueue` callback that is reused by the effect, the NetInfo listener, and
-  the queuing helper.  
+  the queuing helper.
 - Added immediate replays when the device is online: after pushing a payload into
   storage we now check connectivity and flush right away instead of waiting for a
-  future network event.  
+  future network event.
 - Hardened queue processing to discard empty arrays, keep the queue intact when a
   replayed request fails, and always reset the `pending` flag appropriately so the
   UI reflects real state.

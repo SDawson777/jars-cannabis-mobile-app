@@ -17,7 +17,10 @@ function createOrderClient(): ReturnType<typeof axios.create> {
       const token: string | null = await getAuthToken();
       // ensure headers exists and merge Authorization without assuming specific header types
       config = config || {};
-      config.headers = { ...(config.headers as Record<string, any> | undefined), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+      config.headers = {
+        ...(config.headers as Record<string, any> | undefined),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
       return config;
     },
     (error: unknown) => Promise.reject(error)
