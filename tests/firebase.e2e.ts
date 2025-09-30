@@ -41,6 +41,12 @@ describe('firebase e2e', () => {
   it('calls requestExport function', async () => {
     const url = `http://localhost:5001/${projectId}/us-central1/requestExport?uid=test-uid`;
     const res = await axios.get(url);
-    expect(res.data.status).toBe('started');
+    const data = res.data as unknown;
+    if (typeof data === 'object' && data !== null && 'status' in data) {
+      // @ts-ignore - narrow at runtime
+      expect((data as any).status).toBe('started');
+    } else {
+      throw new Error('Unexpected response shape from requestExport function');
+    }
   });
 });

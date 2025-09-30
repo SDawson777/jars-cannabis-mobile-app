@@ -19,7 +19,7 @@ export function useAuth() {
   const signIn = async (email: string, password: string) => {
     // First try backend authentication (email/password)
     try {
-      const res = await authClient.post('/auth/login', { email, password });
+      const res = await authClient.post<{ token?: string }>('/auth/login', { email, password });
       const token = res.data?.token;
       if (token) {
         await setToken(token);
@@ -34,7 +34,7 @@ export function useAuth() {
     // Fallback: sign in with Firebase and exchange ID token for server JWT
     const cred = await auth().signInWithEmailAndPassword(email, password);
     const idToken = await cred.user.getIdToken();
-    const exch = await authClient.post('/auth/login', { idToken });
+    const exch = await authClient.post<{ token?: string }>('/auth/login', { idToken });
     const serverToken = exch.data?.token;
     if (!serverToken) throw new Error('Failed to obtain server token');
     await setToken(serverToken);
@@ -45,7 +45,7 @@ export function useAuth() {
   const signUp = async ({ name, email, phone, password }: SignUpArgs) => {
     // Create user via backend, which returns a server JWT
     try {
-      const res = await authClient.post('/auth/register', { email, password });
+      const res = await authClient.post<{ token?: string }>('/auth/register', { email, password });
       const token = res.data?.token;
       if (token) {
         // Optionally update Firebase profile if desired
@@ -67,7 +67,7 @@ export function useAuth() {
     const cred = await auth().createUserWithEmailAndPassword(email, password);
     await cred.user.updateProfile({ displayName: name, phoneNumber: phone });
     const idT = await cred.user.getIdToken();
-    const exch = await authClient.post('/auth/login', { idToken: idT });
+    const exch = await authClient.post<{ token?: string }>('/auth/login', { idToken: idT });
     const serverToken = exch.data?.token;
     if (!serverToken) throw new Error('Failed to obtain server token');
     await setToken(serverToken);

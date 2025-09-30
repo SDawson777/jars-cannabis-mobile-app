@@ -91,7 +91,7 @@ export default function HelpFAQScreen() {
         <View style={{ width: 24 }} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        {data.map(item => (
+        {data.map((item: { id: string; question: string; answer: string }) => (
           <View key={item.id} style={styles.faqItem}>
             <Pressable onPress={() => toggleFAQ(item.id)}>
               <Text style={[styles.question, { color: jarsPrimary }]}>{item.question}</Text>

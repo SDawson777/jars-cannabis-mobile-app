@@ -16,8 +16,9 @@ export function useUpdateUserProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
     },
-    onError: err => {
-      toast((err as Error).message);
+    onError: (err: unknown) => {
+      if (err instanceof Error) toast(err.message);
+      else toast(String(err));
     },
   });
 }

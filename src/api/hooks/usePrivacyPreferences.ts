@@ -29,8 +29,9 @@ export function usePrivacyPreferences() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['privacy-preferences'] });
     },
-    onError: err => {
-      toast((err as Error).message);
+    onError: (err: unknown) => {
+      if (err instanceof Error) toast(err.message);
+      else toast(String(err));
     },
   });
 

@@ -36,11 +36,11 @@ export default function OrderHistoryScreen() {
   } = useInfiniteQuery<OrdersResponse>({
     queryKey: ['orders'],
     initialPageParam: 1,
-    queryFn: ({ pageParam }) => fetchOrders(pageParam as number),
-    getNextPageParam: lastPage => lastPage.nextPage,
+    queryFn: ({ pageParam }: { pageParam?: number }) => fetchOrders(pageParam as number),
+    getNextPageParam: (lastPage: OrdersResponse) => lastPage.nextPage,
   });
 
-  const orders = data?.pages.flatMap(p => p.orders) ?? [];
+  const orders = data?.pages.flatMap((p: OrdersResponse) => p.orders) ?? [];
 
   useEffect(() => {
     if (error) {
@@ -55,7 +55,7 @@ export default function OrderHistoryScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {isLoading && orders.length === 0 ? (
         <View style={styles.skeletonWrap}>
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i: number) => (
             <View key={i} style={styles.skeletonRow}>
               {useSkeletonText(200, 20)}
               <View style={{ height: 8 }} />

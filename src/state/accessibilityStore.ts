@@ -15,19 +15,27 @@ interface AccessibilityStore extends AccessibilitySettings {
   hydrate: (settings: AccessibilitySettings) => void;
 }
 
-export const useAccessibilityStore = create<AccessibilityStore>(set => ({
-  textSize: 'system',
-  highContrast: false,
-  reduceMotion: false,
-  setTextSize: size => set({ textSize: size }),
-  setHighContrast: enabled => set({ highContrast: enabled }),
-  setReduceMotion: enabled => set({ reduceMotion: enabled }),
-  hydrate: settings => {
-    const validTextSizes = ['system', 'sm', 'md', 'lg', 'xl'];
-    set({
-      textSize: validTextSizes.includes(settings.textSize) ? settings.textSize : 'md',
-      highContrast: settings.highContrast ?? false,
-      reduceMotion: settings.reduceMotion ?? false,
-    });
-  },
-}));
+export const useAccessibilityStore = create<AccessibilityStore>(
+  (
+    set: (
+      updater:
+        | Partial<AccessibilityStore>
+        | ((s: AccessibilityStore) => Partial<AccessibilityStore>)
+    ) => void
+  ) => ({
+    textSize: 'system',
+    highContrast: false,
+    reduceMotion: false,
+    setTextSize: (size: AccessibilityTextSize) => set({ textSize: size }),
+    setHighContrast: (enabled: boolean) => set({ highContrast: enabled }),
+    setReduceMotion: (enabled: boolean) => set({ reduceMotion: enabled }),
+    hydrate: (settings: AccessibilitySettings) => {
+      const validTextSizes = ['system', 'sm', 'md', 'lg', 'xl'];
+      set({
+        textSize: validTextSizes.includes(settings.textSize) ? settings.textSize : 'md',
+        highContrast: settings.highContrast ?? false,
+        reduceMotion: settings.reduceMotion ?? false,
+      });
+    },
+  })
+);
