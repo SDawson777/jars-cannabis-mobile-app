@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 import type { OrdersResponse, Order } from '../types/order';
 import { API_BASE_URL } from '../utils/apiConfig';
@@ -6,18 +6,18 @@ import { getAuthToken } from '../utils/auth';
 
 const BASE_URL = API_BASE_URL;
 
-function createOrderClient(): AxiosInstance {
+function createOrderClient(): ReturnType<typeof axios.create> {
   const client = axios.create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
   });
 
   client.interceptors.request.use(
-    async (config: InternalAxiosRequestConfig) => {
+    async (config: any) => {
       const token: string | null = await getAuthToken();
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      // ensure headers exists and merge Authorization without assuming specific header types
+      config = config || {};
+      config.headers = { ...(config.headers as Record<string, any> | undefined), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
       return config;
     },
     (error: unknown) => Promise.reject(error)

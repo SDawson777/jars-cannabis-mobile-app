@@ -1,7 +1,7 @@
 // src/screens/CheckoutScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useStripe, isPlatformPaySupported } from '@stripe/stripe-react-native';
+import { useStripe } from '@stripe/stripe-react-native';
 import { ChevronLeft, HelpCircle } from 'lucide-react-native';
 import React, { useState, useContext, useEffect } from 'react';
 import {
@@ -49,10 +49,10 @@ export default function CheckoutScreen() {
   const [email, setEmail] = useState('');
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const { initPaymentSheet, presentPaymentSheet, isApplePaySupported, isGooglePaySupported } = useStripe();
   const { preferredStoreId } = usePreferredStoreId.getState();
   // Access cart store (currently only to ensure hydration; items implicitly used on backend)
-  useCartStore(state => state.items);
+  useCartStore((state: { items: { id: string; quantity: number; [key: string]: any }[] }) => state.items);
 
   // Access cart store for clearing after success (direct getState usage later to avoid re-renders)
   const [apiError, setApiError] = useState<string | null>(null);
@@ -117,18 +117,20 @@ export default function CheckoutScreen() {
   const openPaymentSheet = async () => {
     try {
       const params = await fetchPaymentSheetParams();
-      const walletSupported = await isPlatformPaySupported();
+      const applePay = await isApplePaySupported();
+      const googlePay = await isGooglePaySupported();
+      const walletSupported = applePay || googlePay;
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: 'Jars Cannabis',
         customerId: params.customer,
         customerEphemeralKeySecret: params.ephemeralKey,
         paymentIntentClientSecret: params.paymentIntent,
-        applePay: walletSupported
+        applePay: applePay
           ? {
               merchantCountryCode: 'US',
             }
           : undefined,
-        googlePay: walletSupported
+        googlePay: googlePay
           ? {
               merchantCountryCode: 'US',
               testEnv: true,

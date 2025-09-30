@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           try {
             const idToken = await fbUser.getIdToken();
             const resp = await authClient.post('/auth/login', { idToken });
-            const serverToken = resp?.data?.token as string | undefined;
+            const serverToken = (resp?.data as { token?: string })?.token;
             if (serverToken && !isExpired(serverToken)) {
               if (!cancelled) await setToken(serverToken); // setToken persists to secure storage
               return;

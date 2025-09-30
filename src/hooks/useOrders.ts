@@ -14,13 +14,13 @@ export function useCreateOrder(options?: {
   const qc = useQueryClient();
   const mutation = useMutation<Order, any, CreateOrderPayload>({
     mutationFn: createOrder,
-    onSuccess: (order, _vars, _ctx) => {
+    onSuccess: (order: Order, _vars: any, _ctx: any) => {
       // Optimistically prime individual order cache & invalidate list
       qc.setQueryData(orderKey(order.id), order);
       qc.invalidateQueries({ queryKey: ordersKey }).catch(() => {});
       options?.onSuccess?.(order);
     },
-    onError: err => {
+    onError: (err: any) => {
       options?.onError?.(err);
     },
   });
