@@ -101,7 +101,6 @@
         "@testing-library/react": "^13.4.0",
         "@testing-library/react-native": "^13.3.3",
         "@types/aws-lambda": "^8.10.152",
-        "@types/axios": "^0.9.36",
         "@types/bull": "^3.15.9",
         "@types/express": "4.17.23",
         "@types/hammerjs": "^2.0.46",
@@ -10989,13 +10988,6 @@
       "version": "8.10.152",
       "license": "MIT"
     },
-    "node_modules/@types/axios": {
-      "version": "0.9.36",
-      "resolved": "https://registry.npmjs.org/@types/axios/-/axios-0.9.36.tgz",
-      "integrity": "sha512-NLOpedx9o+rxo/X5ChbdiX6mS1atE4WHmEEIcR9NLenRVa5HoVjAvjafwU3FPTqnZEstpoqCaW7fagqSoTDNeg==",
-      "dev": true,
-      "license": "MIT"
-    },
     "node_modules/@types/babel__core": {
       "version": "7.20.5",
       "dev": true,
@@ -13443,6 +13435,8 @@
     },
     "node_modules/axios": {
       "version": "1.12.2",
+      "resolved": "https://registry.npmjs.org/axios/-/axios-1.12.2.tgz",
+      "integrity": "sha512-vMJzPewAlRyOgxV2dU0Cuz2O8zzzx9VYtbJOaBgXFeLc4IV/Eg50n4LowmehOOR61S8ZMpc2K5Sa7g6A4jfkUw==",
       "license": "MIT",
       "dependencies": {
         "follow-redirects": "^1.15.6",

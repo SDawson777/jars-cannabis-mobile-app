@@ -1,19 +1,20 @@
 // src/api/phase4Client.ts
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
 
 const BASE_URL = API_BASE_URL;
 
-function createPhase4Client(): AxiosInstance {
-  const client = axios.create({
+function createPhase4Client() {
+  const client = (axios as any).create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
-  }) as unknown as AxiosInstance;
+  });
 
   client.interceptors.request.use(
-    (config: AxiosRequestConfig) => {
+    // Use a permissive any here to avoid type mismatches between axios and @types/axios
+    (config: any) => {
       // getAuthToken is async, so we must use the token synchronously or refactor
       const token = (getAuthToken as any)();
       if (token instanceof Promise) {
