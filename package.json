@@ -2,6 +2,7 @@
   "name": "jars-cannabis-mobile-app",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.8.2",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "demo:web": "cross-env VITE_API_BASE_URL=http://localhost:8080/api/v1 npm --prefix apps/demo-web run dev",
@@ -12,14 +13,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "expo build:web",
+    "build:web": "npx expo export:web",
     "vercel-build": "mkdir -p dist && echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Placeholder</title></head><body></body></html>' > dist/index.html",
     "build:backend": "npm --prefix backend run build",
     "start:backend": "npm --prefix backend run start",
     "start:backend:local": "npm --prefix backend run start:local",
     "build": "npm run build:backend",
     "precommit": "npm run lint && npm run typecheck && npm run test:ci",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --cache",
+    "lint": "eslint .",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --cache --fix",
     "format": "prettier --write .",
     "format:ci": "prettier --check .",
@@ -35,7 +36,6 @@
     "dev:expo": "expo start",
     "dev:server": "nodemon src/index.ts",
     "dev:emulators": "firebase emulators:start --only firestore,functions,auth",
-    "typecheck": "tsc --noEmit",
     "test": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs",
     "test:watch": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --watch",
     "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --coverage --ci --watchAll=false",
@@ -48,7 +48,11 @@
     "smoke": "newman run qa/collection.json -e qa/env.staging.json --reporters cli,junit --reporter-junit-export ./reports/newman-smoke.xml",
     "format:check": "prettier --check .",
     "postinstall": "node scripts/make-splash.js",
-    "align-deps": "bash scripts/align-deps.sh"
+    "align-deps": "bash scripts/align-deps.sh",
+    "install:all": "npm ci --legacy-peer-deps && (cd backend && npm ci --legacy-peer-deps)",
+    "typecheck": "tsc -p tsconfig.json",
+    "backend:lint": "npm run lint --prefix backend",
+    "backend:typecheck": "npm run typecheck --prefix backend"
   },
   "lint-staged": {
     "{*,src/**,!src/terpene_wheel/snippets/**}/*.{js,jsx,ts,tsx}": [
@@ -135,6 +139,7 @@
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.9.3",
+    "@babel/core": "^7.26.0",
     "@babel/plugin-transform-async-generator-functions": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
@@ -143,6 +148,7 @@
     "@babel/plugin-transform-optional-catch-binding": "^7.27.1",
     "@babel/plugin-transform-optional-chaining": "^7.27.1",
     "@babel/preset-flow": "^7.27.1",
+    "@babel/types": "^7.28.4",
     "@eslint/css": "^0.11.1",
     "@eslint/js": "^9.36.0",
     "@eslint/json": "^0.13.2",
@@ -150,6 +156,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/react-native": "^13.3.3",
     "@types/aws-lambda": "^8.10.152",
+    "@types/axios": "^0.9.36",
     "@types/bull": "^3.15.9",
     "@types/express": "4.17.23",
     "@types/hammerjs": "^2.0.46",
@@ -169,7 +176,7 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
-    "babel-jest": "^30.1.2",
+    "babel-jest": "^29.7.0",
     "detox": "^20.41.3",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
@@ -181,6 +188,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-native": "^5.0.0",
     "eslint-plugin-testing-library": "^7.9.2",
+    "expo-pwa": "^0.0.127",
     "firebase-tools": "^14.17.0",
     "globals": "^16.4.0",
     "husky": "^8.0.3",
@@ -199,7 +207,7 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=18 <=22",
+    "node": "20.19.4",
     "npm": ">=9"
   },
   "expo": {
@@ -223,6 +231,10 @@
     }
   },
   "overrides": {
+    "minimatch": "7.4.6",
+    "eslint-plugin-import": {
+      "minimatch": "9.0.5"
+    },
     "micromatch": "^4.0.8",
     "metro": "0.83.1",
     "metro-config": "0.83.1",

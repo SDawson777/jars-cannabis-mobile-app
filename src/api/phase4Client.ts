@@ -20,7 +20,7 @@ function createPhase4Client(): AxiosInstance {
       }
       return config;
     },
-    error => Promise.reject(error)
+    (error: any) => Promise.reject(error)
   );
 
   return client;

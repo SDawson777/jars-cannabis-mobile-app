@@ -12,7 +12,7 @@ import { toast } from '../../utils/toast';
 
 import { forgotPasswordSchema } from './forgotPasswordSchema';
 
-type FormData = { email: string };
+type ForgotPasswordFormData = { email: string };
 
 type ForgotPasswordNavProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 
@@ -20,16 +20,15 @@ export default function ForgotPasswordScreen() {
   const navigation = useNavigation<ForgotPasswordNavProp>();
   const { jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm<FormData>({
+  const form = useForm<ForgotPasswordFormData>({
     resolver: yupResolver(forgotPasswordSchema),
     mode: 'onChange',
   });
 
-  const onSubmit = async ({ email }: FormData) => {
+  const { control, handleSubmit } = form;
+  const { errors, isValid, isSubmitting } = (form as any).formState;
+
+  const onSubmit = async ({ email }: ForgotPasswordFormData) => {
     try {
       await requestPasswordReset(email);
       toast('Check your email for reset instructions.');
@@ -58,7 +57,11 @@ export default function ForgotPasswordScreen() {
         <Controller
           control={control}
           name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({
+            field: { onChange, onBlur, value },
+          }: {
+            field: { onChange: (value: string) => void; onBlur: () => void; value: string };
+          }) => (
             <TextInput
               className="border rounded-lg p-3 mb-2"
               style={{

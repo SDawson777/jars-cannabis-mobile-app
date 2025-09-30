@@ -11,18 +11,29 @@ jobs:
   e2e-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      NODE_OPTIONS: '--max-old-space-size=4096'
 
     steps:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v4
 
+      - name: 🔍 Preflight - Verify lockfiles exist
+        run: |
+          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
+          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+          echo "✅ All required lockfiles present"
+
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: '.nvmrc'
           cache: npm
+          cache-dependency-path: |
+            npm-shrinkwrap.json
+            backend/package-lock.json
 
-      - name: 🏗 Setup Java
+      - name: ☕ Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -31,82 +42,92 @@ jobs:
       - name: 🏗 Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: ✅ Accept Android SDK licenses
-        shell: bash
-        run: |
-          set +e
-          LICENSE_TOOL="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$LICENSE_TOOL" ]; then
-            echo "sdkmanager tool not found at $LICENSE_TOOL"
-            exit 0
-          fi
-          yes | "$LICENSE_TOOL" --licenses > /tmp/licenses.log 2>&1
-          status=$?
-          if [ "$status" -ne 0 ] && [ "$status" -ne 141 ]; then
-            cat /tmp/licenses.log
-            exit $status
-          fi
-          cat /tmp/licenses.log
+      - name: ️ Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+            ${{ env.ANDROID_HOME }}/system-images/*
+            ${{ env.ANDROID_HOME }}/platforms/*
+            ${{ env.ANDROID_HOME }}/platform-tools/*
+            ${{ env.ANDROID_HOME }}/build-tools/*
+          key: android-sdk-${{ runner.os }}-api-34
+          restore-keys: |
+            android-sdk-${{ runner.os }}-
 
       - name: 📦 Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
-      - name: 🏗 Setup Expo
+      - name: 🔐 Verify Expo token
+        run: test -n "${{ secrets.EXPO_TOKEN }}" || (echo "❌ Missing EXPO_TOKEN secret"; exit 1)
+
+      - name: 🏗 Setup Expo & EAS (npm-only)
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN || '' }}
-        continue-on-error: true
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
 
-      - name: 🤖 Create Android emulator
+      - name: 🛠️ Install modern Android cmdline-tools (schema v4 aware)
         run: |
-          AVD_NAME="Pixel_XL_API_34"
-          # Verify Android SDK is properly installed
-          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "Android SDK tools not found. Ensure android-actions/setup-android@v3 succeeded."
-            exit 1
-          fi
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-34;google_apis;x86_64"
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
+          set -euo pipefail
+          # Install latest cmdline-tools using the legacy bootstrap if needed
+          "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" "cmdline-tools;latest" || true
 
-          # Create AVD with proper parameters - use pixel_xl device profile for better compatibility
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
+          AVD_NAME="Pixel_XL_API_34"
+          # Use the newly installed 'latest' for all subsequent commands
+
+          export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
+
+          # Show versions for diagnostics
+          sdkmanager --version || true
+          avdmanager --help 2>&1 | head -n 1 || true
+
+          # Accept licenses and make sure required packages are present
+          yes | sdkmanager --licenses
+          sdkmanager --install \
+            "platform-tools" \
+            "emulator" \
+            "platforms;android-34" \
+            "system-images;android-34;google_apis;x86_64"
+
+      - name: 🤖 Create / verify AVD (Pixel_XL_API_34)
+        env:
+          AVD_NAME: Pixel_XL_API_34
+          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
+        run: |
+          set -euo pipefail
+          export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
+
+          # Clean up any stale AVD entry
+          avdmanager delete avd --name "${AVD_NAME}" || true
+
+          # Create with schema-v4 aware avdmanager
+          echo "no" | avdmanager create avd \
             --force \
-            --name "$AVD_NAME" \
+            --name "${AVD_NAME}" \
             --package "system-images;android-34;google_apis;x86_64" \
             --tag "google_apis" \
             --abi "x86_64" \
             --device "pixel_xl"
-
-          # Verify AVD was created
-          $ANDROID_HOME/emulator/emulator -list-avds
-        env:
-          AVD_NAME: Pixel_XL_API_34
+          # Diagnostics
+          ls -la "$HOME/.android/avd"
+          grep -n "." "$HOME/.android/avd/${AVD_NAME}.ini"
 
       - name: 🤖 Start Android emulator
-        run: |
-          AVD_NAME="${AVD_NAME:-Pixel_XL_API_34}"
-          # Verify emulator binary exists
-          if [ ! -f "$ANDROID_HOME/emulator/emulator" ]; then
-            echo "Android emulator binary not found at $ANDROID_HOME/emulator/emulator"
-            exit 1
-          fi
-          if [ ! -f "$HOME/.android/avd/${AVD_NAME}.ini" ]; then
-            echo "AVD $AVD_NAME not found, recreating..."
-            mkdir -p "$HOME/.android/avd"
-            echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd \
-              --force \
-              --name "$AVD_NAME" \
-              --package "system-images;android-34;google_apis;x86_64" \
-              --tag "google_apis" \
-              --abi "x86_64" \
-              --device "pixel_xl"
-          fi
-          $ANDROID_HOME/emulator/emulator -avd "$AVD_NAME" -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
-          $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\''\r'\'') ]]; do sleep 1; done; input keyevent 82'
         env:
           AVD_NAME: Pixel_XL_API_34
+          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
+        run: |
+          "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" \
+            -no-snapshot -no-window -camera-back none -camera-front none \
+            -selinux permissive -qemu -m 2048 &
+          "${ANDROID_HOME}/platform-tools/adb" wait-for-device shell \
+            'while [[ -z $(getprop sys.boot_completed | tr -d "\r") ]]; do sleep 1; done; input keyevent 82'
+      - name: 🌐 Expo Web export test
+        run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
 
       - name: 🏗 Build app for E2E
         run: |
@@ -117,16 +138,18 @@ jobs:
 
       - name: 🚀 Start backend server
         run: |
-          cd backend
-          npm ci --legacy-peer-deps
+          npm ci
           npm start &
           # Wait for server to be ready
           timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
+        working-directory: backend
         env:
           NODE_ENV: test
           DATABASE_URL: file:./test.db
           JWT_SECRET: test-secret-key
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
 
       - name: 🧪 Run Detox E2E tests
         run: npm run test:e2e:android

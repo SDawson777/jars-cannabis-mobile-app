@@ -27,10 +27,10 @@ export function useCart() {
   const [loadingFromCache, setLoadingFromCache] = useState(false);
 
   // Get normalized cart items from Zustand store
-  const storeItems = useCartStore(state => state.items);
-  const appliedCoupon = useCartStore(state => state.appliedCoupon);
-  const setItems = useCartStore(state => state.setItems);
-  const setAppliedCoupon = useCartStore(state => state.setAppliedCoupon);
+  const storeItems = useCartStore((state: any) => state.items);
+  const appliedCoupon = useCartStore((state: any) => state.appliedCoupon);
+  const setItems = useCartStore((state: any) => state.setItems);
+  const setAppliedCoupon = useCartStore((state: any) => state.setAppliedCoupon);
 
   const setStoreItems = (cartPayload: any) => {
     try {
@@ -187,7 +187,10 @@ export function useCart() {
     // Return normalized cart with items from store and calculated total
     cart: {
       items: storeItems,
-      total: storeItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      total: storeItems.reduce(
+        (sum: number, item: CartItem) => sum + item.price * item.quantity,
+        0
+      ),
       appliedCoupon,
     },
     isLoading: query.isLoading && !loadingFromCache,

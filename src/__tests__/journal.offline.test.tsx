@@ -32,8 +32,8 @@ describe('useOfflineJournalQueue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUnsubscribe = jest.fn();
-    mockNetInfo.addEventListener.mockReturnValue(mockUnsubscribe);
-    mockNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
+    mockNetInfo.addEventListener.mockReturnValue({ remove: mockUnsubscribe });
+    mockNetInfo.fetch.mockResolvedValue({ isConnected: true, type: 'wifi' } as any);
   });
 
   afterEach(() => {
@@ -222,10 +222,12 @@ describe('useOfflineJournalQueue', () => {
     const queuedActions = [{ type: 'create', payload: { productId: 'test-reconnect' } }];
 
     let connectivityListener: ((state: any) => void) | undefined;
-    mockNetInfo.addEventListener.mockImplementation(listener => {
-      connectivityListener = listener;
-      return mockUnsubscribe;
-    });
+    mockNetInfo.addEventListener.mockImplementation(
+      (listener: (state: { isConnected: boolean; type: string }) => void) => {
+        connectivityListener = listener;
+        return { remove: mockUnsubscribe };
+      }
+    );
 
     // Initially offline
     mockNetInfo.fetch.mockResolvedValueOnce({ isConnected: false } as any);
@@ -245,7 +247,7 @@ describe('useOfflineJournalQueue', () => {
 
     // Trigger connectivity change to online
     if (connectivityListener) {
-      connectivityListener({ isConnected: true });
+      connectivityListener({ isConnected: true, type: 'wifi' });
     }
 
     await waitFor(
@@ -275,22 +277,12 @@ describe('useOfflineJournalQueue', () => {
   });
 
   it('should handle subscription cleanup gracefully with different subscription types', () => {
-    // Test function-style subscription
-    mockNetInfo.addEventListener.mockReturnValue(mockUnsubscribe);
+    // Test object-style with remove method (standard NetInfo pattern)
+    const mockObjectRemove = { remove: jest.fn() };
+    mockNetInfo.addEventListener.mockReturnValue(mockObjectRemove);
     const { unmount: unmount1 } = renderHook(() => useOfflineJournalQueue());
     unmount1();
-    expect(mockUnsubscribe).toHaveBeenCalled();
-
-    // Test object-style with unsubscribe method
-    const mockObjectSub = { unsubscribe: jest.fn() };
-    mockNetInfo.addEventListener.mockReturnValue(mockObjectSub as any);
-    const { unmount: unmount2 } = renderHook(() => useOfflineJournalQueue());
-    unmount2();
-    expect(mockObjectSub.unsubscribe).toHaveBeenCalled();
-
-    // Test object-style with remove method
-    const mockObjectRemove = { remove: jest.fn() };
-    mockNetInfo.addEventListener.mockReturnValue(mockObjectRemove as any);
+    expect(mockObjectRemove.remove).toHaveBeenCalled();
     const { unmount: unmount3 } = renderHook(() => useOfflineJournalQueue());
     unmount3();
     expect(mockObjectRemove.remove).toHaveBeenCalled();

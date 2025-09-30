@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import type { Resolver } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -40,7 +39,7 @@ export default function AddAddressScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
 
   const { control, handleSubmit } = useForm<AddressFormValues>({
-    resolver: yupResolver(addressSchema) as unknown as Resolver<AddressFormValues, any>,
+    resolver: yupResolver(addressSchema) as any,
   });
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -123,7 +122,19 @@ export default function AddAddressScreen() {
             <Controller
               control={control}
               name={name as keyof AddressFormValues}
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }: {
+                field: {
+                  onChange: (value: string) => void;
+                  onBlur: () => void;
+                  value: string;
+                };
+                fieldState: {
+                  error?: { message?: string };
+                };
+              }) => (
                 <>
                   <TextInput
                     style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}

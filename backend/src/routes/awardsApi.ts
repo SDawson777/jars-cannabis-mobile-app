@@ -3,6 +3,7 @@ import { redeemAward, getAwardById } from '../controllers/awardsController';
 import { prisma } from '../prismaClient';
 import { requireAuth } from '../middleware/auth';
 import { rewardsCatalog } from '../rewards/catalog';
+import { rateLimit } from '../middleware/rateLimit';
 
 export const awardsApiRouter = Router();
 
@@ -57,10 +58,16 @@ awardsApiRouter.get('/awards', requireAuth, async (req, res) => {
 });
 
 // POST /awards/:id/redeem -> { success, award }
-awardsApiRouter.post('/awards/:id/redeem', requireAuth, async (req, res) => {
-  req.body = { awardId: req.params.id } as any;
-  return redeemAward(req as any, res as any);
-});
+// Redemption is susceptible to abuse; apply tight rate limit
+awardsApiRouter.post(
+  '/awards/:id/redeem',
+  requireAuth,
+  rateLimit('awards:redeem', 5, 60_000),
+  async (req, res) => {
+    req.body = { awardId: req.params.id } as any;
+    return redeemAward(req as any, res as any);
+  }
+);
 
 // GET single award
 awardsApiRouter.get('/awards/:id', requireAuth, async (req, res) =>

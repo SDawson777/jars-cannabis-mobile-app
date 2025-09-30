@@ -7,8 +7,24 @@ interface RewardPayload {
   id: string;
 }
 
+interface RedeemRewardData {
+  // Add specific fields if known, e.g.:
+  // rewardId: string;
+  // redeemedAt: string;
+  // pointsUsed: number;
+  // etc.
+}
+
+interface RedeemRewardResponse {
+  success: boolean;
+  message?: string;
+  data?: RedeemRewardData;
+}
+
 async function redeemReward(reward: RewardPayload) {
-  return phase4Client.post(`/awards/${reward.id}/redeem`).then(r => r.data);
+  return phase4Client
+    .post<RedeemRewardResponse>(`/awards/${reward.id}/redeem`)
+    .then((r: { data: RedeemRewardResponse }) => r.data as RedeemRewardResponse);
 }
 
 export function useRedeemReward() {

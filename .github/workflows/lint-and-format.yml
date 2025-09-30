@@ -8,17 +8,28 @@ on:
 jobs:
   lint-format:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: '--max-old-space-size=4096'
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: 🔍 Preflight - Verify lockfiles exist
+        run: |
+          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
+          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+          echo "✅ All required lockfiles present"
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
+          cache-dependency-path: |
+            npm-shrinkwrap.json
+            backend/package-lock.json
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
 
       - name: Lint
         run: npm run lint

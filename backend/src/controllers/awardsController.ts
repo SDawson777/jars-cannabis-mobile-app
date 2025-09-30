@@ -31,7 +31,7 @@ export async function redeemAward(req: Request, res: Response) {
   if (!uid) return res.status(401).json({ error: 'unauthorized' });
   const { awardId } = req.body as { awardId: string };
   if (!awardId) {
-    return res.status(400).json({ error: 'awardId is required' });
+    return res.status(400).json({ error: 'invalid_payload', details: { awardId: 'required' } });
   }
 
   try {
@@ -39,6 +39,24 @@ export async function redeemAward(req: Request, res: Response) {
     // First attempt to treat awardId as a reward catalog redemption.
     const reward = findRewardInCatalog(awardId);
     if (reward) {
+      // Idempotent guard: check if a redemption for this catalog reward was created very recently (e.g., within last 5 seconds)
+      // to mitigate rapid duplicate taps. Since catalog redemptions become Award history entries with matching title, inspect recent entries.
+      const recent = await client.award.findMany?.({
+        where: { userId: uid },
+      });
+      if (Array.isArray(recent)) {
+        const now = Date.now();
+        const duplicate = recent.find(
+          (a: any) =>
+            (a.title === reward.title || a.rewardId === reward.id) &&
+            a.status === 'REDEEMED' &&
+            a.redeemedAt &&
+            now - new Date(a.redeemedAt).getTime() < 5000
+        );
+        if (duplicate) {
+          return res.status(409).json({ error: 'duplicate_redemption', details: { awardId } });
+        }
+      }
       // Load or create loyalty status
       const loyalty = await client.loyaltyStatus.upsert({
         where: { userId: uid },
@@ -46,7 +64,10 @@ export async function redeemAward(req: Request, res: Response) {
         create: { userId: uid, points: 0, tier: 'Bronze' },
       });
       if (loyalty.points < reward.cost) {
-        return res.status(400).json({ error: 'insufficient_points' });
+        return res.status(400).json({
+          error: 'insufficient_points',
+          details: { needed: reward.cost, current: loyalty.points },
+        });
       }
       // Deduct cost
       const updatedLoyalty = await client.loyaltyStatus.update({
@@ -61,6 +82,7 @@ export async function redeemAward(req: Request, res: Response) {
       const createdAward = await client.award.create({
         data: {
           userId: uid,
+          rewardId: reward.id,
           // Store redemption as an Award history entry
           title: reward.title,
           description: reward.description,
@@ -75,13 +97,13 @@ export async function redeemAward(req: Request, res: Response) {
     // Fallback: legacy behavior for existing Award entity redemption (achievements)
     const award = await client.award.findUnique({ where: { id: awardId } });
     if (!award) {
-      return res.status(404).json({ error: 'Award not found' });
+      return res.status(404).json({ error: 'not_found', details: { awardId } });
     }
     if (award.userId !== uid) {
-      return res.status(403).json({ error: 'Award does not belong to user' });
+      return res.status(403).json({ error: 'forbidden' });
     }
     if (award.status === 'REDEEMED') {
-      return res.status(400).json({ error: 'Award already redeemed' });
+      return res.status(409).json({ error: 'already_redeemed' });
     }
 
     const updated = await client.award.update({
@@ -91,7 +113,9 @@ export async function redeemAward(req: Request, res: Response) {
 
     return res.json({ success: true, award: updated });
   } catch (err) {
-    return res.status(500).json({ error: (err as Error).message });
+    return res
+      .status(500)
+      .json({ error: 'server_error', details: { message: (err as Error).message } });
   }
 }
 

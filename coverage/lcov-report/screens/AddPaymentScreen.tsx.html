@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.84% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>28/33</span>
+                <span class='fraction'>30/35</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.84% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>28/33</span>
+                <span class='fraction'>30/35</span>
             </div>
         
             
@@ -342,7 +342,14 @@
 <a name='L277'></a><a href='#L277'>277</a>
 <a name='L278'></a><a href='#L278'>278</a>
 <a name='L279'></a><a href='#L279'>279</a>
-<a name='L280'></a><a href='#L280'>280</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -402,15 +409,14 @@
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -520,8 +526,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -653,7 +667,7 @@ import { toast } from '../utils/toast';
 }
 &nbsp;
 type AddPaymentNavProp = NativeStackNavigationProp&lt;RootStackParamList, 'AddPayment'&gt;;
-type FormData = {
+type PaymentFormData = {
   holderName: string;
   cardBrand: string;
   cardLast4: string;
@@ -662,7 +676,7 @@ type FormData = {
 };
 &nbsp;
 type FieldDescriptor = {
-  name: keyof FormData;
+  name: keyof PaymentFormData;
   label: string;
   keyboard: any;
   secure: boolean;
@@ -681,15 +695,14 @@ export default function AddPaymentScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const queryClient = useQueryClient();
 &nbsp;
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm&lt;FormData&gt;({
+  const form = useForm&lt;PaymentFormData&gt;({
     resolver: yupResolver(schema) as any,
     mode: 'onChange',
     defaultValues: { holderName: '', cardBrand: '', cardLast4: '', expiry: '', isDefault: false },
   });
+&nbsp;
+  const { control, handleSubmit } = form;
+  const { errors, isValid, isSubmitting } = (form as any).formState;
 &nbsp;
   useEffect(() =&gt; {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -723,7 +736,7 @@ export default function AddPaymentScreen() {
 <span class="cstat-no" title="statement not covered" >    navigation.goBack();</span>
   };
 &nbsp;
-  const onSubmit = async (data: FormData) =&gt; {
+  const onSubmit = async (data: PaymentFormData) =&gt; {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
@@ -798,7 +811,11 @@ export default function AddPaymentScreen() {
               &lt;Controller
                 control={control}
                 name={f.name}
-                render={({ field: { value, onChange } }) =&gt; (
+                render={({
+                  field: { value, onChange },
+                }: {
+                  field: { value: boolean; onChange: (value: boolean) =&gt; void };
+                }) =&gt; (
                   &lt;Pressable
                     onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >onChange(!value)}</span>
                     style={[
@@ -820,7 +837,11 @@ export default function AddPaymentScreen() {
               &lt;Controller
                 control={control}
                 name={f.name as any}
-                render={({ field: { onChange, onBlur, value } }) =&gt; (
+                render={({
+                  field: { onChange, onBlur, value },
+                }: {
+                  field: { onChange: (value: string) =&gt; void; onBlur: () =&gt; void; value: string };
+                }) =&gt; (
                   &lt;TextInput
                     style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
                     placeholder={f.label}
@@ -907,7 +928,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T17:34:28.832Z
+                at 2025-09-27T02:58:24.547Z
             </div>
         <script src="../prettify.js"></script>
         <script>

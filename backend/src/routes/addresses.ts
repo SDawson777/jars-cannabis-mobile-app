@@ -1,6 +1,28 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { requireAuth } from '../middleware/auth';
+import { z } from 'zod';
+
+// Address validation schema: all create fields required except line2.
+const addressSchema = z.object({
+  fullName: z.string().trim().min(1).max(80),
+  phone: z
+    .string()
+    .trim()
+    .min(7)
+    .max(30)
+    .transform(p => p.replace(/[^+\d]/g, '')),
+  line1: z.string().trim().min(1).max(100),
+  line2: z.string().trim().max(100).optional().or(z.literal('')),
+  city: z.string().trim().min(1).max(80),
+  state: z.string().trim().min(2).max(2),
+  zipCode: z
+    .string()
+    .trim()
+    .regex(/^\d{5}(-\d{4})?$/, 'zipCode must be 12345 or 12345-6789'),
+  country: z.string().trim().min(2).max(2),
+  isDefault: z.boolean().optional(),
+});
 
 export const addressesRouter = Router();
 
@@ -32,32 +54,28 @@ addressesRouter.get('/addresses', requireAuth, async (req, res) => {
 addressesRouter.post('/addresses', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const p = prisma as any;
-  const { line1, line2, city, state, zipCode, country, fullName, phone, isDefault } =
-    req.body || {};
-  // simple runtime validation
-  if (
-    !fullName ||
-    typeof fullName !== 'string' ||
-    !phone ||
-    typeof phone !== 'string' ||
-    !line1 ||
-    typeof line1 !== 'string' ||
-    !city ||
-    typeof city !== 'string' ||
-    !state ||
-    typeof state !== 'string' ||
-    !zipCode ||
-    typeof zipCode !== 'string' ||
-    !country ||
-    typeof country !== 'string'
-  ) {
-    return res.status(400).json({ error: 'Invalid address payload' });
+  const parse = addressSchema.safeParse(req.body || {});
+  if (!parse.success) {
+    return res.status(400).json({ error: 'invalid_payload', details: parse.error.flatten() });
   }
+  const { fullName, phone, line1, line2, city, state, zipCode, country, isDefault } = parse.data;
+
+  // Duplicate detection (userId + line1 + city + state + zipCode [case-insensitive])
+  const existing = await p.address.findMany({ where: { userId: uid } });
+  const dup = existing.find(
+    (a: any) =>
+      a.line1.toLowerCase() === line1.toLowerCase() &&
+      a.city.toLowerCase() === city.toLowerCase() &&
+      a.state.toLowerCase() === state.toLowerCase() &&
+      a.zipCode.toLowerCase() === zipCode.toLowerCase()
+  );
+  if (dup) return res.status(409).json({ error: 'duplicate_address' });
+
   const created = await p.address.create({
     data: {
       userId: uid,
       line1,
-      line2: line2 || null,
+      line2: line2 ? line2 : null,
       city,
       state,
       zipCode,
@@ -97,18 +115,33 @@ addressesRouter.put('/addresses/:id', requireAuth, async (req, res) => {
   const existing = await p.address.findUnique({ where: { id } });
   if (!existing) return res.status(404).json({ error: 'Not found' });
   if (existing.userId !== uid) return res.status(403).json({ error: 'Forbidden' });
-  const { line1, line2, city, state, zipCode, country, fullName, phone, isDefault } =
-    req.body || {};
-  // optional type checks
-  if (fullName !== undefined && typeof fullName !== 'string')
-    return res.status(400).json({ error: 'Invalid fullName' });
-  if (phone !== undefined && typeof phone !== 'string')
-    return res.status(400).json({ error: 'Invalid phone' });
+
+  const partialSchema = addressSchema.partial();
+  const parse = partialSchema.safeParse(req.body || {});
+  if (!parse.success) {
+    return res.status(400).json({ error: 'invalid_payload', details: parse.error.flatten() });
+  }
+  const { fullName, phone, line1, line2, city, state, zipCode, country, isDefault } = parse.data;
+
+  // If identifying location components change, check duplicates
+  if (line1 || city || state || zipCode) {
+    const others = await p.address.findMany({ where: { userId: uid } });
+    const dup = others.find(
+      (a: any) =>
+        a.id !== id &&
+        (line1 ?? existing.line1).toLowerCase() === a.line1.toLowerCase() &&
+        (city ?? existing.city).toLowerCase() === a.city.toLowerCase() &&
+        (state ?? existing.state).toLowerCase() === a.state.toLowerCase() &&
+        (zipCode ?? existing.zipCode).toLowerCase() === a.zipCode.toLowerCase()
+    );
+    if (dup) return res.status(409).json({ error: 'duplicate_address' });
+  }
+
   const updated = await p.address.update({
     where: { id },
     data: {
       ...(line1 !== undefined ? { line1 } : {}),
-      ...(line2 !== undefined ? { line2 } : {}),
+      ...(line2 !== undefined ? { line2: line2 || null } : {}),
       ...(city !== undefined ? { city } : {}),
       ...(state !== undefined ? { state } : {}),
       ...(zipCode !== undefined ? { zipCode } : {}),

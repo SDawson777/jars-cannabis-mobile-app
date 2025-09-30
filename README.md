@@ -56,19 +56,65 @@ Cloud deploy ready (Railway, Render)
 
 Fast local setup and test
 
+## 📋 Requirements
+
+- **Node.js**: 20.11.1 (use `nvm install` to auto-install from .nvmrc)
+- **Package Manager**: npm 9+ (npm-only workflow, Yarn not supported)
+- **Memory**: 8GB+ recommended for dependency installation
+- **Mobile Development**: Expo CLI, Android Studio (for emulator), Xcode (for iOS)
+
+## 🏗️ Monorepo Structure
+
+This project uses a monorepo structure with dual lockfile management:
+
+- **Root App** (React Native/Expo): Uses `npm-shrinkwrap.json` for deterministic installs
+- **Backend** (Node.js/Express): Uses `package-lock.json` for backend-specific dependencies
+- **Lockfile Policy**: Both lockfiles must be committed - CI will fail if either is missing
+- **npm-only Workflow**: Configured for Expo GitHub Action with `packager: npm`
+
+### CI/CD Pipeline Overview
+
+- **Dual npm ci Installs**: Root and backend dependencies installed separately for optimal caching
+- **Cache Strategy**: Keyed to both `npm-shrinkwrap.json` and `backend/package-lock.json`
+- **Memory Optimization**: `NODE_OPTIONS=--max-old-space-size=4096` for large dependency trees
+- **Quality Gates**: Lint, TypeScript, format checks, comprehensive test suites (frontend + backend)
+- **Android E2E**: Schema v4-aware AVD setup with cmdline-tools;latest for reliable emulator testing
+- **Web Export**: Non-blocking Expo web export validation
+
+**Installation Commands:**
+
+```bash
+# Install all dependencies (root + backend)
+npm run install:all
+
+# Manual installation
+npm ci                    # Root dependencies (uses npm-shrinkwrap.json)
+cd backend && npm ci      # Backend dependencies (uses package-lock.json)
+
+# Lockfile regeneration (when adding dependencies)
+npm install && npm shrinkwrap        # Root shrinkwrap update
+cd backend && npm install            # Backend package-lock update
+```
+
 ⚡️ Quickstart
 
 1. Clone the repository
 
+```bash
 git clone https://github.com/YOUR-ORG/jars-cannabis-mobile-app.git
 cd jars-cannabis-mobile-app
+```
 
 2. Install Node and dependencies
 
-nvm install # install Node version from .nvmrc
+```bash
+nvm install # install Node 20.11.1 from .nvmrc
 nvm use
-chmod +x setup.sh
-./setup.sh
+# Install all project dependencies with memory optimization
+npm run install:all
+# OR manual installation:
+NODE_OPTIONS="--max-old-space-size=6144" npm install --legacy-peer-deps
+```
 
 3. Setup the backend
 
@@ -201,19 +247,119 @@ when you want to use the terpene wheel module.
 
 🧪 Testing & Quality
 
-Lint:npm run lint (ESLint)
+**Lint:** `npm run lint` (ESLint with minimatch override for compatibility)
 
-Format:npm run format (Prettier)
+**Format:** `npm run format:ci` (Prettier - fails CI if not formatted)
 
-Test (backend):npm run test (Jest + Supertest)
+**Type Safety:** `npm run typecheck` (TypeScript compilation)
 
-Pre-commit hooks:Linting and formatting run automatically on commit
+**Unit Tests:** `npm run test:ci` (Jest + React Native Testing Library)
 
-🛠️ CI/CD
+**Backend Tests:** `npm --prefix backend run test:ci` (Jest + Supertest)
 
-GitHub Actions: runs tests/lints for every PR
+**E2E Tests:** `npm run test:e2e:android` (Detox with Android emulator)
 
-Sentry: error monitoring (just set your DSN in .env)
+**Pre-commit hooks:** Linting and formatting run automatically on commit
+
+## � CI/CD Pipeline
+
+### GitHub Actions Workflows
+
+**Main CI (`ci.yml`)**
+
+- Triggers: Push to main, Pull Requests
+- Node.js 20.11.1 with 4GB memory allocation
+- Runs: lint → format → typecheck → tests → backend tests → audit
+- Caches: npm cache, backend node_modules
+
+**E2E Smoke Tests (`e2e-smoke.yml`)**
+
+- Android emulator with API 34 (Pixel XL)
+- EAS Build integration for app compilation
+- Comprehensive Android SDK caching
+- Firebase backend integration for full-stack testing
+- Detox test suite: Auth → Cart → Checkout → Concierge → Awards → Weather → Legal
+
+**Lint & Format (`lint-and-format.yml`)**
+
+- Fast formatting and linting checks
+- Fails build on format violations
+
+**Newman Smoke Tests (`newman-smoke.yml`)**
+
+- API endpoint testing with Postman collections
+
+### Memory Optimization
+
+All workflows include `NODE_OPTIONS: "--max-old-space-size=4096"` to prevent memory exhaustion during:
+
+- Dependency installation (`npm ci --legacy-peer-deps`)
+- ESLint execution with large codebases
+- TypeScript compilation
+- Test execution
+
+### Caching Strategy
+
+- **npm cache**: Automatic via `actions/setup-node@v4`
+- **Android SDK**: system-images, platforms, build-tools, AVDs
+- **Backend dependencies**: Separate cache key based on backend/package-lock.json
+
+### Build Artifacts
+
+E2E tests upload artifacts on failure:
+
+- Detox screenshots and videos
+- Test execution logs
+- Device/emulator state dumps
+
+## 🚀 Local Development
+
+### Run Detox E2E Tests Locally
+
+1. **Setup Android Emulator**
+
+   ```bash
+   # Create AVD (if not exists)
+   avdmanager create avd --force --name "Pixel_XL_API_34" --package "system-images;android-34;google_apis;x86_64" --tag "google_apis" --abi "x86_64"
+
+   # Start emulator
+   emulator -avd Pixel_XL_API_34 -no-snapshot -no-window
+   ```
+
+2. **Build E2E App**
+
+   ```bash
+   npm run build:e2e:android
+   ```
+
+3. **Start Backend (separate terminal)**
+
+   ```bash
+   cd backend
+   NODE_ENV=test npm start
+   ```
+
+4. **Run Tests**
+   ```bash
+   npm run test:e2e:android
+   ```
+
+### Development Scripts
+
+```bash
+# Install all dependencies with memory optimization
+npm run install:all
+
+# Clean reinstall
+npm run clean:modules
+
+# Start development servers
+npm run start                    # Expo dev server
+npm run android                 # Android-specific
+npm run ios                     # iOS-specific
+npm run demo:web               # Web demo
+npm run start:backend          # Express API server
+```
 
 ## Compliance
 

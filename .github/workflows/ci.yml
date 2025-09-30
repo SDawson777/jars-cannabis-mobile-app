@@ -9,23 +9,76 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: '--max-old-space-size=4096'
     steps:
       - uses: actions/checkout@v4
+
+      - name: 🔍 Preflight - Verify lockfiles exist
+        run: |
+          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
+          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+          echo "✅ All required lockfiles present"
+
       - uses: actions/setup-node@v4
-        with: { node-version: '20.x', cache: 'npm' }
-      - name: Install root deps (legacy peer deps for RN/@types/react mismatch)
-        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: |
+            npm-shrinkwrap.json
+            backend/package-lock.json
+
+      - name: 📦 Cache npm (root)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache-root-${{ hashFiles('npm-shrinkwrap.json') }}
+          restore-keys: |
+            npm-cache-root-
+
+      - name: 📦 Cache npm (backend)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache-backend-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            npm-cache-backend-
+
+      - name: 🔧 Install deps (root)
+        run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Format Check
+        run: npm run format:ci
       - name: Typecheck
         run: npm run typecheck
       - name: Unit & Integration Tests (frontend)
         run: npm run test:ci
-      - name: Backend deps (legacy peer deps)
-        run: npm --prefix backend ci --legacy-peer-deps || npm --prefix backend install --legacy-peer-deps
+
+      - name: 🔧 Install deps (backend)
+        run: npm ci
+        working-directory: backend
+
+      - name: Backend Lint
+        run: npm run lint
+        working-directory: backend
+
       - name: Backend Typecheck
-        run: npm --prefix backend run typecheck || echo "skip if not configured"
+        run: npm run typecheck
+        working-directory: backend
+
       - name: Backend Tests
-        run: npm --prefix backend run test:ci || echo "no backend tests yet"
+        run: npm run test:ci
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: file:./test.db
+          JWT_SECRET: test-secret-key
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
+      
+      - name: 🌐 Expo Web Export Test (non-blocking)
+        run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
+      
       - name: Audit (no fail on warn)
         run: npm audit --production --audit-level=high || true

@@ -118,7 +118,13 @@ export default function EditProfileScreen() {
             <Controller
               control={control}
               name={name as keyof ProfileFormValues}
-              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error },
+              }: {
+                field: { onChange: (value: string) => void; onBlur: () => void; value: string };
+                fieldState: { error?: { message: string } };
+              }) => (
                 <>
                   <TextInput
                     style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
@@ -127,7 +133,7 @@ export default function EditProfileScreen() {
                     keyboardType={keyboard as any}
                     value={value}
                     onBlur={onBlur}
-                    onChangeText={t => {
+                    onChangeText={(t: string) => {
                       hapticLight();
                       onChange(t);
                     }}

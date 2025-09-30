@@ -1,41 +1,199 @@
 import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { requireAuth } from '../middleware/auth';
+import { z } from 'zod';
+import { rateLimit } from '../middleware/rateLimit';
+import { getCachedPrice, setCachedPrice } from '../utils/lruCache';
 
 export const ordersRouter = Router();
 
-ordersRouter.post('/orders', requireAuth, async (req, res) => {
-  const uid = (req as any).user.userId as string;
-  let { storeId, contact, paymentMethod = 'pay_at_pickup', notes } = req.body || {};
+// Schema for optional contact fields (light validation now, can extend later)
+const contactSchema = z
+  .object({
+    name: z.string().min(1).max(100).optional(),
+    phone: z.string().min(7).max(20).optional(),
+    email: z.string().email().optional(),
+  })
+  .partial();
 
-  // If storeId not provided, try to infer from the user's cart
-  const preCart = await prisma.cart.findFirst({ where: { userId: uid }, include: { items: true } });
-  if (!storeId) {
-    if (preCart && preCart.storeId) storeId = preCart.storeId;
-    else return res.status(400).json({ error: 'storeId required' });
-  }
+// Apply stricter rate limit: ordering is a high-value operation
+ordersRouter.post(
+  '/orders',
+  requireAuth,
+  rateLimit('orders:create', 10, 60_000),
+  async (req, res) => {
+    const uid = (req as any).user.userId as string;
+    let {
+      storeId,
+      contact,
+      paymentMethod = 'pay_at_pickup',
+      notes,
+      idempotencyKey,
+    } = req.body || {};
 
-  // Validate delivery address when deliveryMethod is delivery
-  const { deliveryMethod } = req.body || {};
-  if (deliveryMethod === 'delivery') {
-    const addr = req.body?.deliveryAddress || {};
-    if (!addr.city || !addr.state || !addr.zipCode)
-      return res.status(400).json({ error: 'invalid address' });
-  }
+    // Idempotency check: if key provided, ensure we don't duplicate orders
+    if (idempotencyKey) {
+      const existing = await prisma.order.findFirst({
+        where: {
+          userId: uid,
+          notes: `idempotency:${idempotencyKey}`,
+        },
+        include: { items: true },
+      });
 
-  // Validate payment method
-  const allowedPayments = ['card', 'pay_at_pickup'];
-  if (req.body?.paymentMethod && !allowedPayments.includes(req.body.paymentMethod)) {
-    return res.status(400).json({ error: 'invalid payment method' });
-  }
+      if (existing) {
+        // Return the existing order to prevent duplicate
+        const store = await prisma.store.findUnique({ where: { id: existing.storeId } });
+        const hydratedItems = await Promise.all(
+          (existing.items || []).map(async (it: any) => {
+            const _productPrice = getCachedPrice(`product:${it.productId}`) ?? it.unitPrice ?? 0;
+            const _variantPrice = it.variantId
+              ? getCachedPrice(`variant:${it.variantId}`)
+              : undefined;
+            return {
+              id: it.id,
+              name: 'Item', // Would need product lookup for real name
+              quantity: it.quantity,
+              price: it.unitPrice,
+            };
+          })
+        );
 
-  const cart =
-    preCart || (await prisma.cart.findFirst({ where: { userId: uid }, include: { items: true } }));
-  if (!cart || cart.items.length === 0) return res.status(400).json({ error: 'cart is empty' });
+        return res.status(200).json({
+          order: {
+            id: existing.id,
+            createdAt: existing.createdAt,
+            total: existing.total,
+            status: 'pending',
+            deliveryMethod: 'pickup', // Would need to store this
+            deliveryAddress: null,
+            paymentMethod: existing.paymentMethod || 'pay_at_pickup',
+            store: store?.name || '',
+            items: hydratedItems,
+            subtotal: existing.subtotal,
+            taxes: existing.tax ?? 0,
+            fees: 0,
+          },
+          idempotent: true,
+        });
+      }
+    }
 
-  const itemsToCreate = await Promise.all(
-    cart.items.map(async ci => {
-      const price = (ci.unitPrice ?? 0) as number;
+    // Basic payload validation (non-fatal): validate contact shape if provided
+    if (contact) {
+      const parsed = contactSchema.safeParse(contact);
+      if (!parsed.success) {
+        return res.status(400).json({ error: 'invalid_payload', details: parsed.error.flatten() });
+      }
+      contact = parsed.data;
+    }
+
+    // If storeId not provided, try to infer from the user's cart
+    const preCart = await prisma.cart.findFirst({
+      where: { userId: uid },
+      include: { items: true },
+    });
+    if (!storeId) {
+      if (preCart && preCart.storeId) storeId = preCart.storeId;
+      else return res.status(400).json({ error: 'storeId required' });
+    }
+
+    // Validate delivery address when deliveryMethod is delivery
+    const { deliveryMethod } = req.body || {};
+    if (deliveryMethod === 'delivery') {
+      const addr = req.body?.deliveryAddress || {};
+      if (!addr.city || !addr.state || !addr.zipCode)
+        return res.status(400).json({ error: 'invalid address' });
+    }
+
+    // Validate payment method
+    const allowedPayments = ['card', 'pay_at_pickup'];
+    if (req.body?.paymentMethod && !allowedPayments.includes(req.body.paymentMethod)) {
+      return res.status(400).json({ error: 'invalid payment method' });
+    }
+
+    const cart =
+      preCart ||
+      (await prisma.cart.findFirst({ where: { userId: uid }, include: { items: true } }));
+    if (!cart || cart.items.length === 0) return res.status(400).json({ error: 'cart is empty' });
+
+    // Pricing integrity: batch fetch all products and variants to avoid N+1 queries
+    // Use cache for frequently accessed prices to reduce DB load
+    const productIds = [...new Set(cart.items.map(ci => ci.productId))];
+    const variantIds = cart.items.map(ci => ci.variantId).filter(Boolean) as string[];
+
+    // Check cache first for products and variants
+    const uncachedProductIds: string[] = [];
+    const uncachedVariantIds: string[] = [];
+    const priceCache = new Map<string, number>();
+
+    for (const pid of productIds) {
+      const cached = getCachedPrice(`product:${pid}`);
+      if (cached !== undefined) {
+        priceCache.set(`product:${pid}`, cached);
+      } else {
+        uncachedProductIds.push(pid);
+      }
+    }
+
+    for (const vid of variantIds) {
+      const cached = getCachedPrice(`variant:${vid}`);
+      if (cached !== undefined) {
+        priceCache.set(`variant:${vid}`, cached);
+      } else {
+        uncachedVariantIds.push(vid);
+      }
+    }
+
+    // Fetch uncached items from DB
+    const [products, variants] = await Promise.all([
+      uncachedProductIds.length > 0
+        ? prisma.product.findMany({ where: { id: { in: uncachedProductIds } } })
+        : [],
+      uncachedVariantIds.length > 0
+        ? prisma.productVariant.findMany({ where: { id: { in: uncachedVariantIds } } })
+        : [],
+    ]);
+
+    // Update cache with fetched data
+    for (const p of products) {
+      const price = (p as any).defaultPrice as number;
+      priceCache.set(`product:${p.id}`, price);
+      setCachedPrice(`product:${p.id}`, price);
+    }
+
+    for (const v of variants) {
+      const price = (v as any).price as number;
+      priceCache.set(`variant:${v.id}`, price);
+      setCachedPrice(`variant:${v.id}`, price);
+    }
+
+    // Validate pricing using cached data
+    for (const ci of cart.items) {
+      const productPrice = priceCache.get(`product:${ci.productId}`) ?? 0;
+      const variantPrice = ci.variantId ? priceCache.get(`variant:${ci.variantId}`) : undefined;
+      const currentPrice = variantPrice ?? productPrice;
+
+      // Allow minor floating drift (<= 0.005) but not material changes
+      if (Math.abs((ci.unitPrice ?? 0) - currentPrice) > 0.005) {
+        return res.status(409).json({
+          error: 'pricing_changed',
+          details: {
+            productId: ci.productId,
+            variantId: ci.variantId,
+            previous: ci.unitPrice,
+            current: currentPrice,
+          },
+        });
+      }
+    }
+
+    const itemsToCreate = cart.items.map(ci => {
+      // Use cached pricing data
+      const productPrice = priceCache.get(`product:${ci.productId}`) ?? 0;
+      const variantPrice = ci.variantId ? priceCache.get(`variant:${ci.variantId}`) : undefined;
+      const price = variantPrice ?? productPrice ?? ci.unitPrice ?? 0;
+
       return {
         productId: ci.productId,
         variantId: ci.variantId || undefined,
@@ -43,68 +201,68 @@ ordersRouter.post('/orders', requireAuth, async (req, res) => {
         unitPrice: price,
         lineTotal: price * ci.quantity,
       };
-    })
-  );
-  const subtotal = itemsToCreate.reduce((s, i) => s + (i.lineTotal || 0), 0);
-  const taxes = Math.round(subtotal * 0.06 * 100) / 100;
-  const fees = 0;
-  const total = Math.round((subtotal + taxes + fees) * 100) / 100;
+    });
+    const subtotal = itemsToCreate.reduce((s, i) => s + (i.lineTotal || 0), 0);
+    const taxes = Math.round(subtotal * 0.06 * 100) / 100;
+    const fees = 0;
+    const total = Math.round((subtotal + taxes + fees) * 100) / 100;
 
-  const created = await prisma.order.create({
-    data: {
-      userId: uid,
-      storeId,
-      status: 'CREATED',
-      paymentMethod,
-      notes,
-      contactName: contact?.name,
-      contactPhone: contact?.phone,
-      contactEmail: contact?.email,
-      subtotal,
-      tax: taxes, // keep DB column name `tax` but we'll expose `taxes` to clients
-      total,
-      items: { create: itemsToCreate },
-    },
-    include: { items: true },
-  });
+    const created = await prisma.order.create({
+      data: {
+        userId: uid,
+        storeId,
+        status: 'CREATED',
+        paymentMethod,
+        notes: idempotencyKey ? `idempotency:${idempotencyKey}` : notes,
+        contactName: contact?.name,
+        contactPhone: contact?.phone,
+        contactEmail: contact?.email,
+        subtotal,
+        tax: taxes, // keep DB column name `tax` but we'll expose `taxes` to clients
+        total,
+        items: { create: itemsToCreate },
+      },
+      include: { items: true },
+    });
 
-  await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
 
-  // Hydrate response: populate store name and item names/prices
-  const store = await prisma.store.findUnique({ where: { id: storeId } });
-  const hydratedItems = await Promise.all(
-    (created.items || []).map(async (it: any) => {
-      const product = await prisma.product.findUnique({ where: { id: it.productId } });
-      const variant = it.variantId
-        ? await prisma.productVariant.findUnique({ where: { id: it.variantId } })
-        : null;
-      return {
-        id: it.id,
-        name: variant?.name || product?.name || 'Item',
-        quantity: it.quantity,
-        price: it.unitPrice,
-      };
-    })
-  );
+    // Hydrate response: populate store name and item names/prices
+    const store = await prisma.store.findUnique({ where: { id: storeId } });
+    const hydratedItems = await Promise.all(
+      (created.items || []).map(async (it: any) => {
+        const product = await prisma.product.findUnique({ where: { id: it.productId } });
+        const variant = it.variantId
+          ? await prisma.productVariant.findUnique({ where: { id: it.variantId } })
+          : null;
+        return {
+          id: it.id,
+          name: variant?.name || product?.name || 'Item',
+          quantity: it.quantity,
+          price: it.unitPrice,
+        };
+      })
+    );
 
-  res.status(201).json({
-    order: {
-      id: created.id,
-      createdAt: created.createdAt,
-      total: created.total,
-      // present friendly lowercase status and echo delivery/payment info
-      status: 'pending',
-      deliveryMethod: req.body?.deliveryMethod || deliveryMethod || 'pickup',
-      deliveryAddress: req.body?.deliveryAddress || null,
-      paymentMethod: req.body?.paymentMethod || paymentMethod,
-      store: store?.name || '',
-      items: hydratedItems,
-      subtotal: created.subtotal,
-      taxes,
-      fees,
-    },
-  });
-});
+    res.status(201).json({
+      order: {
+        id: created.id,
+        createdAt: created.createdAt,
+        total: created.total,
+        // present friendly lowercase status and echo delivery/payment info
+        status: 'pending',
+        deliveryMethod: req.body?.deliveryMethod || deliveryMethod || 'pickup',
+        deliveryAddress: req.body?.deliveryAddress || null,
+        paymentMethod: req.body?.paymentMethod || paymentMethod,
+        store: store?.name || '',
+        items: hydratedItems,
+        subtotal: created.subtotal,
+        taxes,
+        fees,
+      },
+    });
+  }
+);
 
 ordersRouter.get('/orders', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;

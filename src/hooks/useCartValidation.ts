@@ -5,8 +5,8 @@ import { phase4Client } from '../api/phase4Client';
 import { toast } from '../utils/toast';
 
 export function useCartValidation() {
-  const items = useCartStore(_state => _state.items);
-  const setItems = useCartStore(_state => _state.setItems);
+  const items = useCartStore((_state: { items: any }) => _state.items);
+  const setItems = useCartStore((_state: { setItems: any }) => _state.setItems);
   const [validating, setValidating] = useState(true);
 
   useEffect(() => {

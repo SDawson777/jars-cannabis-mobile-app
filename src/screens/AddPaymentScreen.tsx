@@ -30,7 +30,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 type AddPaymentNavProp = NativeStackNavigationProp<RootStackParamList, 'AddPayment'>;
-type FormData = {
+type PaymentFormData = {
   holderName: string;
   cardBrand: string;
   cardLast4: string;
@@ -39,7 +39,7 @@ type FormData = {
 };
 
 type FieldDescriptor = {
-  name: keyof FormData;
+  name: keyof PaymentFormData;
   label: string;
   keyboard: any;
   secure: boolean;
@@ -58,15 +58,14 @@ export default function AddPaymentScreen() {
   const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
   const queryClient = useQueryClient();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm<FormData>({
+  const form = useForm<PaymentFormData>({
     resolver: yupResolver(schema) as any,
     mode: 'onChange',
     defaultValues: { holderName: '', cardBrand: '', cardLast4: '', expiry: '', isDefault: false },
   });
+
+  const { control, handleSubmit } = form;
+  const { errors, isValid, isSubmitting } = (form as any).formState;
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -100,7 +99,7 @@ export default function AddPaymentScreen() {
     navigation.goBack();
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: PaymentFormData) => {
     hapticMedium();
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     try {
@@ -175,7 +174,11 @@ export default function AddPaymentScreen() {
               <Controller
                 control={control}
                 name={f.name}
-                render={({ field: { value, onChange } }) => (
+                render={({
+                  field: { value, onChange },
+                }: {
+                  field: { value: boolean; onChange: (value: boolean) => void };
+                }) => (
                   <Pressable
                     onPress={() => onChange(!value)}
                     style={[
@@ -197,7 +200,11 @@ export default function AddPaymentScreen() {
               <Controller
                 control={control}
                 name={f.name as any}
-                render={({ field: { onChange, onBlur, value } }) => (
+                render={({
+                  field: { onChange, onBlur, value },
+                }: {
+                  field: { onChange: (value: string) => void; onBlur: () => void; value: string };
+                }) => (
                   <TextInput
                     style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
                     placeholder={f.label}
