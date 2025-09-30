@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { phase4Client } from '../api/phase4Client';
 
@@ -11,26 +11,34 @@ interface CartAction {
 
 export function useOfflineCartQueue() {
   const [pending, setPending] = useState(false);
-  useEffect(() => {
-    const processQueue = async () => {
-      const _state = await NetInfo.fetch();
-      if (!_state.isConnected) return;
-      const raw = await AsyncStorage.getItem('cartQueue');
-      if (!raw) {
-        setPending(false);
-        return;
-      }
-      const queue: CartAction[] = JSON.parse(raw);
-      for (const action of queue) {
-        try {
-          await phase4Client.post(action.endpoint, action.payload);
-        } catch {
-          return;
-        }
-      }
+  const processQueue = useCallback(async () => {
+    const _state = await NetInfo.fetch();
+    if (!_state.isConnected) return;
+    const raw = await AsyncStorage.getItem('cartQueue');
+    if (!raw) {
+      setPending(false);
+      return;
+    }
+    const queue: CartAction[] = JSON.parse(raw);
+    if (!Array.isArray(queue) || queue.length === 0) {
       await AsyncStorage.removeItem('cartQueue');
       setPending(false);
-    };
+      return;
+    }
+    for (const action of queue) {
+      try {
+        await phase4Client.post(action.endpoint, action.payload);
+      } catch {
+        // leave queue intact so it can retry later
+        setPending(true);
+        return;
+      }
+    }
+    await AsyncStorage.removeItem('cartQueue');
+    setPending(false);
+  }, []);
+
+  useEffect(() => {
     processQueue();
     const subscription: unknown = NetInfo.addEventListener(_state => {
       if (_state.isConnected) processQueue();
@@ -64,7 +72,7 @@ export function useOfflineCartQueue() {
       }
       // Otherwise nothing to clean up
     };
-  }, []);
+  }, [processQueue]);
 
   const queueAction = async (action: CartAction) => {
     const raw = await AsyncStorage.getItem('cartQueue');
@@ -72,6 +80,11 @@ export function useOfflineCartQueue() {
     queue.push(action);
     await AsyncStorage.setItem('cartQueue', JSON.stringify(queue));
     setPending(true);
+    // If we're currently online, attempt to flush immediately so cart stays in sync
+    const state = await NetInfo.fetch();
+    if (state.isConnected) {
+      await processQueue();
+    }
   };
 
   return { queueAction, pending };

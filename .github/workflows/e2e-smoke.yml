@@ -33,7 +33,7 @@ jobs:
             npm-shrinkwrap.json
             backend/package-lock.json
 
-      - name: �� Setup Java
+      - name: ☕ Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -42,7 +42,7 @@ jobs:
       - name: 🏗 Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: 🗂️ Cache Android SDK
+      - name: ️ Cache Android SDK
         uses: actions/cache@v4
         with:
           path: |
@@ -76,7 +76,9 @@ jobs:
           # Install latest cmdline-tools using the legacy bootstrap if needed
           "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" "cmdline-tools;latest" || true
 
+          AVD_NAME="Pixel_XL_API_34"
           # Use the newly installed 'latest' for all subsequent commands
+
           export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
 
           # Show versions for diagnostics
@@ -110,7 +112,7 @@ jobs:
             --tag "google_apis" \
             --abi "x86_64" \
             --device "pixel_xl"
-
+          # Diagnostics
           ls -la "$HOME/.android/avd"
           grep -n "." "$HOME/.android/avd/${AVD_NAME}.ini"
 
@@ -124,7 +126,6 @@ jobs:
             -selinux permissive -qemu -m 2048 &
           "${ANDROID_HOME}/platform-tools/adb" wait-for-device shell \
             'while [[ -z $(getprop sys.boot_completed | tr -d "\r") ]]; do sleep 1; done; input keyevent 82'
-
       - name: 🌐 Expo Web export test
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
 
@@ -135,7 +136,7 @@ jobs:
           EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
           CI: true
 
-      - name: �� Start backend server
+      - name: 🚀 Start backend server
         run: |
           npm ci
           npm start &
