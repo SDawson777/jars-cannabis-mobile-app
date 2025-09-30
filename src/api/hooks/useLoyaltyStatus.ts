@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { phase4Client } from '../phase4Client';
+import { clientGet } from '../http';
 
 export interface LoyaltyStatus {
   points: number;
@@ -8,8 +9,7 @@ export interface LoyaltyStatus {
 }
 
 async function fetchLoyalty(): Promise<LoyaltyStatus> {
-  const res = await phase4Client.get('/loyalty/status');
-  const d = res.data || {};
+  const d = (await clientGet<any>(phase4Client, '/loyalty/status')) || {};
   // Map backend record to the shape the UI expects
   return {
     points: d.points ?? d.balance ?? 0,

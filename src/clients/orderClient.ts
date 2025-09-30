@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clientGet, clientPost } from '../api/http';
 
 import type { OrdersResponse, Order } from '../types/order';
 import { API_BASE_URL } from '../utils/apiConfig';
@@ -40,8 +41,7 @@ export async function fetchOrders(page = 1): Promise<OrdersResponse> {
       pagination?: { page?: number; limit?: number; nextPage?: number };
     };
   }
-  const res = await orderClient.get<RawOrdersResponse>('/orders', { params: { page } });
-  const payload = res.data || {};
+  const payload = await clientGet<RawOrdersResponse>(orderClient, '/orders', { params: { page } });
   const root = payload.data ?? payload;
   return {
     orders: root.orders ?? [],
@@ -71,6 +71,10 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
     order?: Order;
     data?: { order?: Order };
   }
-  const res = await orderClient.post<RawCreateOrderResponse>('/orders', payload);
-  return res.data.order ?? (res.data.data?.order as Order);
+  const res = await clientPost<CreateOrderPayload, RawCreateOrderResponse>(
+    orderClient,
+    '/orders',
+    payload
+  );
+  return res.order ?? (res.data?.order as Order);
 }

@@ -1,6 +1,7 @@
 // src/api/phase4Client.ts
 import axios from 'axios';
 import type { AxiosInstance } from 'axios';
+import { clientGet, clientPost } from './http';
 
 import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
@@ -35,89 +36,76 @@ function createPhase4Client(): AxiosInstance {
 }
 
 export const phase4Client = createPhase4Client();
-
-export async function getForYou(storeId?: string) {
-  const res = await phase4Client.get(
+export async function getForYou<T = any>(storeId?: string): Promise<T> {
+  return clientGet<T>(
+    phase4Client,
     `/recommendations/for-you${storeId ? `?storeId=${storeId}` : ''}`
   );
-  return res.data;
 }
 
-export async function getRelated(productId: string, storeId?: string) {
-  const res = await phase4Client.get(
+export async function getRelated<T = any>(productId: string, storeId?: string): Promise<T> {
+  return clientGet<T>(
+    phase4Client,
     `/recommendations/related/${productId}${storeId ? `?storeId=${storeId}` : ''}`
   );
-  return res.data;
 }
 
 export async function postReview(productId: string, payload: { rating: number; text?: string }) {
-  const res = await phase4Client.post(`/products/${productId}/reviews`, payload);
-  return res.data;
+  return clientPost(phase4Client, `/products/${productId}/reviews`, payload);
 }
 
-export async function getLoyaltyStatus() {
-  const res = await phase4Client.get('/loyalty/status');
-  return res.data;
+export async function getLoyaltyStatus<T = any>(): Promise<T> {
+  return clientGet<T>(phase4Client, '/loyalty/status');
 }
 
-export async function getLoyaltyBadges() {
-  const res = await phase4Client.get('/loyalty/badges');
-  return res.data;
+export async function getLoyaltyBadges<T = any>(): Promise<T> {
+  return clientGet<T>(phase4Client, '/loyalty/badges');
 }
 
-export async function getAddresses() {
-  const res = await phase4Client.get('/addresses');
-  return res.data;
+export async function getAddresses<T = any>(): Promise<T> {
+  return clientGet<T>(phase4Client, '/addresses');
 }
 
-export async function conciergeChat(payload: { message: string; history?: any[] }) {
-  const res = await phase4Client.post('/concierge/chat', payload);
-  return res.data;
+export async function conciergeChat<T = any>(payload: { message: string; history?: any[] }) {
+  return clientPost<typeof payload, T>(phase4Client, '/concierge/chat', payload);
 }
 
-export async function getJournal() {
-  const res = await phase4Client.get('/journal/entries');
-  // Ensure React Query never receives undefined
-  return res.data ?? [];
+export async function getJournal<T = any[]>(): Promise<T> {
+  const data = await clientGet<T>(phase4Client, '/journal/entries');
+  return (data as T) ?? ([] as unknown as T);
 }
 
-export async function addJournal(payload: {
+export async function addJournal<T = any>(payload: {
   productId: string;
   rating?: number;
   notes?: string;
   tags?: string[];
 }) {
-  const res = await phase4Client.post('/journal/entries', payload);
-  return res.data;
+  return clientPost<typeof payload, T>(phase4Client, '/journal/entries', payload);
 }
 
-export async function updateJournal(id: string, payload: any) {
-  const res = await phase4Client.put(`/journal/entries/${id}`, payload);
-  return res.data;
+export async function updateJournal<T = any>(id: string, payload: any) {
+  // axios put generics: put<TRes, T = any>(url, data?) — use clientPost helper for consistency
+  return clientPost<any, T>(phase4Client, `/journal/entries/${id}`, payload);
 }
 
-export async function getPrefs() {
-  const res = await phase4Client.get('/profile/preferences');
-  return res.data;
+export async function getPrefs<T = any>(): Promise<T> {
+  return clientGet<T>(phase4Client, '/profile/preferences');
 }
 
-export async function updatePrefs(payload: any) {
-  const res = await phase4Client.put('/profile/preferences', payload);
-  return res.data;
+export async function updatePrefs<T = any>(payload: any) {
+  return clientPost<any, T>(phase4Client, '/profile/preferences', payload);
 }
 
 // Data privacy preferences (separate from accessibility prefs)
-export async function getDataPrefs() {
-  const res = await phase4Client.get('/profile/data-preferences');
-  return res.data;
+export async function getDataPrefs<T = any>(): Promise<T> {
+  return clientGet<T>(phase4Client, '/profile/data-preferences');
 }
 
-export async function updateDataPrefs(payload: any) {
-  const res = await phase4Client.put('/profile/data-preferences', payload);
-  return res.data;
+export async function updateDataPrefs<T = any>(payload: any) {
+  return clientPost<any, T>(phase4Client, '/profile/data-preferences', payload);
 }
 
-export async function getAwardsStatus() {
-  const res = await phase4Client.get('/awards/status');
-  return res.data;
+export async function getAwardsStatus<T = any>(): Promise<T> {
+  return clientGet<T>(phase4Client, '/awards/status');
 }

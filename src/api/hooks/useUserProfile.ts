@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import logger from '../../lib/logger';
 import { phase4Client } from '../phase4Client';
+import { clientGet } from '../http';
 
 export interface UserProfile {
   id: string;
@@ -11,8 +12,7 @@ export interface UserProfile {
 }
 
 async function fetchProfile(): Promise<UserProfile> {
-  const res = await phase4Client.get('/profile');
-  return res.data;
+  return clientGet<UserProfile>(phase4Client, '/profile');
 }
 
 export function useUserProfile() {

@@ -2,19 +2,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from '../../utils/toast';
 import { phase4Client } from '../phase4Client';
+import { clientGet, clientPost } from '../http';
 
 export interface PrivacyPreferences {
   highContrast: boolean;
 }
 
 async function fetchPrefs(): Promise<PrivacyPreferences> {
-  const res = await phase4Client.get('/profile/preferences');
-  return res.data;
+  return clientGet<PrivacyPreferences>(phase4Client, '/profile/preferences');
 }
 
 async function updatePrefs(payload: PrivacyPreferences) {
-  const res = await phase4Client.put('/profile/preferences', payload);
-  return res.data;
+  return clientPost<PrivacyPreferences, PrivacyPreferences>(
+    phase4Client,
+    '/profile/preferences',
+    payload
+  );
 }
 
 export function usePrivacyPreferences() {

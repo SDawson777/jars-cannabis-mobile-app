@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { phase4Client } from '../phase4Client';
+import { clientGet } from '../http';
 
 export interface DataCategory {
   id: string;
@@ -8,8 +9,7 @@ export interface DataCategory {
 }
 
 async function fetchCategories(): Promise<DataCategory[]> {
-  const res = await phase4Client.get('/profile/data-categories');
-  return res.data;
+  return clientGet<DataCategory[]>(phase4Client, '/profile/data-categories');
 }
 
 export function useDataCategories() {
