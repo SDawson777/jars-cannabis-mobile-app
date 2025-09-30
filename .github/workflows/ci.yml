@@ -73,9 +73,14 @@ jobs:
         env:
           NODE_ENV: test
           DATABASE_URL: file:./test.db
-          JWT_SECRET: test-secret-key
-          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
+          # For tests we prefer long-enough JWT secret (some validators require >=32 chars)
+          JWT_SECRET: test-jwt-secret-at-least-32-characters-long
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || 'dGVzdC1zZXJ2aWNlLWFjY291bnQ=' }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
+          # Add test defaults for external API keys used by the backend env schema
+          STRIPE_SECRET_KEY: sk_test_test
+          OPENAI_API_KEY: test-openai-key
+          OPENWEATHER_API_KEY: test-weather-key
 
       - name: 🌐 Expo Web Export Test (non-blocking)
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
