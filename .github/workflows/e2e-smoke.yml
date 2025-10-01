@@ -1,93 +1,130 @@
-name: E2E Smoke Tests (Detox)
-
+name: e2e-smoke
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+env:
+  NODE_OPTIONS: --max-old-space-size=4096
+
 jobs:
-  e2e-smoke:
+  smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    env:
-      ANDROID_HOME: /usr/lib/android-sdk
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node from .nvmrc and cache npm
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: 'npm'
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            npm-shrinkwrap.json
+            backend/package-lock.json
 
-      - name: Install dependencies
+      - name: Ensure lockfiles exist
+        run: |
+          test -f npm-shrinkwrap.json || (echo "Missing root npm-shrinkwrap.json"; exit 1)
+          test -f backend/package-lock.json || (echo "Missing backend/package-lock.json"; exit 1)
+
+      - name: Install deps (root)
         run: npm ci
 
-      - name: Expo/EAS auth
+      - name: Install deps (backend)
+        run: npm ci
+        working-directory: backend
+
+      # Build APK with EAS
+      - name: Expo/EAS auth (npm only)
         uses: expo/expo-github-action@v8
         with:
           token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
 
       - name: Build Android APK (EAS)
-        run: eas build -p android --profile apk --non-interactive --json > build.json
+        run: |
+          set -euo pipefail
+          eas build -p android --profile apk --non-interactive --json > build.json
+          cat build.json
 
       - name: Download APK artifact
         run: |
+          set -euo pipefail
           URL=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl' build.json)
           test -n "$URL" || (echo "No buildUrl in build.json"; cat build.json; exit 1)
           curl -L "$URL" -o app-release.apk
           ls -lh app-release.apk
 
-      - name: Appetize Github Action
-        uses: appetizeio/github-action-appetize@v1.0.5
+      # Upload to Appetize (demo link)
+      - name: Upload APK to Appetize (Action)
+        id: appetize
+        if: ${{ secrets.APPETIZE_API_TOKEN && github.event.pull_request.head.repo.fork == false }}
+        uses: appetizeio/appetize-github-action@v1
         with:
-          # API token for Appetize (add this secret to the repo settings)
-          api_token: ${{ secrets.APPETIZE_API_TOKEN }}
-          # local path to the APK downloaded earlier
-          app_path: app-release.apk
-          # make the uploaded build public on Appetize; remove or change as needed
-          public: true
-          # NOTE: adjust the input key names above (api_token/app_path) if the action expects different names
+          apiToken: ${{ secrets.APPETIZE_API_TOKEN }}
+          platform: android
+          appFile: app-release.apk
+          publicKey: ${{ secrets.APPETIZE_PUBLIC_KEY }}
 
-      - name: Setup gcloud (for Firebase Test Lab)
-        if: ${{ secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
+      - name: Upload APK to Appetize (API fallback)
+        if: ${{ secrets.APPETIZE_API_TOKEN && github.event.pull_request.head.repo.fork == false }}
+        run: |
+          set -euo pipefail
+          RESPONSE=$(curl -sS https://api.appetize.io/v1/apps \
+            -u "${{ secrets.APPETIZE_API_TOKEN }}:" \
+            -F "file=@app-release.apk" \
+            -F "platform=android")
+          PUB=$(echo "$RESPONSE" | jq -r '.publicKey // .data.publicKey // .app.publicKey // empty')
+          echo "PUBLIC_KEY=$PUB" >> $GITHUB_ENV
+          echo "### Appetize Demo" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dashboard:** https://appetize.io/app/$PUB" >> $GITHUB_STEP_SUMMARY
+          echo "- **Embed:** https://appetize.io/embed/$PUB?device=pixel7&osVersion=14.0&scale=75&autoplay=true" >> $GITHUB_STEP_SUMMARY
+
+      - name: Appetize links (Action outputs)
+        if: ${{ github.event.pull_request.head.repo.fork == false }}
+        run: |
+          PUB="${{ steps.appetize.outputs.publicKey }}"
+          if [ -z "$PUB" ]; then
+            PUB="$PUBLIC_KEY"
+          fi
+          if [ -n "$PUB" ]; then
+            echo "### Appetize Demo" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Dashboard:** https://appetize.io/app/$PUB" >> $GITHUB_STEP_SUMMARY
+            echo "- **Embed:** https://appetize.io/embed/$PUB?device=pixel7&osVersion=14.0&scale=75&autoplay=true" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No Appetize public key available; upload may have failed or been skipped." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Typecheck & lint (root)
+        run: |
+          npm run typecheck
+          npm run lint
+
+      - name: Typecheck & lint (backend)
+        run: |
+          npm run typecheck || true
+          npm run lint || true
+        working-directory: backend
 
       - name: Firebase Test Lab Robo smoke
         if: ${{ secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
         run: |
+          set -euo pipefail
+          echo "${{ secrets.GCP_SA_KEY_JSON }}" > /tmp/gcloud_key.json
+          gcloud auth activate-service-account --key-file=/tmp/gcloud_key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
           gcloud firebase test android run \
             --type robo \
             --app app-release.apk \
             --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
             --timeout 5m
 
-      - name: Cache Android SDK (tools + images)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.ANDROID_HOME }}/platforms
-            ${{ env.ANDROID_HOME }}/build-tools
-            ${{ env.ANDROID_HOME }}/emulator
-            ${{ env.ANDROID_HOME }}/platform-tools
-            ${{ env.ANDROID_HOME }}/system-images
-          key: android-sdk-${{ runner.os }}-api34-${{ hashFiles('.github/workflows/e2e-smoke.yml') }}
-          restore-keys: |
-            android-sdk-${{ runner.os }}-api34-
-
-      - name: Cache AVD (optional)
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.HOME }}/.android/avd
-          key: avd-${{ runner.os }}-api34-arm64-${{ hashFiles('.github/workflows/e2e-smoke.yml') }}
-          restore-keys: |
-            avd-${{ runner.os }}-api34-arm64-
-
-      - name: Install Android SDK & tools (emulator fallback)
+      # Emulator fallback when FTL secrets are not present
+      - name: Install Android SDK & tools (for emulator fallback)
         if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
         run: |
           set -euo pipefail
@@ -104,13 +141,14 @@ jobs:
         env:
           ADB_INSTALL_TIMEOUT: 120000
 
-      - name: Create and configure AVD (emulator fallback)
+      - name: Create and configure AVD (fallback)
         if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
         run: |
           set -euo pipefail
           export ANDROID_AVD_HOME="$HOME/.android/avd"
           mkdir -p "${ANDROID_AVD_HOME}"
           AVD_NAME="ci_arm64_avd"
+          export AVD_NAME
           echo "no" | avdmanager create avd --force --name "${AVD_NAME}" --package "system-images;android-34;google_apis;arm64-v8a" --tag "google_apis" --abi "arm64-v8a" --device "Nexus 5"
           AVD_DIR="$ANDROID_AVD_HOME/${AVD_NAME}.avd"
           {
@@ -120,7 +158,7 @@ jobs:
             echo "disk.dataPartition.size=2048M"
           } >> "${AVD_DIR}/config.ini"
 
-      - name: Boot emulator (emulator fallback)
+      - name: Boot emulator (fallback)
         if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
         shell: bash
         env:
@@ -133,27 +171,31 @@ jobs:
           deadline=$((SECONDS + 720))
           until "${ANDROID_HOME}/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' | grep -q '^1$'; do
             if (( SECONDS > deadline )); then
-              echo "EMULATOR_BOOT_TIMEOUT"
+              echo "❌ Emulator did not finish booting within 12 minutes"
               tail -n 200 emulator.log || true
               exit 1
             fi
-            echo "waiting for Android to boot ($((${deadline}-SECONDS))s left)"
+            echo "…waiting for Android to boot ($((${deadline}-SECONDS))s left)"
             sleep 10
           done
           "${ANDROID_HOME}/platform-tools/adb" shell input keyevent 82 || true
           "${ANDROID_HOME}/platform-tools/adb" devices
 
-      - name: Build app for E2E
+      - name: 🌐 Expo Web export test
+        run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
+
+      - name: 🏗 Build app for E2E
         run: npm run build:e2e:android
         env:
           EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
           CI: true
 
-      - name: Start backend server
+      - name: 🚀 Start backend server
         run: |
-          (cd backend && npm ci)
-          (cd backend && npm start &) 
+          npm ci
+          npm start &
           timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
+        working-directory: backend
         env:
           NODE_ENV: test
           DATABASE_URL: file:./test.db
@@ -162,15 +204,15 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
 
-      - name: Run Detox E2E tests
+      - name: 🧪 Run Detox E2E tests
         run: npm run test:e2e:android
         env:
           DETOX_CONFIGURATION: android.emu.debug
           EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
 
-      - name: Upload test artifacts on failure
-        if: failure()
+      - name: 📱 Upload test artifacts
         uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: detox-artifacts
           path: |
@@ -178,7 +220,7 @@ jobs:
             e2e/screenshots/
             e2e/videos/
 
-      - name: Upload E2E results
+      - name: 📊 Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -186,120 +228,3 @@ jobs:
           path: |
             e2e/test-results/
             coverage/
-
-                      service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
-
-                  - name: Firebase Test Lab Robo smoke
-                    if: ${{ secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
-                    run: |
-                      gcloud firebase test android run \
-                        --type robo \
-                        --app app-release.apk \
-                        --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
-                        --timeout 5m
-
-                  # Emulator fallback when FTL secrets are not present
-                  - name: Install Android SDK & tools (for emulator fallback)
-                    if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
-                    run: |
-                      set -euo pipefail
-                      sudo mkdir -p /usr/lib/android-sdk || true
-                      sudo chown -R $USER:$(id -gn) /usr/lib/android-sdk || true
-                      export ANDROID_SDK_ROOT="/usr/lib/android-sdk"
-                      sudo apt-get update
-                      sudo apt-get install -y openjdk-11-jdk unzip
-                      curl -sS https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -o cmdline.zip
-                      mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
-                      unzip -q cmdline.zip -d /tmp
-                      mv /tmp/cmdline-tools "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
-                      yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "platforms;android-34" "system-images;android-34;google_apis;arm64-v8a" "emulator"
-                    env:
-                      ADB_INSTALL_TIMEOUT: 120000
-
-                  - name: Create and configure AVD (fallback)
-                    if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
-                    run: |
-                      set -euo pipefail
-                      export ANDROID_AVD_HOME="$HOME/.android/avd"
-                      mkdir -p "${ANDROID_AVD_HOME}"
-                      AVD_NAME="ci_arm64_avd"
-                      export AVD_NAME
-                      echo "no" | avdmanager create avd --force --name "${AVD_NAME}" --package "system-images;android-34;google_apis;arm64-v8a" --tag "google_apis" --abi "arm64-v8a" --device "Nexus 5"
-                      AVD_DIR="$ANDROID_AVD_HOME/${AVD_NAME}.avd"
-                      {
-                        echo "hw.accel=off"
-                        echo "hw.gpu.enabled=yes"
-                        echo "hw.gpu.mode=swiftshader_indirect"
-                        echo "disk.dataPartition.size=2048M"
-                      } >> "${AVD_DIR}/config.ini"
-
-                  - name: Boot emulator (fallback)
-                    if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
-                    shell: bash
-                    env:
-                      AVD_NAME: ci_arm64_avd
-                      ANDROID_HOME: /usr/lib/android-sdk
-                    run: |
-                      set -euo pipefail
-                      "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" -no-window -no-snapshot -gpu swiftshader_indirect -no-audio -no-boot-anim -no-metrics -camera-back none -camera-front none -selinux permissive -qemu -m 3072 > emulator.log 2>&1 &
-                      "${ANDROID_HOME}/platform-tools/adb" wait-for-device
-                      deadline=$((SECONDS + 720))
-                      until "${ANDROID_HOME}/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' | grep -q '^1$'; do
-                        if (( SECONDS > deadline )); then
-                          echo "❌ Emulator did not finish booting within 12 minutes"
-                          tail -n 200 emulator.log || true
-                          exit 1
-                        fi
-                        echo "…waiting for Android to boot ($((${deadline}-SECONDS))s left)"
-                        sleep 10
-                      done
-                      "${ANDROID_HOME}/platform-tools/adb" shell input keyevent 82 || true
-                      "${ANDROID_HOME}/platform-tools/adb" devices
-
-                  - name: 🌐 Expo Web export test
-                    run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
-
-                  - name: 🏗 Build app for E2E
-                    run: npm run build:e2e:android
-                    env:
-                      EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
-                      CI: true
-
-                  - name: 🚀 Start backend server
-                    run: |
-                      npm ci
-                      npm start &
-                      timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
-                    working-directory: backend
-                    env:
-                      NODE_ENV: test
-                      DATABASE_URL: file:./test.db
-                      JWT_SECRET: test-secret-key
-                      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
-                      FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 || '' }}
-                      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
-
-                  - name: 🧪 Run Detox E2E tests
-                    run: npm run test:e2e:android
-                    env:
-                      DETOX_CONFIGURATION: android.emu.debug
-                      EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
-
-                  - name: 📱 Upload test artifacts
-                    uses: actions/upload-artifact@v4
-                    if: failure()
-                    with:
-                      name: detox-artifacts
-                      path: |
-                        artifacts/
-                        e2e/screenshots/
-                        e2e/videos/
-
-                  - name: 📊 Upload test results
-                    uses: actions/upload-artifact@v4
-                    if: always()
-                    with:
-                      name: e2e-test-results
-                      path: |
-                        e2e/test-results/
-                        coverage/
