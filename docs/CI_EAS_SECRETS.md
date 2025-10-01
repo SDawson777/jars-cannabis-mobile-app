@@ -56,6 +56,34 @@ npm run lint
 npm test -- --runInBand  # or npm run test:ci
 ```
 
+5.1 ## Expo keystore (one-time local setup — recommended)
+
+If your CI uses `eas build --non-interactive` (as this repo does), EAS cannot generate a new Android keystore during the CI run. The recommended, safest approach is to let EAS manage the keystore remotely for the project. Run the following locally once from your developer machine.
+
+Commands (run from the repo root):
+
+```bash
+# 1) Sign in to Expo
+eas login
+eas whoami
+
+# 2) (Optional) Link the repository to an Expo project if not already linked
+eas project:init
+
+# 3) Configure Android build and provision a remote keystore (interactive)
+eas build:configure --platform android
+
+# When prompted choose: "Let EAS manage your credentials"
+
+# 4) Verify the keystore is present on Expo servers
+eas credentials --platform android
+# You should see an entry like: "Keystore: Present"
+```
+
+After these steps push your branch or update main. The CI can keep `--non-interactive` and will use the remote credentials that EAS stores for the project.
+
+Notes: if you prefer to keep the keystore under your control instead of Expo-managed (option B), you can export the keystore, base64-encode it, and store the keystore and passwords in GitHub Secrets (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD) and update your EAS profile to use `credentialsSource: "local"` or provide credentials via `eas credentials`/the CI step. The Expo docs cover both flows.
+
 These are the same checks the CI runs locally before launching the EAS build.
 
 6. ## Remaining "any" / untyped hotspots (findings)
