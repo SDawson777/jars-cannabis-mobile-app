@@ -18,7 +18,8 @@ export async function postJSON<TReq, TRes>(
   data?: TReq,
   config?: AxiosRequestConfig
 ): Promise<TRes> {
-  const res = await api.post<TRes>(url, data as any, config);
+  // Cast via unknown to avoid `any` while keeping test-friendly call shape for mocks
+  const res = await api.post<TRes>(url, data as unknown as any, config);
   return res.data;
 }
 
@@ -41,10 +42,14 @@ export async function clientPost<TReq, TRes>(
 ): Promise<TRes> {
   // Only pass config when provided to avoid explicit `undefined` becoming a third
   // argument in mocked calls (tests assert calls without a third param).
+  // Use an intermediate unknown cast to avoid `any` while preserving the runtime
+  // shape tests expect (calls without a config arg). Converting to unknown first
+  // keeps the intent explicit.
+  const payload = data as unknown as any;
   const res =
     config === undefined
-      ? await client.post<TRes>(url, data as any)
-      : await client.post<TRes>(url, data as any, config);
+      ? await client.post<TRes>(url, payload)
+      : await client.post<TRes>(url, payload, config);
   return res.data;
 }
 
@@ -54,10 +59,11 @@ export async function clientPut<TReq, TRes>(
   data?: TReq,
   config?: AxiosRequestConfig
 ): Promise<TRes> {
+  const payload = data as unknown as any;
   const res =
     config === undefined
-      ? await client.put<TRes>(url, data as any)
-      : await client.put<TRes>(url, data as any, config);
+      ? await client.put<TRes>(url, payload)
+      : await client.put<TRes>(url, payload, config);
   return res.data;
 }
 

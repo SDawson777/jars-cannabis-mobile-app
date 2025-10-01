@@ -287,7 +287,28 @@
 <a name='L222'></a><a href='#L222'>222</a>
 <a name='L223'></a><a href='#L223'>223</a>
 <a name='L224'></a><a href='#L224'>224</a>
-<a name='L225'></a><a href='#L225'>225</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -378,6 +399,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
@@ -406,6 +434,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -465,6 +497,10 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -517,6 +553,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 &nbsp;
 import { phase4Client } from '../api/phase4Client';
+import { clientGet, clientPost } from '../api/http';
 import { useCartStore } from '../../stores/useCartStore';
 &nbsp;
 import { useOfflineCartQueue } from './useOfflineCartQueue';
@@ -533,6 +570,8 @@ export interface Cart {
   items: CartItem[];
   total: number;
 }
+&nbsp;
+type CartResponse = Cart | { cart: Cart };
 &nbsp;
 export function useCart() {
   const queryClient = useQueryClient();
@@ -583,9 +622,9 @@ export function useCart() {
       }
       throw new Error('Offline');
     }
-    const { data } = await phase4Client.get('/cart');
-    // backend returns { cart: { items: [...], total } }
-    const cartPayload = data?.cart ?? <span class="branch-1 cbranch-no" title="branch not covered" >data;</span>
+    const data = await clientGet&lt;CartResponse | { cart?: Cart }&gt;(phase4Client, '/cart');
+    // backend returns { cart: { items: [...], total } } or Cart directly
+    const cartPayload = (data as any)?.cart ?? (<span class="branch-1 cbranch-no" title="branch not covered" >data as Cart)</span>;
     await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
     setStoreItems(cartPayload);
     return cartPayload;
@@ -601,7 +640,14 @@ export function useCart() {
   }, [query.data]);
 &nbsp;
   const mutation = useMutation&lt;Cart, Error, any&gt;({
-    mutationFn: async body =&gt; {
+    mutationFn: async (body: {
+      items: any[];
+      productId: any;
+      id: any;
+      variantId: any;
+      quantity: any;
+      price: any;
+    }) =&gt; {
       const _state = await NetInfo.fetch();
       // Always normalize items payload to backend contract
       let items: any[] = [];
@@ -629,12 +675,16 @@ export function useCart() {
 <span class="cstat-no" title="statement not covered" >        await queueAction({ endpoint: '/cart/update', payload });</span>
 <span class="cstat-no" title="statement not covered" >        throw new Error('queued');</span>
       }
-      const { data } = await phase4Client.post('/cart/update', payload);
-      return data?.cart ?? <span class="branch-1 cbranch-no" title="branch not covered" >data;</span>
+      const data = await clientPost&lt;typeof payload, CartResponse | { cart?: Cart }&gt;(
+        phase4Client,
+        '/cart/update',
+        payload
+      );
+      return (data as any)?.cart ?? (<span class="branch-1 cbranch-no" title="branch not covered" >data as Cart)</span>;
     },
-    onMutate: async vars =&gt; {
+    onMutate: async (vars: { items: any }) =&gt; {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
-      const prev = queryClient.getQueryData&lt;Cart&gt;(['cart']);
+      const prev = queryClient.getQueryData(['cart']) as Cart | undefined;
       // Build an optimistic cart snapshot
       let next: Cart | undefined = prev ? { ...prev, items: [...(prev.items || <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>] } : undefined;
       if (vars?.items &amp;&amp; Array.isArray(vars.items)) {
@@ -672,10 +722,10 @@ export function useCart() {
       }
       return { prev };
     },
-    onError: <span class="fstat-no" title="function not covered" >(e</span>rr, vars, ctx: any) =&gt; {
+    onError: <span class="fstat-no" title="function not covered" >(e</span>rr: any, vars: any, ctx: any) =&gt; {
 <span class="cstat-no" title="statement not covered" >      if (ctx?.prev) <span class="cstat-no" title="statement not covered" >queryClient.setQueryData(['cart'], ctx.prev);</span></span>
     },
-    onSuccess: data =&gt; {
+    onSuccess: (data: any) =&gt; {
       queryClient.setQueryData(['cart'], data);
       setStoreItems(data);
       Promise.resolve(AsyncStorage.setItem('cart', JSON.stringify(data))).catch(<span class="fstat-no" title="function not covered" >()</span> =&gt; {});
@@ -688,8 +738,12 @@ export function useCart() {
       await queueAction({ endpoint: '/cart/apply-coupon', payload: { code } });
       throw new Error('queued');
     }
-    const { data } = await phase4Client.post('/cart/apply-coupon', { code });
-    const cartPayload = data?.cart ?? <span class="branch-1 cbranch-no" title="branch not covered" >data;</span>
+    const data = await clientPost&lt;{ code: string }, CartResponse | { cart?: Cart }&gt;(
+      phase4Client,
+      '/cart/apply-coupon',
+      { code }
+    );
+    const cartPayload = (data as any)?.cart ?? <span class="branch-1 cbranch-no" title="branch not covered" >data;</span>
     queryClient.setQueryData(['cart'], cartPayload);
     setStoreItems(cartPayload);
     await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
@@ -742,7 +796,7 @@ export function useCart() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-27T02:58:24.547Z
+                at 2025-10-01T00:11:26.964Z
             </div>
         <script src="../prettify.js"></script>
         <script>

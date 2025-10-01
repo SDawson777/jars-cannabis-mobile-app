@@ -1,6 +1,6 @@
 // src/api/phase4Client.ts
 import axios from 'axios';
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { clientGet, clientPost } from './http';
 import type { CMSProduct } from '../types/cms';
 
@@ -16,17 +16,21 @@ function createPhase4Client(): AxiosInstance {
   }) as AxiosInstance;
 
   client.interceptors.request.use(
-    // Keep interceptor parameter permissive to avoid tight coupling with axios internals
-    (config: any) => {
-      const token = (getAuthToken as any)();
+    // Use axios's InternalAxiosRequestConfig here so the interceptor signature
+    // matches axios expectations. We still avoid wide `any` usage when touching
+    // headers by casting to a record.
+    (config: InternalAxiosRequestConfig) => {
+      const token = getAuthToken();
       if (token instanceof Promise) {
         throw new Error('getAuthToken must be synchronous for Axios interceptors');
       }
       if (token) {
         if (!config.headers || Array.isArray(config.headers)) {
-          config.headers = {};
+          // Axios's headers type is complex; initialize with a plain object and
+          // assert via unknown to satisfy the type system.
+          config.headers = {} as unknown as typeof config.headers;
         }
-        (config.headers as any).Authorization = `Bearer ${token}`;
+        (config.headers as unknown as Record<string, string>).Authorization = `Bearer ${token}`;
       }
       return config;
     },

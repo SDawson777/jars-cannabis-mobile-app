@@ -4,6 +4,12 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "apk": {
+      "node": "20.11.1",
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "development": {
       "node": "20.11.1",
       "developmentClient": true,

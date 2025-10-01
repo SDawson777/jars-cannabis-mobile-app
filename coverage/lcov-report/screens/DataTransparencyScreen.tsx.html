@@ -293,7 +293,10 @@
 <a name='L228'></a><a href='#L228'>228</a>
 <a name='L229'></a><a href='#L229'>229</a>
 <a name='L230'></a><a href='#L230'>230</a>
-<a name='L231'></a><a href='#L231'>231</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -320,30 +323,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -358,6 +342,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -365,6 +369,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -536,6 +542,7 @@ import {
 } from 'react-native';
 &nbsp;
 import { phase4Client, getDataPrefs, updateDataPrefs } from '../api/phase4Client';
+import { clientGet, clientPost } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
@@ -594,10 +601,12 @@ export default function <span class="fstat-no" title="function not covered" >Dat
 <span class="cstat-no" title="statement not covered" >    setLoading(true);</span>
 <span class="cstat-no" title="statement not covered" >    setError(null);</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-      const res = <span class="cstat-no" title="statement not covered" >await phase4Client.post&lt;{ exportId: string }&gt;('/data-transparency/export', {</span>
-        userId: 'user-123',
-      });
-<span class="cstat-no" title="statement not covered" >      setExportId(res.data.exportId);</span>
+      const data = <span class="cstat-no" title="statement not covered" >await clientPost&lt;{ userId: string }, { exportId: string }&gt;(</span>
+        phase4Client,
+        '/data-transparency/export',
+        { userId: 'user-123' }
+      );
+<span class="cstat-no" title="statement not covered" >      setExportId(data.exportId);</span>
 <span class="cstat-no" title="statement not covered" >      setStatus('pending');</span>
 <span class="cstat-no" title="statement not covered" >      hapticMedium();</span>
     } catch (e) {
@@ -613,18 +622,18 @@ export default function <span class="fstat-no" title="function not covered" >Dat
 <span class="cstat-no" title="statement not covered" >    if (exportId &amp;&amp; status === 'pending') {</span>
 <span class="cstat-no" title="statement not covered" >      interval = setInterval(<span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        try {</span>
-          const res = <span class="cstat-no" title="statement not covered" >await phase4Client.get&lt;{</span>
+          const res = <span class="cstat-no" title="statement not covered" >await clientGet&lt;{</span>
             exportId: string;
             status: ExportStatus;
             downloadUrl?: string;
-          }&gt;(`/data-transparency/export/${exportId}`);
-<span class="cstat-no" title="statement not covered" >          setStatus(res.data.status);</span>
-<span class="cstat-no" title="statement not covered" >          if (res.data.status === 'completed') {</span>
-<span class="cstat-no" title="statement not covered" >            setDownloadUrl(res.data.downloadUrl || null);</span>
+          }&gt;(phase4Client, `/data-transparency/export/${exportId}`);
+<span class="cstat-no" title="statement not covered" >          setStatus(res.status);</span>
+<span class="cstat-no" title="statement not covered" >          if (res.status === 'completed') {</span>
+<span class="cstat-no" title="statement not covered" >            setDownloadUrl(res.downloadUrl || null);</span>
 <span class="cstat-no" title="statement not covered" >            hapticMedium();</span>
 <span class="cstat-no" title="statement not covered" >            clearInterval(interval);</span>
           }
-<span class="cstat-no" title="statement not covered" >          if (res.data.status === 'failed') {</span>
+<span class="cstat-no" title="statement not covered" >          if (res.status === 'failed') {</span>
 <span class="cstat-no" title="statement not covered" >            clearInterval(interval);</span>
           }
         } catch (e) {
@@ -760,7 +769,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-27T02:58:24.547Z
+                at 2025-10-01T00:11:26.964Z
             </div>
         <script src="../prettify.js"></script>
         <script>
