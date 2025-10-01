@@ -58,16 +58,10 @@ jobs:
           ls -lh app-release.apk
 
       # Upload to Appetize (demo link)
-      - name: Upload APK to Appetize (Action)
-        id: appetize
-        # Only skip when PR originates from a fork; don't reference secrets in the if expression
-        if: ${{ github.event.pull_request == null || github.event.pull_request.head.repo.fork == false }}
-        uses: appetizeio/appetize-github-action@v1
-        with:
-          apiToken: ${{ secrets.APPETIZE_API_TOKEN }}
-          platform: android
-          appFile: app-release.apk
-          publicKey: ${{ secrets.APPETIZE_PUBLIC_KEY }}
+      - name: Upload APK to Appetize (action removed)
+        # The appetizeio/appetize-github-action repository is not available; use the API fallback step below instead.
+        run: |
+          echo "Note: appetizeio/appetize-github-action is not available. Using API upload step to Appetize instead."
 
       - name: Upload APK to Appetize (API fallback)
         # Don't reference secrets in the conditional; check at runtime and skip if missing
@@ -89,10 +83,11 @@ jobs:
           echo "- **Dashboard:** https://appetize.io/app/$PUB" >> $GITHUB_STEP_SUMMARY
           echo "- **Embed:** https://appetize.io/embed/$PUB?device=pixel7&osVersion=14.0&scale=75&autoplay=true" >> $GITHUB_STEP_SUMMARY
 
-      - name: Appetize links (Action outputs)
+      - name: Appetize links
         if: ${{ github.event.pull_request == null || github.event.pull_request.head.repo.fork == false }}
         run: |
-          PUB="${{ steps.appetize.outputs.publicKey }}"
+          # Prefer an explicit APPETIZE_PUBLIC_KEY secret (stable), otherwise use PUBLIC_KEY set by API upload
+          PUB="${{ secrets.APPETIZE_PUBLIC_KEY || '' }}"
           if [ -z "$PUB" ]; then
             PUB="$PUBLIC_KEY"
           fi
