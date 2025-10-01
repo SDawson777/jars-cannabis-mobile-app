@@ -94,7 +94,7 @@ jobs:
             "platform-tools" \
             "emulator" \
             "platforms;android-34" \
-            "system-images;android-34;google_apis;x86_64"
+            "system-images;android-34;google_apis;arm64-v8a"
 
       - name: 🤖 Create / verify AVD (Pixel_XL_API_34)
         env:
@@ -115,9 +115,9 @@ jobs:
           echo "no" | avdmanager create avd \
             --force \
             --name "${AVD_NAME}" \
-            --package "system-images;android-34;google_apis;x86_64" \
+            --package "system-images;android-34;google_apis;arm64-v8a" \
             --tag "google_apis" \
-            --abi "x86_64" \
+            --abi "arm64-v8a" \
             --device "pixel_xl"
 
           # Verify created AVD exists and fail-fast if not
@@ -131,17 +131,27 @@ jobs:
           # Diagnostics
           ls -la "$ANDROID_AVD_HOME"
           avdmanager list avd || true
+          # Verify AVD ini content for ABI and image path
+          echo "--- AVD ini content ---"
+          grep -E "^abi.type=|^image.sysdir.1=" "$ANDROID_AVD_HOME/${AVD_NAME}.ini" || true
+          # Confirm sdkmanager installed the ARM image
+          sdkmanager --list | sed -n '1,200p' | grep -E "android-34" -n || true
+          sdkmanager --list | grep "arm64-v8a" || true
 
       - name: 🤖 Start Android emulator
         env:
           AVD_NAME: Pixel_XL_API_34
           ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
         run: |
+          # Boot ARM AVD with software GPU and no window. Avoid -accel flags for ARM.
           "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" \
-            -no-snapshot -no-window -camera-back none -camera-front none \
-            -selinux permissive -qemu -m 2048 &
+            -gpu swiftshader_indirect -no-window -no-snapshot -no-boot-anim -no-audio -no-metrics -selinux permissive -qemu -m 2048 &
+
+          # Diagnostics while emulator starts
           "${ANDROID_HOME}/platform-tools/adb" wait-for-device shell \
             'while [[ -z $(getprop sys.boot_completed | tr -d "\r") ]]; do sleep 1; done; input keyevent 82'
+          echo "Emulator boot completed"
+          "${ANDROID_HOME}/platform-tools/adb" devices || true
       - name: 🌐 Expo Web export test
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
 
