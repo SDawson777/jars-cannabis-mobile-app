@@ -39,6 +39,17 @@ jobs:
           curl -L "$URL" -o app-release.apk
           ls -lh app-release.apk
 
+      - name: Appetize Github Action
+        uses: appetizeio/github-action-appetize@v1.0.5
+        with:
+          # API token for Appetize (add this secret to the repo settings)
+          api_token: ${{ secrets.APPETIZE_API_TOKEN }}
+          # local path to the APK downloaded earlier
+          app_path: app-release.apk
+          # make the uploaded build public on Appetize; remove or change as needed
+          public: true
+          # NOTE: adjust the input key names above (api_token/app_path) if the action expects different names
+
       - name: Setup gcloud (for Firebase Test Lab)
         if: ${{ secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
         uses: google-github-actions/setup-gcloud@v2
