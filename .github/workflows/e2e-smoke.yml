@@ -70,88 +70,119 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
           packager: npm
 
-      - name: 🛠️ Install modern Android cmdline-tools (schema v4 aware)
+      - name: 🧰 Cache Android SDK (tools + images)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/platforms
+            ${{ env.ANDROID_HOME }}/build-tools
+            ${{ env.ANDROID_HOME }}/emulator
+            ${{ env.ANDROID_HOME }}/platform-tools
+            ${{ env.ANDROID_HOME }}/system-images
+          key: android-sdk-${{ runner.os }}-api34-ga-arm64-${{ hashFiles('e2e-smoke.yml') }}
+          restore-keys: |
+            android-sdk-${{ runner.os }}-api34-ga-arm64-
+
+      - name: Android SDK setup (ARM image)
+        shell: bash
         run: |
           set -euo pipefail
-          # Install latest cmdline-tools using the legacy bootstrap if needed
+
           "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" "cmdline-tools;latest" || true
-
-          AVD_NAME="Pixel_XL_API_34"
-          # Use the newly installed 'latest' for all subsequent commands
-
           export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
 
-          # Show versions for diagnostics
-          sdkmanager --version || true
-          avdmanager --help 2>&1 | head -n 1 || true
-
-          # Accept licenses robustly (avoid failing on SIGPIPE from `yes`) and make sure required packages are present
-          # Mask pipefail for the single line that uses `yes` so a closed pipe doesn't fail the job.
           (set +o pipefail; yes | sdkmanager --licenses >/dev/null) || true
 
-          # Install required packages without piping `yes` — installs should be non-interactive once licenses are accepted
           sdkmanager --install \
             "platform-tools" \
             "emulator" \
             "platforms;android-34" \
             "system-images;android-34;google_apis;arm64-v8a"
 
-      - name: 🤖 Create / verify AVD (Pixel_XL_API_34)
+          sdkmanager --list | grep -E "android-34|arm64-v8a|google_apis" || true
+
+      - name: ⚡ Cache Android AVD directory
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.HOME }}/.android/avd
+          key: avd-${{ runner.os }}-android34-${{ hashFiles('**/e2e-smoke.yml') }}
+          restore-keys: |
+            avd-${{ runner.os }}-android34-
+
+      - name: Create / verify AVD (ARM)
+        shell: bash
         env:
           AVD_NAME: Pixel_XL_API_34
-          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
         run: |
           set -euo pipefail
           export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
-          export ANDROID_AVD_HOME="${HOME}/.android/avd"
+          export ANDROID_AVD_HOME="$HOME/.android/avd"
 
-          # Ensure AVD home exists
-          mkdir -p "$ANDROID_AVD_HOME"
+          mkdir -p "${ANDROID_AVD_HOME}"
 
-          # Clean up any stale AVD entry
           avdmanager delete avd --name "${AVD_NAME}" || true
 
-          # Create with schema-v4 aware avdmanager. Reply 'no' to hardware profile prompt.
+          # Create AVD using a smaller device profile for quicker boot (Nexus 5)
           echo "no" | avdmanager create avd \
             --force \
             --name "${AVD_NAME}" \
             --package "system-images;android-34;google_apis;arm64-v8a" \
             --tag "google_apis" \
             --abi "arm64-v8a" \
-            --device "pixel_xl"
+            --device "Nexus 5"
 
-          # Verify created AVD exists and fail-fast if not
-          if [ ! -f "$ANDROID_AVD_HOME/${AVD_NAME}.ini" ]; then
-            echo "AVD ini missing: $ANDROID_AVD_HOME/${AVD_NAME}.ini"
-            ls -la "$ANDROID_AVD_HOME"
-            avdmanager list avd || true
-            exit 1
-          fi
-
-          # Diagnostics
-          ls -la "$ANDROID_AVD_HOME"
+          test -f "${ANDROID_AVD_HOME}/${AVD_NAME}.ini" || (echo "❌ Failed to create AVD ${AVD_NAME}"; exit 1)
+          echo "INI:"
+          grep -E "abi.type|image.sysdir.1" "${ANDROID_AVD_HOME}/${AVD_NAME}.ini" || true
+          echo "AVDs:"
           avdmanager list avd || true
-          # Verify AVD ini content for ABI and image path
-          echo "--- AVD ini content ---"
-          grep -E "^abi.type=|^image.sysdir.1=" "$ANDROID_AVD_HOME/${AVD_NAME}.ini" || true
-          # Confirm sdkmanager installed the ARM image
-          sdkmanager --list | sed -n '1,200p' | grep -E "android-34" -n || true
-          sdkmanager --list | grep "arm64-v8a" || true
 
-      - name: 🤖 Start Android emulator
+          # Nudge config for stable software rendering and faster boot
+          AVD_DIR="$ANDROID_AVD_HOME/${AVD_NAME}.avd"
+          {
+            echo "hw.accel=off"
+            echo "hw.gpu.enabled=yes"
+            echo "hw.gpu.mode=swiftshader_indirect"
+            echo "disk.dataPartition.size=2048M"
+          } >> "${AVD_DIR}/config.ini"
+
+      - name: Boot emulator (ARM, software GPU)
+        shell: bash
         env:
           AVD_NAME: Pixel_XL_API_34
-          ANDROID_AVD_HOME: ${{ env.HOME }}/.android/avd
         run: |
-          # Boot ARM AVD with software GPU and no window. Avoid -accel flags for ARM.
-          "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" \
-            -gpu swiftshader_indirect -no-window -no-snapshot -no-boot-anim -no-audio -no-metrics -selinux permissive -qemu -m 2048 &
+          set -euo pipefail
 
-          # Diagnostics while emulator starts
-          "${ANDROID_HOME}/platform-tools/adb" wait-for-device shell \
-            'while [[ -z $(getprop sys.boot_completed | tr -d "\r") ]]; do sleep 1; done; input keyevent 82'
-          echo "Emulator boot completed"
-          "${ANDROID_HOME}/platform-tools/adb" devices || true
+          "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" \
+            -no-window \
+            -no-snapshot \
+            -gpu swiftshader_indirect \
+            -no-audio \
+            -no-boot-anim \
+            -no-metrics \
+            -camera-back none \
+            -camera-front none \
+            -selinux permissive \
+            -qemu -m 3072 > emulator.log 2>&1 &
+
+          # Wait for ADB
+          "${ANDROID_HOME}/platform-tools/adb" wait-for-device
+
+          # Robust boot wait (up to ~12 minutes)
+          deadline=$((SECONDS + 720)) # 12 minutes
+          until "${ANDROID_HOME}/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' | grep -q '^1$'; do
+            if (( SECONDS > deadline )); then
+              echo "❌ Emulator did not finish booting within 12 minutes"
+              echo "== tail emulator.log =="
+              tail -n 200 emulator.log || true
+              exit 1
+            fi
+            echo "…waiting for Android to boot ($((${deadline}-SECONDS))s left)"
+            sleep 10
+          done
+
+          "${ANDROID_HOME}/platform-tools/adb" shell input keyevent 82 || true
+          "${ANDROID_HOME}/platform-tools/adb" devices
       - name: 🌐 Expo Web export test
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
 

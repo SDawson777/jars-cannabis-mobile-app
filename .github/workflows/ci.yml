@@ -11,267 +11,156 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: '--max-old-space-size=4096'
-    steps:
-      - uses: actions/checkout@v4
+    name: CI
 
-      - name: 🔍 Preflight - Verify lockfiles exist
-        run: |
-          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
-          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
-          echo "✅ All required lockfiles present"
+    on:
+      push:
+        branches: [main]
+      pull_request:
+        branches: [main]
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          cache-dependency-path: |
-            npm-shrinkwrap.json
-            backend/package-lock.json
-
-      - name: 📦 Cache npm (root)
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-cache-root-${{ hashFiles('npm-shrinkwrap.json') }}
-          restore-keys: |
-            npm-cache-root-
-
-      - name: 📦 Cache npm (backend)
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-cache-backend-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            npm-cache-backend-
-
-      - name: Install deps (root)
-        run: npm ci
-
-      - name: Install deps (backend)
-        run: npm ci
-        working-directory: backend
-
-      - name: Typecheck & lint (root)
-        run: |
-          npm run typecheck
-          npm run lint
-
-      - name: Typecheck & lint (backend)
-        run: |
-          npm run typecheck || true
-          npm run lint || true
-        working-directory: backend
-
-      # Expo/EAS authenticated and npm-only
-      - name: Expo/EAS auth
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          packager: npm
-
-      - name: Build Android APK (EAS)
-        run: eas build -p android --profile apk --non-interactive --json > build.json
-
-      - name: Download APK artifact
-        run: |
-          URL=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl' build.json)
-          test -n "$URL" || (echo "No buildUrl in build.json"; cat build.json; exit 1)
-          curl -L "$URL" -o app-release.apk
-          ls -lh app-release.apk
-
-      # Firebase Test Lab Robo smoke (free quota)
-      - name: Setup gcloud
-        if: ${{ secrets.GC_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GC_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
-
-      - name: Firebase Test Lab Robo
-        if: ${{ secrets.GC_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
-        run: |
-          gcloud firebase test android run \
-            --type robo \
-            --app app-release.apk \
-            --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
-            --timeout 5m
-
-      # Optional: Expo Web export (non-blocking initially)
-      - name: Expo Web export (non-blocking)
-        continue-on-error: true
-        run: npx expo export --platform web --non-interactive
-
-      # Optional: Appetize upload for demo
-      - name: Upload to Appetize (optional)
-        if: ${{ secrets.APPETIZE_API_TOKEN }}
+    jobs:
+      build-test:
+        runs-on: ubuntu-latest
         env:
-          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
-          APPETIZE_PUBLIC_KEY: ${{ secrets.APPETIZE_PUBLIC_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -n "${APPETIZE_PUBLIC_KEY:-}" ]; then
-            curl -sS https://api.appetize.io/v1/apps/${APPETIZE_PUBLIC_KEY} \
-              -u "$APPETIZE_API_TOKEN:" \
-              -F "file=@app-release.apk" \
-              -F "platform=android" | tee appetize.json
-          else
-            curl -sS https://api.appetize.io/v1/apps \
-              -u "$APPETIZE_API_TOKEN:" \
-              -F "file=@app-release.apk" \
-              -F "platform=android" | tee appetize.json
-          fi
-          PUB=$(jq -r '.publicKey // .data.publicKey // .app.publicKey' appetize.json)
-          echo "Appetize public key: $PUB"
-          echo "Embed: https://appetize.io/embed/${PUB}?device=pixel7&osVersion=14.0&scale=75&autoplay=true"
+          NODE_OPTIONS: '--max-old-space-size=4096'
+        steps:
+          - uses: actions/checkout@v4
 
-      # Upload test artifacts on failure
-      - name: 📱 Upload test artifacts
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: artifacts
-          path: |
-            artifacts/
-            e2e/screenshots/
-            e2e/videos/
+          - name: 🔍 Preflight - Verify lockfiles exist
+            run: |
+              test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
+              test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
+              echo "✅ All required lockfiles present"
 
-      - name: 📊 Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            e2e/test-results/
-            coverage/
+          - uses: actions/setup-node@v4
+            with:
+              node-version-file: '.nvmrc'
+              cache: 'npm'
+              cache-dependency-path: |
+                npm-shrinkwrap.json
+                backend/package-lock.json
 
-# TODO: actionable checklist (kept as comments to avoid YAML parsing issues)
-#  - Ensure lockfiles exist: npm-shrinkwrap.json and backend/package-lock.json
-#  - Ensure EXPO_TOKEN, GC_PROJECT_ID, and GCP_SA_KEY_JSON are set in repo secrets for EAS+FTL
-#  - Local verification commands: npm ci; npx tsc -p tsconfig.json; npm run lint; npm run test:ci
-name: CI
+          - name: 📦 Cache npm (root)
+            uses: actions/cache@v4
+            with:
+              path: ~/.npm
+              key: npm-cache-root-${{ hashFiles('npm-shrinkwrap.json') }}
+              restore-keys: |
+                npm-cache-root-
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+          - name: 📦 Cache npm (backend)
+            uses: actions/cache@v4
+            with:
+              path: ~/.npm
+              key: npm-cache-backend-${{ hashFiles('backend/package-lock.json') }}
+              restore-keys: |
+                npm-cache-backend-
 
-jobs:
-  build-test:
-    runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: '--max-old-space-size=4096'
+          - name: Install deps (root)
+            run: npm ci
+
+          - name: Install deps (backend)
+            run: npm ci
+            working-directory: backend
+
+          - name: Typecheck & lint (root)
+            run: |
+              npm run typecheck
+              npm run lint
+
+          - name: Typecheck & lint (backend)
+            run: |
+              npm run typecheck || true
+              npm run lint || true
+            working-directory: backend
+
+          # Expo/EAS authenticated and npm-only
+          - name: Expo/EAS auth
+            uses: expo/expo-github-action@v8
+            with:
+              expo-version: latest
+              eas-version: latest
+              token: ${{ secrets.EXPO_TOKEN }}
+              packager: npm
+
+          - name: Build Android APK (EAS)
+            run: eas build -p android --profile apk --non-interactive --json > build.json
+
+          - name: Download APK artifact
+            run: |
+              URL=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl' build.json)
+              test -n "$URL" || (echo "No buildUrl in build.json"; cat build.json; exit 1)
+              curl -L "$URL" -o app-release.apk
+              ls -lh app-release.apk
+
+          # Firebase Test Lab Robo smoke (free quota)
+          - name: Setup gcloud
+            if: ${{ secrets.GC_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
+            uses: google-github-actions/setup-gcloud@v2
+            with:
+              project_id: ${{ secrets.GC_PROJECT_ID }}
+              service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
+
+          - name: Firebase Test Lab Robo
+            if: ${{ secrets.GC_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
+            run: |
+              gcloud firebase test android run \
+                --type robo \
+                --app app-release.apk \
+                --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
+                --timeout 5m
+
+          # Optional: Expo Web export (non-blocking initially)
+          - name: Expo Web export (non-blocking)
+            continue-on-error: true
+            run: npx expo export --platform web --non-interactive
+
+          # Optional: Appetize upload for demo
+          - name: Upload to Appetize (optional)
+            if: ${{ secrets.APPETIZE_API_TOKEN }}
+            env:
+              APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+              APPETIZE_PUBLIC_KEY: ${{ secrets.APPETIZE_PUBLIC_KEY }}
+            run: |
+              set -euo pipefail
+              if [ -n "${APPETIZE_PUBLIC_KEY:-}" ]; then
+                curl -sS https://api.appetize.io/v1/apps/${APPETIZE_PUBLIC_KEY} \
+                  -u "$APPETIZE_API_TOKEN:" \
+                  -F "file=@app-release.apk" \
+                  -F "platform=android" | tee appetize.json
+              else
+                curl -sS https://api.appetize.io/v1/apps \
+                  -u "$APPETIZE_API_TOKEN:" \
+                  -F "file=@app-release.apk" \
+                  -F "platform=android" | tee appetize.json
+              fi
+              PUB=$(jq -r '.publicKey // .data.publicKey // .app.publicKey' appetize.json)
+              echo "Appetize public key: $PUB"
+              echo "Embed: https://appetize.io/embed/${PUB}?device=pixel7&osVersion=14.0&scale=75&autoplay=true"
+
+          # Upload test artifacts on failure
+          - name: 📱 Upload test artifacts
+            uses: actions/upload-artifact@v4
+            if: failure()
+            with:
+              name: artifacts
+              path: |
+                artifacts/
+                e2e/screenshots/
+                e2e/videos/
+
+          - name: 📊 Upload test results
+            uses: actions/upload-artifact@v4
+            if: always()
+            with:
+              name: test-results
+              path: |
+                e2e/test-results/
+                coverage/
+
+    # TODO: actionable checklist (kept as comments to avoid YAML parsing issues)
+    #  - Ensure lockfiles exist: npm-shrinkwrap.json and backend/package-lock.json
+    #  - Ensure EXPO_TOKEN, GC_PROJECT_ID, and GCP_SA_KEY_JSON are set in repo secrets for EAS+FTL
+    #  - Local verification commands: npm ci; npx tsc -p tsconfig.json; npm run lint; npm run test:ci
     steps:
-      - uses: actions/checkout@v4
-
-      - name: 🔍 Preflight - Verify lockfiles exist
-        run: |
-          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
-          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
-          echo "✅ All required lockfiles present"
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          cache-dependency-path: |
-            npm-shrinkwrap.json
-            backend/package-lock.json
-
-      - name: 📦 Cache npm (root)
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-cache-root-${{ hashFiles('npm-shrinkwrap.json') }}
-          restore-keys: |
-            npm-cache-root-
-
-      - name: 📦 Cache npm (backend)
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-cache-backend-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            npm-cache-backend-
-
-            ## TODO — actionable checklist to go green and demo-ready
-
-            The following is a compact, actionable checklist with commands and verification steps. Work through these items and run the local checks shown under "Local verification" before committing.
-
-            1) CI lockfile + installs (monorepo)
-              - Ensure both lockfiles exist in repo root: `npm-shrinkwrap.json` and `backend/package-lock.json`.
-              - CI should run (already present):
-                - `npm ci` at repo root
-                - `npm ci` in `backend/` (use `working-directory: backend`)
-              - actions/setup-node@v4 config (present): `node-version-file: .nvmrc`, `cache: npm`, and `cache-dependency-path` should include both lockfiles.
-
-            2) Expo / EAS (build APK)
-              - Ensure `eas.json` contains a build profile named `apk` (CI runs `eas build -p android --profile apk`).
-              - CI uses `expo/expo-github-action@v8` with `token: ${{ secrets.EXPO_TOKEN }}` and `packager: npm` (done).
-              - Build step (CI): `eas build -p android --profile apk --non-interactive --json > build.json`
-              - Download artifact via the `build.json` `buildUrl` (script already included).
-
-            3) Firebase Test Lab (Robo smoke)
-              - CI runs Robo only when `secrets.GC_PROJECT_ID` and `secrets.GCP_SA_KEY_JSON` are present.
-              - Ensure service account JSON has these roles: `firebase.testLabAdmin` or equivalent and `storage.objectViewer` on the project used for tests.
-              - CI command (already present):
-                gcloud firebase test android run --type robo --app app-release.apk --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait --timeout 5m
-
-            4) Optional Appetize demo
-              - Provide `APPETIZE_API_TOKEN` (and optional `APPETIZE_PUBLIC_KEY`) as GitHub secrets to enable the upload step.
-              - CI prints the embed URL when upload succeeds so reviewers can demo the APK.
-
-            5) Expo web export (non-blocking)
-              - Keep `npx expo export --platform web` as a non-blocking step. Ensure `@expo/webpack-config` and `expo-pwa` are on root deps if you rely on web builds.
-
-            6) Backend test env defaults (CI safety)
-              - The backend env validator is strict. Provide safe test defaults in CI env (use secrets when real credentials are required):
-                - JWT_SECRET: at least 32 chars (example fallback used in previous commit)
-                - FIREBASE_SERVICE_ACCOUNT_BASE64: prefer `${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}` with a harmless base64 fallback in CI
-                - FIREBASE_PROJECT_ID: `${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}`
-                - STRIPE_SECRET_KEY: `sk_test_test` (test key)
-                - OPENAI_API_KEY: `test-openai-key`
-                - OPENWEATHER_API_KEY: `test-weather-key`
-
-            7) TypeScript + axios generics (quick plan)
-              - Create or confirm `src/api/http.ts` exports typed helpers: `clientGet<T>`, `clientPost<TReq, TRes>`, `clientPut<TReq, TRes>` that return `res.data` typed.
-              - Replace ad-hoc `api.get<T>(...)` usages where `api` has `any` type with `clientGet<T>(phase4Client, '/path')` or ensure the `api` instance is properly typed as `AxiosInstance`.
-              - Key files to check (incremental):
-                - `src/api/cmsClient.ts`
-                - `src/clients/authClient.ts`
-                - `src/clients/orderClient.ts`
-                - `src/api/phase4Client.ts` (wrappers)
-                - Hooks and screens that call `phase4Client.get/post/put` directly
-
-            8) Docs & developer notes
-              - Update `README.md` (or `src/api/README.md`) describing the HTTP helper pattern and how tests mock `phase4Client`.
-              - Update `DEPENDENCY_SETUP.md` with lockfile policy and EAS build notes.
-
-            Local verification (run before committing)
-              - Install & lint/typecheck:
-                ```bash
-                npm ci
-                npx tsc -p tsconfig.json
-                npm run lint
-                ```
-              - Backend checks:
-                ```bash
-                (cd backend && npm ci)
-                npx tsc -p backend/tsconfig.json
-                npm --prefix backend run test:ci
-                ```
-              - EAS dry-run (requires EXPO_TOKEN):
-                ```bash
-                EXPO_TOKEN=... eas build -p android --profile apk --non-interactive --local
-                ```
-
-            Commit checklist
-              - Run Prettier: `npx prettier --write .`
-              - Stage CI changes and helper/type fixes
-              - Run `npx tsc` and `npm test` (or `npm run test:ci`) locally if possible
-              - Push branch / open PR so CI runs EAS + FTL Robo
-
-            Notes
-              - CI builds that use EAS will consume EAS build minutes; ensure your account has capacity (or use Expo's free tier limits).
