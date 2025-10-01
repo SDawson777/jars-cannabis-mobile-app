@@ -60,7 +60,8 @@ jobs:
       # Upload to Appetize (demo link)
       - name: Upload APK to Appetize (Action)
         id: appetize
-        if: ${{ secrets.APPETIZE_API_TOKEN && github.event.pull_request.head.repo.fork == false }}
+        # Only skip when PR originates from a fork; don't reference secrets in the if expression
+        if: ${{ github.event.pull_request == null || github.event.pull_request.head.repo.fork == false }}
         uses: appetizeio/appetize-github-action@v1
         with:
           apiToken: ${{ secrets.APPETIZE_API_TOKEN }}
@@ -69,9 +70,14 @@ jobs:
           publicKey: ${{ secrets.APPETIZE_PUBLIC_KEY }}
 
       - name: Upload APK to Appetize (API fallback)
-        if: ${{ secrets.APPETIZE_API_TOKEN && github.event.pull_request.head.repo.fork == false }}
+        # Don't reference secrets in the conditional; check at runtime and skip if missing
+        if: ${{ github.event.pull_request == null || github.event.pull_request.head.repo.fork == false }}
         run: |
           set -euo pipefail
+          if [ -z "${{ secrets.APPETIZE_API_TOKEN }}" ]; then
+            echo "APPETIZE_API_TOKEN not set; skipping API fallback upload"
+            exit 0
+          fi
           RESPONSE=$(curl -sS https://api.appetize.io/v1/apps \
             -u "${{ secrets.APPETIZE_API_TOKEN }}:" \
             -F "file=@app-release.apk" \
@@ -84,7 +90,7 @@ jobs:
           echo "- **Embed:** https://appetize.io/embed/$PUB?device=pixel7&osVersion=14.0&scale=75&autoplay=true" >> $GITHUB_STEP_SUMMARY
 
       - name: Appetize links (Action outputs)
-        if: ${{ github.event.pull_request.head.repo.fork == false }}
+        if: ${{ github.event.pull_request == null || github.event.pull_request.head.repo.fork == false }}
         run: |
           PUB="${{ steps.appetize.outputs.publicKey }}"
           if [ -z "$PUB" ]; then
@@ -111,9 +117,13 @@ jobs:
         working-directory: backend
 
       - name: Firebase Test Lab Robo smoke
-        if: ${{ secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON }}
+        # Do a runtime check for GCP secrets to avoid using secrets in the workflow expression
         run: |
           set -euo pipefail
+          if [ -z "${{ secrets.GCP_PROJECT_ID }}" ] || [ -z "${{ secrets.GCP_SA_KEY_JSON }}" ]; then
+            echo "GCP_PROJECT_ID or GCP_SA_KEY_JSON not set; skipping Firebase Test Lab run"
+            exit 0
+          fi
           echo "${{ secrets.GCP_SA_KEY_JSON }}" > /tmp/gcloud_key.json
           gcloud auth activate-service-account --key-file=/tmp/gcloud_key.json
           gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
@@ -125,9 +135,13 @@ jobs:
 
       # Emulator fallback when FTL secrets are not present
       - name: Install Android SDK & tools (for emulator fallback)
-        if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
+        # This step will check at runtime whether GCP secrets are present; if they are, it will skip.
         run: |
           set -euo pipefail
+          if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_SA_KEY_JSON }}" ]; then
+            echo "GCP secrets present; skipping emulator fallback SDK install"
+            exit 0
+          fi
           sudo mkdir -p /usr/lib/android-sdk || true
           sudo chown -R $USER:$(id -gn) /usr/lib/android-sdk || true
           export ANDROID_SDK_ROOT="/usr/lib/android-sdk"
@@ -142,9 +156,12 @@ jobs:
           ADB_INSTALL_TIMEOUT: 120000
 
       - name: Create and configure AVD (fallback)
-        if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
         run: |
           set -euo pipefail
+          if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_SA_KEY_JSON }}" ]; then
+            echo "GCP secrets present; skipping AVD creation"
+            exit 0
+          fi
           export ANDROID_AVD_HOME="$HOME/.android/avd"
           mkdir -p "${ANDROID_AVD_HOME}"
           AVD_NAME="ci_arm64_avd"
@@ -159,13 +176,16 @@ jobs:
           } >> "${AVD_DIR}/config.ini"
 
       - name: Boot emulator (fallback)
-        if: ${{ ! (secrets.GCP_PROJECT_ID && secrets.GCP_SA_KEY_JSON) }}
         shell: bash
         env:
           AVD_NAME: ci_arm64_avd
           ANDROID_HOME: /usr/lib/android-sdk
         run: |
           set -euo pipefail
+          if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_SA_KEY_JSON }}" ]; then
+            echo "GCP secrets present; skipping emulator boot"
+            exit 0
+          fi
           "${ANDROID_HOME}/emulator/emulator" -avd "${AVD_NAME}" -no-window -no-snapshot -gpu swiftshader_indirect -no-audio -no-boot-anim -no-metrics -camera-back none -camera-front none -selinux permissive -qemu -m 3072 > emulator.log 2>&1 &
           "${ANDROID_HOME}/platform-tools/adb" wait-for-device
           deadline=$((SECONDS + 720))
