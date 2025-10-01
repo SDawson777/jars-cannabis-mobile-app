@@ -1,0 +1,43 @@
+# Goal: Finish CI hardening & get green ✅
+
+[Formatting]
+- Run Prettier in write mode and commit:
+  npx prettier . --write
+
+[Workflow: Caching]
+- In .github/workflows/e2e-smoke.yml:
+  - Add actions/cache step to cache Android SDK dirs:
+    $ANDROID_HOME/platforms, build-tools, emulator, platform-tools, system-images
+  - (Optional) Add actions/cache for $HOME/.android/avd
+
+[Workflow: Docs]
+- Add a short README/docs/ci.md section:
+  - EAS requires EXPO_TOKEN secret.
+  - FTL Robo requires GCP_PROJECT_ID and GCP_SA_KEY_JSON.
+  - If FTL secrets are absent, emulator fallback path is used (slower, ARM).
+
+[Workflow: Sanity checks]
+- Ensure steps:
+  - Root: npm ci (uses npm-shrinkwrap.json)
+  - Backend: npm ci (uses backend/package-lock.json)
+  - EAS: uses expo/expo-github-action with packager: npm
+  - FTL: conditional on both GCP secrets; runs Robo test against built APK
+
+[Validation runs]
+- Trigger two CI runs:
+  - With FTL secrets → APK + FTL Robo gate invoked
+  - Without FTL secrets → emulator fallback path invoked
+  - Verify artifacts, exit codes, and step logs.
+
+[Optional tunings]
+- Emulator fallback:
+  - Use default;arm64-v8a image (faster boot) and smaller device (Nexus 5)
+  - Extend boot timeout to 20 min for cold runs
+  - Keep -gpu swiftshader_indirect, -no-window, -no-snapshot, -no-boot-anim
+  - Add caching for Android SDK and AVD (done)
+  - Consider increasing job timeout-minutes
+
+[Done criteria]
+- PR CI green with FTL path
+- Emulator fallback passes when secrets are missing
+- Prettier clean, no YAML duplicate keys, no format errors
