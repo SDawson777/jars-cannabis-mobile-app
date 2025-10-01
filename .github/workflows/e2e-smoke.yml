@@ -42,6 +42,11 @@ jobs:
         with:
           token: ${{ secrets.EXPO_TOKEN }}
           packager: npm
+          expo-version: latest
+          eas-version: latest
+          expo-cache: true
+          eas-cache: true
+          patch-watchers: true
 
       - name: Build Android APK (EAS)
         run: |
