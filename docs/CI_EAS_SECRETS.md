@@ -4,7 +4,7 @@ This short doc explains what the repository's CI (green-path) expects for EAS bu
 
 1. ## Purpose
 
-- CI builds an Android APK with EAS and then (optionally) runs a Firebase Test Lab Robo smoke test. The CI workflow uses `eas build --profile apk` and expects an `apk` profile in `eas.json` (present in this repo).
+- CI builds an Android APK with EAS and then (optionally) runs a Firebase Test Lab Robo smoke test. The CI workflow uses `eas build --profile android-preview` and expects an `android-preview` profile in `eas.json` (present in this repo).
 
 2. ## Required GitHub secrets (names used by the workflow)
 

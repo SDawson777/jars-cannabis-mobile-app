@@ -51,7 +51,7 @@ jobs:
       - name: Build Android APK (EAS)
         run: |
           set -euo pipefail
-          eas build -p android --profile apk --non-interactive --json > build.json
+          eas build -p android --profile android-preview --non-interactive --json > build.json
           cat build.json
 
       - name: Download APK artifact
