@@ -3,26 +3,22 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "channel": "dev"
+      "distribution": "internal"
     },
     "android-preview": {
       "android": { "buildType": "apk" },
       "credentialsSource": "local",
-      "distribution": "internal",
-      "channel": "preview"
+      "distribution": "internal"
     },
     "ios-simulator": {
       "ios": { "simulator": true },
-      "distribution": "internal",
-      "channel": "preview"
+      "distribution": "internal"
     },
     "production": {
       "android": { "buildType": "app-bundle" },
       "ios": {},
       "credentialsSource": "remote",
-      "autoIncrement": true,
-      "channel": "production"
+      "autoIncrement": true
     }
   },
   "submit": {
