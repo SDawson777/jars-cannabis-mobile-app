@@ -2,125 +2,119 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
-
-env:
-  NODE_OPTIONS: --max-old-space-size=4096
 
 jobs:
-  smoke:
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-
-      - name: Use Node from .nvmrc and cache npm
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
         with:
-          node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: |
-            npm-shrinkwrap.json
-            backend/package-lock.json
-
-      - name: Ensure lockfiles exist
-        run: |
-          test -f npm-shrinkwrap.json || (echo "Missing root npm-shrinkwrap.json"; exit 1)
-          test -f backend/package-lock.json || (echo "Missing backend/package-lock.json"; exit 1)
-
-      - name: Install deps (root)
-        run: npm ci
-
-      - name: Install deps (backend)
-        run: npm ci
-        working-directory: backend
-
-      - name: Typecheck & lint (root)
-        run: |
-          npm run typecheck
-          npm run lint
-
-      - name: Typecheck & lint (backend)
-        run: |
-          npm run typecheck || true
-          npm run lint || true
-        working-directory: backend
-
-      - name: Expo/EAS auth
-        uses: expo/expo-github-action@v8
+          version: '9'
+      - uses: actions/setup-node@v4
         with:
-          expo-version: latest
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          packager: npm
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test -- --ci
 
-      - name: Build Android APK (EAS)
-        run: eas build -p android --profile apk --non-interactive --json > build.json
-
-      - name: Download APK artifact
-        run: |
-          URL=$(jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl' build.json)
-          test -n "$URL" || (echo "No buildUrl in build.json"; cat build.json; exit 1)
-          curl -L "$URL" -o app-release.apk
-          ls -lh app-release.apk
-
-      - name: Setup gcloud (for Firebase Test Lab)
-        if: ${{ (secrets.GCP_PROJECT_ID || secrets.GC_PROJECT_ID) && secrets.GCP_SA_KEY_JSON }}
-        uses: google-github-actions/setup-gcloud@v2
+  build-android-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID || secrets.GC_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
-
-      - name: Firebase Test Lab Robo smoke
-        if: ${{ (secrets.GCP_PROJECT_ID || secrets.GC_PROJECT_ID) && secrets.GCP_SA_KEY_JSON }}
-        run: |
-          gcloud firebase test android run \
-            --type robo \
-            --app app-release.apk \
-            --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
-            --timeout 5m
-
-      - name: Upload to Appetize (optional)
-        if: ${{ secrets.APPETIZE_API_TOKEN && (github.event.pull_request == null || github.event.pull_request.head.repo.fork == false) }}
-        env:
-          APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
-          APPETIZE_PUBLIC_KEY: ${{ secrets.APPETIZE_PUBLIC_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -n "${APPETIZE_PUBLIC_KEY:-}" ]; then
-            curl -sS https://api.appetize.io/v1/apps/${APPETIZE_PUBLIC_KEY} \
-              -u "$APPETIZE_API_TOKEN:" \
-              -F "file=@app-release.apk" \
-              -F "platform=android" | tee appetize.json
-          else
-            curl -sS https://api.appetize.io/v1/apps \
-              -u "$APPETIZE_API_TOKEN:" \
-              -F "file=@app-release.apk" \
-              -F "platform=android" | tee appetize.json
-          fi
-          PUB=$(jq -r '.publicKey // .data.publicKey // .app.publicKey // empty' appetize.json)
-          echo "Appetize public key: $PUB"
-          echo "Embed: https://appetize.io/embed/${PUB}?device=pixel7&osVersion=14.0&scale=75&autoplay=true"
-
-      - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
-        if: failure()
+          version: '9'
+      - uses: actions/setup-node@v4
         with:
-          name: artifacts
-          path: |
-            artifacts/
-            e2e/screenshots/
-            e2e/videos/
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Build Android Preview APK (no store creds)
+        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
+  build-ios-simulator:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          name: test-results
-          path: |
-            e2e/test-results/
-            coverage/
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Build iOS Simulator (no Apple creds)
+        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
+name: CI
+name: CI
 
-    # Notes: run `eas build:configure --platform android` locally once to provision keystore for CI.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test -- --ci
+
+  build-android-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Build Android Preview APK (no store creds)
+        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
+
+  build-ios-simulator:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Build iOS Simulator (no Apple creds)
+        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
+
