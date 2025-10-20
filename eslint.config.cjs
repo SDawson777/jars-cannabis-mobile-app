@@ -283,6 +283,7 @@ module.exports = [
       'functions/lib/',
       'server/',
       'apps/',
+      'apps/demo-web/index.html',
     ],
   },
 ];
