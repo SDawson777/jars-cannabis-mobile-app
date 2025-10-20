@@ -1,5 +1,5 @@
 {
-  "cli": { "version": ">= 12.0.0" },
+  "cli": { "version": ">= 12.0.0", "appVersionSource": "manifest" },
   "build": {
     "development": {
       "developmentClient": true,
@@ -7,7 +7,7 @@
     },
     "android-preview": {
       "android": { "buildType": "apk" },
-      "credentialsSource": "local",
+      "credentialsSource": "remote",
       "distribution": "internal"
     },
     "ios-simulator": {
