@@ -394,6 +394,43 @@ Where is the mobile app code?All React Native code is in /src. Entry point is Ap
 
 How do I add environment variables in production?Use your platform’s UI (Railway/Render/Heroku/etc).
 
+## CI: EAS Android keystore (secrets & one-time setup)
+
+To allow CI to produce signed Android APKs for preview builds, add these GitHub Actions secrets:
+
+- `EXPO_TOKEN` — your Expo access token (already used by CI).
+- `EXPO_ANDROID_KEYSTORE_BASE64` — base64-encoded JKS keystore file (contents of your .keystore file encoded with base64 - see below).
+- `EXPO_ANDROID_KEYSTORE_PASSWORD` — the keystore password (e.g. `DemoPass123`).
+- `EXPO_ANDROID_KEY_ALIAS` — the alias inside the keystore (e.g. `upload`).
+- `EXPO_ANDROID_KEY_PASSWORD` — the key password (e.g. `DemoPass123`).
+
+How to produce the base64 keystore locally:
+
+```bash
+# Example: produces a single-line base64 string suitable for a GitHub secret
+base64 -w0 path/to/your.keystore > android-demo.keystore.b64
+```
+
+One-time local interactive step (recommended):
+
+1. Install and login to EAS locally:
+
+```bash
+npm install -g eas-cli
+eas login
+```
+
+2. Run the interactive configure command and choose Android → "Let EAS manage credentials":
+
+```bash
+eas build:configure
+# choose: Android -> Let EAS manage credentials
+```
+
+This either seeds Expo-managed remote credentials or you can instead provide the keystore via the secrets above (CI reads `EXPO_ANDROID_*` env vars and will use a local keystore if `credentialsSource: "local"` is set in `eas.json`).
+
+Security note: always store keystores and passwords in GitHub Secrets; do not commit them to source control.
+
 🤝 Buyer Information & Support
 
 See [docs/buyer-setup.md](docs/buyer-setup.md) for configuring credentials and running production builds.
