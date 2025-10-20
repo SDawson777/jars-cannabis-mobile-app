@@ -48,6 +48,29 @@ jobs:
           eas-cache: true
           patch-watchers: true
 
+      - name: Create Android credentials.json (local keystore)
+        if: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          set -euo pipefail
+          echo "$EXPO_ANDROID_KEYSTORE_BASE64" | base64 -d > android.keystore
+          cat > credentials.json <<EOF
+          {
+            "android": {
+              "keystore": {
+                "keystorePath": "android.keystore",
+                "keystorePassword": "${EXPO_ANDROID_KEYSTORE_PASSWORD}",
+                "keyAlias": "${EXPO_ANDROID_KEY_ALIAS}",
+                "keyPassword": "${EXPO_ANDROID_KEY_PASSWORD}"
+              }
+            }
+          }
+          EOF
+        env:
+          EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
+          EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
+          EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
+          EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
+
       - name: Build Android APK (EAS)
         run: |
           set -euo pipefail
