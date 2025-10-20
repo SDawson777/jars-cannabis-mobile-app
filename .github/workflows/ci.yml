@@ -42,9 +42,18 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Create Android credentials.json (local keystore)
-        if: ${{ env.EXPO_ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
+          EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
+          EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
+          EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
+          if [ -z "$EXPO_ANDROID_KEYSTORE_BASE64" ]; then
+            echo "::warning::EXPO_ANDROID_KEYSTORE_BASE64 not set; skipping credentials.json creation"
+            echo "EAS will attempt to use remote credentials or fail if none available"
+            exit 0
+          fi
           echo "$EXPO_ANDROID_KEYSTORE_BASE64" | base64 -d > android.keystore
           cat > credentials.json <<EOF
           {
@@ -58,6 +67,7 @@ jobs:
             }
           }
           EOF
+          echo "✅ Created credentials.json with local keystore"
 
       - name: Build Android Preview APK (no store creds)
         run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
