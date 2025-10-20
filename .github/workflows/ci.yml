@@ -27,6 +27,124 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      # Optional: if you switch to local creds later
+      # EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
+      # EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
+      # EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
+      # EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
+      GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
+      GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Build Android Preview APK (no store creds)
+        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
+
+      - name: Download latest EAS Android artifact (APK)
+        run: |
+          pnpm dlx eas-cli build:download \
+            --latest \
+            --platform android \
+            --output app-preview.apk
+          test -f app-preview.apk
+
+      - name: Upload APK artifact (preserve)
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-preview-apk
+          path: app-preview.apk
+          if-no-files-found: error
+
+      # --- Firebase Test Lab Robo Gate ---
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
+          export_default_credentials: true
+
+      - name: Run Firebase Test Lab (Robo) on APK
+        id: ftl
+        run: |
+          set -euo pipefail
+          # Standard device matrix; adjust as needed
+          DEVICE="model=Pixel2,version=30,locale=en,orientation=portrait"
+          EXIT_CODE=0
+          gcloud firebase test android run \
+            --type robo \
+            --app app-preview.apk \
+            --device "$DEVICE" \
+            --timeout 900s \
+            --results-bucket gs://test-lab-${GCLOUD_PROJECT_ID} || EXIT_CODE=$?
+          # Capture results URL from the last run
+          RESULTS_URL=$(grep -Eo 'Test results will be streamed to \S+' "$HOME/.config/gcloud/logs/"* 2>/dev/null | tail -n1 | awk '{print $NF}') || true
+          echo "results_url=${RESULTS_URL:-}" >> $GITHUB_OUTPUT
+          # Fail the job if Robo test failed
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "::error::Firebase Test Lab reported failures. See results: ${RESULTS_URL:-unknown}"
+            exit $EXIT_CODE
+          fi
+
+      - name: Summarize Firebase Test Lab results
+        if: always()
+        run: |
+          echo "### Firebase Test Lab (Robo) Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Results: ${{ steps.ftl.outputs.results_url }}" >> $GITHUB_STEP_SUMMARY
+
+  build-ios-simulator:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Build iOS Simulator (no Apple creds)
+        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test -- --ci
+
+  build-android-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
