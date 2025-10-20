@@ -7,23 +7,21 @@
       "channel": "dev"
     },
     "android-preview": {
-      "platforms": ["android"],
       "android": { "buildType": "apk" },
       "credentialsSource": "local",
       "distribution": "internal",
       "channel": "preview"
     },
     "ios-simulator": {
-      "platforms": ["ios"],
       "ios": { "simulator": true },
       "distribution": "internal",
       "channel": "preview"
     },
     "production": {
       "android": { "buildType": "app-bundle" },
-      "ios": { "simulator": false },
+      "ios": {},
       "credentialsSource": "remote",
-      "autoIncrement": "version",
+      "autoIncrement": true,
       "channel": "production"
     }
   },
