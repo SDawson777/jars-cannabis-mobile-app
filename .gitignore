@@ -1,6 +1,8 @@
 # Local Android keystore artifacts created by CI step or local testing
 android.keystore
 credentials.json
+android-demo.keystore
+android-demo.keystore.b64
 # Node
 node_modules/
 npm-debug.log*
