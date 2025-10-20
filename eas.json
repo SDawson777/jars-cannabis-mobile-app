@@ -1,34 +1,36 @@
 {
-  "cli": {
-    "version": ">= 16.17.0",
-    "appVersionSource": "remote"
-  },
+  "cli": { "version": ">= 12.0.0" },
   "build": {
-    "apk": {
-      "node": "20.11.1",
-      "android": {
-        "buildType": "apk"
-      }
-    },
     "development": {
-      "node": "20.11.1",
       "developmentClient": true,
       "distribution": "internal",
-      "resourceClass": "medium"
+      "channel": "dev"
     },
-    "preview": {
-      "node": "20.11.1",
-      "distribution": "internal"
+    "android-preview": {
+      "platforms": ["android"],
+      "android": { "buildType": "apk" },
+      "credentialsSource": "local",
+      "distribution": "internal",
+      "channel": "preview"
+    },
+    "ios-simulator": {
+      "platforms": ["ios"],
+      "ios": { "simulator": true },
+      "distribution": "internal",
+      "channel": "preview"
     },
     "production": {
-      "node": "20.11.1",
-      "autoIncrement": true,
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://api.jarscannabis.com"
-      }
+      "android": { "buildType": "app-bundle" },
+      "ios": { "simulator": false },
+      "credentialsSource": "remote",
+      "autoIncrement": "version",
+      "channel": "production"
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": { "serviceAccountKeyPath": "./fastlane/google-service-account.json" },
+      "ios": { "ascAppId": "REPLACE_AT_HANOFF" }
+    }
   }
 }
