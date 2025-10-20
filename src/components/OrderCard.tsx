@@ -12,7 +12,9 @@ interface Props {
 
 export default function OrderCard({ order, onPress, primaryColor, secondaryColor }: Props) {
   const date = new Date(order.createdAt).toLocaleDateString();
-  const label = `Order ${order.id} on ${date} at ${order.store} totaling $${order.total.toFixed(2)}`;
+  const label = `Order ${order.id} on ${date} at ${order.store} totaling $${order.total.toFixed(
+    2
+  )}`;
 
   return (
     <Pressable

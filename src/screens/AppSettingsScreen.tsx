@@ -87,8 +87,16 @@ ${debugInfo.fallbackReason ? `Fallback Reason: ${debugInfo.fallbackReason}` : ''
 ${debugInfo.actualTemperature ? `Temperature: ${debugInfo.actualTemperature}°` : ''}
 ${debugInfo.actualCondition ? `Condition: ${debugInfo.actualCondition}` : ''}
 ${debugInfo.cloudCover !== undefined ? `Cloud Cover: ${debugInfo.cloudCover}%` : ''}
-${debugInfo.location ? `Location: ${debugInfo.location.lat.toFixed(4)}, ${debugInfo.location.lon.toFixed(4)}` : ''}
-${debugInfo.simulation?.enabled ? `Simulation: ${debugInfo.simulation?.condition ?? 'unknown'} (enabled)` : 'Simulation: disabled'}
+${
+  debugInfo.location
+    ? `Location: ${debugInfo.location.lat.toFixed(4)}, ${debugInfo.location.lon.toFixed(4)}`
+    : ''
+}
+${
+  debugInfo.simulation?.enabled
+    ? `Simulation: ${debugInfo.simulation?.condition ?? 'unknown'} (enabled)`
+    : 'Simulation: disabled'
+}
     `.trim();
 
     Alert.alert('Weather Debug Info', debugText, [{ text: 'OK' }]);

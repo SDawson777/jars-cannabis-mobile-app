@@ -288,7 +288,9 @@ export default function ShopScreen() {
           }
           renderItem={({ item }) => (
             <Pressable
-              testID={`product-item-${(item as any).id ?? (item as any).__id ?? (item as any).slug}`}
+              testID={`product-item-${
+                (item as any).id ?? (item as any).__id ?? (item as any).slug
+              }`}
               style={[
                 styles.card,
                 { borderColor: jarsPrimary, backgroundColor: '#FFF' },
@@ -307,7 +309,9 @@ export default function ShopScreen() {
               <Text style={[styles.name, { color: jarsPrimary }]}>{item.name}</Text>
               <Text style={[styles.price, { color: jarsSecondary }]}>${item.price.toFixed(2)}</Text>
               <Pressable
-                testID={`add-to-cart-${(item as any).id ?? (item as any).__id ?? (item as any).slug}`}
+                testID={`add-to-cart-${
+                  (item as any).id ?? (item as any).__id ?? (item as any).slug
+                }`}
                 onPress={() => handleAddToCart(item)}
                 accessibilityLabel={`Add ${item.name} to cart`}
               >

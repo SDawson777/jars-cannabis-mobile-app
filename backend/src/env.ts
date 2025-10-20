@@ -99,7 +99,9 @@ function validateEnv(): EnvConfig {
       missingVars.forEach(msg => logger.error(`  • ${msg}`));
 
       const criticalError = new Error(
-        `Missing or invalid environment variables:\n${missingVars.map(msg => `  • ${msg}`).join('\n')}\n\nPlease check your .env file and ensure all required variables are set.`
+        `Missing or invalid environment variables:\n${missingVars
+          .map(msg => `  • ${msg}`)
+          .join('\n')}\n\nPlease check your .env file and ensure all required variables are set.`
       );
 
       // Set a clear error name for debugging
