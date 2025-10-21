@@ -10,8 +10,8 @@
     "fix:deps": "bash scripts/fix-dependencies.sh",
     "prepare": "sh -c 'if [ -n \"$CI\" ]; then exit 0; fi; if [ -x ./node_modules/.bin/husky ]; then ./node_modules/.bin/husky install; fi'",
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "build:web": "npx expo export:web",
     "vercel-build": "mkdir -p dist && echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Placeholder</title></head><body></body></html>' > dist/index.html",
@@ -230,11 +230,6 @@
     }
   },
   "overrides": {
-    "minimatch": "7.4.6",
-    "eslint-plugin-import": {
-      "minimatch": "9.0.5"
-    },
-    "micromatch": "^4.0.8",
     "metro": "~0.80.4",
     "metro-config": "~0.80.4",
     "metro-core": "~0.80.4",
@@ -244,14 +239,7 @@
     "metro-cache": "~0.80.4",
     "metro-minify-terser": "~0.80.4",
     "@expo/config-plugins": "^7.8.0",
-    "glob": "^9.3.5",
-    "rimraf": "^5.0.5",
     "@faker-js/faker": "^8.4.1",
-    "stable": "^0.1.8",
-    "@xmldom/xmldom": "^0.8.10",
-    "semver": "^7.5.4",
-    "send": "^0.19.0",
-    "webpack-dev-server": "^5.0.0",
     "nativewind": {
       "tailwindcss": "^3.4.17"
     },
