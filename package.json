@@ -196,7 +196,6 @@
     "jsonc-eslint-parser": "^2.4.1",
     "lint-staged": "^13.3.0",
     "prettier": "^3.6.2",
-    "@expo/config-plugins": "^7.8.0",
     "react-dom": "18.2.0",
     "react-test-renderer": "18.2.0",
     "supertest": "^7.1.4",
@@ -213,6 +212,7 @@
     "doctor": {
       "reactNativeDirectoryCheck": {
         "exclude": [
+          "@expo/config-plugins",
           "@prisma/client",
           "@sentry/node",
           "async-mutex",
