@@ -17,8 +17,8 @@ A premium React Native mobile app for Jars Cannabis, designed to deliver an awar
 
 ## ⚡ Tech Stack
 
-- React Native (Expo)
-- Typescript
+- React Native (Expo SDK 50)
+- TypeScript
 - Tailwind CSS (via NativeWind)
 - React Navigation
 - Firebase (Auth, Firestore, Analytics)
