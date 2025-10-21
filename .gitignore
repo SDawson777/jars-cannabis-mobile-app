@@ -41,3 +41,7 @@ service-account.json
 firebase_sa.b64
 assets/splash/jars_splash_static.png
 backend/dist/
+
+# Firebase configs (placeholders may exist; real values should not be committed)
+apps/android/google-services.json
+apps/ios/GoogleService-Info.plist

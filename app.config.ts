@@ -12,9 +12,15 @@ const config: ExpoConfig = {
   },
   ios: {
     bundleIdentifier: 'com.jarss.dev',
+    // Firebase iOS config: path to GoogleService-Info.plist
+    // Replace the placeholder file with the real one from Firebase when available
+    googleServicesFile: './apps/ios/GoogleService-Info.plist',
   },
   android: {
     package: 'com.jars.dev.android',
+    // Firebase Android config: path to google-services.json
+    // Replace the placeholder file with the real one from Firebase when available
+    googleServicesFile: './apps/android/google-services.json',
   },
   splash: {
     backgroundColor: '#F9F9F9',
