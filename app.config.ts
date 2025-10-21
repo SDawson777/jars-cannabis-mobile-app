@@ -5,6 +5,8 @@ import type { ExpoConfig } from 'expo/config';
 const config: ExpoConfig = {
   name: 'JARS',
   slug: 'jars-cannabis-mobile-app',
+  // Manual app versioning (controlled instead of EAS autoIncrement)
+  version: '1.0.0',
   extra: {
     eas: {
       projectId: 'f480819a-c0e4-430e-82bc-1a761385db05',
@@ -12,12 +14,16 @@ const config: ExpoConfig = {
   },
   ios: {
     bundleIdentifier: 'com.jarss.dev',
+    // iOS build number should match or be incremented per release
+    buildNumber: '1.0.0',
     // Firebase iOS config: path to GoogleService-Info.plist
     // Replace the placeholder file with the real one from Firebase when available
     googleServicesFile: './apps/ios/GoogleService-Info.plist',
   },
   android: {
     package: 'com.jars.dev.android',
+    // Increment versionCode with each release
+    versionCode: 1,
     // Firebase Android config: path to google-services.json
     // Replace the placeholder file with the real one from Firebase when available
     googleServicesFile: './apps/android/google-services.json',
