@@ -23,7 +23,7 @@
   "submit": {
     "production": {
       "android": { "serviceAccountKeyPath": "./fastlane/google-service-account.json" },
-      "ios": { "ascAppId": "REPLACE_AT_HANOFF" }
+      "ios": { "ascAppId": "REPLACE_AT_HANDOFF" }
     }
   }
 }
