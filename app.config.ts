@@ -18,7 +18,8 @@ const config: ExpoConfig = {
   },
   splash: {
     backgroundColor: '#F9F9F9',
-    image: './assets/splash/jars_splash_static.png',
+    // Use a known-good PNG from assets/textures to avoid prebuild CRC errors
+    image: './assets/textures/paper_noise_tile.png',
     resizeMode: 'contain',
   },
   plugins: [
