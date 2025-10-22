@@ -16,7 +16,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-          cache: 'pnpm'
       - name: Install dependencies (pnpm)
         run: |
           if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
@@ -42,7 +41,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-          cache: 'pnpm'
       - name: Install dependencies (pnpm)
         run: |
           if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
@@ -189,7 +187,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-          cache: 'pnpm'
       - name: Install dependencies (pnpm)
         run: |
           if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
