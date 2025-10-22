@@ -49,3 +49,8 @@ GoogleService-Info.plist.b64
 # Local bin scripts
 bin/
 
+
+# Expo
+.expo
+dist/
+web-build/

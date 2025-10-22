@@ -55,7 +55,12 @@ jobs:
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./apps/android/google-services.json
 
       - name: Run expo prebuild (Android)
-        run: npx expo prebuild --platform android --clean --no-install
+        run: |
+          npx expo prebuild --platform android --clean --no-install
+          # Update CocoaPods repo for iOS (in case E2E needs it)
+          if [ -d "ios" ]; then
+            cd ios && pod install --repo-update || echo "⚠️  iOS pod install optional, skipping error"
+          fi
 
       - name: Create Android credentials.json (local keystore)
         env:

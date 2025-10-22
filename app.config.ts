@@ -100,6 +100,20 @@ const config: ExpoConfig = {
         enableGooglePay: true,
       },
     ],
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          deploymentTarget: '13.4',
+        },
+        android: {
+          compileSdkVersion: 34,
+          targetSdkVersion: 34,
+          minSdkVersion: 24,
+          buildToolsVersion: '34.0.0',
+        },
+      },
+    ],
   ],
   web: {
     bundler: 'webpack',
