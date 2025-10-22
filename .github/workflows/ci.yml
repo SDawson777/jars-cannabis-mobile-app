@@ -10,18 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-      - name: Install dependencies (pnpm)
-        run: |
-          if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
+          cache: npm
+          cache-dependency-path: npm-shrinkwrap.json
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --ci
 
   build-android-preview:
     needs: test
@@ -33,19 +31,21 @@ jobs:
       GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
       GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
       GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+      EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
+      EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
+      EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
+      EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-      - name: Install dependencies (pnpm)
-        run: |
-          if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
+          cache: npm
+          cache-dependency-path: npm-shrinkwrap.json
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
 
-      - name: Ensure EAS project secret for GOOGLE_SERVICES_JSON_BASE64
+      - name: Ensure EAS secret GOOGLE_SERVICES_JSON_BASE64
         if: ${{ env.GOOGLE_SERVICES_JSON_BASE64 != '' }}
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -54,15 +54,13 @@ jobs:
           set -euo pipefail
           sudo apt-get update -y && sudo apt-get install -y jq
           echo "🔐 Syncing EAS secret: GOOGLE_SERVICES_JSON_BASE64"
-          pnpm dlx eas-cli whoami || true
-          # List existing secrets and delete conflicting one (project scope) if present
-          EXISTING=$(pnpm -s dlx eas-cli secret:list --json | jq -r '.[] | select(.name=="GOOGLE_SERVICES_JSON_BASE64" and .scope=="project") | .id' || true)
+          npx -y eas-cli@latest whoami || true
+          EXISTING=$(npx -y eas-cli@latest secret:list --json | jq -r '.[] | select(.name=="GOOGLE_SERVICES_JSON_BASE64" and .scope=="project") | .id' || true)
           if [ -n "$EXISTING" ]; then
             echo "Found existing secret id=$EXISTING. Deleting to update..."
-            pnpm -s dlx eas-cli secret:delete --id "$EXISTING" --non-interactive || true
+            npx -y eas-cli@latest secret:delete --id "$EXISTING" --non-interactive || true
           fi
-          # Re-create the secret from the GitHub secret
-          pnpm -s dlx eas-cli secret:create \
+          npx -y eas-cli@latest secret:create \
             --non-interactive \
             --name GOOGLE_SERVICES_JSON_BASE64 \
             --value "$GOOGLE_SERVICES_JSON_BASE64" \
@@ -71,20 +69,11 @@ jobs:
           echo "✅ EAS secret synchronized."
 
       - name: Create Android credentials.json (local keystore)
-        env:
-          EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
-          EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
-          EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
-          EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
+        if: ${{ env.EXPO_ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
           set -euo pipefail
-          if [ -z "${EXPO_ANDROID_KEYSTORE_BASE64:-}" ]; then
-            echo "::warning::EXPO_ANDROID_KEYSTORE_BASE64 not set; skipping credentials.json creation"
-            echo "EAS will attempt to use remote credentials or fail if none available"
-            exit 0
-          fi
           echo "$EXPO_ANDROID_KEYSTORE_BASE64" | base64 -d > android.keystore
-          cat > credentials.json <<EOF
+          cat > credentials.json <<'JSON'
           {
             "android": {
               "keystore": {
@@ -95,15 +84,15 @@ jobs:
               }
             }
           }
-          EOF
+          JSON
           echo "✅ Created credentials.json with local keystore"
 
       - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
+        run: npx eas-cli@latest build --platform android --profile android-preview --non-interactive
 
       - name: Download latest EAS Android artifact (APK)
         run: |
-          pnpm dlx eas-cli build:download \
+          npx eas-cli@latest build:download \
             --latest \
             --platform android \
             --output app-preview.apk
@@ -119,14 +108,7 @@ jobs:
       - name: (Info) Skipping FTL — secrets missing or PR is from a fork
         if: ${{ (env.GCLOUD_PROJECT_ID == '' || env.GCP_SA_KEY_JSON == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
         run: |
-          echo "Skipping Firebase Test Lab:"
-          if [ -z "${GCLOUD_PROJECT_ID}" ] || [ -z "${GCP_SA_KEY_JSON}" ]; then
-            echo "- Missing GCLOUD_PROJECT_ID and/or GCP_SA_KEY_JSON."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repository (GitHub masks secrets for forked PRs)."
-          fi
-          echo "APK artifact is still uploaded for manual testing."
+          echo "Skipping Firebase Test Lab due to missing secrets or forked PR."
           echo "### Firebase Test Lab (Robo) — Skipped" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
@@ -181,21 +163,19 @@ jobs:
       APPETIZE_PUBLIC: ${{ vars.APPETIZE_PUBLIC }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
-      - name: Install dependencies (pnpm)
-        run: |
-          if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install; fi
+          cache: npm
+          cache-dependency-path: npm-shrinkwrap.json
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
       - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
+        run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive
 
       - name: Download latest EAS iOS Simulator artifact
         run: |
-          pnpm dlx eas-cli build:download \
+          npx eas-cli@latest build:download \
             --latest \
             --platform ios \
             --profile ios-simulator \
@@ -213,12 +193,6 @@ jobs:
         if: ${{ (env.APPETIZE_API_TOKEN == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
         run: |
           echo "Skipping Appetize upload."
-          if [ -z "${APPETIZE_API_TOKEN}" ]; then
-            echo "- APPETIZE_API_TOKEN not set."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repo; secrets are unavailable."
-          fi
           echo "### Appetize — Skipped" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
