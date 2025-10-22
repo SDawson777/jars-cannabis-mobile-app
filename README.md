@@ -466,7 +466,7 @@ This either seeds Expo-managed remote credentials or you can instead provide the
 
 Security note: always store keystores and passwords in GitHub Secrets; do not commit them to source control.
 
-🤝 Buyer Information & Support
+🤝Buyer Information & Support
 
 See [docs/buyer-setup.md](docs/buyer-setup.md) for configuring credentials and running production builds.
 
