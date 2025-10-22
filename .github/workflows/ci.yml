@@ -91,7 +91,7 @@ jobs:
         run: npx expo prebuild --clean --platform android
 
       - name: Build Android Preview APK (no store creds)
-        run: npx eas-cli@latest build --platform android --profile android-preview --non-interactive
+        run: npx eas-cli@latest build --platform android --profile android-preview --non-interactive --clear-cache
 
       - name: Download latest EAS Android artifact (APK)
         run: |
