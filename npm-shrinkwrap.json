@@ -36,6 +36,7 @@
         "bull": "^4.16.5",
         "expo": "^50.0.21",
         "expo-av": "~13.10.6",
+        "expo-build-properties": "^1.0.9",
         "expo-haptics": "~12.8.1",
         "expo-local-authentication": "~13.8.0",
         "expo-localization": "~14.8.4",
@@ -132,7 +133,6 @@
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-native": "^5.0.0",
         "eslint-plugin-testing-library": "^7.9.2",
-        "expo-build-properties": "^1.0.9",
         "expo-pwa": "^0.0.127",
         "firebase-tools": "^14.17.0",
         "globals": "^16.4.0",
@@ -20274,7 +20274,6 @@
       "version": "1.0.9",
       "resolved": "https://registry.npmjs.org/expo-build-properties/-/expo-build-properties-1.0.9.tgz",
       "integrity": "sha512-2icttCy3OPTk/GWIFt+vwA+0hup53jnmYb7JKRbvNvrrOrz+WblzpeoiaOleI2dYG/vjwpNO8to8qVyKhYJtrQ==",
-      "dev": true,
       "license": "MIT",
       "dependencies": {
         "ajv": "^8.11.0",
@@ -20288,7 +20287,6 @@
       "version": "8.17.1",
       "resolved": "https://registry.npmjs.org/ajv/-/ajv-8.17.1.tgz",
       "integrity": "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==",
-      "dev": true,
       "license": "MIT",
       "dependencies": {
         "fast-deep-equal": "^3.1.3",

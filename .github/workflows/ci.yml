@@ -199,10 +199,7 @@ jobs:
           echo "✅ EAS secret synchronized."
 
       - name: Prebuild native iOS project
-        run: |
-          npx expo prebuild --clean --platform ios
-          # Update CocoaPods specs repo for ExpoModulesCore and other pods
-          cd ios && pod install --repo-update
+        run: npx expo prebuild --clean --platform ios
 
       - name: Build iOS Simulator (no Apple creds)
         run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive
