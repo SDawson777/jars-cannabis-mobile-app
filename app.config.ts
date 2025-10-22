@@ -1,6 +1,35 @@
 // This file is a TypeScript configuration file for Expo
 // @ts-nocheck
 import type { ExpoConfig } from 'expo/config';
+import fs from 'fs';
+import path from 'path';
+
+function resolveAndroidGoogleServicesFile(): string {
+  // 1) If GOOGLE_SERVICES_JSON points to an existing file, use it
+  const pathEnv = process.env.GOOGLE_SERVICES_JSON;
+  if (pathEnv && fs.existsSync(pathEnv)) {
+    return pathEnv;
+  }
+
+  // 2) If GOOGLE_SERVICES_JSON_BASE64 is provided, decode and write to a stable path
+  const b64 = process.env.GOOGLE_SERVICES_JSON_BASE64;
+  if (b64) {
+    try {
+      const projectRoot = process.cwd();
+      const outDir = path.join(projectRoot, '.expo', 'secrets');
+      const outFile = path.join(outDir, 'google-services.json');
+      fs.mkdirSync(outDir, { recursive: true });
+      fs.writeFileSync(outFile, Buffer.from(b64, 'base64'));
+      return outFile;
+    } catch (e) {
+      // Fall through to default on any error
+    }
+  }
+
+  // 3) Default to repo file if present
+  const defaultPath = path.join(process.cwd(), 'apps', 'android', 'google-services.json');
+  return defaultPath;
+}
 
 const config: ExpoConfig = {
   name: 'JARS',
@@ -26,7 +55,7 @@ const config: ExpoConfig = {
     versionCode: 1,
     // Firebase Android config: path to google-services.json
     // Replace the placeholder file with the real one from Firebase when available
-    googleServicesFile: './apps/android/google-services.json',
+    googleServicesFile: resolveAndroidGoogleServicesFile(),
   },
   splash: {
     backgroundColor: '#F9F9F9',
