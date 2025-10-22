@@ -75,11 +75,13 @@ This project uses a monorepo structure with dual lockfile management:
 ### CI/CD Pipeline Overview
 
 - **Dual npm ci Installs**: Root and backend dependencies installed separately for optimal caching
-- **Cache Strategy**: Keyed to both `npm-shrinkwrap.json` and `backend/package-lock.json`
+- **Cache Strategy**: Keyed to `npm-shrinkwrap.json` for deterministic root installs
 - **Memory Optimization**: `NODE_OPTIONS=--max-old-space-size=4096` for large dependency trees
-- **Quality Gates**: Lint, TypeScript, format checks, comprehensive test suites (frontend + backend)
-- **Android E2E**: Schema v4-aware AVD setup with cmdline-tools;latest for reliable emulator testing
-- **Web Export**: Non-blocking Expo web export validation
+- **Quality Gates**: Lint, TypeScript, format checks, comprehensive test suites
+- **EAS Preview Builds**: Automated Android APK and iOS Simulator builds on push/PR
+- **Firebase Test Lab**: Automated Robo testing for Android preview builds (when secrets available)
+- **Appetize.io**: Automated iOS simulator upload for shareable preview links
+- **Fork-Safe**: All secret-dependent steps skip gracefully for external contributors
 
 **Installation Commands:**
 
@@ -394,22 +396,40 @@ Where is the mobile app code?All React Native code is in /src. Entry point is Ap
 
 How do I add environment variables in production?Use your platform’s UI (Railway/Render/Heroku/etc).
 
-## CI: EAS Android keystore (secrets & one-time setup)
+## CI: EAS Build Secrets (Android & iOS)
 
-To allow CI to produce signed Android APKs for preview builds, add these GitHub Actions secrets:
+To allow CI to produce signed Android APKs and iOS simulator builds for preview, add these GitHub Actions secrets:
 
-- `EXPO_TOKEN` — your Expo access token (already used by CI).
-- `EXPO_ANDROID_KEYSTORE_BASE64` — base64-encoded JKS keystore file (contents of your .keystore file encoded with base64 - see below).
-- `EXPO_ANDROID_KEYSTORE_PASSWORD` — the keystore password (e.g. `DemoPass123`).
-- `EXPO_ANDROID_KEY_ALIAS` — the alias inside the keystore (e.g. `upload`).
-- `EXPO_ANDROID_KEY_PASSWORD` — the key password (e.g. `DemoPass123`).
+**Required for all builds:**
 
-How to produce the base64 keystore locally:
+- `EXPO_TOKEN` — your Expo access token (get from `npx eas-cli@latest whoami`)
+
+**Android signing (optional - for signed APKs):**
+
+- `EXPO_ANDROID_KEYSTORE_BASE64` — base64-encoded JKS keystore file (see encoding instructions below)
+- `EXPO_ANDROID_KEYSTORE_PASSWORD` — the keystore password (e.g. `DemoPass123`)
+- `EXPO_ANDROID_KEY_ALIAS` — the alias inside the keystore (e.g. `upload`)
+- `EXPO_ANDROID_KEY_PASSWORD` — the key password (e.g. `DemoPass123`)
+
+**Firebase integration (optional - enables push notifications & analytics):**
+
+- `GOOGLE_SERVICES_JSON_BASE64` — base64-encoded `google-services.json` for Android
+- `GOOGLESERVICE_PLIST_BASE64` — base64-encoded `GoogleService-Info.plist` for iOS
+
+How to encode files as base64 for GitHub secrets:
 
 ```bash
-# Example: produces a single-line base64 string suitable for a GitHub secret
-base64 -w0 path/to/your.keystore > android-demo.keystore.b64
+# Android keystore
+base64 -w0 path/to/your.keystore > android-keystore.b64
+
+# Android google-services.json
+base64 -w0 apps/android/google-services.json > google-services.b64
+
+# iOS GoogleService-Info.plist
+base64 -w0 apps/ios/GoogleService-Info.plist > GoogleService-Info.b64
 ```
+
+Copy the contents of these `.b64` files into the corresponding GitHub secret.
 
 One-time local interactive step (recommended):
 
