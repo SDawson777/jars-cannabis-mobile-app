@@ -431,6 +431,21 @@ base64 -w0 apps/ios/GoogleService-Info.plist > GoogleService-Info.b64
 
 Copy the contents of these `.b64` files into the corresponding GitHub secret.
 
+### CI Prebuild Step
+
+The CI workflow automatically runs `npx expo prebuild --clean` before EAS builds to ensure:
+
+- Native `android/` and `ios/` folders are regenerated with correct Expo SDK versions
+- `expo-modules-core` is properly linked
+- Firebase modules and all native dependencies are configured
+- `compileSdkVersion` is auto-set via Expo SDK
+
+This prebuild step happens automatically in CI before both Android and iOS builds. For local development, you can also run:
+
+```bash
+npx expo prebuild --clean
+```
+
 One-time local interactive step (recommended):
 
 1. Install and login to EAS locally:

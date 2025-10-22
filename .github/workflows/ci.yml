@@ -87,6 +87,9 @@ jobs:
           JSON
           echo "✅ Created credentials.json with local keystore"
 
+      - name: Prebuild native Android project
+        run: npx expo prebuild --clean --platform android
+
       - name: Build Android Preview APK (no store creds)
         run: npx eas-cli@latest build --platform android --profile android-preview --non-interactive
 
@@ -194,6 +197,9 @@ jobs:
             --scope project \
             --type string
           echo "✅ EAS secret synchronized."
+
+      - name: Prebuild native iOS project
+        run: npx expo prebuild --clean --platform ios
 
       - name: Build iOS Simulator (no Apple creds)
         run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive
