@@ -386,7 +386,7 @@ jars-cannabis-mobile-app/
 └─ README.md
 ```
 
-🙋 FAQ
+FAQ
 
 Where do I set my Sentry DSN? Add to `backend/.env` as `SENTRY_DSN=<your-sentry-dsn>`.
 
