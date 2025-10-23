@@ -157,7 +157,7 @@ jobs:
 
   build-ios-simulator:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     outputs:
       appetize_url: ${{ steps.appetize.outputs.url }}
     env:
@@ -202,7 +202,7 @@ jobs:
         run: npx expo prebuild --clean --platform ios
 
       - name: Build iOS Simulator (no Apple creds)
-        run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive
+        run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive --clear-cache
 
       - name: Download latest EAS iOS Simulator artifact
         run: |
