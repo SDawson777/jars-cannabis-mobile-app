@@ -14,7 +14,6 @@ yarn.lock
 .expo/
 .expo-shared/
 web-build/
-android/
 ios/
 
 # macOS
