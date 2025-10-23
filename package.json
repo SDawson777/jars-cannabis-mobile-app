@@ -2,7 +2,7 @@
   "name": "jars-cannabis-mobile-app",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "yarn@3.6.1",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "build:android": "eas build --platform android --profile android-preview --clear-cache",
@@ -78,7 +78,8 @@
     "@react-native-community/netinfo": "11.1.0",
     "@react-native-community/slider": "4.4.2",
     "@react-native-firebase/analytics": "^22.4.0",
-    "@react-native-firebase/app": "^22.4.0",
+    "@react-native-firebase/app": "^23.4.1",
+    "@react-native-firebase/auth": "^23.4.1",
     "@react-native-firebase/messaging": "^22.4.0",
     "@react-native-masked-view/masked-view": "0.3.2",
     "@react-navigation/native": "^6.1.18",
