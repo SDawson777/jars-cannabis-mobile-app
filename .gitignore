@@ -14,7 +14,6 @@ yarn.lock
 .expo/
 .expo-shared/
 web-build/
-android/
 ios/
 
 # macOS
@@ -41,3 +40,16 @@ service-account.json
 firebase_sa.b64
 assets/splash/jars_splash_static.png
 backend/dist/
+
+# Do not commit iOS Firebase config (handled via EAS secrets)
+GoogleService-Info.plist
+GoogleService-Info.plist.b64
+
+# Local bin scripts
+bin/
+
+
+# Expo
+.expo
+dist/
+web-build/

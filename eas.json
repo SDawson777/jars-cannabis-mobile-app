@@ -8,23 +8,31 @@
     "android-preview": {
       "android": { "buildType": "apk" },
       "credentialsSource": "local",
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     },
     "ios-simulator": {
       "ios": { "simulator": true },
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     },
     "production": {
       "android": { "buildType": "app-bundle" },
       "ios": {},
       "credentialsSource": "remote",
-      "autoIncrement": true
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     }
   },
   "submit": {
     "production": {
       "android": { "serviceAccountKeyPath": "./fastlane/google-service-account.json" },
-      "ios": { "ascAppId": "REPLACE_AT_HANOFF" }
+      "ios": { "ascAppId": "REPLACE_AT_HANDOFF" }
     }
   }
 }

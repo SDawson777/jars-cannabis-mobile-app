@@ -7,7 +7,7 @@ import renderer, { act } from 'react-test-renderer';
 import SplashScreenWrapper from '../src/screens/SplashScreenWrapper';
 import AgeVerification from '../src/screens/onboarding/AgeVerificationScreen';
 
-jest.mock('react-native-sound', () => jest.fn());
+jest.mock('expo-av', () => require('./__mocks__/expo-av'));
 
 it('marks onboarding complete on splash finish', () => {
   const tree = renderer.create(

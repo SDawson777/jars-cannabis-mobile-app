@@ -10,7 +10,6 @@ module.exports = async function (env, argv) {
   config.resolve.alias = {
     ...(config.resolve.alias || {}),
     'react-native-linear-gradient': path.resolve(__dirname, 'src/shims/linear-gradient.web.ts'),
-    'react-native-sound': path.resolve(__dirname, 'src/shims/sound.web.ts'),
     '@react-native-firebase/auth': path.resolve(__dirname, 'src/shims/firebase-auth.web.ts'),
     '@react-native-firebase/messaging': path.resolve(
       __dirname,
