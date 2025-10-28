@@ -2,7 +2,13 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
+      - develop
   pull_request:
+    branches:
+      - main
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -14,7 +20,8 @@ jobs:
         run: |
           corepack enable || true
           corepack prepare yarn@3.6.1 --activate || true
-      - uses: actions/setup-node@v4
+      - name: Use Node 20.19.4
+        uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
           cache: 'yarn'
@@ -24,11 +31,25 @@ jobs:
           echo "Runner versions"
           node --version || true
           yarn --version || true
+      - name: Ensure only Yarn is used
+        run: |
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            echo '❌ Detected npm lockfile. Project is Yarn-only.'; exit 1;
+          fi
+          if [ ! -f yarn.lock ]; then
+            echo '❌ Missing yarn.lock. Cannot guarantee reproducible installs.'; exit 1;
+          fi
+          echo '✅ Yarn lockfile verified.'
       - name: Install dependencies (Yarn)
         run: yarn install --immutable
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test -- --ci
+      - name: Typecheck
+        run: yarn typecheck
+      - name: Lint
+        run: yarn lint
+      - name: Prettier formatting check
+        run: yarn format:check
+      - name: Run tests
+        run: yarn test -- --ci
 
   build-android-preview:
     needs: test
