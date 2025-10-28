@@ -235,45 +235,63 @@ jobs:
           fi
           echo "✅ ios/Podfile present"
 
-      - name: Ensure EAS secret GOOGLESERVICE_PLIST_BASE64
+      - name: Write GoogleService-Info.plist
         if: ${{ env.GOOGLESERVICE_PLIST_BASE64 != '' }}
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          GOOGLESERVICE_PLIST_BASE64: ${{ secrets.GOOGLESERVICE_PLIST_BASE64 }}
+        run: |
+          echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 --decode > ios/JARS/GoogleService-Info.plist
+          echo "✅ GoogleService-Info.plist written"
+
+      - name: Verify vendored Stripe pods exist
+        run: |
+          test -d ios/Vendor/Stripe || { echo '❌ You forgot to run Vendor Stripe Pods workflow on this branch'; exit 1; }
+
+      - name: Install CocoaPods (offline-friendly with vendored Stripe)
         run: |
           set -euo pipefail
-          sudo apt-get update -y && sudo apt-get install -y jq
-          echo "🔐 Syncing EAS secret: GOOGLESERVICE_PLIST_BASE64"
-          npx -y eas-cli@latest whoami || true
-          EXISTING=$(npx -y eas-cli@latest secret:list --json | jq -r '.[] | select(.name=="GOOGLESERVICE_PLIST_BASE64" and .scope=="project") | .id' || true)
-          if [ -n "$EXISTING" ]; then
-            echo "Found existing secret id=$EXISTING. Deleting to update..."
-            npx -y eas-cli@latest secret:delete --id "$EXISTING" --non-interactive || true
-          fi
-          npx -y eas-cli@latest secret:create \
-            --non-interactive \
-            --name GOOGLESERVICE_PLIST_BASE64 \
-            --value "$GOOGLESERVICE_PLIST_BASE64" \
-            --scope project \
-            --type string
-          echo "✅ EAS secret synchronized."
-      - name: Build iOS Simulator (no Apple creds)
-        run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive --clear-cache
+          cd ios
+          test -d Vendor/Stripe || { echo '❌ Stripe vendor folder missing. Run Vendor Stripe Pods workflow on this branch.'; exit 1; }
 
-      - name: Download latest EAS iOS Simulator artifact
+          pod deintegrate || true
+
+          attempt_pod_install () {
+            pod install --repo-update && return 0
+            return 1
+          }
+
+          if ! attempt_pod_install; then
+            echo 'pod install failed, retrying in 10s...'
+            sleep 10
+            if ! attempt_pod_install; then
+              echo 'pod install failed again, retrying in 30s...'
+              sleep 30
+              attempt_pod_install
+            fi
+          fi
+
+      - name: Build iOS simulator .app via xcodebuild
         run: |
-          npx eas-cli@latest build:download \
-            --latest \
-            --platform ios \
-            --profile ios-simulator \
-            --output ios-simulator.tar.gz
-          test -f ios-simulator.tar.gz
+          set -euo pipefail
+          cd ios
+          xcodebuild \
+            -workspace JARS.xcworkspace \
+            -scheme JARS \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -derivedDataPath build
+
+      - name: Package simulator app
+        run: |
+          set -euo pipefail
+          cd ios/build/Build/Products/Release-iphonesimulator
+          APP_NAME=$(ls -d *.app | head -n 1)
+          zip -r "$APP_NAME.zip" "$APP_NAME"
+          mv "$APP_NAME.zip" ../../../JARS-simulator.zip
 
       - name: Upload iOS Simulator artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-simulator-build
-          path: ios-simulator.tar.gz
+          path: ios/build/JARS-simulator.zip
           if-no-files-found: error
 
       - name: (Info) Skipping Appetize — token missing or PR is from a fork
