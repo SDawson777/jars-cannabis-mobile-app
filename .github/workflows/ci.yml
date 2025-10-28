@@ -223,6 +223,18 @@ jobs:
       - name: Install dependencies (Yarn)
         run: yarn install --immutable
 
+      - name: Verify iOS Podfile exists (fail early)
+        run: |
+          if [ ! -f ios/Podfile ]; then
+            echo "❌ ios/Podfile missing in repository root"
+            echo "Repository tree (top-level):"
+            ls -la
+            echo "\nGit status:"
+            git status --porcelain=v1
+            exit 1
+          fi
+          echo "✅ ios/Podfile present"
+
       - name: Ensure EAS secret GOOGLESERVICE_PLIST_BASE64
         if: ${{ env.GOOGLESERVICE_PLIST_BASE64 != '' }}
         env:
