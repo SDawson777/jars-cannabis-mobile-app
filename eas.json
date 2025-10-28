@@ -32,9 +32,6 @@
       "node": "20.19.4",
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
-      },
-      "hooks": {
-        "pre-install": "bash ./eas-build-pre-install.sh"
       }
     },
     "production": {
@@ -47,11 +44,11 @@
       "env": {
         "NODE_ENV": "production",
         "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
-      },
-      "hooks": {
-        "pre-install": "bash ./eas-build-pre-install.sh"
       }
     }
+  },
+  "hooks": {
+    "pre-install": "bash ./eas-build-pre-install.sh"
   },
   "submit": {
     "production": {
