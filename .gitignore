@@ -8,7 +8,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-yarn.lock
+package-lock.jsongh run view RUN_ID --repo SDawson777/jars-cannabis-mobile-app --log | sed -n '/Print Node & Yarn versions/,/Install dependencies (Yarn)/p'
 
 # Expo
 .expo/
