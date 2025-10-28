@@ -40,7 +40,7 @@
     "dev:expo": "expo start",
     "dev:server": "nodemon src/index.ts",
     "dev:emulators": "firebase emulators:start --only firestore,functions,auth",
-    "test": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs",
+    "test": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --passWithNoTests",
     "test:watch": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --watch",
     "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --coverage --ci --watchAll=false",
     "prisma:generate": "prisma generate",

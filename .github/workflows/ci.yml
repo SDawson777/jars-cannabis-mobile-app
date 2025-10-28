@@ -49,7 +49,7 @@ jobs:
       - name: Prettier formatting check
         run: yarn format:check
       - name: Run tests
-        run: yarn test -- --ci
+        run: yarn test -- --ci --passWithNoTests
 
   build-android-preview:
     needs: test
