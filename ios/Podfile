@@ -9,7 +9,6 @@ ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWO
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 
-# 👇 THIS IS THE KEY ADD
 use_modular_headers!
 
 install! 'cocoapods',
