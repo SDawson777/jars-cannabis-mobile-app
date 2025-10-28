@@ -241,9 +241,9 @@ jobs:
           echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 --decode > ios/JARS/GoogleService-Info.plist
           echo "✅ GoogleService-Info.plist written"
 
-      - name: Verify vendored Stripe pods exist
+      - name: Verify vendored Stripe exists
         run: |
-          test -d ios/Vendor/Stripe || { echo '❌ You forgot to run Vendor Stripe Pods workflow on this branch'; exit 1; }
+          test -d ios/Vendor/Stripe || { echo '❌ ios/Vendor/Stripe missing. Run "Vendor Stripe Pods" workflow on this branch first.'; exit 1; }
 
       - name: Install CocoaPods
         run: |
