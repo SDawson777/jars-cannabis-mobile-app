@@ -47,9 +47,6 @@
       }
     }
   },
-  "hooks": {
-    "pre-install": "bash ./eas-build-pre-install.sh"
-  },
   "submit": {
     "production": {
       "android": {
