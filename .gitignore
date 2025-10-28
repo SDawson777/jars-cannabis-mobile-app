@@ -14,7 +14,6 @@ package-lock.jsongh run view RUN_ID --repo SDawson777/jars-cannabis-mobile-app -
 .expo/
 .expo-shared/
 web-build/
-ios/
 
 # macOS
 .DS_Store
