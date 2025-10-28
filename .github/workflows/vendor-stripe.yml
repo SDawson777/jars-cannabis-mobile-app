@@ -1,0 +1,113 @@
+name: Vendor Stripe Pods
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to vendor Stripe into (will push commits to this branch)'
+        required: true
+        default: 'chore/ios-lockdown'
+
+jobs:
+  vendor-stripe:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+          # We need full history so we can push back
+          fetch-depth: 0
+
+      - name: Set up Ruby / CocoaPods environment
+        run: |
+          sudo gem install cocoapods --no-document
+          pod --version
+
+      - name: Install JS deps (for autolinking consistency)
+        run: |
+          corepack enable || true
+          corepack prepare yarn@3.6.1 --activate || true
+          node --version || true
+          yarn --version || true
+          yarn install --immutable
+
+      - name: Initial pod install (online, with Stripe from GitHub)
+        run: |
+          set -euo pipefail
+          cd ios
+          pod install --repo-update
+
+      - name: Vendor Stripe pods into ios/Vendor/Stripe
+        run: |
+          set -euo pipefail
+          cd ios
+
+          mkdir -p Vendor/Stripe
+
+          # Copy all Stripe* pods into Vendor/Stripe
+          cp -R Pods/Stripe* Vendor/Stripe/ || true
+
+          echo 'Vendored Stripe pods:'
+          ls Vendor/Stripe
+
+      - name: Patch Podfile to use vendored Stripe pods
+        run: |
+          set -euo pipefail
+          cd ios
+
+          PODFILE="Podfile"
+
+          # We'll append our vendored Stripe pod declarations if not already present.
+          # We do NOT remove use_modular_headers!, we leave everything else as-is.
+          # We insert right before the line that starts with 'post_install do'.
+          if ! grep -q 'Vendor/Stripe/StripeFinancialConnections' "$PODFILE"; then
+            awk '
+              /post_install do/ && !done {
+                print "  # BEGIN vendored Stripe pods (no network in CI)"
+                print "  pod \x27Stripe\x27,                    :path => \x27Vendor/Stripe/Stripe\x27"
+                print "  pod \x27StripeCore\x27,                :path => \x27Vendor/Stripe/StripeCore\x27"
+                print "  pod \x27StripeUICore\x27,              :path => \x27Vendor/Stripe/StripeUICore\x27"
+                print "  pod \x27StripeApplePay\x27,            :path => \x27Vendor/Stripe/StripeApplePay\x27"
+                print "  pod \x27StripePayments\x27,            :path => \x27Vendor/Stripe/StripePayments\x27"
+                print "  pod \x27StripePaymentsUI\x27,          :path => \x27Vendor/Stripe/StripePaymentsUI\x27"
+                print "  pod \x27StripePaymentSheet\x27,        :path => \x27Vendor/Stripe/StripePaymentSheet\x27"
+                print "  pod \x27StripeFinancialConnections\x27,:path => \x27Vendor/Stripe/StripeFinancialConnections\x27"
+                print "  # END vendored Stripe pods"
+                done=1
+              }
+              { print }
+            ' "$PODFILE" > "$PODFILE.tmp" && mv "$PODFILE.tmp" "$PODFILE"
+          fi
+
+          echo 'Final Podfile:'
+          cat Podfile
+
+      - name: Clean Pods and re-install using vendored Stripe (offline-style)
+        run: |
+          set -euo pipefail
+          cd ios
+          pod deintegrate
+          pod install
+
+      - name: Commit vendored Stripe + Podfile changes back to the branch
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add ios/Vendor/Stripe ios/Podfile ios/Podfile.lock
+          git status
+
+          # only commit if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(ios): vendor Stripe pods for offline CI stability"
+            git push origin ${{ github.event.inputs.target_branch }}
+          else
+            echo "No changes to commit."
+          fi

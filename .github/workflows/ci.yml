@@ -241,10 +241,17 @@ jobs:
           echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 --decode > ios/JARS/GoogleService-Info.plist
           echo "✅ GoogleService-Info.plist written"
 
-      - name: Install CocoaPods (with retry for Stripe pods)
+      - name: Verify vendored Stripe pods exist
+        run: |
+          test -d ios/Vendor/Stripe || { echo '❌ You forgot to run Vendor Stripe Pods workflow on this branch'; exit 1; }
+
+      - name: Install CocoaPods (offline-friendly with vendored Stripe)
         run: |
           set -euo pipefail
           cd ios
+          test -d Vendor/Stripe || { echo '❌ Stripe vendor folder missing. Run Vendor Stripe Pods workflow on this branch.'; exit 1; }
+
+          pod deintegrate || true
 
           attempt_pod_install () {
             pod install --repo-update && return 0
