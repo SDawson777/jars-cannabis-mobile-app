@@ -8,6 +8,10 @@ ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR']
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
+
+# 👇 THIS IS THE KEY ADD
+use_modular_headers!
+
 install! 'cocoapods',
   :deterministic_uuids => false
 
@@ -41,18 +45,11 @@ target 'JARS' do
   use_expo_modules!
   config = use_native_modules!
 
+  # NOTE: we are NOT manually declaring individual Firebase pods anymore.
+  # Global use_modular_headers! above handles them for static Swift compat.
+
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
   use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
-
-  # Firebase pods with modular headers to fix static+Swift integration
-  pod 'Firebase/Auth', :modular_headers => true
-  pod 'Firebase/Core', :modular_headers => true
-  pod 'Firebase/CoreInternal', :modular_headers => true
-  pod 'FirebaseAppCheckInterop', :modular_headers => true
-  pod 'FirebaseAuthInterop', :modular_headers => true
-  pod 'FirebaseCoreExtension', :modular_headers => true
-  pod 'RecaptchaInterop', :modular_headers => true
-  pod 'GoogleUtilities', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],
