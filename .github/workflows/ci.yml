@@ -245,6 +245,12 @@ jobs:
         run: |
           test -d ios/Vendor/Stripe || { echo '❌ You forgot to run Vendor Stripe Pods workflow on this branch'; exit 1; }
 
+      - name: Install CocoaPods
+        run: |
+          set -euo pipefail
+          sudo gem install cocoapods --no-document
+          pod --version
+
       - name: Install CocoaPods (offline-friendly with vendored Stripe)
         run: |
           set -euo pipefail
