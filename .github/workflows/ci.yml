@@ -245,10 +245,6 @@ jobs:
             --scope project \
             --type string
           echo "✅ EAS secret synchronized."
-
-      - name: Prebuild native iOS project (no clean, preserve Podfile)
-        run: npx expo prebuild --platform ios || true
-
       - name: Build iOS Simulator (no Apple creds)
         run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive --clear-cache
 
