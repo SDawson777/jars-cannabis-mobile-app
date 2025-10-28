@@ -241,40 +241,50 @@ jobs:
           echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 --decode > ios/JARS/GoogleService-Info.plist
           echo "✅ GoogleService-Info.plist written"
 
-      - name: Install CocoaPods dependencies
+      - name: Install CocoaPods (with retry for Stripe pods)
         run: |
+          set -euo pipefail
           cd ios
-          pod install --repo-update
-          echo "✅ pod install complete"
 
-      - name: Build iOS Simulator with xcodebuild
+          attempt_pod_install () {
+            pod install --repo-update && return 0
+            return 1
+          }
+
+          if ! attempt_pod_install; then
+            echo 'pod install failed, retrying in 10s...'
+            sleep 10
+            if ! attempt_pod_install; then
+              echo 'pod install failed again, retrying in 30s...'
+              sleep 30
+              attempt_pod_install
+            fi
+          fi
+
+      - name: Build iOS simulator .app via xcodebuild
         run: |
+          set -euo pipefail
           cd ios
           xcodebuild \
             -workspace JARS.xcworkspace \
             -scheme JARS \
-            -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
-            -derivedDataPath ./build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            build
-          echo "✅ xcodebuild complete"
+            -configuration Release \
+            -derivedDataPath build
 
-      - name: Package iOS Simulator build
+      - name: Package simulator app
         run: |
-          cd ios/build/Build/Products/Debug-iphonesimulator
-          tar -czf ../../../../../ios-simulator.tar.gz JARS.app
-          cd ../../../../..
-          test -f ios-simulator.tar.gz
-          echo "✅ Packaged ios-simulator.tar.gz"
+          set -euo pipefail
+          cd ios/build/Build/Products/Release-iphonesimulator
+          APP_NAME=$(ls -d *.app | head -n 1)
+          zip -r "$APP_NAME.zip" "$APP_NAME"
+          mv "$APP_NAME.zip" ../../../JARS-simulator.zip
 
       - name: Upload iOS Simulator artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-simulator-build
-          path: ios-simulator.tar.gz
+          path: ios/build/JARS-simulator.zip
           if-no-files-found: error
 
       - name: (Info) Skipping Appetize — token missing or PR is from a fork
