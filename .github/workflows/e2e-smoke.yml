@@ -15,25 +15,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node from .nvmrc and cache npm
+      - name: Use Node and enforce Yarn lockfile
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
-          cache: npm
+          node-version: '20.19.4'
+          cache: 'yarn'
           cache-dependency-path: |
-            npm-shrinkwrap.json
-            backend/package-lock.json
+            yarn.lock
 
-      - name: Ensure lockfiles exist
+      - name: 🔍 Preflight - Verify lockfiles exist
         run: |
-          test -f npm-shrinkwrap.json || (echo "Missing root npm-shrinkwrap.json"; exit 1)
-          test -f backend/package-lock.json || (echo "Missing backend/package-lock.json"; exit 1)
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            echo '❌ Detected npm lockfile. Project is Yarn-only.'
+            exit 1
+          fi
+
+          if [ ! -f yarn.lock ]; then
+            echo '❌ Missing yarn.lock. Cannot guarantee reproducible installs.'
+            exit 1
+          fi
+
+          echo '✅ Yarn lockfile verified.'
 
       - name: Install deps (root)
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Install deps (backend)
-        run: npm ci
+        run: yarn install --immutable
         working-directory: backend
 
       # Build APK with EAS
@@ -88,6 +96,11 @@ jobs:
       - name: Build Android APK (EAS)
         run: |
           set -euo pipefail
+          # Ensure Corepack + Yarn Berry is active on the runner before EAS
+          corepack enable || true
+          corepack prepare yarn@3.6.1 --activate || true
+          yarn --version || true
+
           eas build -p android --profile android-preview --non-interactive --json > build.json
           cat build.json
 
@@ -144,13 +157,13 @@ jobs:
 
       - name: Typecheck & lint (root)
         run: |
-          npm run typecheck
-          npm run lint
+          yarn typecheck
+          yarn lint
 
       - name: Typecheck & lint (backend)
         run: |
-          npm run typecheck || true
-          npm run lint || true
+          yarn typecheck || true
+          yarn lint || true
         working-directory: backend
 
       - name: Firebase Test Lab Robo smoke
@@ -242,15 +255,15 @@ jobs:
         run: CI=1 npx expo export --platform web || echo "⚠️  Web export not available in this Expo configuration"
 
       - name: 🏗 Build app for E2E
-        run: npm run build:e2e:android
+        run: yarn build:e2e:android
         env:
           EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1
           CI: true
 
       - name: 🚀 Start backend server
         run: |
-          npm ci
-          npm start &
+          yarn install --immutable
+          yarn start &
           timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
         working-directory: backend
         env:
@@ -262,7 +275,7 @@ jobs:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID || 'test-project' }}
 
       - name: 🧪 Run Detox E2E tests
-        run: npm run test:e2e:android
+        run: yarn test:e2e:android
         env:
           DETOX_CONFIGURATION: android.emu.debug
           EXPO_PUBLIC_API_BASE_URL: http://10.0.2.2:3000/api/v1

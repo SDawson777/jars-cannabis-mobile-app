@@ -16,23 +16,31 @@ jobs:
 
       - name: 🔍 Preflight - Verify lockfiles exist
         run: |
-          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
-          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
-          echo "✅ All required lockfiles present"
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            echo '❌ Detected npm lockfile. Project is Yarn-only.'
+            exit 1
+          fi
+
+          if [ ! -f yarn.lock ]; then
+            echo '❌ Missing yarn.lock. Cannot guarantee reproducible installs.'
+            exit 1
+          fi
+
+          echo '✅ Yarn lockfile verified.'
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version: '20.19.4'
+          cache: 'yarn'
           cache-dependency-path: |
-            npm-shrinkwrap.json
-            backend/package-lock.json
+            yarn.lock
 
-      - run: npm ci
+      - name: Install dependencies (Yarn)
+        run: yarn install --immutable
 
       - name: Lint
-        run: npm run lint
+        run: yarn lint
 
       - name: Format
-        run: npm run format:ci
+        run: yarn format:ci
