@@ -2,25 +2,33 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
+      - name: Enable Corepack (Yarn) and activate Yarn 3
+        run: |
+          corepack enable || true
+          corepack prepare yarn@3.6.1 --activate || true
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
+          node-version: 20.19.4
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      - name: Print Node & Yarn versions
+        run: |
+          echo "Runner versions"
+          node --version || true
+          yarn --version || true
+      - name: Install dependencies (Yarn)
+        run: yarn install --immutable
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --ci
 
   build-android-preview:
     needs: test
@@ -31,22 +39,59 @@ jobs:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
       GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
+      GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+      EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
+      EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
+      EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
+      EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
+      - name: Enable Corepack (Yarn) and activate Yarn 3
+        run: |
+          corepack enable || true
+          corepack prepare yarn@3.6.1 --activate || true
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+          node-version: 20.19.4
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      - name: Print Node & Yarn versions
+        run: |
+          echo "Runner versions"
+          node --version || true
+          yarn --version || true
+      - name: Install dependencies (Yarn)
+        run: yarn install --immutable
+
+      - name: Ensure EAS secret GOOGLE_SERVICES_JSON_BASE64
+        if: ${{ env.GOOGLE_SERVICES_JSON_BASE64 != '' }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y && sudo apt-get install -y jq
+          echo "🔐 Syncing EAS secret: GOOGLE_SERVICES_JSON_BASE64"
+          npx -y eas-cli@latest whoami || true
+          EXISTING=$(npx -y eas-cli@latest secret:list --json | jq -r '.[] | select(.name=="GOOGLE_SERVICES_JSON_BASE64" and .scope=="project") | .id' || true)
+          if [ -n "$EXISTING" ]; then
+            echo "Found existing secret id=$EXISTING. Deleting to update..."
+            npx -y eas-cli@latest secret:delete --id "$EXISTING" --non-interactive || true
+          fi
+          npx -y eas-cli@latest secret:create \
+            --non-interactive \
+            --name GOOGLE_SERVICES_JSON_BASE64 \
+            --value "$GOOGLE_SERVICES_JSON_BASE64" \
+            --scope project \
+            --type string
+          echo "✅ EAS secret synchronized."
+
       - name: Create Android credentials.json (local keystore)
         if: ${{ env.EXPO_ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
           set -euo pipefail
           echo "$EXPO_ANDROID_KEYSTORE_BASE64" | base64 -d > android.keystore
-          cat > credentials.json <<EOF
+          cat > credentials.json <<'JSON'
           {
             "android": {
               "keystore": {
@@ -57,14 +102,18 @@ jobs:
               }
             }
           }
-          EOF
+          JSON
+          echo "✅ Created credentials.json with local keystore"
+
+      - name: Prebuild native Android project
+        run: npx expo prebuild --clean --platform android
 
       - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
+        run: npx eas-cli@latest build --platform android --profile android-preview --non-interactive --clear-cache
 
       - name: Download latest EAS Android artifact (APK)
         run: |
-          pnpm dlx eas-cli build:download \
+          npx eas-cli@latest build:download \
             --latest \
             --platform android \
             --output app-preview.apk
@@ -80,25 +129,22 @@ jobs:
       - name: (Info) Skipping FTL — secrets missing or PR is from a fork
         if: ${{ (env.GCLOUD_PROJECT_ID == '' || env.GCP_SA_KEY_JSON == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
         run: |
-          echo "Skipping Firebase Test Lab:"
-          if [ -z "${GCLOUD_PROJECT_ID}" ] || [ -z "${GCP_SA_KEY_JSON}" ]; then
-            echo "- Missing GCLOUD_PROJECT_ID and/or GCP_SA_KEY_JSON."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repository (GitHub masks secrets for forked PRs)."
-          fi
-          echo "APK artifact is still uploaded for manual testing."
+          echo "Skipping Firebase Test Lab due to missing secrets or forked PR."
           echo "### Firebase Test Lab (Robo) — Skipped" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
 
-      - name: Set up gcloud
+      - name: Authenticate to Google Cloud
+        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY_JSON }}
+
+      - name: Set up gcloud SDK
         if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.GCLOUD_PROJECT_ID }}
-          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
-          export_default_credentials: true
 
       - name: Run Firebase Test Lab (Robo) on APK
         id: ftl
@@ -129,30 +175,65 @@ jobs:
 
   build-ios-simulator:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     outputs:
       appetize_url: ${{ steps.appetize.outputs.url }}
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
-      # Optional: set to "true" to create a public Appetize link; default is private
       APPETIZE_PUBLIC: ${{ vars.APPETIZE_PUBLIC }}
+      GOOGLESERVICE_PLIST_BASE64: ${{ secrets.GOOGLESERVICE_PLIST_BASE64 }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
+      - name: Enable Corepack (Yarn) and activate Yarn 3
+        run: |
+          corepack enable || true
+          corepack prepare yarn@3.6.1 --activate || true
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+          node-version: 20.19.4
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      - name: Print Node & Yarn versions
+        run: |
+          echo "Runner versions"
+          node --version || true
+          yarn --version || true
+      - name: Install dependencies (Yarn)
+        run: yarn install --immutable
+
+      - name: Ensure EAS secret GOOGLESERVICE_PLIST_BASE64
+        if: ${{ env.GOOGLESERVICE_PLIST_BASE64 != '' }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLESERVICE_PLIST_BASE64: ${{ secrets.GOOGLESERVICE_PLIST_BASE64 }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y && sudo apt-get install -y jq
+          echo "🔐 Syncing EAS secret: GOOGLESERVICE_PLIST_BASE64"
+          npx -y eas-cli@latest whoami || true
+          EXISTING=$(npx -y eas-cli@latest secret:list --json | jq -r '.[] | select(.name=="GOOGLESERVICE_PLIST_BASE64" and .scope=="project") | .id' || true)
+          if [ -n "$EXISTING" ]; then
+            echo "Found existing secret id=$EXISTING. Deleting to update..."
+            npx -y eas-cli@latest secret:delete --id "$EXISTING" --non-interactive || true
+          fi
+          npx -y eas-cli@latest secret:create \
+            --non-interactive \
+            --name GOOGLESERVICE_PLIST_BASE64 \
+            --value "$GOOGLESERVICE_PLIST_BASE64" \
+            --scope project \
+            --type string
+          echo "✅ EAS secret synchronized."
+
+      - name: Prebuild native iOS project
+        run: npx expo prebuild --clean --platform ios
+
       - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
+        run: npx eas-cli@latest build --platform ios --profile ios-simulator --non-interactive --clear-cache
 
       - name: Download latest EAS iOS Simulator artifact
         run: |
-          pnpm dlx eas-cli build:download \
+          npx eas-cli@latest build:download \
             --latest \
             --platform ios \
             --profile ios-simulator \
@@ -170,12 +251,6 @@ jobs:
         if: ${{ (env.APPETIZE_API_TOKEN == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
         run: |
           echo "Skipping Appetize upload."
-          if [ -z "${APPETIZE_API_TOKEN}" ]; then
-            echo "- APPETIZE_API_TOKEN not set."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repo; secrets are unavailable."
-          fi
           echo "### Appetize — Skipped" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
@@ -188,7 +263,6 @@ jobs:
           set -euo pipefail
           sudo apt-get update -y && sudo apt-get install -y jq
           PUBLIC_FLAG="${APPETIZE_PUBLIC:-false}"
-          # Appetize API v2 upload
           RESP_JSON=$(curl -sS -X POST https://api.appetize.io/v2/apps \
             -H "Authorization: Bearer ${APPETIZE_API_TOKEN}" \
             -H "Content-Type: multipart/form-data" \
@@ -197,7 +271,6 @@ jobs:
             -F "note=Jars iOS Simulator build ${GITHUB_SHA}" \
             -F "public=${PUBLIC_FLAG}")
           echo "${RESP_JSON}" > appetize_response.json
-          # Best-effort link extraction
           PUBLIC_KEY=$(echo "$RESP_JSON" | jq -r '.publicKey // empty')
           DASH_URL=$(echo "$RESP_JSON" | jq -r '.dashboardUrl // .publicURL // .appURL // empty')
           if [ -n "$PUBLIC_KEY" ]; then
@@ -225,7 +298,6 @@ jobs:
             echo "- Launch: ${{ steps.appetize.outputs.url }}" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Upload succeeded. See 'appetize-response' artifact for details and shareable link." >> $GITHUB_STEP_SUMMARY
-          fi
 
   post-summary:
     needs: [build-android-preview, build-ios-simulator]
@@ -246,822 +318,3 @@ jobs:
             - Appetize iOS Simulator: ${{ needs.build-ios-simulator.outputs.appetize_url || 'N/A' }}
             - Firebase Test Lab Results: ${{ needs.build-android-preview.outputs.ftl_url || 'N/A' }}
             *(automatically generated by CI)*
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
-
-  build-android-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    outputs:
-      ftl_url: ${{ steps.ftl.outputs.results_url }}
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
-      GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
-
-      - name: Download latest EAS Android artifact (APK)
-        run: |
-          pnpm dlx eas-cli build:download \
-            --latest \
-            --platform android \
-            --output app-preview.apk
-          test -f app-preview.apk
-
-      - name: Upload APK artifact (preserve)
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-preview-apk
-          path: app-preview.apk
-          if-no-files-found: error
-
-      - name: (Info) Skipping FTL — secrets missing or PR is from a fork
-        if: ${{ (env.GCLOUD_PROJECT_ID == '' || env.GCP_SA_KEY_JSON == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
-        run: |
-          echo "Skipping Firebase Test Lab:"
-          if [ -z "${GCLOUD_PROJECT_ID}" ] || [ -z "${GCP_SA_KEY_JSON}" ]; then
-            echo "- Missing GCLOUD_PROJECT_ID and/or GCP_SA_KEY_JSON."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repository (GitHub masks secrets for forked PRs)."
-          fi
-          echo "APK artifact is still uploaded for manual testing."
-          echo "### Firebase Test Lab (Robo) — Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
-
-      - name: Set up gcloud
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCLOUD_PROJECT_ID }}
-          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
-          export_default_credentials: true
-
-      - name: Run Firebase Test Lab (Robo) on APK
-        id: ftl
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        run: |
-          set -euo pipefail
-          DEVICE="model=Pixel2,version=30,locale=en,orientation=portrait"
-          EXIT_CODE=0
-          gcloud firebase test android run \
-            --type robo \
-            --app app-preview.apk \
-            --device "$DEVICE" \
-            --timeout 900s \
-            || EXIT_CODE=$?
-          RESULTS_URL=$(grep -Eo 'More details are available at: https://console.developers.google.com/storage/browser/[^ ]+' "$HOME/.config/gcloud/logs/"* 2>/dev/null | tail -n1 | awk '{print $NF}') || true
-          echo "results_url=${RESULTS_URL:-}" >> $GITHUB_OUTPUT
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "::error::Firebase Test Lab reported failures. See results: ${RESULTS_URL:-unknown}"
-            exit $EXIT_CODE
-          fi
-
-      - name: Summarize Firebase Test Lab results
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        run: |
-          echo "### Firebase Test Lab (Robo) Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Results: ${{ steps.ftl.outputs.results_url }}" >> $GITHUB_STEP_SUMMARY
-
-  build-ios-simulator:
-    needs: test
-    runs-on: ubuntu-latest
-    outputs:
-      appetize_url: ${{ steps.appetize.outputs.url }}
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
-      # Optional: set to "true" to create a public Appetize link; default is private
-      APPETIZE_PUBLIC: ${{ vars.APPETIZE_PUBLIC }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
-
-      - name: Download latest EAS iOS Simulator artifact
-        run: |
-          pnpm dlx eas-cli build:download \
-            --latest \
-            --platform ios \
-            --profile ios-simulator \
-            --output ios-simulator.tar.gz
-          test -f ios-simulator.tar.gz
-
-      - name: Upload iOS Simulator artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-simulator-build
-          path: ios-simulator.tar.gz
-          if-no-files-found: error
-
-      - name: (Info) Skipping Appetize — token missing or PR is from a fork
-        if: ${{ (env.APPETIZE_API_TOKEN == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
-        run: |
-          echo "Skipping Appetize upload."
-          if [ -z "${APPETIZE_API_TOKEN}" ]; then
-            echo "- APPETIZE_API_TOKEN not set."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repo; secrets are unavailable."
-          fi
-          echo "### Appetize — Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
-          echo "- iOS Simulator artifact uploaded as 'ios-simulator-build'." >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload iOS build to Appetize
-        if: ${{ (env.APPETIZE_API_TOKEN != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        id: appetize
-        run: |
-          set -euo pipefail
-          sudo apt-get update -y && sudo apt-get install -y jq
-          PUBLIC_FLAG="${APPETIZE_PUBLIC:-false}"
-          # Appetize API v2 upload
-          RESP_JSON=$(curl -sS -X POST https://api.appetize.io/v2/apps \
-            -H "Authorization: Bearer ${APPETIZE_API_TOKEN}" \
-            -H "Content-Type: multipart/form-data" \
-            -F "platform=ios" \
-            -F "file=@ios-simulator.tar.gz" \
-            -F "note=Jars iOS Simulator build ${GITHUB_SHA}" \
-            -F "public=${PUBLIC_FLAG}")
-          echo "${RESP_JSON}" > appetize_response.json
-          # Best-effort link extraction
-          PUBLIC_KEY=$(echo "$RESP_JSON" | jq -r '.publicKey // empty')
-          DASH_URL=$(echo "$RESP_JSON" | jq -r '.dashboardUrl // .publicURL // .appURL // empty')
-          if [ -n "$PUBLIC_KEY" ]; then
-            APP_URL="https://appetize.io/app/${PUBLIC_KEY}"
-          elif [ -n "$DASH_URL" ]; then
-            APP_URL="$DASH_URL"
-          else
-            APP_URL=""
-          fi
-          echo "url=${APP_URL}" >> $GITHUB_OUTPUT
-
-      - name: Upload Appetize API response (artifact)
-        if: steps.appetize.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: appetize-response
-          path: appetize_response.json
-
-      - name: Summarize Appetize upload
-        if: steps.appetize.outcome == 'success'
-        run: |
-          echo "### Appetize — iOS Simulator" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ steps.appetize.outputs.url }}" ]; then
-            echo "- Launch: ${{ steps.appetize.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Upload succeeded. See 'appetize-response' artifact for details and shareable link." >> $GITHUB_STEP_SUMMARY
-          fi
-
-  post-summary:
-    needs: [build-android-preview, build-ios-simulator]
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false }}
-    steps:
-      - name: Post preview links as PR comment
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ### 🚀 JARS Mobile Preview Build Ready
-            **Artifacts**
-            - [Android APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            - [iOS Simulator tar.gz](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            **Live Testing**
-            - Appetize iOS Simulator: ${{ needs.build-ios-simulator.outputs.appetize_url || 'N/A' }}
-            - Firebase Test Lab Results: ${{ needs.build-android-preview.outputs.ftl_url || 'N/A' }}
-            *(automatically generated by CI)*
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
-
-  build-android-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
-      EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
-      EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
-      EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
-      GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
-      GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
-
-      - name: Download latest EAS Android artifact (APK)
-        run: |
-          pnpm dlx eas-cli build:download \
-            --latest \
-            --platform android \
-            --output app-preview.apk
-          test -f app-preview.apk
-
-      - name: Upload APK artifact (preserve)
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-preview-apk
-          path: app-preview.apk
-          if-no-files-found: error
-
-      - name: (Info) Skipping FTL — secrets missing or PR is from a fork
-        if: ${{ (env.GCLOUD_PROJECT_ID == '' || env.GCP_SA_KEY_JSON == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
-        run: |
-          echo "Skipping Firebase Test Lab:"
-          if [ -z "${GCLOUD_PROJECT_ID}" ] || [ -z "${GCP_SA_KEY_JSON}" ]; then
-            echo "- Missing GCLOUD_PROJECT_ID and/or GCP_SA_KEY_JSON."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repository (GitHub masks secrets for forked PRs)."
-          fi
-          echo "APK artifact is still uploaded for manual testing."
-          echo "### Firebase Test Lab (Robo) — Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
-
-      # --- Firebase Test Lab Robo Gate ---
-      - name: Set up gcloud
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCLOUD_PROJECT_ID }}
-          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
-          export_default_credentials: true
-
-      - name: Run Firebase Test Lab (Robo) on APK
-        id: ftl
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        run: |
-          set -euo pipefail
-          # Standard device; adjust as needed or expand matrix later
-          DEVICE="model=Pixel2,version=30,locale=en,orientation=portrait"
-          EXIT_CODE=0
-          # Use default Google-managed results bucket (no --results-bucket), reduces IAM friction
-          gcloud firebase test android run \
-            --type robo \
-            --app app-preview.apk \
-            --device "$DEVICE" \
-            --timeout 900s \
-            || EXIT_CODE=$?
-          # Capture results URL (best-effort from gcloud logs)
-          RESULTS_URL=$(grep -Eo 'More details are available at: https://console.developers.google.com/storage/browser/[^ ]+' "$HOME/.config/gcloud/logs/"* 2>/dev/null | tail -n1 | awk '{print $NF}') || true
-          echo "results_url=${RESULTS_URL:-}" >> $GITHUB_OUTPUT
-          # Fail the job if Robo test failed
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "::error::Firebase Test Lab reported failures. See results: ${RESULTS_URL:-unknown}"
-            exit $EXIT_CODE
-          fi
-
-      - name: Summarize Firebase Test Lab results
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        run: |
-          echo "### Firebase Test Lab (Robo) Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Results: ${{ steps.ftl.outputs.results_url }}" >> $GITHUB_STEP_SUMMARY
-
-  build-ios-simulator:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
-      # Optional: set to "true" to create a public Appetize link; default is private
-      APPETIZE_PUBLIC: ${{ vars.APPETIZE_PUBLIC }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
-
-      - name: Download latest EAS iOS Simulator artifact
-        run: |
-          pnpm dlx eas-cli build:download \
-            --latest \
-            --platform ios \
-            --profile ios-simulator \
-            --output ios-simulator.tar.gz
-          test -f ios-simulator.tar.gz
-
-      - name: Upload iOS Simulator artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-simulator-build
-          path: ios-simulator.tar.gz
-          if-no-files-found: error
-
-      - name: (Info) Skipping Appetize — token missing or PR is from a fork
-        if: ${{ (env.APPETIZE_API_TOKEN == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
-        run: |
-          echo "Skipping Appetize upload."
-          if [ -z "${APPETIZE_API_TOKEN}" ]; then
-            echo "- APPETIZE_API_TOKEN not set."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repo; secrets are unavailable."
-          fi
-          echo "### Appetize — Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
-          echo "- iOS Simulator artifact uploaded as 'ios-simulator-build'." >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload iOS build to Appetize
-        if: ${{ (env.APPETIZE_API_TOKEN != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        id: appetize
-        run: |
-          set -euo pipefail
-          sudo apt-get update -y && sudo apt-get install -y jq
-          PUBLIC_FLAG="${APPETIZE_PUBLIC:-false}"
-          # Appetize API v2 upload
-          RESP_JSON="$ (curl -sS -X POST https://api.appetize.io/v2/apps \
-            -H "Authorization: Bearer ${APPETIZE_API_TOKEN}" \
-            -H "Content-Type: multipart/form-data" \
-            -F "platform=ios" \
-            -F "file=@ios-simulator.tar.gz" \
-            -F "note=Jars iOS Simulator build ${GITHUB_SHA}" \
-            -F "public=${PUBLIC_FLAG}")"
-          echo "$RESP_JSON" > appetize_response.json
-          # Best-effort link extraction
-          PUBLIC_KEY="$(echo "$RESP_JSON" | jq -r '.publicKey // empty')"
-          DASH_URL="$(echo "$RESP_JSON" | jq -r '.dashboardUrl // .publicURL // .appURL // empty')"
-          if [ -n "$PUBLIC_KEY" ]; then
-            APP_URL="https://appetize.io/app/${PUBLIC_KEY}"
-          elif [ -n "$DASH_URL" ]; then
-            APP_URL="$DASH_URL"
-          else
-            APP_URL=""
-          fi
-          echo "url=${APP_URL}" >> $GITHUB_OUTPUT
-
-      - name: Upload Appetize API response (artifact)
-        if: steps.appetize.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: appetize-response
-          path: appetize_response.json
-
-      - name: Summarize Appetize upload
-        if: steps.appetize.outcome == 'success'
-        run: |
-          echo "### Appetize — iOS Simulator" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ steps.appetize.outputs.url }}" ]; then
-            echo "- Launch: ${{ steps.appetize.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Upload succeeded. See 'appetize-response' artifact for details and shareable link." >> $GITHUB_STEP_SUMMARY
-          fi
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
-
-  build-android-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      # Optional: if you switch to local creds later
-      # EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
-      # EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
-      # EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
-      # EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
-      GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
-      GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
-
-      - name: Download latest EAS Android artifact (APK)
-        run: |
-          pnpm dlx eas-cli build:download \
-            --latest \
-            --platform android \
-            --output app-preview.apk
-          test -f app-preview.apk
-
-      - name: Upload APK artifact (preserve)
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-preview-apk
-          path: app-preview.apk
-          if-no-files-found: error
-
-      - name: (Info) Skipping FTL — secrets missing or PR is from a fork
-        if: ${{ (env.GCLOUD_PROJECT_ID == '' || env.GCP_SA_KEY_JSON == '') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
-        run: |
-          echo "Skipping Firebase Test Lab:"
-          if [ -z "${GCLOUD_PROJECT_ID}" ] || [ -z "${GCP_SA_KEY_JSON}" ]; then
-            echo "- Missing GCLOUD_PROJECT_ID and/or GCP_SA_KEY_JSON."
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "- Build triggered by a forked repository (GitHub masks secrets for forked PRs)."
-          fi
-          echo "APK artifact is still uploaded for manual testing."
-          echo "### Firebase Test Lab (Robo) — Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Reason: secrets not available or forked PR." >> $GITHUB_STEP_SUMMARY
-
-      # --- Firebase Test Lab Robo Gate ---
-      - name: Set up gcloud
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCLOUD_PROJECT_ID }}
-          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
-          export_default_credentials: true
-
-      - name: Run Firebase Test Lab (Robo) on APK
-        id: ftl
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        run: |
-          set -euo pipefail
-          # Standard device; adjust as needed or expand matrix later
-          DEVICE="model=Pixel2,version=30,locale=en,orientation=portrait"
-          EXIT_CODE=0
-          # Use default Google-managed results bucket (no --results-bucket), reduces IAM friction
-          gcloud firebase test android run \
-            --type robo \
-            --app app-preview.apk \
-            --device "$DEVICE" \
-            --timeout 900s \
-            || EXIT_CODE=$?
-          # Capture results URL (best-effort from gcloud logs)
-          RESULTS_URL=$(grep -Eo 'More details are available at: https://console.developers.google.com/storage/browser/[^ ]+' "$HOME/.config/gcloud/logs/"* 2>/dev/null | tail -n1 | awk '{print $NF}') || true
-          echo "results_url=${RESULTS_URL:-}" >> $GITHUB_OUTPUT
-          # Fail the job if Robo test failed
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "::error::Firebase Test Lab reported failures. See results: ${RESULTS_URL:-unknown}"
-            exit $EXIT_CODE
-          fi
-
-      - name: Summarize Firebase Test Lab results
-        if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
-        run: |
-          echo "### Firebase Test Lab (Robo) Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Results: ${{ steps.ftl.outputs.results_url }}" >> $GITHUB_STEP_SUMMARY
-
-  build-ios-simulator:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
-
-  build-android-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      # Optional: if you switch to local creds later
-      # EXPO_ANDROID_KEYSTORE_BASE64: ${{ secrets.EXPO_ANDROID_KEYSTORE_BASE64 }}
-      # EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
-      # EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
-      # EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
-      GCLOUD_PROJECT_ID: ${{ secrets.GC_PROJECT_ID }}
-      GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
-
-      - name: Download latest EAS Android artifact (APK)
-        run: |
-          pnpm dlx eas-cli build:download \
-            --latest \
-            --platform android \
-            --output app-preview.apk
-          test -f app-preview.apk
-
-      - name: Upload APK artifact (preserve)
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-preview-apk
-          path: app-preview.apk
-          if-no-files-found: error
-
-      # --- Firebase Test Lab Robo Gate ---
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCLOUD_PROJECT_ID }}
-          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
-          export_default_credentials: true
-
-      - name: Run Firebase Test Lab (Robo) on APK
-        id: ftl
-        run: |
-          set -euo pipefail
-          # Standard device matrix; adjust as needed
-          DEVICE="model=Pixel2,version=30,locale=en,orientation=portrait"
-          EXIT_CODE=0
-          gcloud firebase test android run \
-            --type robo \
-            --app app-preview.apk \
-            --device "$DEVICE" \
-            --timeout 900s \
-            --results-bucket gs://test-lab-${GCLOUD_PROJECT_ID} || EXIT_CODE=$?
-          # Capture results URL from the last run
-          RESULTS_URL=$(grep -Eo 'Test results will be streamed to \S+' "$HOME/.config/gcloud/logs/"* 2>/dev/null | tail -n1 | awk '{print $NF}') || true
-          echo "results_url=${RESULTS_URL:-}" >> $GITHUB_OUTPUT
-          # Fail the job if Robo test failed
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "::error::Firebase Test Lab reported failures. See results: ${RESULTS_URL:-unknown}"
-            exit $EXIT_CODE
-          fi
-
-      - name: Summarize Firebase Test Lab results
-        if: always()
-        run: |
-          echo "### Firebase Test Lab (Robo) Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Results: ${{ steps.ftl.outputs.results_url }}" >> $GITHUB_STEP_SUMMARY
-
-  build-ios-simulator:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
-
-  build-android-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
-
-  build-ios-simulator:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
-name: CI
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test -- --ci
-
-  build-android-preview:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build Android Preview APK (no store creds)
-        run: pnpm dlx eas-cli build --platform android --profile android-preview --non-interactive
-
-  build-ios-simulator:
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Build iOS Simulator (no Apple creds)
-        run: pnpm dlx eas-cli build --platform ios --profile ios-simulator --non-interactive
-

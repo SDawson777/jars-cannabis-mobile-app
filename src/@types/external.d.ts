@@ -95,7 +95,6 @@ declare module '*.mp3' {
 
 // 6. React Native module overrides
 declare module 'react-native-linear-gradient';
-declare module 'react-native-sound';
 declare module 'react-native-haptic-feedback';
 declare module 'react-native-maps';
 declare module 'lottie-react-native';

@@ -8,13 +8,12 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-yarn.lock
+package-lock.jsongh run view RUN_ID --repo SDawson777/jars-cannabis-mobile-app --log | sed -n '/Print Node & Yarn versions/,/Install dependencies (Yarn)/p'
 
 # Expo
 .expo/
 .expo-shared/
 web-build/
-android/
 ios/
 
 # macOS
@@ -41,3 +40,16 @@ service-account.json
 firebase_sa.b64
 assets/splash/jars_splash_static.png
 backend/dist/
+
+# Do not commit iOS Firebase config (handled via EAS secrets)
+GoogleService-Info.plist
+GoogleService-Info.plist.b64
+
+# Local bin scripts
+bin/
+
+
+# Expo
+.expo
+dist/
+web-build/
