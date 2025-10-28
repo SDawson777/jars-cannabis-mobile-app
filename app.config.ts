@@ -1,10 +1,68 @@
 // This file is a TypeScript configuration file for Expo
 // @ts-nocheck
 import type { ExpoConfig } from 'expo/config';
+import fs from 'fs';
+import path from 'path';
+
+function resolveAndroidGoogleServicesFile(): string {
+  // 1) If GOOGLE_SERVICES_JSON points to an existing file, use it
+  const pathEnv = process.env.GOOGLE_SERVICES_JSON;
+  if (pathEnv && fs.existsSync(pathEnv)) {
+    return pathEnv;
+  }
+
+  // 2) If GOOGLE_SERVICES_JSON_BASE64 is provided, decode and write to a stable path
+  const b64 = process.env.GOOGLE_SERVICES_JSON_BASE64;
+  if (b64) {
+    try {
+      const projectRoot = process.cwd();
+      const outDir = path.join(projectRoot, '.expo', 'secrets');
+      const outFile = path.join(outDir, 'google-services.json');
+      fs.mkdirSync(outDir, { recursive: true });
+      fs.writeFileSync(outFile, Buffer.from(b64, 'base64'));
+      return outFile;
+    } catch (e) {
+      // Fall through to default on any error
+    }
+  }
+
+  // 3) Default to repo file if present
+  const defaultPath = path.join(process.cwd(), 'apps', 'android', 'google-services.json');
+  return defaultPath;
+}
+
+function resolveIOSGoogleServicesFile(): string {
+  // 1) If GOOGLE_SERVICE_PLIST points to an existing file, use it
+  const pathEnv = process.env.GOOGLE_SERVICE_PLIST;
+  if (pathEnv && fs.existsSync(pathEnv)) {
+    return pathEnv;
+  }
+
+  // 2) If GOOGLESERVICE_PLIST_BASE64 is provided, decode and write to a stable path
+  const b64 = process.env.GOOGLESERVICE_PLIST_BASE64;
+  if (b64) {
+    try {
+      const projectRoot = process.cwd();
+      const outDir = path.join(projectRoot, '.expo', 'secrets');
+      const outFile = path.join(outDir, 'GoogleService-Info.plist');
+      fs.mkdirSync(outDir, { recursive: true });
+      fs.writeFileSync(outFile, Buffer.from(b64, 'base64'));
+      return outFile;
+    } catch (e) {
+      // Fall through to default on any error
+    }
+  }
+
+  // 3) Default to repo file if present
+  const defaultPath = path.join(process.cwd(), 'apps', 'ios', 'GoogleService-Info.plist');
+  return defaultPath;
+}
 
 const config: ExpoConfig = {
   name: 'JARS',
   slug: 'jars-cannabis-mobile-app',
+  // Manual app versioning (controlled instead of EAS autoIncrement)
+  version: '1.0.0',
   extra: {
     eas: {
       projectId: 'f480819a-c0e4-430e-82bc-1a761385db05',
@@ -12,13 +70,24 @@ const config: ExpoConfig = {
   },
   ios: {
     bundleIdentifier: 'com.jarss.dev',
+    // iOS build number should match or be incremented per release
+    buildNumber: '1.0.0',
+    // Firebase iOS config: path to GoogleService-Info.plist
+    // Resolved from env var or base64 secret at build time, or fallback to repo file
+    googleServicesFile: resolveIOSGoogleServicesFile(),
   },
   android: {
     package: 'com.jars.dev.android',
+    // Increment versionCode with each release
+    versionCode: 1,
+    // Firebase Android config: path to google-services.json
+    // Replace the placeholder file with the real one from Firebase when available
+    googleServicesFile: resolveAndroidGoogleServicesFile(),
   },
   splash: {
     backgroundColor: '#F9F9F9',
-    image: './assets/splash/jars_splash_static.png',
+    // Use a known-good PNG from assets/textures to avoid prebuild CRC errors
+    image: './assets/textures/paper_noise_tile.png',
     resizeMode: 'contain',
   },
   plugins: [
@@ -29,6 +98,20 @@ const config: ExpoConfig = {
       {
         merchantIdentifier: 'merchant.com.placeholder',
         enableGooglePay: true,
+      },
+    ],
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          deploymentTarget: '15.1',
+        },
+        android: {
+          compileSdkVersion: 34,
+          targetSdkVersion: 34,
+          minSdkVersion: 24,
+          buildToolsVersion: '34.0.0',
+        },
       },
     ],
   ],

@@ -1,30 +1,60 @@
 {
-  "cli": { "version": ">= 12.0.0", "appVersionSource": "local" },
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "20.19.4",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     },
     "android-preview": {
-      "android": { "buildType": "apk" },
-      "credentialsSource": "local",
-      "distribution": "internal"
+      "android": {
+        "buildType": "apk"
+      },
+      "credentialsSource": "remote",
+      "distribution": "internal",
+      "node": "20.19.4",
+      "env": {
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     },
     "ios-simulator": {
-      "ios": { "simulator": true },
-      "distribution": "internal"
+      "ios": {
+        "simulator": true
+      },
+      "distribution": "internal",
+      "node": "20.19.4",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     },
     "production": {
-      "android": { "buildType": "app-bundle" },
+      "android": {
+        "buildType": "app-bundle"
+      },
       "ios": {},
       "credentialsSource": "remote",
-      "autoIncrement": true
+      "node": "20.19.4",
+      "env": {
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_API_BASE_URL": "https://jars-cannabis-mobile-app-production.up.railway.app"
+      }
     }
   },
   "submit": {
     "production": {
-      "android": { "serviceAccountKeyPath": "./fastlane/google-service-account.json" },
-      "ios": { "ascAppId": "REPLACE_AT_HANOFF" }
+      "android": {
+        "serviceAccountKeyPath": "./fastlane/google-service-account.json"
+      },
+      "ios": {
+        "ascAppId": "REPLACE_AT_HANDOFF"
+      }
     }
   }
 }
