@@ -13,19 +13,29 @@ jobs:
 
       - name: 🔍 Preflight - Verify lockfiles exist
         run: |
-          test -f npm-shrinkwrap.json || (echo "❌ Missing root npm-shrinkwrap.json"; exit 1)
-          test -f backend/package-lock.json || (echo "❌ Missing backend/package-lock.json"; exit 1)
-          echo "✅ All required lockfiles present"
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            echo '❌ Detected npm lockfile. Project is Yarn-only.'
+            exit 1
+          fi
+
+          if [ ! -f yarn.lock ]; then
+            echo '❌ Missing yarn.lock. Cannot guarantee reproducible installs.'
+            exit 1
+          fi
+
+          echo '✅ Yarn lockfile verified.'
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version: '20.19.4'
+          cache: 'yarn'
           cache-dependency-path: |
-            npm-shrinkwrap.json
-            backend/package-lock.json
-      - run: npm ci
-      - run: npm run smoke
+            yarn.lock
+
+      - name: Install dependencies (Yarn)
+        run: yarn install --immutable
+
+      - run: yarn smoke
       - uses: actions/upload-artifact@v4
         with:
           name: newman-smoke-report
