@@ -41,30 +41,41 @@ jobs:
           cd ios
           pod install --repo-update
 
-      - name: Vendor Stripe pods (source dirs + podspecs) into ios/Vendor/Stripe
+      - name: Discover Stripe pods from first CocoaPods install
+        id: discover_stripe
+        run: |
+          set -euo pipefail
+          cd ios
+
+          echo 'Listing Pods/* for Stripe* folders:'
+          ls Pods | sed -n 's/^/  Pods\\//p'
+
+          # Collect every top-level pod folder that starts with 'Stripe'
+          STRIPE_PODS=$(ls Pods | grep '^Stripe' || true)
+
+          echo 'Stripe pods detected:'
+          echo "$STRIPE_PODS"
+
+          # Save to GITHUB_OUTPUT so next steps can use it.
+          {
+            echo "pods_list<<EOF"
+            echo "$STRIPE_PODS"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Vendor Stripe pods (source + podspecs) into ios/Vendor/Stripe
         run: |
           set -euo pipefail
           cd ios
 
           mkdir -p Vendor/Stripe
 
-          echo ">>> Copy Stripe source folders from Pods/"
-          for PODDIR in Pods/Stripe*; do
-            [ -d "$PODDIR" ] || continue
-            PODNAME=$(basename "$PODDIR")
-            echo "Vendoring $PODNAME from $PODDIR"
-            mkdir -p "Vendor/Stripe/$PODNAME"
-            cp -R "$PODDIR/"* "Vendor/Stripe/$PODNAME"/ || true
-          done
+          # Read list from previous step
+          STRIPE_PODS="${{ steps.discover_stripe.outputs.pods_list }}"
 
-          echo ">>> Copy Stripe podspecs from any known CocoaPods locations"
-          # Strategy:
-          # - Look in Pods/<PodName>/<PodName>.podspec*
-          # - Look in Pods/Local Podspecs/Stripe*.podspec*
-          # - Look in Pods/Target Support Files/<PodName>/<PodName>.podspec*
-          # For each podspec we find, drop it in Vendor/Stripe/<PodName>/<PodName>.podspec(.json)
+          echo "Vendoring these Stripe pods:"
+          echo "$STRIPE_PODS"
 
-          # helper: copy_spec <specpath> <podname>
           copy_spec () {
             local SPECFILE="$1"
             local PODNAME="$2"
@@ -76,70 +87,74 @@ jobs:
             fi
           }
 
-          # Pass 1: direct pod folders
-          for PODDIR in Pods/Stripe*; do
-            [ -d "$PODDIR" ] || continue
-            PODNAME=$(basename "$PODDIR")
+          for PODNAME in $STRIPE_PODS; do
+            PODDIR="Pods/$PODNAME"
+            echo "---"
+            echo "Processing $PODNAME from $PODDIR"
+
+            # copy the entire pod source folder if it exists
+            if [ -d "$PODDIR" ]; then
+              mkdir -p "Vendor/Stripe/$PODNAME"
+              cp -R "$PODDIR/"* "Vendor/Stripe/$PODNAME"/ || true
+            else
+              echo "WARNING: $PODDIR not found (maybe this pod is subspec-only)"
+            fi
+
+            # try to locate a podspec for this pod in common places:
+            # 1. inside the pod dir itself
             copy_spec "$PODDIR/$PODNAME.podspec" "$PODNAME"
             copy_spec "$PODDIR/$PODNAME.podspec.json" "$PODNAME"
-          done
 
-          # Pass 2: Local Podspecs (CocoaPods sometimes caches specs here)
-          if [ -d "Pods/Local Podspecs" ]; then
-            for SPECFILE in Pods/Local\ Podspecs/Stripe*.podspec Pods/Local\ Podspecs/Stripe*.podspec.json; do
-              [ -f "$SPECFILE" ] || continue
-              # Extract 'StripeFoo' from '.../StripeFoo.podspec...'
-              PODNAME=$(basename "$SPECFILE")
-              PODNAME=${PODNAME%%.podspec*}
-              PODNAME=${PODNAME%%.podspec.json*}
-              copy_spec "$SPECFILE" "$PODNAME"
-            done
-          fi
-
-          # Pass 3: Target Support Files (used per-pod)
-          if [ -d "Pods/Target Support Files" ]; then
-            for SUPPORTDIR in Pods/Target\ Support\ Files/Stripe* Pods/Target\ Support\ Files/Stripe*/*; do
-              [ -d "$SUPPORTDIR" ] || continue
-              # SUPPORTDIR might be Pods/Target Support Files/StripePayments or its subdir
-              PODBASE=$(basename "$SUPPORTDIR")
-              # Look for *.podspec or *.podspec.json inside
-              for SPECFILE in "$SUPPORTDIR"/*.podspec "$SUPPORTDIR"/*.podspec.json; do
-                [ -f "$SPECFILE" ] || continue
-                # Derive podname from file name, e.g. StripePayments.podspec.json -> StripePayments
-                PODNAME=$(basename "$SPECFILE")
-                PODNAME=${PODNAME%%.podspec*}
-                PODNAME=${PODNAME%%.podspec.json*}
+            # 2. Local Podspecs cache
+            if [ -d "Pods/Local Podspecs" ]; then
+              for SPECFILE in "Pods/Local Podspecs/$PODNAME.podspec" "Pods/Local Podspecs/$PODNAME.podspec.json"; do
                 copy_spec "$SPECFILE" "$PODNAME"
               done
-            done
-          fi
+            fi
 
-          echo ">>> After vendoring, list Vendor/Stripe contents recursively:"
-          find Vendor/Stripe -maxdepth 2 -type f -print
+            # 3. Target Support Files (CocoaPods sometimes mirrors podspec info here)
+            if [ -d "Pods/Target Support Files/$PODNAME" ]; then
+              for SPECFILE in "Pods/Target Support Files/$PODNAME/$PODNAME.podspec" "Pods/Target Support Files/$PODNAME/$PODNAME.podspec.json"; do
+                copy_spec "$SPECFILE" "$PODNAME"
+              done
+            fi
 
-      - name: Patch Podfile to use vendored Stripe pods
+            echo "Final contents of Vendor/Stripe/$PODNAME:"
+            ls "Vendor/Stripe/$PODNAME" || true
+          done
+
+          echo 'Full Vendor/Stripe tree:'
+          find Vendor/Stripe -maxdepth 2 -print
+
+      - name: Patch Podfile to use vendored Stripe pods dynamically
         run: |
           set -euo pipefail
           cd ios
-          PODFILE="Podfile"
 
-          # comment out any Stripe lines that declare remote pods to avoid conflicts
+          PODFILE="Podfile"
+          STRIPE_PODS="${{ steps.discover_stripe.outputs.pods_list }}"
+
+          echo "Stripe pods to inject into Podfile:"
+          echo "$STRIPE_PODS"
+
+          # 1. Comment out any existing Stripe* pod lines (remote definitions)
           sed -i.bak -E 's/^([[:space:]]*pod[[:space:]]+\"Stripe[A-Za-z0-9]*\".*)$/# \1/g' "$PODFILE"
 
-          # inject vendored block before post_install (if not already present)
-          if ! grep -q 'Vendor/Stripe/StripeFinancialConnections' "$PODFILE"; then
+          # 2. Build a temp file with our vendored block
+          {
+            echo '  # BEGIN vendored Stripe pods (offline, committed)'
+            for PODNAME in $STRIPE_PODS; do
+              echo "  pod \"$PODNAME\", :path => \"Vendor/Stripe/$PODNAME\""
+            done
+            echo '  # END vendored Stripe pods'
+          } > vendored_stripe_block.txt
+
+          # 3. Insert vendored block right before the first 'post_install do' line,
+          #    but only if we haven't already inserted it before.
+          if ! grep -q 'BEGIN vendored Stripe pods' "$PODFILE"; then
             awk '
               /post_install do/ && !done {
-                print "  # BEGIN vendored Stripe pods (offline, committed)"
-                print "  pod \\\"Stripe\\\",                    :path => \\\"Vendor/Stripe/Stripe\\\""
-                print "  pod \\\"StripeCore\\\",                :path => \\\"Vendor/Stripe/StripeCore\\\""
-                print "  pod \\\"StripeUICore\\\",              :path => \\\"Vendor/Stripe/StripeUICore\\\""
-                print "  pod \\\"StripeApplePay\\\",            :path => \\\"Vendor/Stripe/StripeApplePay\\\""
-                print "  pod \\\"StripePayments\\\",            :path => \\\"Vendor/Stripe/StripePayments\\\""
-                print "  pod \\\"StripePaymentsUI\\\",          :path => \\\"Vendor/Stripe/StripePaymentsUI\\\""
-                print "  pod \\\"StripePaymentSheet\\\",        :path => \\\"Vendor/Stripe/StripePaymentSheet\\\""
-                print "  pod \\\"StripeFinancialConnections\\\",:path => \\\"Vendor/Stripe/StripeFinancialConnections\\\""
-                print "  # END vendored Stripe pods"
+                system("cat vendored_stripe_block.txt")
                 done=1
               }
               { print }
@@ -154,6 +169,7 @@ jobs:
         run: |
           set -euo pipefail
           cd ios
+
           pod deintegrate
           pod install
 
@@ -172,7 +188,7 @@ jobs:
           git status
 
           if ! git diff --cached --quiet; then
-            git commit -m "chore(ios): vendor Stripe pods (including podspecs from Local Podspecs / Target Support Files) for offline CI"
+            git commit -m "chore(ios): vendor Stripe pods dynamically (only existing pods) + lock Podfile for offline CI"
             git push origin ${{ github.event.inputs.target_branch }}
           else
             echo "No vendored changes to commit."
