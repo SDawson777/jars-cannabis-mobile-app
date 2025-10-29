@@ -87,6 +87,18 @@ target 'JARS' do
         end
       end
     end
+  
+    # --- Force modern iOS deployment target for all pods to satisfy Xcode 16 ---
+    installer.pods_project.targets.each do |t|
+      t.build_configurations.each do |config|
+        # Match the app/platform line at the top of the Podfile
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+
+        # Normalize simulator arch settings on Apple Silicon runners
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      end
+    end
+    # --- end deployment target patch ---
   end
 
   post_integrate do |installer|
