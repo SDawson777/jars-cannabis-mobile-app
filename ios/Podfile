@@ -59,6 +59,17 @@ target 'JARS' do
     :flipper_configuration => flipper_config
   )
 
+  # BEGIN vendored Stripe pods (offline, committed)
+  # pod 'Stripe', :path => 'Vendor/Stripe/Stripe'  # Commented out: podspec not present
+  pod 'StripeCore', :path => 'Vendor/Stripe/StripeCore'
+  pod 'StripeUICore', :path => 'Vendor/Stripe/StripeUICore'
+  pod 'StripeApplePay', :path => 'Vendor/Stripe/StripeApplePay'
+  pod 'StripePayments', :path => 'Vendor/Stripe/StripePayments'
+  pod 'StripePaymentsUI', :path => 'Vendor/Stripe/StripePaymentsUI'
+  pod 'StripePaymentSheet', :path => 'Vendor/Stripe/StripePaymentSheet'
+  pod 'StripeFinancialConnections', :path => 'Vendor/Stripe/StripeFinancialConnections'
+  # END vendored Stripe pods
+
   post_install do |installer|
     react_native_post_install(
       installer,
