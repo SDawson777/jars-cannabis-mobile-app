@@ -96,17 +96,58 @@ target 'JARS' do
       end
     end
     # --- end deployment target patch ---
- 
-    # Ensure HEADER_SEARCH_PATHS and MODULEMAPS are exported for vendored Stripe pods
+
+    # --- BEGIN Stripe / ExpoModulesCore module visibility fix ---
+    module_pods = %w[
+      ExpoModulesCore
+      stripe-react-native
+      Stripe
+      StripeCore
+      StripeUICore
+      StripeApplePay
+      StripePayments
+      StripePaymentsUI
+      StripePaymentSheet
+      StripeFinancialConnections
+      lottie-ios
+      lottie-react-native
+    ]
+
     installer.pods_project.targets.each do |t|
-      if t.name.start_with?('Stripe')
+      if module_pods.include?(t.name)
         t.build_configurations.each do |config|
           config.build_settings['DEFINES_MODULE'] = 'YES'
           config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+          config.build_settings['SWIFT_COMPILATION_MODE'] = 'wholemodule'
           config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-O'
+          config.build_settings['MACH_O_TYPE'] = 'mh_dylib'
+          config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -ObjC'
+        end
+
+        if t.respond_to?(:product_type)
+          t.product_type = 'com.apple.product-type.framework'
         end
       end
     end
+
+    installer.pods_project.targets.each do |t|
+      next unless t.name == 'JARS' || t.name == 'Pods-JARS'
+      t.build_configurations.each do |config|
+        config.build_settings['FRAMEWORK_SEARCH_PATHS'] = [
+          '$(inherited)',
+          '${PODS_CONFIGURATION_BUILD_DIR}'
+        ]
+        config.build_settings['HEADER_SEARCH_PATHS'] = [
+          '$(inherited)',
+          '${PODS_CONFIGURATION_BUILD_DIR}/**'
+        ]
+        config.build_settings['LIBRARY_SEARCH_PATHS'] = [
+          '$(inherited)',
+          '${PODS_CONFIGURATION_BUILD_DIR}/**'
+        ]
+      end
+    end
+    # --- END Stripe / ExpoModulesCore module visibility fix ---
   end
 
   post_integrate do |installer|
