@@ -44,6 +44,28 @@ target 'JARS' do
   use_expo_modules!
   config = use_native_modules!
 
+  # Force specific pods to be dynamic frameworks so they generate modulemaps
+  # This runs before pod installation to configure how pods are built
+  dynamic_frameworks = [
+    'ExpoModulesCore', 'ExpoFileSystem', 'ExpoHaptics', 'ExpoKeepAwake',
+    'ExpoLocalAuthentication', 'ExpoLocalization', 'ExpoSecureStore', 'ExpoSpeech',
+    'ExpoWebBrowser', 'EXAV', 'EXApplication', 'EXConstants', 'EXNotifications',
+    'EXLocation', 'EXTaskManager', 'EXFont', 'Expo',
+    'Stripe', 'StripeCore', 'StripeUICore', 'StripeApplePay',
+    'StripePayments', 'StripePaymentsUI', 'StripePaymentSheet', 'StripeFinancialConnections',
+    'stripe-react-native', 'lottie-ios', 'lottie-react-native', 'Sentry', 'SentryPrivate'
+  ]
+
+  pre_install do |installer|
+    installer.pod_targets.each do |pod|
+      if dynamic_frameworks.include?(pod.name)
+        def pod.build_type
+          Pod::BuildType.dynamic_framework
+        end
+      end
+    end
+  end
+
   # NOTE: we are NOT manually declaring individual Firebase pods anymore.
   # Global use_modular_headers! above handles them for static Swift compat.
 
@@ -139,15 +161,6 @@ target 'JARS' do
           config.build_settings['DEFINES_MODULE'] = 'YES'
           config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
           config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-          config.build_settings['MACH_O_TYPE'] = 'mh_dylib'
-          config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -ObjC'
-          # Keep Release optimization; don't force -Onone
-          config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] ||= '-O'
-        end
-
-        # Expose these pods to Swift as frameworks so imports work
-        if t.respond_to?(:product_type)
-          t.product_type = 'com.apple.product-type.framework'
         end
       end
     end
@@ -159,7 +172,7 @@ target 'JARS' do
         config.build_settings['FRAMEWORK_SEARCH_PATHS'] = [
           '$(inherited)',
           '${PODS_CONFIGURATION_BUILD_DIR}',
-          '${PODS_CONFIGURATION_BUILD_DIR}/*'
+          '${PODS_CONFIGURATION_BUILD_DIR}/**'
         ]
         config.build_settings['HEADER_SEARCH_PATHS'] = [
           '$(inherited)',
@@ -176,7 +189,6 @@ target 'JARS' do
       end
     end
 
-    # --- END module visibility + search path fix for Expo & Stripe ---
   end
 
   post_integrate do |installer|
