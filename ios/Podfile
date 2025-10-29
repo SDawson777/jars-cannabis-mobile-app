@@ -44,35 +44,8 @@ target 'JARS' do
   use_expo_modules!
   config = use_native_modules!
 
-  # Force specific Swift pods to build as dynamic frameworks so that their .modulemap
-  # and Swift modules exist when the main target compiles.
-  pre_install do |pi_installer|
-    pi_installer.pod_targets.each do |pod|
-      framework_pods = %w[
-        ExpoModulesCore
-        stripe-react-native
-        Stripe
-        StripeCore
-        StripeUICore
-        StripeApplePay
-        StripePayments
-        StripePaymentsUI
-        StripePaymentSheet
-        StripeFinancialConnections
-        lottie-ios
-        lottie-react-native
-      ]
-
-      if framework_pods.include?(pod.name)
-        pod.build_type = Pod::BuildType.dynamic_framework
-      end
-    end
-  end
-
   # NOTE: we are NOT manually declaring individual Firebase pods anymore.
   # Global use_modular_headers! above handles them for static Swift compat.
-
-  
 
   use_react_native!(
     :path => config[:reactNativePath],
