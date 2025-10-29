@@ -1,22 +1,22 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "form_error_icon.pdf",
-      "idiom" : "universal"
+      "filename": "form_error_icon.pdf",
+      "idiom": "universal"
     },
     {
-      "appearances" : [
+      "appearances": [
         {
-          "appearance" : "luminosity",
-          "value" : "dark"
+          "appearance": "luminosity",
+          "value": "dark"
         }
       ],
-      "filename" : "form_error_icon_dark.pdf",
-      "idiom" : "universal"
+      "filename": "form_error_icon_dark.pdf",
+      "idiom": "universal"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

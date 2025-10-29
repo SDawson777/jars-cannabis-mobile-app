@@ -1,25 +1,25 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "cardLight.svg",
-      "idiom" : "universal"
+      "filename": "cardLight.svg",
+      "idiom": "universal"
     },
     {
-      "appearances" : [
+      "appearances": [
         {
-          "appearance" : "luminosity",
-          "value" : "dark"
+          "appearance": "luminosity",
+          "value": "dark"
         }
       ],
-      "filename" : "cardDark.svg",
-      "idiom" : "universal"
+      "filename": "cardDark.svg",
+      "idiom": "universal"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   },
-  "properties" : {
-    "preserves-vector-representation" : true
+  "properties": {
+    "preserves-vector-representation": true
   }
 }

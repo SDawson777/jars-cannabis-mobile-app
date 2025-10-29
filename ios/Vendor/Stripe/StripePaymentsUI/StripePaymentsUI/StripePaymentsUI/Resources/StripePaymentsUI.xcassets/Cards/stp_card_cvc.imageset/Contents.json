@@ -1,25 +1,25 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "cvcLight.svg",
-      "idiom" : "universal"
+      "filename": "cvcLight.svg",
+      "idiom": "universal"
     },
     {
-      "appearances" : [
+      "appearances": [
         {
-          "appearance" : "luminosity",
-          "value" : "dark"
+          "appearance": "luminosity",
+          "value": "dark"
         }
       ],
-      "filename" : "cvcDark.svg",
-      "idiom" : "universal"
+      "filename": "cvcDark.svg",
+      "idiom": "universal"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   },
-  "properties" : {
-    "preserves-vector-representation" : true
+  "properties": {
+    "preserves-vector-representation": true
   }
 }
