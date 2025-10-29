@@ -44,23 +44,13 @@ target 'JARS' do
   use_expo_modules!
   config = use_native_modules!
 
-  # Force specific pods to be dynamic frameworks so they generate modulemaps
-  # This runs before pod installation to configure how pods are built
-  dynamic_frameworks = [
-    'ExpoModulesCore', 'ExpoFileSystem', 'ExpoHaptics', 'ExpoKeepAwake',
-    'ExpoLocalAuthentication', 'ExpoLocalization', 'ExpoSecureStore', 'ExpoSpeech',
-    'ExpoWebBrowser', 'EXAV', 'EXApplication', 'EXConstants', 'EXNotifications',
-    'EXLocation', 'EXTaskManager', 'EXFont', 'Expo',
-    'Stripe', 'StripeCore', 'StripeUICore', 'StripeApplePay',
-    'StripePayments', 'StripePaymentsUI', 'StripePaymentSheet', 'StripeFinancialConnections',
-    'stripe-react-native', 'lottie-ios', 'lottie-react-native', 'Sentry', 'SentryPrivate'
-  ]
-
+  # Force Stripe + friends to integrate as static frameworks so they can coexist
   pre_install do |installer|
     installer.pod_targets.each do |pod|
-      if dynamic_frameworks.include?(pod.name)
+      if pod.name.start_with?('Stripe')
+        # Tell CocoaPods to treat Stripe pods as static frameworks
         def pod.build_type
-          Pod::BuildType.dynamic_framework
+          Pod::BuildType.static_library
         end
       end
     end
