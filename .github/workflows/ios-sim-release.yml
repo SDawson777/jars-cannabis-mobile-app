@@ -11,73 +11,6 @@ on:
       - "ios/Podfile"
       - "ios/Podfile.lock"
 
-jobs:
-  ios-sim-release:
-    runs-on: macos-14
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
-      # Keep code signing off for simulator
-      CODE_SIGNING_ALLOWED: "NO"
-      CODE_SIGNING_REQUIRED: "NO"
-      RCT_NO_LAUNCH_PACKAGER: "true"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode 16.4
-        run: |
-          sudo xcode-select -s "$DEVELOPER_DIR"
-          xcodebuild -version
-          xcode-select -p
-
-      - name: Print Ruby & gem env
-        run: |
-          ruby -v
-          gem -v
-
-      - name: Install CocoaPods (1.16.2)
-        run: |
-          gem install cocoapods -v 1.16.2 --no-document
-          pod --version
-
-      - name: Cache Pods
-        uses: actions/cache@v4
-        with:
-          path: |
-            ios/Pods
-            ~/Library/Caches/CocoaPods
-            ~/.cocoapods
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}-xcode-16.4
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      - name: Pod install
-        working-directory: ios
-        run: |
-          # Clean any partial state from previous attempts
-          rm -rf build DerivedData
-          pod repo update --silent
-          pod install --repo-update
-
-      - name: Show workspace & schemes
-        working-directory: ios
-        run: |
-          xcodebuild -list -json -workspace JARS.xcworkspace
-
-      - name: Build (Release / Simulator)
-        working-directory: ios
-        run: |
-          set -euo pipefail
-          DERIVED_DATA="$PWD/DerivedData"
-          xcodebuild \
-            -workspace JARS.xcworkspace \
-            -scheme JARS \
-            -configuration Release \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
-            -derivedDataPath "$DERIVED_DATA" \
-            build | xcpretty -c
 name: iOS Pods & Simulator Build (Release)
 
 on:
@@ -158,3 +91,4 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 15' \
             -derivedDataPath "$DERIVED_DATA" \
             build | xcpretty -c
+jobs:
