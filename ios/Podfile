@@ -9,10 +9,118 @@ ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWO
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 
-use_modular_headers!
+# Commented out to force framework-style builds for simulator Swift modulemap visibility
+# use_modular_headers!
 
 install! 'cocoapods',
   :deterministic_uuids => false
+
+post_install do |installer|
+  react_native_post_install(
+    installer,
+    installer.podfile.target_definitions['Pods-JARS']['reactNativePath'],
+    :mac_catalyst_enabled => false
+  )
+
+  # Force all pods to build as dynamic frameworks for simulator so Swift can see modulemaps
+  installer.pods_project.targets.each do |t|
+    t.build_configurations.each do |config|
+      if config.name.include?("Release") || config.name.include?("Debug")
+        config.build_settings['MACH_O_TYPE'] = 'mh_dylib'
+        config.build_settings['CLANG_MODULES_AUTOLINK'] = 'YES'
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+    end
+  end
+
+  # Prevent resource bundles being code-signed when building for device (Xcode 14+)
+  installer.target_installation_results.pod_target_installation_results
+    .each do |pod_name, target_installation_result|
+    target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
+      resource_bundle_target.build_configurations.each do |config|
+        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      end
+    end
+  end
+
+  # Force modern iOS deployment target for all pods to satisfy Xcode 16
+  installer.pods_project.targets.each do |t|
+    t.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
+  end
+
+  # Module visibility + search path fix for Expo & Stripe
+  expo_and_stripe_modules = %w[
+    ExpoModulesCore
+    ExpoFileSystem
+    ExpoHaptics
+    ExpoKeepAwake
+    ExpoLocalAuthentication
+    ExpoLocalization
+    ExpoSecureStore
+    ExpoSpeech
+    ExpoWebBrowser
+    EXAV
+    EXApplication
+    EXConstants
+    EXNotifications
+    EXLocation
+    EXTaskManager
+    EXFont
+    EXConstants-EXConstants
+    Expo
+    Stripe
+    StripeCore
+    StripeUICore
+    StripeApplePay
+    StripePayments
+    StripePaymentsUI
+    StripePaymentSheet
+    StripeFinancialConnections
+    stripe-react-native
+    lottie-ios
+    lottie-react-native
+    Sentry
+    SentryPrivate
+  ]
+
+  installer.pods_project.targets.each do |t|
+    if expo_and_stripe_modules.include?(t.name)
+      t.build_configurations.each do |config|
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+        config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+    end
+  end
+
+  installer.pods_project.targets.each do |t|
+    next unless ['JARS', 'Pods-JARS'].include?(t.name)
+    t.build_configurations.each do |config|
+      config.build_settings['FRAMEWORK_SEARCH_PATHS'] = [
+        '$(inherited)',
+        '${PODS_CONFIGURATION_BUILD_DIR}',
+        '${PODS_CONFIGURATION_BUILD_DIR}/**'
+      ]
+      config.build_settings['HEADER_SEARCH_PATHS'] = [
+        '$(inherited)',
+        '${PODS_CONFIGURATION_BUILD_DIR}',
+        '${PODS_CONFIGURATION_BUILD_DIR}/**',
+        '${PODS_ROOT}/Headers/Public',
+        '${PODS_ROOT}/Headers/Public/**'
+      ]
+      config.build_settings['LIBRARY_SEARCH_PATHS'] = [
+        '$(inherited)',
+        '${PODS_CONFIGURATION_BUILD_DIR}',
+        '${PODS_CONFIGURATION_BUILD_DIR}/**'
+      ]
+    end
+  end
+
+end
 
 prepare_react_native_project!
 
@@ -78,108 +186,7 @@ target 'JARS' do
   # pod 'StripePaymentSheet', :path => 'Vendor/Stripe/StripePaymentSheet'
   # pod 'StripeFinancialConnections', :path => 'Vendor/Stripe/StripeFinancialConnections'
   # END vendored Stripe pods
-
-  post_install do |installer|
-    react_native_post_install(
-      installer,
-      config[:reactNativePath],
-      :mac_catalyst_enabled => false
-    )
-
-    # This is necessary for Xcode 14, because it signs resource bundles by default
-    # when building for devices.
-    installer.target_installation_results.pod_target_installation_results
-      .each do |pod_name, target_installation_result|
-      target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
-        resource_bundle_target.build_configurations.each do |config|
-          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-        end
-      end
-    end
-  
-    # --- Force modern iOS deployment target for all pods to satisfy Xcode 16 ---
-    installer.pods_project.targets.each do |t|
-      t.build_configurations.each do |config|
-        # Match the app/platform line at the top of the Podfile
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
-
-        # Normalize simulator arch settings on Apple Silicon runners
-        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-      end
-    end
-    # --- end deployment target patch ---
-
-    # --- BEGIN module visibility + search path fix for Expo & Stripe ---
-
-    expo_and_stripe_modules = %w[
-      ExpoModulesCore
-      ExpoFileSystem
-      ExpoHaptics
-      ExpoKeepAwake
-      ExpoLocalAuthentication
-      ExpoLocalization
-      ExpoSecureStore
-      ExpoSpeech
-      ExpoWebBrowser
-      EXAV
-      EXApplication
-      EXConstants
-      EXNotifications
-      EXLocation
-      EXTaskManager
-      EXFont
-      EXConstants-EXConstants
-      Expo
-      Stripe
-      StripeCore
-      StripeUICore
-      StripeApplePay
-      StripePayments
-      StripePaymentsUI
-      StripePaymentSheet
-      StripeFinancialConnections
-      stripe-react-native
-      lottie-ios
-      lottie-react-native
-      Sentry
-      SentryPrivate
-    ]
-
-    installer.pods_project.targets.each do |t|
-      if expo_and_stripe_modules.include?(t.name)
-        t.build_configurations.each do |config|
-          config.build_settings['DEFINES_MODULE'] = 'YES'
-          config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
-          config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-        end
-      end
-    end
-
-    # Give app target visibility into these frameworks when building Release for simulator
-    installer.pods_project.targets.each do |t|
-      next unless ['JARS', 'Pods-JARS'].include?(t.name)
-      t.build_configurations.each do |config|
-        config.build_settings['FRAMEWORK_SEARCH_PATHS'] = [
-          '$(inherited)',
-          '${PODS_CONFIGURATION_BUILD_DIR}',
-          '${PODS_CONFIGURATION_BUILD_DIR}/**'
-        ]
-        config.build_settings['HEADER_SEARCH_PATHS'] = [
-          '$(inherited)',
-          '${PODS_CONFIGURATION_BUILD_DIR}',
-          '${PODS_CONFIGURATION_BUILD_DIR}/**',
-          '${PODS_ROOT}/Headers/Public',
-          '${PODS_ROOT}/Headers/Public/**'
-        ]
-        config.build_settings['LIBRARY_SEARCH_PATHS'] = [
-          '$(inherited)',
-          '${PODS_CONFIGURATION_BUILD_DIR}',
-          '${PODS_CONFIGURATION_BUILD_DIR}/**'
-        ]
-      end
-    end
-
-  end
+  # post_install merged into the global post_install above
 
   post_integrate do |installer|
     begin
