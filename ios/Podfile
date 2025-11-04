@@ -9,8 +9,8 @@ ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWO
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 
-# Commented out to force framework-style builds for simulator Swift modulemap visibility
-# use_modular_headers!
+# Keep modular headers enabled to allow Swift pods (Firebase, GoogleUtilities) to generate module maps
+use_modular_headers!
 
 install! 'cocoapods',
   :deterministic_uuids => false
