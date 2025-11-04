@@ -47,9 +47,31 @@ post_install do |installer|
   installer.pods_project.targets.each do |t|
     t.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
     end
   end
+  
+    # Additional build tweaks: disable bitcode and append arm64 exclusion for simulator
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Disable bitcode for pods (optional but sometimes helps)
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+
+        # Exclude arm64 for simulator builds to avoid Apple Silicon vs Intel mismatch
+        if config.name == 'Debug' || config.name == 'Release'
+          existing = config.build_settings['EXCLUDED_ARCHS'] || ''
+          # Keep existing exclusions, then add arm64 for simulator
+          config.build_settings['EXCLUDED_ARCHS'] = "#{existing} arm64"
+        end
+      end
+    end
+
+    # For React Native iOS, sometimes Pods require cocoapods being loaded during post_install
+    begin
+      require 'cocoapods'
+      # ensure frameworks build settings are okay
+    rescue LoadError
+    end
 
   # Module visibility + search path fix for Expo & Stripe
   expo_and_stripe_modules = %w[
