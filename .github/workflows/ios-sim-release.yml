@@ -15,8 +15,6 @@ jobs:
   ios-sim-release:
     runs-on: macos-14
     env:
-      # Use a fixed Xcode on the runner
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
       # Keep code signing off for simulator
       CODE_SIGNING_ALLOWED: "NO"
       CODE_SIGNING_REQUIRED: "NO"
@@ -26,9 +24,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode 16.4
+      - name: Select Xcode
         run: |
-          sudo xcode-select -s "$DEVELOPER_DIR"
+          set -euo pipefail
+          echo "Looking for installed Xcode apps under /Applications..."
+          # Find the newest Xcode app (e.g. /Applications/Xcode_16.4.app or /Applications/Xcode.app)
+          XCODE_APP=$(ls -1 /Applications/Xcode*.app 2>/dev/null | sort -V | tail -n1 || true)
+          if [ -n "$XCODE_APP" ]; then
+            echo "Selecting Xcode at: $XCODE_APP"
+            sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          else
+            echo "No Xcode app found under /Applications; using system default xcode-select"
+          fi
           xcodebuild -version
 
       - name: Print Ruby & gem env
