@@ -16,11 +16,10 @@ install! 'cocoapods',
   :deterministic_uuids => false
 
 post_install do |installer|
-  react_native_post_install(
-    installer,
-    installer.podfile.target_definitions['Pods-JARS']['reactNativePath'],
-    :mac_catalyst_enabled => false
-  )
+  # react_native_post_install requires the reactNativePath from the target's `config`.
+  # We'll call the RN post-install inside the app target's post_install (below) where
+  # `config = use_native_modules!` is available. This top-level post_install focuses on
+  # cross-target build setting adjustments.
 
   # Force all pods to build as dynamic frameworks for simulator so Swift can see modulemaps
   installer.pods_project.targets.each do |t|
@@ -186,7 +185,14 @@ target 'JARS' do
   # pod 'StripePaymentSheet', :path => 'Vendor/Stripe/StripePaymentSheet'
   # pod 'StripeFinancialConnections', :path => 'Vendor/Stripe/StripeFinancialConnections'
   # END vendored Stripe pods
-  # post_install merged into the global post_install above
+  post_install do |installer|
+    # Call RN post-install with the app's reactNativePath (from the target's config)
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+  end
 
   post_integrate do |installer|
     begin
