@@ -2,6 +2,10 @@ require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 platform :ios, '14.0'
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '14.0'
 
 target 'JARS' do
   use_frameworks!
@@ -55,12 +59,8 @@ post_install do |installer|
       end
     end
   end
-
-  # Ensure Firebase Swift pods work with modular headers
-  installer.pods_project.targets.each do |t|
-    if t.name.start_with?('Firebase') || t.name.start_with?('Google')
-      t.build_configurations.each do |config|
-        config.build_settings['DEFINES_MODULE'] = 'YES'
+end
+# --- END merged post_install ---
         config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
       end
     end
