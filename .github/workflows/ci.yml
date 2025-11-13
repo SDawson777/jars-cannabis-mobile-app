@@ -141,19 +141,24 @@ jobs:
           BUILD_OUTPUT=$(eas build --platform android --profile android-preview --non-interactive --clear-cache --json)
           echo "$BUILD_OUTPUT"
           BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '(.[0].id // .id // .buildId // .[0].buildId)')
+          ARTIFACT_URL=$(echo "$BUILD_OUTPUT" | jq -r '(.[0].artifacts.applicationArchiveUrl // .artifacts[0].applicationArchiveUrl // .applicationArchiveUrl)')
           if [ -z "$BUILD_ID" ]; then
             echo "Error: Could not extract build ID from EAS output"
             echo "Build output was: $BUILD_OUTPUT"
             exit 1
           fi
+          if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" = "null" ]; then
+            echo "Error: Could not extract artifact URL from EAS output"
+            echo "Build output was: $BUILD_OUTPUT"
+            exit 1
+          fi
           echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "ARTIFACT_URL=$ARTIFACT_URL" >> $GITHUB_OUTPUT
           echo "✅ Android build completed with ID: $BUILD_ID"
 
       - name: Download EAS Android artifact (APK)
         run: |
-          eas build:artifacts:download \
-            --id "${{ steps.eas_build.outputs.BUILD_ID }}" \
-            --output app-preview.apk
+          curl -L "${{ steps.eas_build.outputs.ARTIFACT_URL }}" -o app-preview.apk
           test -f app-preview.apk
           echo "✅ Downloaded APK: app-preview.apk"
 
