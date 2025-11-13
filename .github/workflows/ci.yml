@@ -194,8 +194,9 @@ jobs:
         if: ${{ (env.GCLOUD_PROJECT_ID != '' && env.GCP_SA_KEY_JSON != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
         run: |
           set -euo pipefail
-          # Update device model if Firebase Test Lab removes support in future
-          DEVICE="model=Pixel4,version=30,locale=en,orientation=portrait"
+          # Using Pixel6 with Android 31 for better compatibility and performance
+          # Alternative devices: Pixel5,version=30 or Pixel6,version=32
+          DEVICE="model=Pixel6,version=31,locale=en,orientation=portrait"
           EXIT_CODE=0
           gcloud firebase test android run \
             --type robo \
