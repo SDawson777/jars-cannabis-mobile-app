@@ -133,15 +133,26 @@ jobs:
         run: npx expo prebuild --clean --platform android
 
       - name: Build Android Preview APK (no store creds)
-        run: npx eas-cli@latest build --platform android --profile android-preview --non-interactive --clear-cache
+        id: eas_build
+        run: |
+          BUILD_OUTPUT=$(npx eas-cli@latest build --platform android --profile android-preview --non-interactive --clear-cache --json)
+          echo "$BUILD_OUTPUT"
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id // .buildId // empty')
+          if [ -z "$BUILD_ID" ]; then
+            echo "Error: Could not extract build ID from EAS output"
+            echo "Build output was: $BUILD_OUTPUT"
+            exit 1
+          fi
+          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "✅ Android build completed with ID: $BUILD_ID"
 
-      - name: Download latest EAS Android artifact (APK)
+      - name: Download EAS Android artifact (APK)
         run: |
           npx eas-cli@latest build:download \
-            --latest \
-            --platform android \
-            --output app-preview.apk
+            --id "${{ steps.eas_build.outputs.BUILD_ID }}" \
+            --path app-preview.apk
           test -f app-preview.apk
+          echo "✅ Downloaded APK: app-preview.apk"
 
       - name: Upload APK artifact (preserve)
         uses: actions/upload-artifact@v4
@@ -410,6 +421,7 @@ jobs:
             echo "- Launch: ${{ steps.appetize.outputs.url }}" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Upload succeeded. See 'appetize-response' artifact for details and shareable link." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Summarize Appetize upload (failure)
         if: steps.appetize.outcome == 'failure'
