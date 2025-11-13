@@ -37,7 +37,7 @@ jobs:
             yarn.lock
 
       - name: Install dependencies (Yarn)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Lint
         run: yarn lint

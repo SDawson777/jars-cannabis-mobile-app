@@ -25,14 +25,12 @@ jobs:
           sudo gem install cocoapods --no-document
           pod --version
 
-      - name: Enable Corepack / Yarn 3 / install JS deps
+      - name: Setup Yarn (use system default) / install JS deps
         run: |
           set -euo pipefail
-          corepack enable || true
-          corepack prepare yarn@3.6.1 --activate || true
           node --version || true
           yarn --version || true
-          yarn install --immutable
+          yarn install --frozen-lockfile
 
       # 1. Online pod install: this pulls Stripe from GitHub into ios/Pods/*
       - name: Online pod install to fetch Stripe

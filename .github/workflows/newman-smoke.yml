@@ -33,7 +33,7 @@ jobs:
             yarn.lock
 
       - name: Install dependencies (Yarn)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - run: yarn smoke
       - uses: actions/upload-artifact@v4

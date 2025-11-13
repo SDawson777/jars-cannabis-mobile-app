@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Enable Corepack (Yarn) and activate Yarn 3
+      - name: Setup Yarn (use system default)
         run: |
-          corepack enable || true
-          corepack prepare yarn@3.6.1 --activate || true
+          echo "Using system Yarn version for compatibility"
+          yarn --version
       - name: Use Node 20.19.4
         uses: actions/setup-node@v4
         with:
@@ -44,7 +44,7 @@ jobs:
           fi
           echo '✅ Yarn lockfile verified.'
       - name: Install dependencies (Yarn)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
       - name: Typecheck
         run: yarn typecheck
       - name: Lint
@@ -70,10 +70,10 @@ jobs:
       EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - name: Enable Corepack (Yarn) and activate Yarn 3
+      - name: Setup Yarn (use system default)
         run: |
-          corepack enable || true
-          corepack prepare yarn@3.6.1 --activate || true
+          echo "Using system Yarn version for compatibility"
+          yarn --version
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
@@ -85,7 +85,7 @@ jobs:
           node --version || true
           yarn --version || true
       - name: Install dependencies (Yarn)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Ensure EAS secret GOOGLE_SERVICES_JSON_BASE64
         if: ${{ env.GOOGLE_SERVICES_JSON_BASE64 != '' }}
@@ -209,10 +209,10 @@ jobs:
       GOOGLESERVICE_PLIST_BASE64: ${{ secrets.GOOGLESERVICE_PLIST_BASE64 }}
     steps:
       - uses: actions/checkout@v4
-      - name: Enable Corepack (Yarn) and activate Yarn 3
+      - name: Setup Yarn (use system default)
         run: |
-          corepack enable || true
-          corepack prepare yarn@3.6.1 --activate || true
+          echo "Using system Yarn version for compatibility"
+          yarn --version
       - uses: actions/setup-node@v4
         with:
           node-version: 20.19.4
@@ -224,7 +224,7 @@ jobs:
           node --version || true
           yarn --version || true
       - name: Install dependencies (Yarn)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Verify iOS Podfile exists (fail early)
         run: |

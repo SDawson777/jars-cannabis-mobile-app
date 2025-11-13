@@ -38,10 +38,10 @@ jobs:
           echo '✅ Yarn lockfile verified.'
 
       - name: Install deps (root)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Install deps (backend)
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
         working-directory: backend
 
       # Build APK with EAS
@@ -96,9 +96,7 @@ jobs:
       - name: Build Android APK (EAS)
         run: |
           set -euo pipefail
-          # Ensure Corepack + Yarn Berry is active on the runner before EAS
-          corepack enable || true
-          corepack prepare yarn@3.6.1 --activate || true
+          # Use system default Yarn for EAS compatibility
           yarn --version || true
 
           eas build -p android --profile android-preview --non-interactive --json > build.json
@@ -262,7 +260,7 @@ jobs:
 
       - name: 🚀 Start backend server
         run: |
-          yarn install --immutable
+          yarn install --frozen-lockfile
           yarn start &
           timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
         working-directory: backend
