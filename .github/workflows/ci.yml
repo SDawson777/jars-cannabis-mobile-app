@@ -325,20 +325,66 @@ jobs:
       - name: Upload iOS build to Appetize
         if: ${{ (env.APPETIZE_API_TOKEN != '') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
         id: appetize
+        continue-on-error: true
         run: |
           set -euo pipefail
-          sudo apt-get update -y && sudo apt-get install -y jq
+          
+          # Cross-platform jq installation
+          if command -v jq >/dev/null 2>&1; then
+            echo "jq already available"
+          elif [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install jq 2>/dev/null || { echo "jq installation failed, continuing without..."; }
+          else
+            echo "Warning: jq not available on this platform"
+          fi
+          
+          # Find the correct iOS simulator file
+          if [ -f "ios/build/JARS-simulator.zip" ]; then
+            IOS_FILE="ios/build/JARS-simulator.zip"
+          elif [ -f "ios-simulator.tar.gz" ]; then
+            IOS_FILE="ios-simulator.tar.gz"
+          elif [ -f "ios-simulator.zip" ]; then
+            IOS_FILE="ios-simulator.zip"
+          else
+            echo "Error: No iOS simulator build file found"
+            echo "Available files:"
+            find . -name "*.zip" -o -name "*.tar.gz" | head -10
+            exit 1
+          fi
+          
+          echo "Using iOS file: $IOS_FILE"
           PUBLIC_FLAG="${APPETIZE_PUBLIC:-false}"
-          RESP_JSON=$(curl -sS -X POST https://api.appetize.io/v2/apps \
-            -H "Authorization: Bearer ${APPETIZE_API_TOKEN}" \
-            -H "Content-Type: multipart/form-data" \
-            -F "platform=ios" \
-            -F "file=@ios-simulator.tar.gz" \
-            -F "note=Jars iOS Simulator build ${GITHUB_SHA}" \
-            -F "public=${PUBLIC_FLAG}")
-          echo "${RESP_JSON}" > appetize_response.json
-          PUBLIC_KEY=$(echo "$RESP_JSON" | jq -r '.publicKey // empty')
-          DASH_URL=$(echo "$RESP_JSON" | jq -r '.dashboardUrl // .publicURL // .appURL // empty')
+          
+          # Upload to Appetize with proper error handling
+          if command -v jq >/dev/null 2>&1; then
+            RESP_JSON=$(curl -sS -X POST https://api.appetize.io/v2/apps \
+              -H "Authorization: Bearer ${APPETIZE_API_TOKEN}" \
+              -H "Content-Type: multipart/form-data" \
+              -F "platform=ios" \
+              -F "file=@${IOS_FILE}" \
+              -F "note=Jars iOS Simulator build ${GITHUB_SHA}" \
+              -F "public=${PUBLIC_FLAG}")
+            echo "${RESP_JSON}" > appetize_response.json
+            PUBLIC_KEY=$(echo "$RESP_JSON" | jq -r '.publicKey // empty')
+            DASH_URL=$(echo "$RESP_JSON" | jq -r '.dashboardUrl // .publicURL // .appURL // empty')
+          else
+            # Fallback without jq parsing
+            echo "Uploading without jq parsing..."
+            RESP_JSON=$(curl -sS -X POST https://api.appetize.io/v2/apps \
+              -H "Authorization: Bearer ${APPETIZE_API_TOKEN}" \
+              -H "Content-Type: multipart/form-data" \
+              -F "platform=ios" \
+              -F "file=@${IOS_FILE}" \
+              -F "note=Jars iOS Simulator build ${GITHUB_SHA}" \
+              -F "public=${PUBLIC_FLAG}")
+            echo "${RESP_JSON}" > appetize_response.json
+            PUBLIC_KEY=""
+            DASH_URL=""
+          fi
+          
+          # Set output URL
           if [ -n "$PUBLIC_KEY" ]; then
             APP_URL="https://appetize.io/app/${PUBLIC_KEY}"
           elif [ -n "$DASH_URL" ]; then
@@ -355,15 +401,23 @@ jobs:
           name: appetize-response
           path: appetize_response.json
 
-      - name: Summarize Appetize upload
+      - name: Summarize Appetize upload (success)
         if: steps.appetize.outcome == 'success'
         run: |
-          echo "### Appetize — iOS Simulator" >> $GITHUB_STEP_SUMMARY
+          echo "### Appetize — iOS Simulator ✅" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ -n "${{ steps.appetize.outputs.url }}" ]; then
             echo "- Launch: ${{ steps.appetize.outputs.url }}" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Upload succeeded. See 'appetize-response' artifact for details and shareable link." >> $GITHUB_STEP_SUMMARY
+
+      - name: Summarize Appetize upload (failure)
+        if: steps.appetize.outcome == 'failure'
+        run: |
+          echo "### Appetize — iOS Simulator ⚠️" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Upload failed, but iOS build artifact is still available" >> $GITHUB_STEP_SUMMARY
+          echo "- Download 'ios-simulator-build' artifact for manual testing" >> $GITHUB_STEP_SUMMARY
 
   post-summary:
     needs: [build-android-preview, build-ios-simulator]
