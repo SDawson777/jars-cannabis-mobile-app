@@ -15,7 +15,7 @@
     "firebase-functions": "^4.0.0"
   },
   "devDependencies": {
-    "firebase-tools": "^14.11.0",
+    "firebase-tools": "^14.24.2",
     "typescript": "^4.9.5"
   }
 }

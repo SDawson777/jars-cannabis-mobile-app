@@ -26,7 +26,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLocalAuthentication (13.8.0):
     - ExpoModulesCore
-  - ExpoLocalization (14.8.4):
+  - ExpoLocalization (17.0.7):
     - ExpoModulesCore
   - ExpoModulesCore (1.11.14):
     - glog
@@ -1507,7 +1507,7 @@ SPEC CHECKSUMS:
   ExpoHaptics: c91902e436f3fb0e07aa19acc118018089fa90de
   ExpoKeepAwake: 3b8cf8533b9212500565a1e41fb080fc5af29918
   ExpoLocalAuthentication: 5967317248e27c53f77c61ff5608d74329b4c41d
-  ExpoLocalization: 7423aa1abcc59209dc2ce2b9bb63776a18023a98
+  ExpoLocalization: b852a5d8ec14c5349c1593eca87896b5b3ebfcca
   ExpoModulesCore: 43ebd65adf2c0e6ffb0de24a41f8f7de12829331
   ExpoSecureStore: 4cec57fd2c40dcff05ce2186c39afc1af39d213c
   ExpoSpeech: 46ddff772c2157828e439c1f74a07f10ec20ff5a
@@ -1516,12 +1516,12 @@ SPEC CHECKSUMS:
   FBLazyVector: f64d1e2ea739b4d8f7e4740cde18089cd97fe864
   FBReactNativeSpec: 9f2b8b243131565335437dba74923a8d3015e780
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
-  hermes-engine: 9cecf9953a681df7556b8cc9c74905de8f3293c0
+  glog: 79d13cd7c34b5d0cea5f4ca72c0e6b462ef8fb4d
+  hermes-engine: 6474974cf6baee35ab3383d3307339e7b2aa5534
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   lottie-ios: 3d98679b41fa6fd6aff2352b3953dbd3df8a397e
   lottie-react-native: 40606c0cb47d75632ee673fb370719e8c57f6e16
-  RCT-Folly: cd21f1661364f975ae76b3308167ad66b09f53f5
+  RCT-Folly: 6e635a9ad07c6e3742199742ab2b368826f2e11e
   RCTRequired: ca1d7414aba0b27efcfa2ccd37637edb1ab77d96
   RCTTypeSafety: 678e344fb976ff98343ca61dc62e151f3a042292
   React: e296bcebb489deaad87326067204eb74145934ab

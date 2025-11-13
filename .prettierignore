@@ -8,3 +8,6 @@ coverage
 **/.expo-shared
 **/package-lock.json
 **/yarn.lock
+ios/Pods/
+android/build/
+android/app/build/

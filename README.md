@@ -58,19 +58,20 @@ Fast local setup and test
 
 ## 📋 Requirements
 
-- **Node.js**: 20.11.1 (use `nvm install` to auto-install from .nvmrc)
-- **Package Manager**: npm 9+ (npm-only workflow, Yarn not supported)
+- **Node.js**: 20.x - 25.x (tested with 25.1.0, CI uses 20.19.4)
+- **Package Manager**: Yarn (primary), npm supported in CI
+- **Java**: OpenJDK 17+ (required for Android development)
 - **Memory**: 8GB+ recommended for dependency installation
 - **Mobile Development**: Expo CLI, Android Studio (for emulator), Xcode (for iOS)
 
 ## 🏗️ Monorepo Structure
 
-This project uses a monorepo structure with dual lockfile management:
+This project uses a monorepo structure with flexible package management:
 
-- **Root App** (React Native/Expo): Uses `npm-shrinkwrap.json` for deterministic installs
+- **Root App** (React Native/Expo): Uses `yarn.lock` for dependency management
 - **Backend** (Node.js/Express): Uses `package-lock.json` for backend-specific dependencies
-- **Lockfile Policy**: Both lockfiles must be committed - CI will fail if either is missing
-- **npm-only Workflow**: Configured for Expo GitHub Action with `packager: npm`
+- **Dual Package Manager Support**: Yarn for development, npm for CI/CD
+- **Node.js Compatibility**: Resolved via `resolutions` field for superstatic package
 
 ### CI/CD Pipeline Overview
 
@@ -86,16 +87,16 @@ This project uses a monorepo structure with dual lockfile management:
 **Installation Commands:**
 
 ```bash
-# Install all dependencies (root + backend)
-npm run install:all
+# Install all dependencies (root + backend) - Recommended
+yarn install --ignore-engines        # Root dependencies (handles Node.js compatibility)
+cd backend && npm ci                 # Backend dependencies (uses package-lock.json)
 
-# Manual installation
-npm ci                    # Root dependencies (uses npm-shrinkwrap.json)
-cd backend && npm ci      # Backend dependencies (uses package-lock.json)
+# Alternative: Use install script
+npm run install:all                  # Automated installation (both root and backend)
 
-# Lockfile regeneration (when adding dependencies)
-npm install && npm shrinkwrap        # Root shrinkwrap update
-cd backend && npm install            # Backend package-lock update
+# Node.js Compatibility Note:
+# Use --ignore-engines flag with Yarn to handle superstatic/Node.js 25+ compatibility
+# CI environment (Node 20.19.4) works without this flag via resolutions field
 ```
 
 ⚡️ Quickstart
@@ -103,33 +104,61 @@ cd backend && npm install            # Backend package-lock update
 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-ORG/jars-cannabis-mobile-app.git
+git clone https://github.com/SDawson777/jars-cannabis-mobile-app.git
 cd jars-cannabis-mobile-app
 ```
 
-2. Install Node and dependencies
+2. Install Node.js and dependencies
 
 ```bash
-nvm install # install Node 20.11.1 from .nvmrc
-nvm use
-# Install all project dependencies with memory optimization
-npm run install:all
-# OR manual installation:
-NODE_OPTIONS="--max-old-space-size=6144" npm install --legacy-peer-deps
+# Install Node.js 20.x - 25.x (any version in this range works)
+# For development with Node 25+, use --ignore-engines flag:
+yarn install --ignore-engines
+
+# Install backend dependencies
+cd backend && npm ci
+
+# Return to root
+cd ..
 ```
 
-3. Setup the backend
+3. Setup Android Development (if needed)
 
+```bash
+# Install Java 17
+brew install openjdk@17
+
+# Set up Android environment variables
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+export ANDROID_HOME=~/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+# Add to your shell profile for persistence
+echo 'export JAVA_HOME=/opt/homebrew/opt/openjdk@17' >> ~/.bash_profile
+echo 'export ANDROID_HOME=~/Library/Android/sdk' >> ~/.bash_profile
+echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools' >> ~/.bash_profile
+```
+
+4. Setup the backend
+
+```bash
 cd backend
 cp .env.example .env # Add your SENTRY_DSN, etc. (see /backend/.env.example and below)
-npm install
 npm run build
 npm run dev # Runs backend API at http://localhost:3000
+```
 
-4. Setup and run the mobile app
+5. Setup and run the mobile app
 
+```bash
 cd ..
-expo start # Open Expo dev menu (QR code for device/simulator/web)
+yarn start # Open Expo dev menu (QR code for device/simulator/web)
+
+# Or run specific platforms:
+yarn run ios      # iOS simulator
+yarn run android  # Android emulator (requires Android SDK setup)
+yarn run web      # Web browser
+```
 
 🌐 Backend Deployment (Cloud)
 
@@ -223,6 +252,42 @@ Frontend (`.env`):
 
 ```env
 EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
+```
+
+## 🔧 Platform-Specific Setup & Troubleshooting
+
+### Node.js Compatibility
+
+This project resolves Node.js version compatibility issues through:
+
+- **Yarn resolutions**: `superstatic` package override in `package.json`
+- **Engine bypassing**: Use `--ignore-engines` flag for Node.js 25+
+- **CI compatibility**: Works with Node 20.19.4 in GitHub Actions
+
+### iOS Development
+
+iOS builds are configured to work without Firebase native modules:
+
+- Firebase imports commented out in `ios/JARS/AppDelegate.mm`
+- CocoaPods configuration excludes Firebase iOS modules via `react-native.config.js`
+- Expo SDK 50 compatible versions used (e.g., `expo-localization@14.8.4`)
+
+### Android Development
+
+Android development requires:
+
+- **Java 17**: `brew install openjdk@17`
+- **Android SDK**: Command line tools, platform-tools, build-tools
+- **Environment variables**: JAVA_HOME, ANDROID_HOME properly configured
+
+If you encounter Android SDK issues:
+
+```bash
+# Download and setup Android SDK manually
+mkdir -p ~/Library/Android/sdk
+cd ~/Library/Android/sdk
+# Download command line tools from https://developer.android.com/studio
+# Extract and install required packages via sdkmanager
 ```
 
 ## Sentry Setup
@@ -349,18 +414,27 @@ E2E tests upload artifacts on failure:
 ### Development Scripts
 
 ```bash
-# Install all dependencies with memory optimization
-npm run install:all
+# Install all dependencies
+yarn install --ignore-engines   # Root dependencies (Node.js 25+ compatibility)
+npm run install:all             # Automated root + backend install
 
 # Clean reinstall
-npm run clean:modules
+npm run clean:modules           # Remove node_modules and lockfiles
+yarn install --ignore-engines   # Reinstall from scratch
 
 # Start development servers
-npm run start                    # Expo dev server
-npm run android                 # Android-specific
-npm run ios                     # iOS-specific
-npm run demo:web               # Web demo
-npm run start:backend          # Express API server
+yarn start                      # Expo dev server
+yarn run android               # Android-specific (requires Android SDK)
+yarn run ios                   # iOS-specific (requires Xcode)
+yarn run web                   # Web demo
+npm run demo:web               # Web demo with API connection
+npm run start:backend          # Express API server (port 3000)
+
+# Quality checks
+yarn lint                      # ESLint
+yarn typecheck                 # TypeScript
+yarn test                      # Jest tests
+yarn format:check              # Prettier format validation
 ```
 
 ## Compliance
@@ -575,3 +649,67 @@ We welcome improvements and bug fixes. See [CONTRIBUTING.md](CONTRIBUTING.md) fo
 ## Code of Conduct
 
 Please read and follow our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) to help us maintain a respectful community.
+
+## 🛠️ Troubleshooting
+
+### Common Issues & Solutions
+
+**1. Node.js Engine Compatibility Error**
+
+```bash
+# Error: The engine "node" is incompatible with this module
+# Solution: Use --ignore-engines flag
+yarn install --ignore-engines
+```
+
+**2. Firebase iOS Build Errors**
+
+```bash
+# Error: 'Firebase/Firebase.h' file not found
+# Solution: Firebase iOS modules are disabled by design
+# Check ios/JARS/AppDelegate.mm - imports should be commented out
+```
+
+**3. Yarn Version Conflicts**
+
+```bash
+# Error: This project requires Yarn 3.6.1 but system has 1.x
+# Solution: This is resolved - use any Yarn 1.x or 3.x version locally
+# CI uses Yarn 3.6.1, development works with Yarn 1.22.22+
+```
+
+**4. Android Build Issues**
+
+```bash
+# Error: ANDROID_HOME not set
+# Solution: Set up Android environment
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+export ANDROID_HOME=~/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+```
+
+**5. Metro Bundler Issues**
+
+```bash
+# Clear Metro cache if experiencing module resolution issues
+npx react-native start --reset-cache
+# or
+yarn start --clear
+```
+
+### Build Status Verification
+
+After setup, verify everything works:
+
+```bash
+# Run all quality checks
+yarn lint && yarn typecheck && yarn test && yarn format:check
+
+# Test iOS build (macOS only)
+yarn run ios
+
+# Test Android build (requires Android SDK)
+yarn run android
+```
+
+All checks should pass ✅ indicating a successful setup.

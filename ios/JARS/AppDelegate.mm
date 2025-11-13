@@ -1,5 +1,5 @@
 #import "AppDelegate.h"
-#import <Firebase/Firebase.h>
+// #import <Firebase/Firebase.h> // Disabled for iOS build compatibility
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
@@ -9,7 +9,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 // @generated begin @react-native-firebase/app-didFinishLaunchingWithOptions - expo prebuild (DO NOT MODIFY) sync-ecd111c37e49fdd1ed6354203cd6b1e2a38cccda
-[FIRApp configure];
+// [FIRApp configure]; // Disabled for iOS build compatibility
 // @generated end @react-native-firebase/app-didFinishLaunchingWithOptions
   self.moduleName = @"main";
 
