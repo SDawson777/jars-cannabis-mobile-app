@@ -244,9 +244,15 @@ jobs:
           echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 --decode > ios/JARS/GoogleService-Info.plist
           echo "✅ GoogleService-Info.plist written"
 
-      - name: Verify vendored Stripe exists
+      - name: Check vendored Stripe status
         run: |
-          test -d ios/Vendor/Stripe || { echo '❌ ios/Vendor/Stripe missing. Run "Vendor Stripe Pods" workflow on this branch first.'; exit 1; }
+          if [ -d ios/Vendor/Stripe ]; then
+            echo "✅ Vendored Stripe found - using offline-friendly pod install"
+            echo "USE_VENDORED_STRIPE=true" >> $GITHUB_ENV
+          else
+            echo "⚠️ Vendored Stripe not found - using standard pod install"
+            echo "USE_VENDORED_STRIPE=false" >> $GITHUB_ENV
+          fi
 
       - name: Install CocoaPods
         run: |
@@ -254,13 +260,17 @@ jobs:
           sudo gem install cocoapods --no-document
           pod --version
 
-      - name: Install CocoaPods (offline-friendly with vendored Stripe)
+      - name: Install CocoaPods (with optional vendored Stripe)
         run: |
           set -euo pipefail
           cd ios
-          test -d Vendor/Stripe || { echo '❌ Stripe vendor folder missing. Run Vendor Stripe Pods workflow on this branch.'; exit 1; }
 
-          pod deintegrate || true
+          if [ "$USE_VENDORED_STRIPE" = "true" ]; then
+            echo "Using offline-friendly pod install with vendored Stripe"
+            pod deintegrate || true
+          else
+            echo "Using standard pod install (no vendored Stripe)"
+          fi
 
           attempt_pod_install () {
             pod install --repo-update && return 0
