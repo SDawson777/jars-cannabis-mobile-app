@@ -151,10 +151,9 @@ jobs:
 
       - name: Download EAS Android artifact (APK)
         run: |
-          eas build:download \
-            --platform android \
-            --build-id "${{ steps.eas_build.outputs.BUILD_ID }}" \
-            --path app-preview.apk
+          eas build:artifacts:download \
+            --id "${{ steps.eas_build.outputs.BUILD_ID }}" \
+            --output app-preview.apk
           test -f app-preview.apk
           echo "✅ Downloaded APK: app-preview.apk"
 
