@@ -1,6 +1,6 @@
 # Post-Readiness Extra Tasks & Optional Enhancements
 
-This document tracks optional tasks deferred from the readiness phase. Core readiness is COMPLETE as of 2025-09-27. These are now "extra" enhancements for improved performance, observability, and polish.
+This document tracks optional tasks deferred from the readiness phase. Core readiness is COMPLETE as of 2025-09-27. These are now extra enhancements for improved performance, observability, and polish.
 
 ## Core Readiness Complete (2025-09-27)
 
