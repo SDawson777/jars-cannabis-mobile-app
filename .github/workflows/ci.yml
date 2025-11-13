@@ -140,7 +140,7 @@ jobs:
         run: |
           BUILD_OUTPUT=$(eas build --platform android --profile android-preview --non-interactive --clear-cache --json)
           echo "$BUILD_OUTPUT"
-          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id // .buildId // empty')
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '(.[0].id // .id // .buildId // .[0].buildId)')
           if [ -z "$BUILD_ID" ]; then
             echo "Error: Could not extract build ID from EAS output"
             echo "Build output was: $BUILD_OUTPUT"
