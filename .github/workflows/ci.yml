@@ -135,7 +135,7 @@ jobs:
       - name: Build Android Preview APK (no store creds)
         id: eas_build
         run: |
-          BUILD_OUTPUT=$(npx eas-cli@latest build --platform android --profile android-preview --non-interactive --clear-cache --json)
+          BUILD_OUTPUT=$(npx eas build --platform android --profile android-preview --non-interactive --clear-cache --json)
           echo "$BUILD_OUTPUT"
           BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id // .buildId // empty')
           if [ -z "$BUILD_ID" ]; then
@@ -148,8 +148,9 @@ jobs:
 
       - name: Download EAS Android artifact (APK)
         run: |
-          npx eas-cli@latest build:download \
-            --id "${{ steps.eas_build.outputs.BUILD_ID }}" \
+          npx eas build:download \
+            --platform android \
+            --build-id "${{ steps.eas_build.outputs.BUILD_ID }}" \
             --path app-preview.apk
           test -f app-preview.apk
           echo "✅ Downloaded APK: app-preview.apk"
