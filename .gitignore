@@ -3,6 +3,7 @@ android.keystore
 credentials.json
 android-demo.keystore
 android-demo.keystore.b64
+
 # Node
 node_modules/
 npm-debug.log*
@@ -12,6 +13,7 @@ yarn-error.log*
 # Expo
 .expo/
 .expo-shared/
+dist/
 web-build/
 
 # macOS
@@ -23,7 +25,10 @@ web-build/
 # Environment
 .env
 .env.*
+backend/.env
+backend/.env.*
 !.env.example
+!backend/.env.example
 
 # Firebase logs
 firebase-debug.log
@@ -45,9 +50,3 @@ GoogleService-Info.plist.b64
 
 # Local bin scripts
 bin/
-
-
-# Expo
-.expo
-dist/
-web-build/

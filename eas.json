@@ -4,6 +4,11 @@
     "appVersionSource": "local"
   },
   "build": {
+    "demo": {
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "demo"
+      }
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal",
@@ -34,6 +39,11 @@
         "EXPO_PUBLIC_API_BASE_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
       }
     },
+    "preview": {
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "preview"
+      }
+    },
     "production": {
       "android": {
         "buildType": "app-bundle"
@@ -43,7 +53,8 @@
       "node": "20.19.4",
       "env": {
         "NODE_ENV": "production",
-        "EXPO_PUBLIC_API_BASE_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
+        "EXPO_PUBLIC_API_BASE_URL": "https://nimbus-cannabis-mobile-production.up.railway.app",
+        "EXPO_PUBLIC_APP_ENV": "prod"
       }
     }
   },

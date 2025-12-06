@@ -40,6 +40,7 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
 2. **Local environment setup (≈10 minutes)**
    - Install Node 20 LTS (`nvm use 20.18`) and run `./setup.sh` to install root + backend dependencies, generate Prisma client, and verify toolchains.
    - Copy env templates: `cp .env.example .env` and `cp backend/.env.example backend/.env`, then fill in API URLs, Firebase keys, and Stripe sandbox credentials.
+   - All `.env` and `.env.*` files are gitignored—keep secrets in local files or platform secret managers instead of committing them.
    - Optional but recommended: start Redis locally (Docker compose) to exercise rate limiting, caching, and push backoff logic.
 3. **Running the stack**
    - Backend: `npm run dev:backend` (or `npm --prefix backend run dev`) boots Express on `http://localhost:3000` with health probes at `/api/v1/health` and `/api/v1/ready`.
@@ -54,6 +55,7 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
    - `ARCHITECTURE.md`: systems overview and request lifecycle.
    - `API_CONTRACT.md`: high-level endpoint catalog linked to `backend/openapi.yaml`.
    - `SECURITY_NOTES.md`: current threat model + rotation policies.
+   - `docs/SEEDING.md`: how to seed the database with baseline or demo data.
    - `docs/` directory: historical audits, QA guides, and per-feature implementation notes.
 
 Completing the steps above gives buyers a fully reproducible environment and clear launch path.
