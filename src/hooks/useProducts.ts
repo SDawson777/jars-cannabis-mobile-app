@@ -31,7 +31,7 @@ async function fetchPage(
 export function useProducts(storeId?: string, filter?: string) {
   return useInfiniteQuery<ProductPage, Error>({
     queryKey: ['products', storeId, filter],
-    queryFn: async ({ pageParam = 1, signal }) => {
+    queryFn: async ({ pageParam = 1, signal }: { pageParam?: number; signal?: AbortSignal }) => {
       const cacheKey = `products:${storeId || 'all'}:${filter || 'all'}:${pageParam}`;
       const _state = await NetInfo.fetch();
 

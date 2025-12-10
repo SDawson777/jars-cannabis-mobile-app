@@ -119,13 +119,19 @@ export function useApiConnectivity() {
   });
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(status => {
+    const unsubscribe: unknown = NetInfo.addEventListener(status => {
       setState({
         isConnected: status.isConnected,
         isInternetReachable: status.isInternetReachable,
       });
     });
-    return () => unsubscribe();
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        (unsubscribe as () => void)();
+      } else if (unsubscribe && typeof (unsubscribe as any).remove === 'function') {
+        (unsubscribe as any).remove();
+      }
+    };
   }, []);
 
   return {
