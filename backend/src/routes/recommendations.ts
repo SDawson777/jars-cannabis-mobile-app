@@ -21,15 +21,25 @@ recommendationsRouter.get(
       const cached = await cacheService.get<{ items: any[] }>(cacheKey);
       if (cached) return res.json(cached);
 
-      let items = await prisma.product.findMany({
-        orderBy: { purchasesLast30d: 'desc' },
-        take,
-        include: { variants: true },
-      });
+      let items: any[] = [];
       if (storeId) {
-        const stocked = await prisma.storeProduct.findMany({ where: { storeId: String(storeId) } });
+        const [products, stocked] = await prisma.$transaction([
+          prisma.product.findMany({
+            orderBy: { purchasesLast30d: 'desc' },
+            take,
+            include: { variants: true, stores: true, brandRef: true },
+          }),
+          prisma.storeProduct.findMany({ where: { storeId: String(storeId) } }),
+        ]);
+
         const inStock = new Set(stocked.map(s => s.productId));
-        items = items.sort((a, b) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
+        items = products.sort((a, b) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
+      } else {
+        items = await prisma.product.findMany({
+          orderBy: { purchasesLast30d: 'desc' },
+          take,
+          include: { variants: true, stores: true, brandRef: true },
+        });
       }
       const payload = { items };
       await cacheService.set(cacheKey, payload, RECOMMENDATION_CACHE_TTL);
@@ -62,6 +72,7 @@ recommendationsRouter.get(
         },
         take,
         orderBy: { purchasesLast30d: 'desc' },
+        include: { brandRef: true, variants: true },
       });
       const payload = { items };
       await cacheService.set(cacheKey, payload, RECOMMENDATION_CACHE_TTL);
@@ -147,7 +158,7 @@ recommendationsRouter.get(
         where: whereConditions.length > 0 ? { OR: whereConditions } : {},
         orderBy: { purchasesLast30d: 'desc' },
         take,
-        include: { variants: true },
+        include: { variants: true, brandRef: true },
       });
 
       const payload = {
@@ -229,7 +240,7 @@ recommendationsRouter.get(
           where: whereConditions.length ? { OR: whereConditions } : {},
           orderBy: { purchasesLast30d: 'desc' },
           take,
-          include: { variants: true },
+          include: { variants: true, brandRef: true },
         });
       } catch (_e) {
         // In test context without a seeded DB we still want a successful shape response.

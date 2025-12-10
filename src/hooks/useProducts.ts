@@ -14,9 +14,15 @@ interface ProductPage {
   hasNextPage: boolean;
 }
 
-async function fetchPage(page: number, storeId?: string, filter?: string): Promise<ProductPage> {
+async function fetchPage(
+  page: number,
+  storeId?: string,
+  filter?: string,
+  signal?: AbortSignal
+): Promise<ProductPage> {
   const data = await clientGet<{ products?: CMSProduct[] }>(phase4Client, '/products', {
     params: { page, limit: PAGE_SIZE, storeId, filter },
+    signal,
   });
   const products: CMSProduct[] = data.products ?? [];
   return { products, page, hasNextPage: products.length === PAGE_SIZE };
@@ -25,7 +31,7 @@ async function fetchPage(page: number, storeId?: string, filter?: string): Promi
 export function useProducts(storeId?: string, filter?: string) {
   return useInfiniteQuery<ProductPage, Error>({
     queryKey: ['products', storeId, filter],
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam = 1, signal }) => {
       const cacheKey = `products:${storeId || 'all'}:${filter || 'all'}:${pageParam}`;
       const _state = await NetInfo.fetch();
 
@@ -36,7 +42,7 @@ export function useProducts(storeId?: string, filter?: string) {
       }
 
       try {
-        const data = await fetchPage(pageParam, storeId, filter);
+        const data = await fetchPage(pageParam, storeId, filter, signal);
         await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
         return data;
       } catch (err) {

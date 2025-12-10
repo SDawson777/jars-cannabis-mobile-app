@@ -22,7 +22,7 @@ Required environment variables:
 #### Frontend (.env)
 
 ```bash
-EXPO_PUBLIC_API_BASE_URL=https://your-api-domain.com
+EXPO_PUBLIC_API_URL=https://your-api-domain.com
 EXPO_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
 STRIPE_PUBLISHABLE_KEY=pk_live_your_stripe_key
