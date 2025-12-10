@@ -119,7 +119,7 @@ https://nimbus-cannabis-mobile-production.up.railway.app
 
 💡 To switch backends:
 1. Stop the app (Cmd+C in terminal)
-2. Set EXPO_PUBLIC_API_BASE_URL=<url>
+2. Set EXPO_PUBLIC_API_URL=<url>
 3. Restart with: npm start
 
 Docker Quick Start:

@@ -10,6 +10,7 @@ import logger from '../lib/logger';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 import { authClient } from '../clients/authClient';
+import { registerUnauthorizedHandler } from '../utils/apiClient';
 
 export interface User extends UserProfile {}
 
@@ -56,6 +57,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       deleteSecure('userEmail'),
     ]);
   };
+
+  useEffect(() => {
+    registerUnauthorizedHandler(async () => {
+      await clearAuth();
+      try {
+        await auth().signOut();
+      } catch (err) {
+        logger.warn('auth.sign_out_failed', { error: err });
+      }
+    });
+  }, [clearAuth]);
 
   const isExpired = (t: string) => {
     try {

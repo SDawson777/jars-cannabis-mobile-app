@@ -48,4 +48,4 @@ backend/
 - Ensure `backend/.env` includes all required secrets. Server fails fast during startup if env validation fails.
 - Redis strongly recommended for production to back rate limiting, caching, and push token backoff.
 - Prisma migrations managed via `npm run migrate`. Build process: `npm run build` (tsc + tsc-alias), then `node dist/index.js`.
-- Mobile app configuration via Expo needs API base URL (`EXPO_PUBLIC_API_BASE_URL`) and matching environment settings.
+- Mobile app configuration via Expo needs API base URL (`EXPO_PUBLIC_API_URL`) and matching environment settings.

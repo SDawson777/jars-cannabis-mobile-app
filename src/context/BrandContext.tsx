@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+import { apiRequest } from '../utils/apiClient';
+
 export interface Brand {
   id: string;
   name: string;
@@ -42,25 +44,23 @@ export function BrandProvider({ children }: BrandProviderProps) {
   };
 
   useEffect(() => {
-    loadDefaultBrand();
+    const controller = new AbortController();
+    loadDefaultBrand(controller.signal);
+    return () => controller.abort();
   }, []);
 
-  const loadDefaultBrand = async () => {
+  const loadDefaultBrand = async (signal?: AbortSignal) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Try to fetch the default brand from API
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/brands/default`);
+      const brandData = await apiRequest<Brand>({
+        path: '/api/brands/default',
+        signal,
+        retries: 2,
+      });
 
-      if (response.ok) {
-        const brandData = await response.json();
-        setBrandState(brandData);
-      } else {
-        // Fallback to default brand if API call fails
-        console.warn('Failed to load brand from API, using default');
-        setBrandState(DEFAULT_BRAND);
-      }
+      setBrandState(brandData);
     } catch (err) {
       console.warn('Error loading brand, using default:', err);
       setError(err instanceof Error ? err.message : 'Failed to load brand');

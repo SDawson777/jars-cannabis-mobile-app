@@ -1,4 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
+
+import { apiRequest } from '../utils/apiClient';
 
 // Types matching backend interfaces
 export interface RecommendProductsRequest {
@@ -45,25 +48,27 @@ export interface BudtenderResponse {
  * Hook for getting AI product recommendations
  */
 export function useAiRecommendations() {
+  const controllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort();
+    };
+  }, []);
+
   return useMutation<RecommendationsResponse, Error, RecommendProductsRequest>({
     mutationFn: async (request: RecommendProductsRequest) => {
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/ai/recommend-products`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(request),
-        }
-      );
+      controllerRef.current?.abort();
+      const controller = new AbortController();
+      controllerRef.current = controller;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-        throw new Error(errorData.error || 'Failed to get recommendations');
-      }
-
-      return response.json();
+      return apiRequest<RecommendationsResponse>({
+        path: '/api/ai/recommend-products',
+        method: 'POST',
+        body: request,
+        signal: controller.signal,
+        retries: 2,
+      });
     },
     onError: (error: Error) => {
       console.warn('AI recommendations error:', error.message);
@@ -75,22 +80,27 @@ export function useAiRecommendations() {
  * Hook for AI budtender chat
  */
 export function useAiBudtender() {
+  const controllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort();
+    };
+  }, []);
+
   return useMutation<BudtenderResponse, Error, BudtenderRequest>({
     mutationFn: async (request: BudtenderRequest) => {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/ai/budtender`, {
+      controllerRef.current?.abort();
+      const controller = new AbortController();
+      controllerRef.current = controller;
+
+      return apiRequest<BudtenderResponse>({
+        path: '/api/ai/budtender',
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
+        body: request,
+        signal: controller.signal,
+        retries: 2,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-        throw new Error(errorData.error || 'Failed to get budtender response');
-      }
-
-      return response.json();
     },
     onError: (error: Error) => {
       console.warn('AI budtender error:', error.message);
