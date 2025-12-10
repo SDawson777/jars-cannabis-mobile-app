@@ -119,17 +119,19 @@ export function useApiConnectivity() {
   });
 
   useEffect(() => {
-    const unsubscribe: unknown = NetInfo.addEventListener(status => {
+    type NetInfoUnsubscribe = (() => void) | { remove: () => void };
+    const unsubscribe = NetInfo.addEventListener(status => {
       setState({
         isConnected: status.isConnected,
         isInternetReachable: status.isInternetReachable,
       });
-    });
+    }) as NetInfoUnsubscribe;
+    
     return () => {
       if (typeof unsubscribe === 'function') {
-        (unsubscribe as () => void)();
-      } else if (unsubscribe && typeof (unsubscribe as any).remove === 'function') {
-        (unsubscribe as any).remove();
+        unsubscribe();
+      } else if ('remove' in unsubscribe) {
+        unsubscribe.remove();
       }
     };
   }, []);
