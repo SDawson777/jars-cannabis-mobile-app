@@ -153,6 +153,7 @@ model Product {
   @@index([category])
   @@index([strainType])
   @@index([name])
+  @@index([purchasesLast30d])
 }
 
 model ProductVariant {
@@ -296,6 +297,7 @@ model Order {
   @@index([userId])
   @@index([storeId])
   @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {

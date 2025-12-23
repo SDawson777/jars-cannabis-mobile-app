@@ -23,15 +23,19 @@ dataRouter.post('/data-transparency/export', authRequired, async (req, res, next
       throw new Error('Firebase configuration missing');
     }
     initFirebase();
-    const payload = {
-      profile: await prisma.user.findUnique({ where: { id: uid } }),
-      preferences: await prisma.userPreference.findUnique({ where: { userId: uid } }),
-      accessibility: await prisma.accessibilitySetting.findUnique({ where: { userId: uid } }),
-      orders: await prisma.order.findMany({ where: { userId: uid }, include: { items: true } }),
-      reviews: await prisma.review.findMany({ where: { userId: uid } }),
-      journal: await prisma.journalEntry.findMany({ where: { userId: uid } }),
-      events: await prisma.userEvent.findMany({ where: { userId: uid } }),
-    };
+    // Run related reads in a transaction to perform them in parallel and reduce latency.
+    const [profile, preferences, accessibility, orders, reviews, journal, events] =
+      await prisma.$transaction([
+        prisma.user.findUnique({ where: { id: uid } }),
+        prisma.userPreference.findUnique({ where: { userId: uid } }),
+        prisma.accessibilitySetting.findUnique({ where: { userId: uid } }),
+        prisma.order.findMany({ where: { userId: uid }, include: { items: true } }),
+        prisma.review.findMany({ where: { userId: uid } }),
+        prisma.journalEntry.findMany({ where: { userId: uid } }),
+        prisma.userEvent.findMany({ where: { userId: uid } }),
+      ]);
+
+    const payload = { profile, preferences, accessibility, orders, reviews, journal, events };
 
     const bucket = admin.storage().bucket();
     const file = bucket.file(`exports/${uid}/${job.id}.json`);
