@@ -2,6 +2,7 @@
 import { Platform } from 'react-native';
 
 import { API_BASE_URL } from '../utils/apiConfig';
+import { fetchJson } from '../utils/apiClient';
 
 const API_URL = API_BASE_URL;
 
@@ -12,15 +13,10 @@ export interface PaymentSheetParams {
 }
 
 export async function fetchPaymentSheetParams(): Promise<PaymentSheetParams> {
-  const res = await fetch(`${API_URL}/stripe/payment-sheet`, {
+  return fetchJson<PaymentSheetParams>(`${API_URL}/stripe/payment-sheet`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ platform: Platform.OS }),
+    retries: 2,
   });
-
-  if (!res.ok) {
-    throw new Error('Failed to load payment parameters');
-  }
-
-  return res.json();
 }

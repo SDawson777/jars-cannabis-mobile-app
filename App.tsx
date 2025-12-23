@@ -78,6 +78,7 @@ import OrderHistoryScreen from './src/screens/orders/OrderHistoryScreen';
 import LegalScreen from './src/screens/profile/LegalScreen';
 import { API_BASE_URL } from './src/utils/apiConfig';
 import { getAuthToken } from './src/utils/auth';
+import { fetchJson } from './src/utils/apiClient';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -101,20 +102,18 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 const TOKEN_SYNC_KEY = 'pendingFcmToken';
 
 const syncTokenToBackend = async (token: string, attempt = 0): Promise<void> => {
-  const baseUrl = API_BASE_URL;
+    const baseUrl = API_BASE_URL;
   try {
     const authToken = await getAuthToken();
-    const res = await fetch(`${baseUrl}/profile/push-token`, {
+    await fetchJson(`${baseUrl}/profile/push-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({ token }),
+      retries: 2,
     });
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
     await AsyncStorage.removeItem(TOKEN_SYNC_KEY);
   } catch (err) {
     console.error('Sync token to backend failed:', err);

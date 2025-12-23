@@ -1,6 +1,7 @@
 // Analytics implementation - fallback when @aws-amplify/analytics is not available
 import logger from '../lib/logger';
 import { API_BASE_URL } from '../utils/apiConfig';
+import { fetchJson } from './apiClient';
 
 export function logEvent(name: string, data: Record<string, any>) {
   // In development, log to console via logger
@@ -16,12 +17,11 @@ export function logEvent(name: string, data: Record<string, any>) {
 async function trackEventToBackend(event: string, data: Record<string, any>) {
   try {
     // Don't block on this - just send the event
-    fetch(`${API_BASE_URL}/analytics/track`, {
+    fetchJson(`${API_BASE_URL}/analytics/track`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ event, data }),
+      retries: 0,
     }).catch(error => {
       // Silently fail - analytics shouldn't block the app
       if (__DEV__) {

@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
+import { fetchJson } from '../utils/apiClient';
 
 const BASE_URL = API_BASE_URL;
 
@@ -13,7 +14,7 @@ export interface PaymentPayload {
 }
 
 // eslint-disable-next-line no-undef
-async function authFetch(path: string, options: RequestInit) {
+async function authFetch(path: string, options: RequestInit = {}) {
   const token = await getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -21,11 +22,7 @@ async function authFetch(path: string, options: RequestInit) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-  if (!res.ok) {
-    throw new Error('Request failed');
-  }
-  return res.json();
+  return fetchJson(`${BASE_URL}${path}`, { ...options, headers } as any);
 }
 
 export async function addPaymentMethod(payload: PaymentPayload) {

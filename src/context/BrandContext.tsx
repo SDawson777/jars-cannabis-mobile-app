@@ -55,16 +55,13 @@ export function BrandProvider({ children }: BrandProviderProps) {
       setError(null);
 
       // Try to fetch the default brand from API
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/brands/default`, {
-        signal,
-      });
-
-      if (response.ok) {
-        const brandData = await response.json();
+      try {
+        const brandData = await fetchJson(`${process.env.EXPO_PUBLIC_API_URL}/api/brands/default`, {
+          signal,
+        });
         setBrandState(brandData);
-      } else {
-        // Fallback to default brand if API call fails
-        console.warn('Failed to load brand from API, using default');
+      } catch (e) {
+        console.warn('Failed to load brand from API, using default', e);
         setBrandState(DEFAULT_BRAND);
       }
     } catch (err) {

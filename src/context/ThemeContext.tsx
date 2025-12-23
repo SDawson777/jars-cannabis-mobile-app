@@ -1,6 +1,7 @@
 // src/context/ThemeContext.tsx
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'expo-localization';
+import { fetchJson } from '../utils/apiClient';
 import * as Location from 'expo-location';
 import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
@@ -224,9 +225,36 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             `?lat=${latitude}&lon=${longitude}` +
             `&appid=${EXPO_PUBLIC_OPENWEATHER_KEY}` +
             `&units=${units}`;
-          const resp = await fetch(url);
-          if (!resp.ok) {
-            const reason = `OpenWeather request failed with status ${resp.status}; using time-based theme.`;
+          try {
+            const data = await fetchJson<any>(url, { retries: 1 });
+            const current = data.main?.temp as number | undefined;
+            const clouds = data.clouds?.all as number | undefined; // percent
+            const weatherCondition = data.weather?.[0]?.main?.toLowerCase() || 'unknown';
+
+            // Update debug info with successful OpenWeather data
+            currentDebugInfo = {
+              weatherSource: 'openweather',
+              lastUpdated: new Date(),
+              actualTemperature: current,
+              actualCondition: weatherCondition,
+              cloudCover: clouds,
+              location: { lat: latitude, lon: longitude },
+            };
+
+            if (current !== undefined) {
+              if (usesImperial) {
+                if (current < COOL_THRESHOLD_IMPERIAL) temp = 'cool';
+                else if (current > WARM_THRESHOLD_IMPERIAL) temp = 'warm';
+                else temp = 'neutral';
+              } else {
+                if (current < COOL_THRESHOLD_METRIC) temp = 'cool';
+                else if (current > WARM_THRESHOLD_METRIC) temp = 'warm';
+                else temp = 'neutral';
+              }
+            }
+          } catch (err) {
+            const status = (err && (err as any).status) || 'unknown';
+            const reason = `OpenWeather request failed with status ${status}; using time-based theme.`;
             logger.warn(reason);
 
             // Log fallback event
@@ -254,33 +282,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             return;
           }
 
-          const data = await resp.json();
-          const current = data.main?.temp as number | undefined;
-          const clouds = data.clouds?.all as number | undefined; // percent
-          const weatherCondition = data.weather?.[0]?.main?.toLowerCase() || 'unknown';
-
-          // Update debug info with successful OpenWeather data
-          currentDebugInfo = {
-            weatherSource: 'openweather',
-            lastUpdated: new Date(),
-            actualTemperature: current,
-            actualCondition: weatherCondition,
-            cloudCover: clouds,
-            location: { lat: latitude, lon: longitude },
-          };
-
-          if (current !== undefined) {
-            // 5a. Apply temperature thresholds
-            if (usesImperial) {
-              if (current < COOL_THRESHOLD_IMPERIAL) temp = 'cool';
-              else if (current > WARM_THRESHOLD_IMPERIAL) temp = 'warm';
-              else temp = 'neutral';
-            } else {
-              if (current < COOL_THRESHOLD_METRIC) temp = 'cool';
-              else if (current > WARM_THRESHOLD_METRIC) temp = 'warm';
-              else temp = 'neutral';
-            }
-          }
+          // handled above in try/catch
 
           if (clouds !== undefined) {
             // 5b. Adjust based on cloudiness
