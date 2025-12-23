@@ -199,8 +199,8 @@ try {
 }
 
 // Register routers under both /api and /api/v1 for compatibility with tests and older clients
+// AI router mounted at /ai subpath to match mobile client expectations
 const routers = [
-  aiRouter,
   authRouter,
   brandsRouter,
   profileRouter,
@@ -230,6 +230,10 @@ for (const r of routers) {
   app.use('/api', r);
   app.use('/api/v1', r);
 }
+
+// Mount AI router separately at /ai subpath
+app.use('/api/ai', aiRouter);
+app.use('/api/v1/ai', aiRouter);
 if (isDebugEnabled) app.use('/api/v1', qaRouter);
 
 // Global error handler so nothing crashes

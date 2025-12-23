@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 
 export interface Brand {
   id: string;
@@ -42,16 +42,22 @@ export function BrandProvider({ children }: BrandProviderProps) {
   };
 
   useEffect(() => {
-    loadDefaultBrand();
-  }, []);
+    const controller = new AbortController();
+    loadDefaultBrand(controller.signal);
 
-  const loadDefaultBrand = async () => {
+    return () => {
+      controller.abort();
+    };
+  }, []);
+  const loadDefaultBrand = async (signal?: AbortSignal) => {
     try {
       setLoading(true);
       setError(null);
 
       // Try to fetch the default brand from API
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/brands/default`);
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/brands/default`, {
+        signal,
+      });
 
       if (response.ok) {
         const brandData = await response.json();

@@ -43,7 +43,7 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
    - Optional but recommended: start Redis locally (Docker compose) to exercise rate limiting, caching, and push backoff logic.
 3. **Running the stack**
    - Backend: `npm run dev:backend` (or `npm --prefix backend run dev`) boots Express on `http://localhost:3000` with health probes at `/api/v1/health` and `/api/v1/ready`.
-   - Mobile: `npm run start` (Expo) for the dev menu, or `npm run ios` / `npm run android` for platform targets. Point `EXPO_PUBLIC_API_BASE_URL` to your backend URL.
+   - Mobile: `npm run start` (Expo) for the dev menu, or `npm run ios` / `npm run android` for platform targets. Point `EXPO_PUBLIC_API_URL` to your backend URL.
 4. **Quality gates before merging/deploying**
    - `npm run lint`, `npm run typecheck`, `npm test`, `npm --prefix backend run test:ci`, and `npm run smoke` (Postman collection) must all pass.
    - For release tags, also run `npm run test:e2e:smoke` (Detox) and build store binaries via `eas build --profile production --platform ios|android`.
@@ -325,7 +325,7 @@ openssl rand -base64 48
 Frontend (`.env`):
 
 ```env
-EXPO_PUBLIC_API_BASE_URL=http://localhost:3000
+EXPO_PUBLIC_API_URL=http://localhost:3000
 ```
 
 ## 🔧 Platform-Specific Setup & Troubleshooting
