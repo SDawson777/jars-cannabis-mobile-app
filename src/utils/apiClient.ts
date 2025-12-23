@@ -1,3 +1,14 @@
+/**
+ * Centralized fetch helper for the app.
+ *
+ * Features:
+ * - Retry logic for transient failures
+ * - Normalized ApiError envelope
+ * - Per-request and global unauthorized (401) handlers
+ * - Offline fast-fail via NetInfo
+ *
+ * Use `fetchJson(url, { retries, retryDelayMs, onUnauthorized })`.
+ */
 import NetInfo from '@react-native-community/netinfo';
 
 export type ApiError = {
@@ -7,31 +18,43 @@ export type ApiError = {
   status?: number;
 };
 
-type FetchOptions = RequestInit & {
+type FetchOptions = Record<string, any> & {
   retries?: number;
   retryDelayMs?: number;
   onUnauthorized?: () => void;
 };
 
 async function delay(ms: number) {
-  return new Promise((res) => setTimeout(res, ms));
+  return new Promise(res => setTimeout(res, ms));
 }
 
 export async function fetchJson<T = any>(url: string, options: FetchOptions = {}): Promise<T> {
   const { retries = 1, retryDelayMs = 400, onUnauthorized, signal, ...rest } = options;
 
-  // Offline fast-fail
+  // Offline fast-fail: call NetInfo.fetch and only throw when it explicitly reports offline.
+  let netInfoState: any | undefined;
   try {
-    const net = await NetInfo.fetch();
-    if (!net.isConnected) throw { message: 'Offline', code: 'offline' } as ApiError;
+    netInfoState = await NetInfo.fetch();
   } catch (_err) {
-    // NetInfo may fail on web; ignore and continue
+    // NetInfo may fail on some platforms (web/testing). In that case, don't assume offline.
+    netInfoState = undefined;
+  }
+  if (netInfoState && netInfoState.isConnected === false) {
+    throw { message: 'Offline', code: 'offline' } as ApiError;
   }
 
   let attempt = 0;
   while (true) {
     try {
-      const resp = await fetch(url, { signal, ...rest });
+      // Avoid passing `signal: undefined` into fetch to preserve call-site shapes in tests.
+      const opts: any = { ...rest };
+      if (signal) opts.signal = signal;
+      const resp = Object.keys(opts).length ? await fetch(url, opts) : await fetch(url as any);
+
+      // Defensive: if fetch resolves to a falsy/undefined response, normalize error
+      if (!resp) {
+        throw { message: 'No response from fetch', code: 'no_response' } as ApiError;
+      }
 
       if (resp.status === 401) {
         // Call per-request handler first, then global handler if present
@@ -83,8 +106,8 @@ export function useOffline() {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   useEffect(() => {
     let mounted = true;
-    NetInfo.fetch().then((s) => mounted && setIsOnline(!!s.isConnected));
-    const unsub = NetInfo.addEventListener((s) => mounted && setIsOnline(!!s.isConnected));
+    NetInfo.fetch().then(s => mounted && setIsOnline(!!s.isConnected));
+    const unsub = NetInfo.addEventListener(s => mounted && setIsOnline(!!s.isConnected));
     return () => {
       mounted = false;
       unsub();
@@ -105,4 +128,3 @@ export function setOnUnauthorizedGlobal(fn: (() => void) | null) {
 export function getOnUnauthorizedGlobal() {
   return onUnauthorizedGlobal;
 }
-

@@ -1,9 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react-native';
 
 import { useWeatherRecommendations, mapWeatherCondition } from '../useWeatherRecommendations';
-
-// Mock fetch
-global.fetch = jest.fn();
+import * as apiClient from '../../utils/apiClient';
 
 describe('useWeatherRecommendations', () => {
   beforeEach(() => {
@@ -38,10 +36,7 @@ describe('useWeatherRecommendations', () => {
       ],
     };
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockResponse,
-    });
+    jest.spyOn(apiClient, 'fetchJson').mockResolvedValueOnce(mockResponse as any);
 
     const { result } = renderHook(() => useWeatherRecommendations({ condition: 'sunny' }));
 
@@ -53,17 +48,15 @@ describe('useWeatherRecommendations', () => {
 
     expect(result.current.data).toEqual(mockResponse);
     expect(result.current.error).toBeNull();
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(apiClient.fetchJson).toHaveBeenCalledWith(
       '/api/recommendations/weather?condition=sunny&limit=24'
     );
   });
 
   it('should handle fetch error', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      json: async () => ({ error: 'Invalid weather condition' }),
-    });
+    jest
+      .spyOn(apiClient, 'fetchJson')
+      .mockRejectedValueOnce({ message: 'Invalid weather condition' });
 
     const { result } = renderHook(() => useWeatherRecommendations({ condition: 'invalid' }));
 
@@ -76,10 +69,14 @@ describe('useWeatherRecommendations', () => {
   });
 
   it('should include location parameters when provided', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ condition: 'sunny', tags: [], description: '', products: [] }),
-    });
+    jest
+      .spyOn(apiClient, 'fetchJson')
+      .mockResolvedValueOnce({
+        condition: 'sunny',
+        tags: [],
+        description: '',
+        products: [],
+      } as any);
 
     const { result } = renderHook(() =>
       useWeatherRecommendations({
@@ -94,7 +91,7 @@ describe('useWeatherRecommendations', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(apiClient.fetchJson).toHaveBeenCalledWith(
       '/api/recommendations/weather?condition=sunny&limit=12&city=Denver&state=CO'
     );
   });

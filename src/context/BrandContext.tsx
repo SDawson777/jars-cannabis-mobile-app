@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { fetchJson } from '../utils/apiClient';
 
 export interface Brand {
   id: string;

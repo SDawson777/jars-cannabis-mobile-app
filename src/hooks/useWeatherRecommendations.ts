@@ -58,7 +58,15 @@ export function useWeatherRecommendations(
       );
       setData(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch weather recommendations');
+      // Normalise ApiError-like objects thrown by fetchJson
+      // so caller tests and UIs get a readable message.
+      const msg =
+        err instanceof Error
+          ? err.message
+          : err && (err as any).message
+            ? (err as any).message
+            : 'Failed to fetch weather recommendations';
+      setError(msg);
       setData(null);
     } finally {
       setIsLoading(false);
