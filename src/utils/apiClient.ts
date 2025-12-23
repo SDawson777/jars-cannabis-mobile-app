@@ -119,13 +119,21 @@ export function useApiConnectivity() {
   });
 
   useEffect(() => {
+    type NetInfoUnsubscribe = (() => void) | { remove: () => void };
     const unsubscribe = NetInfo.addEventListener(status => {
       setState({
         isConnected: status.isConnected,
         isInternetReachable: status.isInternetReachable,
       });
-    });
-    return () => unsubscribe();
+    }) as NetInfoUnsubscribe;
+    
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      } else if ('remove' in unsubscribe) {
+        unsubscribe.remove();
+      }
+    };
   }, []);
 
   return {
