@@ -11,6 +11,7 @@ import logger from '../lib/logger';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 import { authClient } from '../clients/authClient';
+import { registerUnauthorizedHandler } from '../utils/apiClient';
 
 export interface User extends UserProfile {}
 

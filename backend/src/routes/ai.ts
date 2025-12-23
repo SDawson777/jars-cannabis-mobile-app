@@ -35,7 +35,7 @@ interface BudtenderRequest {
  * POST /ai/recommend-products
  * AI-powered product recommendations based on user preferences
  */
-router.post('/recommend-products', async (req, res) => {
+router.post('/ai/recommend-products', async (req, res) => {
   try {
     const { desiredEffects, experienceLevel, budgetLevel, preferredCategories } =
       req.body as RecommendProductsRequest;
@@ -58,6 +58,7 @@ router.post('/recommend-products', async (req, res) => {
     // Get products from database with store pricing
     const products = await prisma.product.findMany({
       include: {
+        brandRef: true,
         variants: {
           where: { active: true },
           select: { id: true, name: true, price: true, active: true },
@@ -189,7 +190,7 @@ router.post('/recommend-products', async (req, res) => {
  * POST /ai/budtender
  * AI budtender chat assistant
  */
-router.post('/budtender', async (req, res) => {
+router.post('/ai/budtender', async (req, res) => {
   try {
     const { message, history = [] } = req.body as BudtenderRequest;
 

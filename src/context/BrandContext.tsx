@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { fetchJson } from '../utils/apiClient';
 
+import { apiRequest } from '../utils/apiClient';
+
 export interface Brand {
   id: string;
   name: string;

@@ -1,6 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRef, useEffect } from 'react';
 import { fetchJson } from '../utils/apiClient';
+
+import { apiRequest } from '../utils/apiClient';
 
 // Types matching backend interfaces
 export interface RecommendProductsRequest {
