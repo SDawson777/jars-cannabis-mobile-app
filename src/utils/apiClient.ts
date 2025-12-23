@@ -34,7 +34,9 @@ export async function fetchJson<T = any>(url: string, options: FetchOptions = {}
       const resp = await fetch(url, { signal, ...rest });
 
       if (resp.status === 401) {
+        // Call per-request handler first, then global handler if present
         onUnauthorized?.();
+        if (typeof onUnauthorizedGlobal === 'function') onUnauthorizedGlobal();
         throw { message: 'Unauthorized', status: 401 } as ApiError;
       }
 
@@ -92,3 +94,15 @@ export function useOffline() {
 }
 
 export default fetchJson;
+
+// Global handler registration for 401 -> allow AuthProvider to register auto-logout
+let onUnauthorizedGlobal: (() => void) | null = null;
+
+export function setOnUnauthorizedGlobal(fn: (() => void) | null) {
+  onUnauthorizedGlobal = fn;
+}
+
+export function getOnUnauthorizedGlobal() {
+  return onUnauthorizedGlobal;
+}
+

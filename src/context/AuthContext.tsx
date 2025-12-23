@@ -6,6 +6,7 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { Alert } from 'react-native';
 
 import { useUserProfile, UserProfile } from '../api/hooks/useUserProfile';
+import { setOnUnauthorizedGlobal } from '../utils/apiClient';
 import logger from '../lib/logger';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
@@ -56,6 +57,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       deleteSecure('userEmail'),
     ]);
   };
+
+  // Register global unauthorized handler so API utilities can auto-logout
+  useEffect(() => {
+    setOnUnauthorizedGlobal(() => {
+      // best-effort: clear auth and notify user
+      clearAuth().catch(() => {});
+    });
+    return () => setOnUnauthorizedGlobal(null);
+  }, []);
 
   const isExpired = (t: string) => {
     try {
