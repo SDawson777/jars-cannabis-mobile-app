@@ -6,6 +6,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Sentry from '@sentry/react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { asyncStoragePersister } from './src/config/queryClient';
 // Preload cart hook early to hydrate store & cache
 import { useCart } from './src/hooks/useCart';
 import React, { useEffect, useState } from 'react';
@@ -78,7 +80,8 @@ import OrderHistoryScreen from './src/screens/orders/OrderHistoryScreen';
 import LegalScreen from './src/screens/profile/LegalScreen';
 import { API_BASE_URL } from './src/utils/apiConfig';
 import { getAuthToken } from './src/utils/auth';
-import { fetchJson } from './src/utils/apiClient';
+import { fetchJson, setOnForbiddenGlobal, setOnServerErrorGlobal } from './src/utils/apiClient';
+import AppErrorHandlers from './src/components/AppErrorHandlers';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -214,6 +217,12 @@ function App() {
                   <CMSPreviewProvider>
                     <AuthProvider>
                       <QueryClientProvider client={queryClient}>
+                        <PersistQueryClientProvider
+                          client={queryClient}
+                          persistOptions={{ persister: asyncStoragePersister }}
+                        >
+                          {/* Global API error handlers (403 => permission modal, 500 => toast) */}
+                          <AppErrorHandlers />
                         <OfflineNotice />
                         {!notificationsEnabled && (
                           <View
@@ -345,6 +354,7 @@ function App() {
                             </Stack.Navigator>
                           </View>
                         </NavigationContainer>
+                        </PersistQueryClientProvider>
                       </QueryClientProvider>
                     </AuthProvider>
                   </CMSPreviewProvider>

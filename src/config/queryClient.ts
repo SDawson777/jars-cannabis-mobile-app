@@ -14,10 +14,7 @@ export const asyncStoragePersister = createAsyncStoragePersister({
 });
 
 // Custom network mode resolver
-const isOnline = async (): Promise<boolean> => {
-  const state = await NetInfo.fetch();
-  return state.isConnected ?? true;
-};
+// (removed unused isOnline helper - NetInfo listener below handles connectivity)
 
 export const queryClient = new QueryClient({
   defaultOptions: {

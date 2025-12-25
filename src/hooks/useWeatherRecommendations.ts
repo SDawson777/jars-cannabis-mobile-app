@@ -36,11 +36,10 @@ export function useWeatherRecommendations(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRecommendations = useCallback(async () => {
+  const fetchRecommendations = useCallback(async (signal?: AbortSignal) => {
     if (!condition || !enabled) {
       return;
     }
-
     setIsLoading(true);
     setError(null);
 
@@ -54,10 +53,15 @@ export function useWeatherRecommendations(
       if (state) params.append('state', state);
 
       const result = await fetchJson<WeatherRecommendationsResponse>(
-        `/api/recommendations/weather?${params.toString()}`
+        `/api/recommendations/weather?${params.toString()}`,
+        { signal }
       );
       setData(result);
     } catch (err) {
+      if ((err as any)?.name === 'AbortError') {
+        // Fetch was aborted, bail silently
+        return;
+      }
       // Normalise ApiError-like objects thrown by fetchJson
       // so caller tests and UIs get a readable message.
       const msg =
@@ -71,10 +75,14 @@ export function useWeatherRecommendations(
     } finally {
       setIsLoading(false);
     }
+
   }, [condition, city, state, limit, enabled]);
 
   useEffect(() => {
-    fetchRecommendations();
+    const controller = new AbortController();
+    // fire-and-forget; allow cleanup to cancel
+    void fetchRecommendations(controller.signal);
+    return () => controller.abort();
   }, [fetchRecommendations]);
 
   return {
