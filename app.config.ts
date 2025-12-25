@@ -64,11 +64,9 @@ const config: ExpoConfig = {
   // Manual app versioning (controlled instead of EAS autoIncrement)
   version: '1.0.0',
   extra: {
-    apiUrl: process.env.EXPO_PUBLIC_API_URL,
     eas: {
       projectId: 'f480819a-c0e4-430e-82bc-1a761385db05',
     },
-    apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000',
   },
   ios: {
     bundleIdentifier: 'com.nimbus.cannabis.dev',

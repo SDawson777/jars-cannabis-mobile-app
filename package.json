@@ -55,7 +55,9 @@
     "install:all": "npm ci --legacy-peer-deps && (cd backend && npm ci --legacy-peer-deps)",
     "typecheck": "tsc --noEmit",
     "backend:lint": "npm run lint --prefix backend",
-    "backend:typecheck": "npm run typecheck --prefix backend"
+    "backend:typecheck": "npm run typecheck --prefix backend",
+    "white-label:setup": "bash scripts/white-label-setup.sh",
+    "licenses:check": "npx license-checker --summary > licenses.txt && npx license-checker --production --json > licenses.json"
   },
   "lint-staged": {
     "{*,src/**,!src/terpene_wheel/snippets/**}/*.{js,jsx,ts,tsx}": [

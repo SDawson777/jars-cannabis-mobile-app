@@ -1,0 +1,97 @@
+{
+  "common": {
+    "appName": "Nimbus Cannabis OS",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "auth": {
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "confirmPassword": "Confirm Password",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "verifyOTP": "Verify Code",
+    "resendCode": "Resend Code"
+  },
+  "onboarding": {
+    "welcome": "Welcome to {{appName}}",
+    "ageVerification": "Age Verification",
+    "confirmAge": "I confirm I am 21 years or older",
+    "storeSelection": "Select Your Store"
+  },
+  "shop": {
+    "products": "Products",
+    "categories": "Categories",
+    "brands": "Brands",
+    "cart": "Cart",
+    "addToCart": "Add to Cart",
+    "viewProduct": "View Product",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total"
+  },
+  "cart": {
+    "myCart": "My Cart",
+    "emptyCart": "Your cart is empty",
+    "checkout": "Checkout",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "delivery": "Delivery",
+    "remove": "Remove"
+  },
+  "checkout": {
+    "shippingAddress": "Shipping Address",
+    "paymentMethod": "Payment Method",
+    "reviewOrder": "Review Order",
+    "placeOrder": "Place Order",
+    "orderConfirmation": "Order Confirmation",
+    "orderNumber": "Order #{{number}}"
+  },
+  "profile": {
+    "myProfile": "My Profile",
+    "editProfile": "Edit Profile",
+    "orders": "Orders",
+    "favorites": "Favorites",
+    "addresses": "Addresses",
+    "payments": "Payment Methods",
+    "settings": "Settings",
+    "loyalty": "Loyalty Program",
+    "notifications": "Notifications",
+    "privacy": "Privacy"
+  },
+  "education": {
+    "greenhouse": "Educational Greenhouse",
+    "articles": "Articles",
+    "terpenes": "Terpene Wheel",
+    "community": "Community Garden",
+    "readMore": "Read More"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Please log in to continue",
+    "forbidden": "You don't have permission to perform this action",
+    "serverError": "Server error. Please try again later.",
+    "offline": "You are offline"
+  }
+}

@@ -63,6 +63,18 @@ export async function fetchJson<T = any>(url: string, options: FetchOptions = {}
         throw { message: 'Unauthorized', status: 401 } as ApiError;
       }
 
+      if (resp.status === 403) {
+        // Permission denied - trigger permission modal handler if registered
+        if (typeof onForbiddenGlobal === 'function') onForbiddenGlobal();
+        throw { message: 'Permission denied', status: 403 } as ApiError;
+      }
+
+      if (resp.status >= 500) {
+        // Server error - trigger toast handler if registered
+        if (typeof onServerErrorGlobal === 'function') onServerErrorGlobal(resp.status);
+        throw { message: 'Server error', status: resp.status } as ApiError;
+      }
+
       if (!resp.ok) {
         // Try parse structured error
         let body: any = null;
@@ -120,6 +132,8 @@ export default fetchJson;
 
 // Global handler registration for 401 -> allow AuthProvider to register auto-logout
 let onUnauthorizedGlobal: (() => void) | null = null;
+let onForbiddenGlobal: (() => void) | null = null;
+let onServerErrorGlobal: ((status: number) => void) | null = null;
 
 export function setOnUnauthorizedGlobal(fn: (() => void) | null) {
   onUnauthorizedGlobal = fn;
@@ -127,4 +141,12 @@ export function setOnUnauthorizedGlobal(fn: (() => void) | null) {
 
 export function getOnUnauthorizedGlobal() {
   return onUnauthorizedGlobal;
+}
+
+export function setOnForbiddenGlobal(fn: (() => void) | null) {
+  onForbiddenGlobal = fn;
+}
+
+export function setOnServerErrorGlobal(fn: ((status: number) => void) | null) {
+  onServerErrorGlobal = fn;
 }
