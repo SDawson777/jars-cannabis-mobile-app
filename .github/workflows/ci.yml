@@ -104,17 +104,18 @@ jobs:
             exit 1
           fi
 
-          # Validate shrinkwrap resolves all dependencies
-          npm ls > /dev/null || {
-            echo "❌ Dependency tree mismatch"
-            exit 1
-          }
-
-          echo "✅ Lockfile consistency verified."
+          echo "✅ Lockfile marker verified."
       - name: Install dependencies (root)
         run: npm ci --legacy-peer-deps --omit=optional
       - name: Install dependencies (backend)
         run: npm --prefix backend ci --legacy-peer-deps --omit=optional
+      - name: Verify dependency tree (post-install)
+        run: |
+          npm ls > /dev/null || {
+            echo "❌ Dependency tree mismatch"
+            exit 1
+          }
+          echo "✅ Dependency tree verified."
       - name: Check for modified lockfiles
         run: |
           if ! git diff --exit-code npm-shrinkwrap.json; then
