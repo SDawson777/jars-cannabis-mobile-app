@@ -258,7 +258,7 @@ jobs:
 
   build-ios-simulator:
     needs: test
-    runs-on: macos-latest
+    runs-on: macos-14
     outputs:
       appetize_url: ${{ steps.appetize.outputs.url }}
     env:
@@ -269,6 +269,12 @@ jobs:
       COCOAPODS_DISABLE_STATS: 'true'
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 15.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.4'
+      - name: Print Xcode version
+        run: xcodebuild -version
       - name: Setup Node 20.19.4 (npm cache)
         uses: actions/setup-node@v4
         with:
