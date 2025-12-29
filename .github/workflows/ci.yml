@@ -2,66 +2,6 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      - name: Install
-        run: npm ci
-
-      - name: Validate env example
-        run: npm run validate:env
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Run tests
-        run: npm test -- --runInBand --silent
-
-      - name: Prisma generate (backend)
-        working-directory: backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || '' }}
-        run: npx prisma generate --schema=prisma/schema.prisma
-
-      - name: Prisma migrate deploy (dry-run)
-        working-directory: backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || '' }}
-        run: |
-          if [ -n "$DATABASE_URL" ]; then
-            npx prisma migrate resolve --applied --schema=prisma/schema.prisma || true
-            npx prisma migrate deploy --schema=prisma/schema.prisma || true
-          else
-            echo "Skipping prisma migrate deploy: DATABASE_URL not provided in secrets"
-          fi
-name: CI
-
-on:
-  push:
     branches:
       - main
       - develop
@@ -104,9 +44,9 @@ jobs:
           fi
           echo '✅ npm lockfiles verified.'
       - name: Install dependencies (root)
-        run: npm ci
+        run: npm ci --legacy-peer-deps
       - name: Install dependencies (backend)
-        run: npm --prefix backend ci
+        run: npm --prefix backend ci --legacy-peer-deps
       - name: Typecheck
         run: npm run typecheck
       - name: Lint
@@ -172,9 +112,9 @@ jobs:
 
           echo "✅ Lockfile consistency verified."
       - name: Install dependencies (root)
-        run: npm ci --omit=optional
+        run: npm ci --legacy-peer-deps --omit=optional
       - name: Install dependencies (backend)
-        run: npm --prefix backend ci --omit=optional
+        run: npm --prefix backend ci --legacy-peer-deps --omit=optional
       - name: Check for modified lockfiles
         run: |
           if ! git diff --exit-code npm-shrinkwrap.json; then
@@ -351,25 +291,23 @@ jobs:
             exit 1
           fi
           echo '✅ npm lockfiles verified.'
-      - name: Verify lockfile consistency
+      - name: Install dependencies (root)
+        run: npm ci --legacy-peer-deps --omit=optional
+      - name: Install dependencies (backend)
+        run: npm --prefix backend ci --legacy-peer-deps --omit=optional
+      - name: Verify lockfile consistency (post-install)
         run: |
           if ! grep -q '"picomatch"' npm-shrinkwrap.json; then
             echo "❌ Drift detected: picomatch missing in shrinkwrap."
             echo "Re-run: npm install && npm shrinkwrap"
             exit 1
           fi
-
-          # Validate shrinkwrap resolves all dependencies
+          # Validate installed dependency tree
           npm ls > /dev/null || {
             echo "❌ Dependency tree mismatch"
             exit 1
           }
-
           echo "✅ Lockfile consistency verified."
-      - name: Install dependencies (root)
-        run: npm ci --omit=optional
-      - name: Install dependencies (backend)
-        run: npm --prefix backend ci --omit=optional
       - name: Check for modified lockfiles
         run: |
           if ! git diff --exit-code npm-shrinkwrap.json; then

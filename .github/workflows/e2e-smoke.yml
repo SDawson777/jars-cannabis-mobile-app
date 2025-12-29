@@ -1,12 +1,15 @@
 name: e2e-smoke
-on:
-  push:
-    branches: [main]
-  pull_request:
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
     branches: [main]
 
 env:
-  NODE_OPTIONS: --max-old-space-size=4096
+          # Provide defaults if secrets are not set
+          export OPENAI_API_KEY="${OPENAI_API_KEY:-test-key}"
+          export FIREBASE_PROJECT_ID="${FIREBASE_PROJECT_ID:-test-project}"
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/v1/health; do sleep 1; done'
 
 jobs:
   smoke:
@@ -35,27 +38,25 @@ jobs:
           fi
           echo '✅ npm lockfiles verified.'
 
-      - name: Verify lockfile consistency
+      - name: Install deps (root)
+        run: npm ci --legacy-peer-deps --omit=optional
+
+      - name: Install deps (backend)
+        run: npm --prefix backend ci --legacy-peer-deps --omit=optional
+
+      - name: Verify lockfile consistency (post-install)
         run: |
           if ! grep -q '"picomatch"' npm-shrinkwrap.json; then
             echo "❌ Drift detected: picomatch missing in shrinkwrap."
             echo "Re-run: npm install && npm shrinkwrap"
             exit 1
           fi
-
-          # Validate shrinkwrap resolves all dependencies
+          # Validate installed dependency tree
           npm ls > /dev/null || {
             echo "❌ Dependency tree mismatch"
             exit 1
           }
-
           echo "✅ Lockfile consistency verified."
-
-      - name: Install deps (root)
-        run: npm ci --omit=optional
-
-      - name: Install deps (backend)
-        run: npm --prefix backend ci --omit=optional
 
       - name: Check for modified lockfiles
         run: |
