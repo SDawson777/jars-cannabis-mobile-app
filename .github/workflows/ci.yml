@@ -266,6 +266,7 @@ jobs:
       APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
       APPETIZE_PUBLIC: ${{ vars.APPETIZE_PUBLIC }}
       GOOGLESERVICE_PLIST_BASE64: ${{ secrets.GOOGLESERVICE_PLIST_BASE64 }}
+      COCOAPODS_DISABLE_STATS: 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node 20.19.4 (npm cache)
@@ -367,7 +368,7 @@ jobs:
           fi
 
           attempt_pod_install () {
-            pod install --repo-update && return 0
+            pod install --repo-update --silent && return 0
             return 1
           }
 
@@ -385,13 +386,34 @@ jobs:
         run: |
           set -euo pipefail
           cd ios
-          xcodebuild \
+          LOG_PATH="$PWD/build/xcodebuild.log"
+          rm -f "$LOG_PATH"
+          mkdir -p "$PWD/build"
+
+          if ! xcodebuild \
             -workspace NimbusCannabisOS.xcworkspace \
             -scheme NimbusCannabisOS \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Release \
-            -derivedDataPath build
+            -derivedDataPath build \
+            -quiet \
+            >"$LOG_PATH" 2>&1; then
+            echo "❌ xcodebuild failed. Tail of log:" >&2
+            tail -n 200 "$LOG_PATH" >&2 || true
+            exit 1
+          fi
+
+          echo "✅ xcodebuild succeeded. Tail of log:" 
+          tail -n 60 "$LOG_PATH" || true
+
+      - name: Upload xcodebuild log (artifact)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcodebuild-log
+          path: ios/build/xcodebuild.log
+          if-no-files-found: warn
 
       - name: Package simulator app
         run: |
