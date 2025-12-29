@@ -60,6 +60,7 @@ model Brand {
   updatedAt      DateTime @updatedAt
 
   stores Store[]
+  products Product[] @relation("BrandToProducts")
 
   @@index([slug])
 }
@@ -144,7 +145,7 @@ model Product {
   reviews  Review[]
   journal  JournalEntry[]
   stores   StoreProduct[]
-  brandRef Brand?          @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  brandRef Brand?          @relation("BrandToProducts", fields: [brandId], references: [id], onDelete: SetNull)
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
