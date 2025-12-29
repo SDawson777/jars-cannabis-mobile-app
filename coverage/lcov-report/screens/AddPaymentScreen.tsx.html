@@ -692,7 +692,7 @@ const schema = yup.object({
 &nbsp;
 export default function AddPaymentScreen() {
   const navigation = useNavigation&lt;AddPaymentNavProp&gt;();
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
   const queryClient = useQueryClient();
 &nbsp;
   const form = useForm&lt;PaymentFormData&gt;({
@@ -709,12 +709,12 @@ export default function AddPaymentScreen() {
   }, []);
 &nbsp;
   const bgColor =
-    colorTemp === 'warm' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#FAF8F4' </span>: colorTemp === 'cool' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#F7F9FA' </span>: jarsBackground;
+    colorTemp === 'warm' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#FAF8F4' </span>: colorTemp === 'cool' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#F7F9FA' </span>: brandBackground;
 &nbsp;
   const glowStyle =
     colorTemp === 'warm'
       ? <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
-          shadowColor: jarsPrimary,
+          shadowColor: brandPrimary,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
@@ -790,7 +790,7 @@ export default function AddPaymentScreen() {
 &nbsp;
   return (
     &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}&gt;
-      &lt;View style={[styles.header, { borderBottomColor: jarsSecondary }]}&gt;
+      &lt;View style={[styles.header, { borderBottomColor: brandSecondary }]}&gt;
         &lt;Pressable
           onPress={handleBack}
           style={styles.iconBtn}
@@ -798,15 +798,15 @@ export default function AddPaymentScreen() {
           accessibilityLabel="Go back"
           accessibilityHint="Return to previous screen"
         &gt;
-          &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+          &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
         &lt;/Pressable&gt;
-        &lt;Text style={[styles.headerTitle, { color: jarsPrimary }]}&gt;Add Payment&lt;/Text&gt;
+        &lt;Text style={[styles.headerTitle, { color: brandPrimary }]}&gt;Add Payment&lt;/Text&gt;
         &lt;View style={styles.iconBtn} /&gt;
       &lt;/View&gt;
       &lt;View style={styles.form}&gt;
         {fields.map(f =&gt; (
           &lt;View key={f.name} style={styles.field}&gt;
-            &lt;Text style={[styles.label, { color: jarsSecondary }]}&gt;{f.label}&lt;/Text&gt;
+            &lt;Text style={[styles.label, { color: brandSecondary }]}&gt;{f.label}&lt;/Text&gt;
             {f.name === 'isDefault' ? (
               &lt;Controller
                 control={control}
@@ -821,7 +821,7 @@ export default function AddPaymentScreen() {
                     style={[
                       styles.input,
                       {
-                        borderColor: jarsSecondary,
+                        borderColor: brandSecondary,
                         justifyContent: 'center',
                         flexDirection: 'row',
                       },
@@ -829,7 +829,7 @@ export default function AddPaymentScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={f.label}
                   &gt;
-                    &lt;Text style={{ color: jarsPrimary }}&gt;{value ? <span class="branch-0 cbranch-no" title="branch not covered" >'Yes (Default)' </span>: 'No'}&lt;/Text&gt;
+                    &lt;Text style={{ color: brandPrimary }}&gt;{value ? <span class="branch-0 cbranch-no" title="branch not covered" >'Yes (Default)' </span>: 'No'}&lt;/Text&gt;
                   &lt;/Pressable&gt;
                 )}
               /&gt;
@@ -843,9 +843,9 @@ export default function AddPaymentScreen() {
                   field: { onChange: (value: string) =&gt; void; onBlur: () =&gt; void; value: string };
                 }) =&gt; (
                   &lt;TextInput
-                    style={[styles.input, { borderColor: jarsSecondary, color: jarsPrimary }]}
+                    style={[styles.input, { borderColor: brandSecondary, color: brandPrimary }]}
                     placeholder={f.label}
-                    placeholderTextColor={jarsSecondary}
+                    placeholderTextColor={brandSecondary}
                     keyboardType={f.keyboard as any}
                     secureTextEntry={f.secure}
                     onBlur={onBlur}
@@ -870,7 +870,7 @@ export default function AddPaymentScreen() {
         &lt;Pressable
           style={[
             styles.saveBtn,
-            { backgroundColor: jarsPrimary },
+            { backgroundColor: brandPrimary },
             glowStyle,
             (!isValid || isSubmitting) &amp;&amp; { opacity: 0.5 },
           ]}
@@ -928,7 +928,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

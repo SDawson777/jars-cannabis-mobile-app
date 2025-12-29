@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
@@ -136,7 +136,16 @@
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,6 +160,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -217,19 +235,28 @@ import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSettings } from '../context/SettingsContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
-import { t } from '../utils/i18n';
+import { useTranslation } from '../i18n/useTranslation';
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >LanguageSelectionScreen(</span>) {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation();</span>
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
   const { locale, setLocale } = <span class="cstat-no" title="statement not covered" >useSettings();</span>
+  const { t } = <span class="cstat-no" title="statement not covered" >useTranslation();</span>
   const languages = <span class="cstat-no" title="statement not covered" >[</span>
-    { code: 'en', label: t('english') },
-    { code: 'es', label: t('spanish') },
+    {
+      code: 'en',
+      label:
+        t('common.ok', {}) === 'common.ok'
+          ? 'English'
+          : t('onboarding.welcome', { appName: '' })
+            ? 'English'
+            : 'English',
+    },
+    { code: 'es', label: 'Español' },
   ];
 &nbsp;
   const bgColor =
-<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;</span>
+<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;</span>
 &nbsp;
   const handleSelect = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (code: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    hapticLight();</span>
@@ -239,22 +266,22 @@ export default function <span class="fstat-no" title="function not covered" >Lan
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}&gt;
-      &lt;View style={[styles.header, { borderBottomColor: jarsSecondary }]}&gt;
+      &lt;View style={[styles.header, { borderBottomColor: brandSecondary }]}&gt;
         &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.goBack()}</span>&gt;
-          &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+          &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
         &lt;/Pressable&gt;
-        &lt;Text style={[styles.headerTitle, { color: jarsPrimary }]}&gt;{t('selectLanguage')}&lt;/Text&gt;
+        &lt;Text style={[styles.headerTitle, { color: brandPrimary }]}&gt;{t('selectLanguage')}&lt;/Text&gt;
         &lt;View style={{ width: 24 }} /&gt;
       &lt;/View&gt;
       &lt;View style={styles.content}&gt;
         {languages.map(<span class="fstat-no" title="function not covered" >la</span>ng =&gt; (
 <span class="cstat-no" title="statement not covered" >          &lt;Pressable</span>
             key={lang.code}
-            style={[styles.row, { borderBottomColor: jarsSecondary }]}
+            style={[styles.row, { borderBottomColor: brandSecondary }]}
             onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleSelect(lang.code)}</span>
           &gt;
-            &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;{lang.label}&lt;/Text&gt;
-            {locale === lang.code &amp;&amp; &lt;Text style={{ color: jarsSecondary }}&gt;✓&lt;/Text&gt;}
+            &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;{lang.label}&lt;/Text&gt;
+            {locale === lang.code &amp;&amp; &lt;Text style={{ color: brandSecondary }}&gt;✓&lt;/Text&gt;}
           &lt;/Pressable&gt;
         ))}
       &lt;/View&gt;
@@ -289,7 +316,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

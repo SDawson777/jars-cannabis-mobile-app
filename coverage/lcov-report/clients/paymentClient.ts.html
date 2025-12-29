@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">10% </span>
+                <span class="strong">14.28% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/10</span>
+                <span class='fraction'>1/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">10% </span>
+                <span class="strong">14.28% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/10</span>
+                <span class='fraction'>1/7</span>
             </div>
         
             
@@ -104,7 +104,13 @@
 <a name='L39'></a><a href='#L39'>39</a>
 <a name='L40'></a><a href='#L40'>40</a>
 <a name='L41'></a><a href='#L41'>41</a>
-<a name='L42'></a><a href='#L42'>42</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -128,10 +134,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -139,7 +141,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,6 +157,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { API_BASE_URL } from '../utils/apiConfig';
 import { getAuthToken } from '../utils/auth';
+import { fetchJson } from '../utils/apiClient';
 &nbsp;
 const BASE_URL = API_BASE_URL;
 &nbsp;
@@ -160,7 +171,7 @@ export interface PaymentPayload {
 }
 &nbsp;
 // eslint-disable-next-line no-undef
-async function <span class="fstat-no" title="function not covered" >authFetch(</span>path: string, options: RequestInit) {
+async function <span class="fstat-no" title="function not covered" >authFetch(</span>path: string, options: RequestInit = <span class="branch-0 cbranch-no" title="branch not covered" >{},</span> signal?: AbortSignal) {
   const token = <span class="cstat-no" title="statement not covered" >await getAuthToken();</span>
   const headers = <span class="cstat-no" title="statement not covered" >{</span>
     'Content-Type': 'application/json',
@@ -168,23 +179,27 @@ async function <span class="fstat-no" title="function not covered" >authFetch(</
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 &nbsp;
-  const res = <span class="cstat-no" title="statement not covered" >await fetch(`${BASE_URL}${path}`, { ...options, headers });</span>
-<span class="cstat-no" title="statement not covered" >  if (!res.ok) {</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error('Request failed');</span>
-  }
-<span class="cstat-no" title="statement not covered" >  return res.json();</span>
+<span class="cstat-no" title="statement not covered" >  return fetchJson(`${BASE_URL}${path}`, { ...options, headers, signal } as any);</span>
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >addPaymentMethod(</span>payload: PaymentPayload) {
-<span class="cstat-no" title="statement not covered" >  return authFetch('/payment-methods', { method: 'POST', body: JSON.stringify(payload) });</span>
+export async function <span class="fstat-no" title="function not covered" >addPaymentMethod(</span>payload: PaymentPayload, signal?: AbortSignal) {
+<span class="cstat-no" title="statement not covered" >  return authFetch('/payment-methods', { method: 'POST', body: JSON.stringify(payload) }, signal);</span>
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >updatePaymentMethod(</span>id: string, payload: PaymentPayload) {
-<span class="cstat-no" title="statement not covered" >  return authFetch(`/payment-methods/${id}`, { method: 'PUT', body: JSON.stringify(payload) });</span>
+export async function <span class="fstat-no" title="function not covered" >updatePaymentMethod(</span>
+  id: string,
+  payload: PaymentPayload,
+  signal?: AbortSignal
+) {
+<span class="cstat-no" title="statement not covered" >  return authFetch(</span>
+    `/payment-methods/${id}`,
+    { method: 'PUT', body: JSON.stringify(payload) },
+    signal
+  );
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >getPaymentMethods(</span>) {
-<span class="cstat-no" title="statement not covered" >  return authFetch('/payment-methods', { method: 'GET' });</span>
+export async function <span class="fstat-no" title="function not covered" >getPaymentMethods(</span>signal?: AbortSignal) {
+<span class="cstat-no" title="statement not covered" >  return authFetch('/payment-methods', { method: 'GET' }, signal);</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -193,7 +208,7 @@ export async function <span class="fstat-no" title="function not covered" >getPa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
 &nbsp;
 export default function LegalScreen() {
   const navigation = useNavigation&lt;NavProp&gt;();
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
   const [selected, setSelected] = useState&lt;string | null&gt;(null);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const { data, isLoading, isError } = useLegal();
@@ -529,7 +529,7 @@ export default function LegalScreen() {
   const preferredStore = usePreferredStore((state: any) =&gt; state.preferredStore);
   const userState = preferredStore?.state?.toUpperCase() || <span class="branch-1 cbranch-no" title="branch not covered" >null;</span>
   const bgColor =
-    colorTemp === 'warm' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#FAF8F4' </span>: colorTemp === 'cool' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#F7F9FA' </span>: jarsBackground;
+    colorTemp === 'warm' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#FAF8F4' </span>: colorTemp === 'cool' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#F7F9FA' </span>: brandBackground;
 &nbsp;
   // Fallback for offline or error
   const offline = isError || !data;
@@ -569,16 +569,16 @@ export default function LegalScreen() {
 &nbsp;
   return (
     &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="legal-screen"&gt;
-      &lt;View style={[styles.header, { borderBottomColor: jarsSecondary }]}&gt;
+      &lt;View style={[styles.header, { borderBottomColor: brandSecondary }]}&gt;
         &lt;Pressable
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >            hapticLight();</span>
 <span class="cstat-no" title="statement not covered" >            navigation.goBack();</span>
           }}
         &gt;
-          &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+          &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
         &lt;/Pressable&gt;
-        &lt;Text style={[styles.headerTitle, { color: jarsPrimary }]}&gt;Legal&lt;/Text&gt;
+        &lt;Text style={[styles.headerTitle, { color: brandPrimary }]}&gt;Legal&lt;/Text&gt;
         &lt;View style={{ width: 24 }} /&gt;
       &lt;/View&gt;
 &nbsp;
@@ -587,43 +587,43 @@ export default function LegalScreen() {
           &lt;Pressable
             key={item.id}
             testID={`legal-terms-link-${item.id}`}
-            style={[styles.row, { borderBottomColor: jarsSecondary }]}
+            style={[styles.row, { borderBottomColor: brandSecondary }]}
             onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >              hapticLight();</span>
 <span class="cstat-no" title="statement not covered" >              setSelected(item.id);</span>
             }}
           &gt;
-            &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;{item.label}&lt;/Text&gt;
+            &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;{item.label}&lt;/Text&gt;
           &lt;/Pressable&gt;
         ))}
         &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setShowDisclaimer(true)}</span> style={styles.disclaimerBtn}&gt;
-          &lt;Text style={[styles.disclaimerLink, { color: jarsPrimary }]}&gt;View Disclaimer&lt;/Text&gt;
+          &lt;Text style={[styles.disclaimerLink, { color: brandPrimary }]}&gt;View Disclaimer&lt;/Text&gt;
         &lt;/Pressable&gt;
       &lt;/View&gt;
 &nbsp;
       &lt;Modal visible={!!selected} animationType="slide" onRequestClose={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setSelected(null)}</span>&gt;
         &lt;SafeAreaView style={[styles.modalContainer, { backgroundColor: bgColor }]}&gt;
-          &lt;View style={[styles.header, { borderBottomColor: jarsSecondary }]}&gt;
+          &lt;View style={[styles.header, { borderBottomColor: brandSecondary }]}&gt;
             &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setSelected(null)}</span>&gt;
-              &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+              &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
             &lt;/Pressable&gt;
-            &lt;Text style={[styles.headerTitle, { color: jarsPrimary }]}&gt;
+            &lt;Text style={[styles.headerTitle, { color: brandPrimary }]}&gt;
               {LEGAL_LINKS.find(l =&gt; l.id === selected)?.label}
             &lt;/Text&gt;
             &lt;View style={{ width: 24 }} /&gt;
           &lt;/View&gt;
           &lt;ScrollView contentContainerStyle={styles.modalContent}&gt;
             {isLoading ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >              &lt;ActivityIndicator size="large" color={jarsPrimary} /&gt;</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >              &lt;ActivityIndicator size="large" color={brandPrimary} /&gt;</span>
             ) : (
               &lt;&gt;
                 &lt;RenderHTML
                   contentWidth={width - 32}
                   source={{ html: getModalContent(selected || '').html }}
-                  baseStyle={{ color: jarsSecondary, fontSize: 16 }}
+                  baseStyle={{ color: brandSecondary, fontSize: 16 }}
                 /&gt;
                 {getModalContent(selected || '').lastUpdated &amp;&amp; (
-<span class="branch-1 cbranch-no" title="branch not covered" >                  &lt;Text style={{ color: jarsSecondary, fontSize: 12, marginTop: 12 }}&gt;</span>
+<span class="branch-1 cbranch-no" title="branch not covered" >                  &lt;Text style={{ color: brandSecondary, fontSize: 12, marginTop: 12 }}&gt;</span>
                     Last updated:{' '}
                     {new Date(
                       getModalContent(selected || '').lastUpdated as string
@@ -645,10 +645,10 @@ export default function LegalScreen() {
           &lt;RenderHTML
             contentWidth={width - 64}
             source={{ html: stateNotice }}
-            baseStyle={{ color: jarsSecondary, fontSize: 15 }}
+            baseStyle={{ color: brandSecondary, fontSize: 15 }}
           /&gt;
           {stateNoticeLastUpdated &amp;&amp; (
-            &lt;Text style={{ color: jarsSecondary, fontSize: 12, marginTop: 8 }}&gt;
+            &lt;Text style={{ color: brandSecondary, fontSize: 12, marginTop: 8 }}&gt;
               State notice last updated:{' '}
               {new Date(stateNoticeLastUpdated as string).toLocaleDateString()}
             &lt;/Text&gt;
@@ -676,7 +676,7 @@ export default function LegalScreen() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

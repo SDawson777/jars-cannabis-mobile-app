@@ -557,9 +557,9 @@ type Preferences = {
 type ExportStatus = 'pending' | 'completed' | 'failed';
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >DataTransparencyScreen(</span>) {
-  const { colorTemp, jarsPrimary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
+  const { colorTemp, brandPrimary, brandBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
   const bgColor =
-<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;</span>
+<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;</span>
 &nbsp;
   const [exportId, setExportId] = <span class="cstat-no" title="statement not covered" >useState&lt;string | null&gt;(null);</span>
   const [status, setStatus] = <span class="cstat-no" title="statement not covered" >useState&lt;ExportStatus | null&gt;(null);</span>
@@ -654,14 +654,14 @@ export default function <span class="fstat-no" title="function not covered" >Dat
           &lt;ActivityIndicator style={styles.spinner} /&gt;
         ) : (
           &lt;&gt;
-            &lt;Text style={[styles.sectionTitle, { color: jarsPrimary }]}&gt;Data Preferences&lt;/Text&gt;
+            &lt;Text style={[styles.sectionTitle, { color: brandPrimary }]}&gt;Data Preferences&lt;/Text&gt;
 &nbsp;
             &lt;View style={styles.prefRow}&gt;
-              &lt;Text style={{ color: jarsPrimary }}&gt;Personalized Ads&lt;/Text&gt;
+              &lt;Text style={{ color: brandPrimary }}&gt;Personalized Ads&lt;/Text&gt;
               &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
                 &lt;Button
                   title={prefs.personalizedAds ? 'On' : 'Off'}
-                  color={prefs.personalizedAds ? jarsPrimary : '#CCCCCC'}
+                  color={prefs.personalizedAds ? brandPrimary : '#CCCCCC'}
                   onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleToggle('personalizedAds')}</span>
                   disabled={prefLoading !== null}
                   accessibilityLabel="Toggle personalized ads"
@@ -673,11 +673,11 @@ export default function <span class="fstat-no" title="function not covered" >Dat
             &lt;/View&gt;
 &nbsp;
             &lt;View style={styles.prefRow}&gt;
-              &lt;Text style={{ color: jarsPrimary }}&gt;Email Tracking&lt;/Text&gt;
+              &lt;Text style={{ color: brandPrimary }}&gt;Email Tracking&lt;/Text&gt;
               &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
                 &lt;Button
                   title={prefs.emailTracking ? 'On' : 'Off'}
-                  color={prefs.emailTracking ? jarsPrimary : '#CCCCCC'}
+                  color={prefs.emailTracking ? brandPrimary : '#CCCCCC'}
                   onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleToggle('emailTracking')}</span>
                   disabled={prefLoading !== null}
                   accessibilityLabel="Toggle email tracking"
@@ -687,11 +687,11 @@ export default function <span class="fstat-no" title="function not covered" >Dat
             &lt;/View&gt;
 &nbsp;
             &lt;View style={styles.prefRow}&gt;
-              &lt;Text style={{ color: jarsPrimary }}&gt;Share With Partners&lt;/Text&gt;
+              &lt;Text style={{ color: brandPrimary }}&gt;Share With Partners&lt;/Text&gt;
               &lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
                 &lt;Button
                   title={prefs.shareWithPartners ? 'On' : 'Off'}
-                  color={prefs.shareWithPartners ? jarsPrimary : '#CCCCCC'}
+                  color={prefs.shareWithPartners ? brandPrimary : '#CCCCCC'}
                   onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleToggle('shareWithPartners')}</span>
                   disabled={prefLoading !== null}
                   accessibilityLabel="Toggle share with partners"
@@ -706,7 +706,7 @@ export default function <span class="fstat-no" title="function not covered" >Dat
 &nbsp;
         &lt;Button
           title={loading ? 'Requesting Export...' : 'Request Data Export'}
-          color={jarsPrimary}
+          color={brandPrimary}
           onPress={requestExport}
           disabled={loading || status === 'pending'}
           accessibilityLabel="Request data export"
@@ -715,12 +715,12 @@ export default function <span class="fstat-no" title="function not covered" >Dat
         {(loading || status === 'pending') &amp;&amp; &lt;ActivityIndicator style={styles.spinner} /&gt;}
 &nbsp;
         {status === 'pending' &amp;&amp; (
-          &lt;Text style={[styles.statusText, { color: jarsPrimary }]}&gt;Export pending...&lt;/Text&gt;
+          &lt;Text style={[styles.statusText, { color: brandPrimary }]}&gt;Export pending...&lt;/Text&gt;
         )}
 &nbsp;
         {status === 'completed' &amp;&amp; downloadUrl &amp;&amp; (
           &lt;Text
-            style={[styles.linkText, { color: jarsPrimary }]}
+            style={[styles.linkText, { color: brandPrimary }]}
             onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >Linking.openURL(downloadUrl)}</span>
             accessibilityLabel="Download data export"
             accessible
@@ -731,11 +731,11 @@ export default function <span class="fstat-no" title="function not covered" >Dat
 &nbsp;
         {error &amp;&amp; (
           &lt;View style={styles.errorContainer}&gt;
-            &lt;Text style={[styles.errorText, { color: jarsPrimary }]}&gt;Error: {error}&lt;/Text&gt;
+            &lt;Text style={[styles.errorText, { color: brandPrimary }]}&gt;Error: {error}&lt;/Text&gt;
             &lt;Button
               title="Retry"
               onPress={requestExport}
-              color={jarsPrimary}
+              color={brandPrimary}
               accessibilityLabel="Retry export"
             /&gt;
           &lt;/View&gt;
@@ -769,7 +769,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

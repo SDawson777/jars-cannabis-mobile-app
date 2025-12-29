@@ -32,7 +32,7 @@ function createOrderClient(): ReturnType<typeof axios.create> {
 
 export const orderClient = createOrderClient();
 
-export async function fetchOrders(page = 1): Promise<OrdersResponse> {
+export async function fetchOrders(page = 1, signal?: AbortSignal): Promise<OrdersResponse> {
   interface RawOrdersResponse {
     orders?: Order[];
     pagination?: { page?: number; limit?: number; nextPage?: number };
@@ -41,7 +41,10 @@ export async function fetchOrders(page = 1): Promise<OrdersResponse> {
       pagination?: { page?: number; limit?: number; nextPage?: number };
     };
   }
-  const payload = await clientGet<RawOrdersResponse>(orderClient, '/orders', { params: { page } });
+  const payload = await clientGet<RawOrdersResponse>(orderClient, '/orders', {
+    params: { page },
+    signal,
+  } as any);
   const root = payload.data ?? payload;
   return {
     orders: root.orders ?? [],
@@ -66,7 +69,10 @@ export interface CreateOrderPayload {
   notes?: string;
 }
 
-export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
+export async function createOrder(
+  payload: CreateOrderPayload,
+  signal?: AbortSignal
+): Promise<Order> {
   interface RawCreateOrderResponse {
     order?: Order;
     data?: { order?: Order };
@@ -74,7 +80,8 @@ export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
   const res = await clientPost<CreateOrderPayload, RawCreateOrderResponse>(
     orderClient,
     '/orders',
-    payload
+    payload,
+    { signal } as unknown as any
   );
   return res.order ?? (res.data?.order as Order);
 }

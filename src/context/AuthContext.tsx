@@ -11,7 +11,7 @@ import logger from '../lib/logger';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { saveSecure, getSecure, deleteSecure } from '../utils/secureStorage';
 import { authClient } from '../clients/authClient';
-import { registerUnauthorizedHandler } from '../utils/apiClient';
+// registerUnauthorizedHandler was previously imported but is not used here
 
 export interface User extends UserProfile {}
 
@@ -86,7 +86,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (storedToken) {
           if (isExpired(storedToken)) {
             await clearAuth();
-            Alert.alert('Session expired', 'Please log in again.');
+            try {
+              // Use i18n when available
+              const { t } = require('../i18n/useTranslation');
+              // require returns module with named export; fall back if unavailable
+              const msg =
+                typeof t === 'function' ? t('errors.session_expired') : 'Please log in again.';
+              Alert.alert('Session expired', msg);
+            } catch (_e) {
+              Alert.alert('Session expired', 'Please log in again.');
+            }
           } else {
             const pref = await getSecure('useBiometricAuth');
             if (pref !== 'false') {
@@ -127,7 +136,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                   }
                   hapticHeavy();
                 } else if (!hasHardware) {
-                  Alert.alert('Biometric unlock not available on this device.');
+                  try {
+                    const { t } = require('../i18n/useTranslation');
+                    const msg =
+                      typeof t === 'function'
+                        ? t('errors.biometric_not_available')
+                        : 'Biometric unlock not available on this device.';
+                    Alert.alert(msg);
+                  } catch (_e) {
+                    Alert.alert('Biometric unlock not available on this device.');
+                  }
                 }
               } catch (bioErr) {
                 logger.warn('Biometric prompt failed / skipped', { error: bioErr });

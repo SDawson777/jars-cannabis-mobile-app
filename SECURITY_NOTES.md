@@ -34,6 +34,11 @@ _Last reviewed: January 2025 — Next review due: April 2025_
 - **Timeouts**: `EXTERNAL_API_TIMEOUT_MS` ensures upstream calls (OpenAI, weather) fail fast, preventing thread exhaustion.
 - **Security headers**: `middleware/security.ts` applies Helmet, CORS, body limits, and sanitizer middleware by default.
 
+### CSRF & RBAC
+
+- **CSRF**: Not required for mobile APIs using Bearer tokens and `SameSite` cookies are not used. If you introduce browser-based forms or cookie auth, add `csurf` middleware with per-route exemptions for webhooks.
+- **RBAC**: Current endpoints gate by authentication (`requireAuth`). If admin-only routes are added, implement `requireRole('admin')` middleware and enforce least-privilege checks at controllers.
+
 ## 5. Monitoring & Incident Response Hooks
 
 - **Sentry** captures both mobile and backend exceptions; include `correlationId` to stitch logs together.

@@ -1,6 +1,6 @@
 /**
  * HMAC signature validation middleware for analytics and webhook endpoints
- * 
+ *
  * Usage:
  *   router.post('/analytics/track', validateHMAC('analytics'), handler);
  *   router.post('/webhooks/stripe', validateHMAC('stripe'), handler);
@@ -62,7 +62,15 @@ export function validateHMAC(configKey: string = 'default') {
       }
 
       // Standard HMAC validation
-      const rawBody = (req as any).rawBody || JSON.stringify(req.body);
+      // Prefer a rawBody set by upstream middleware; if not present, handle Buffer body (from express.raw)
+      let rawBody: string;
+      if ((req as any).rawBody) {
+        rawBody = (req as any).rawBody;
+      } else if (req.body && Buffer.isBuffer(req.body)) {
+        rawBody = req.body.toString('utf8');
+      } else {
+        rawBody = JSON.stringify(req.body);
+      }
       const expectedSignature = crypto
         .createHmac(config.algorithm, config.secret)
         .update(rawBody)
@@ -90,7 +98,7 @@ export function validateHMAC(configKey: string = 'default') {
 export function captureRawBody() {
   return (req: Request, res: Response, next: NextFunction) => {
     let data = '';
-    req.on('data', (chunk) => {
+    req.on('data', chunk => {
       data += chunk;
     });
     req.on('end', () => {

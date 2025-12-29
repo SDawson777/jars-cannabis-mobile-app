@@ -24,6 +24,7 @@ import { useConcierge } from '../hooks/useConcierge';
 import { useAiBudtender } from '../hooks/useAI';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium } from '../utils/haptic';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface Message {
   id: string;
@@ -46,6 +47,7 @@ export default function ConciergeChatScreen() {
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
   const { messages, loading, sendMessage, retryMessage } = useConcierge();
   const aiBudtenderMutation = useAiBudtender();
+  const { t } = useTranslation();
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;
@@ -66,7 +68,7 @@ export default function ConciergeChatScreen() {
     if (Platform.OS === 'android') {
       ToastAndroid.show(message, ToastAndroid.SHORT);
     } else {
-      Alert.alert('Notice', message);
+      Alert.alert(t('concierge.notice'), message);
     }
   };
 
@@ -86,13 +88,13 @@ export default function ConciergeChatScreen() {
       const { code, message: errorMessage, retryAfter } = result.error;
 
       if (code === 'rate_limit' && retryAfter) {
-        showToast(`Too many requests. Try again in ${retryAfter}s.`);
+        showToast(t('concierge.rateLimitError', { seconds: retryAfter }));
       } else if (code === 'timeout') {
-        showToast('Request timed out. Please try again.');
+        showToast(t('concierge.timeoutError'));
       } else if (code === 'network') {
-        showToast('Network error. Check your connection and tap to retry.');
+        showToast(t('concierge.networkError'));
       } else {
-        showToast(errorMessage || 'Something went wrong. Tap to retry.');
+        showToast(errorMessage || t('concierge.genericError'));
       }
     }
   };
@@ -104,7 +106,7 @@ export default function ConciergeChatScreen() {
     const result = await retryMessage(lastUserMessage);
 
     if (!result.success && result.error) {
-      showToast(result.error.message || 'Still having trouble. Please try again later.');
+      showToast(result.error.message || t('concierge.retryError'));
     }
   };
 
@@ -133,7 +135,7 @@ export default function ConciergeChatScreen() {
       // Note: The AI response from the budtender could be integrated here
       // For now, it uses the existing concierge flow
     } catch (_error) {
-      showToast('AI Budtender is temporarily unavailable. Try typing your question instead.');
+      showToast(t('concierge.aiBudtenderUnavailable'));
     }
   };
 
@@ -152,7 +154,9 @@ export default function ConciergeChatScreen() {
             <Send color={brandPrimary} size={24} />
           </Pressable>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={[styles.headerTitle, { color: brandPrimary }]}>Concierge Chat</Text>
+            <Text style={[styles.headerTitle, { color: brandPrimary }]}>
+              {t('concierge.title')}
+            </Text>
           </View>
           <View style={{ width: 24 }} />
         </View>
@@ -205,40 +209,48 @@ export default function ConciergeChatScreen() {
         />
 
         {loading && (
-          <Text style={[styles.statusText, { color: brandSecondary }]}>Bot is typing...</Text>
+          <Text style={[styles.statusText, { color: brandSecondary }]}>
+            {t('concierge.botTyping')}
+          </Text>
         )}
 
         {/* AI Budtender Quick Prompts */}
         <View style={styles.quickPromptsContainer}>
           <Text style={[styles.quickPromptsTitle, { color: brandPrimary }]}>
-            Quick AI Budtender Questions
+            {t('concierge.quickPromptsTitle')}
           </Text>
           <View style={styles.quickPromptsGrid}>
             <Pressable
               style={[styles.quickPromptButton, { backgroundColor: brandSecondary }]}
               onPress={() => handleQuickPrompt('Recommend something for sleep')}
             >
-              <Text style={[styles.quickPromptText, { color: brandPrimary }]}>💤 Sleep Help</Text>
+              <Text style={[styles.quickPromptText, { color: brandPrimary }]}>
+                💤 {t('concierge.quick.sleep')}
+              </Text>
             </Pressable>
             <Pressable
               style={[styles.quickPromptButton, { backgroundColor: brandSecondary }]}
               onPress={() => handleQuickPrompt("I'm new to cannabis, where do I start?")}
             >
-              <Text style={[styles.quickPromptText, { color: brandPrimary }]}>🌱 Beginner</Text>
+              <Text style={[styles.quickPromptText, { color: brandPrimary }]}>
+                🌱 {t('concierge.quick.beginner')}
+              </Text>
             </Pressable>
             <Pressable
               style={[styles.quickPromptButton, { backgroundColor: brandSecondary }]}
               onPress={() => handleQuickPrompt('What helps with stress and anxiety?')}
             >
               <Text style={[styles.quickPromptText, { color: brandPrimary }]}>
-                😌 Stress Relief
+                😌 {t('concierge.quick.stress')}
               </Text>
             </Pressable>
             <Pressable
               style={[styles.quickPromptButton, { backgroundColor: brandSecondary }]}
               onPress={() => handleQuickPrompt('Something for energy and focus?')}
             >
-              <Text style={[styles.quickPromptText, { color: brandPrimary }]}>⚡ Energy</Text>
+              <Text style={[styles.quickPromptText, { color: brandPrimary }]}>
+                ⚡ {t('concierge.quick.energy')}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -253,7 +265,7 @@ export default function ConciergeChatScreen() {
           <TextInput
             testID="message-input"
             style={[styles.input, { backgroundColor: brandBackground, color: brandPrimary }]}
-            placeholder="Type your message..."
+            placeholder={t('concierge.placeholder')}
             placeholderTextColor={brandSecondary}
             value={input}
             onChangeText={text => {

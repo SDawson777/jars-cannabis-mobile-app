@@ -24,7 +24,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<SupportedLocale>('en');
 
   useEffect(() => {
-    AsyncStorage.getItem(LOCALE_STORAGE_KEY).then((stored) => {
+    AsyncStorage.getItem(LOCALE_STORAGE_KEY).then(stored => {
       if (stored && translations[stored as SupportedLocale]) {
         setLocaleState(stored as SupportedLocale);
       }
@@ -54,11 +54,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return value;
   };
 
-  return (
-    <I18nContext.Provider value={{ locale, setLocale, t }}>
-      {children}
-    </I18nContext.Provider>
-  );
+  return <I18nContext.Provider value={{ locale, setLocale, t }}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n(): I18nContextValue {

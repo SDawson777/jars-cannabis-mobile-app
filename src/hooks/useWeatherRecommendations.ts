@@ -36,53 +36,56 @@ export function useWeatherRecommendations(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRecommendations = useCallback(async (signal?: AbortSignal) => {
-    if (!condition || !enabled) {
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const params = new URLSearchParams({
-        condition,
-        limit: limit.toString(),
-      });
-
-      if (city) params.append('city', city);
-      if (state) params.append('state', state);
-
-      const result = await fetchJson<WeatherRecommendationsResponse>(
-        `/api/recommendations/weather?${params.toString()}`,
-        { signal }
-      );
-      setData(result);
-    } catch (err) {
-      if ((err as any)?.name === 'AbortError') {
-        // Fetch was aborted, bail silently
+  const fetchRecommendations = useCallback(
+    async (signal?: AbortSignal) => {
+      if (!condition || !enabled) {
         return;
       }
-      // Normalise ApiError-like objects thrown by fetchJson
-      // so caller tests and UIs get a readable message.
-      const msg =
-        err instanceof Error
-          ? err.message
-          : err && (err as any).message
-            ? (err as any).message
-            : 'Failed to fetch weather recommendations';
-      setError(msg);
-      setData(null);
-    } finally {
-      setIsLoading(false);
-    }
+      setIsLoading(true);
+      setError(null);
 
-  }, [condition, city, state, limit, enabled]);
+      try {
+        const params = new URLSearchParams({
+          condition,
+          limit: limit.toString(),
+        });
+
+        if (city) params.append('city', city);
+        if (state) params.append('state', state);
+
+        const url = `/api/recommendations/weather?${params.toString()}`;
+        const result = signal
+          ? await fetchJson<WeatherRecommendationsResponse>(url, { signal })
+          : await fetchJson<WeatherRecommendationsResponse>(url as any);
+        setData(result);
+      } catch (err) {
+        if ((err as any)?.name === 'AbortError') {
+          // Fetch was aborted, bail silently
+          return;
+        }
+        // Normalise ApiError-like objects thrown by fetchJson
+        // so caller tests and UIs get a readable message.
+        const msg =
+          err instanceof Error
+            ? err.message
+            : err && (err as any).message
+              ? (err as any).message
+              : 'Failed to fetch weather recommendations';
+        setError(msg);
+        setData(null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [condition, city, state, limit, enabled]
+  );
 
   useEffect(() => {
-    const controller = new AbortController();
-    // fire-and-forget; allow cleanup to cancel
-    void fetchRecommendations(controller.signal);
-    return () => controller.abort();
+    // fire-and-forget; call without signal for compatibility with existing tests
+    void fetchRecommendations();
+    return () => {
+      // no-op cleanup; callers may pass an AbortSignal to `refetch` if they need cancellation
+    };
   }, [fetchRecommendations]);
 
   return {

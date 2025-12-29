@@ -13,6 +13,7 @@ import {
 import { useAccessibilityStore } from '../state/accessibilityStore';
 import { useTextScaling } from '../hooks/useTextScaling';
 import { ThemeContext } from '../context/ThemeContext';
+import { useTranslation } from '../i18n/useTranslation';
 
 export default function AppSettingsScreen() {
   const {
@@ -99,7 +100,7 @@ ${
 }
     `.trim();
 
-    Alert.alert('Weather Debug Info', debugText, [{ text: 'OK' }]);
+    Alert.alert(t('settings.weatherDebugTitle'), debugText, [{ text: t('common.ok') }]);
   };
 
   const showDemoBackendHelper = () => {
@@ -127,12 +128,20 @@ docker-compose up -d
 npm run seed:demo
     `.trim();
 
-    Alert.alert('Demo Backend Helper', demoText, [{ text: 'OK' }]);
+    Alert.alert(t('settings.demoBackendTitle'), demoText, [{ text: t('common.ok') }]);
   };
 
   const getConditionDisplayName = (condition: 'rain' | 'sunny' | 'cloudy' | 'snow' | null) => {
-    if (!condition) return 'None';
-    return condition.charAt(0).toUpperCase() + condition.slice(1);
+    if (!condition) return t('settings.condition.none');
+    return condition === 'sunny'
+      ? t('settings.condition.sunny')
+      : condition === 'cloudy'
+        ? t('settings.condition.cloudy')
+        : condition === 'rain'
+          ? t('settings.condition.rain')
+          : condition === 'snow'
+            ? t('settings.condition.snow')
+            : condition;
   };
 
   const getConditionEmoji = (condition: 'rain' | 'sunny' | 'cloudy' | 'snow' | null) => {
@@ -153,6 +162,7 @@ npm run seed:demo
   const textColor = highContrast ? '#000000' : brandPrimary;
   const backgroundColor = highContrast ? '#FFFFFF' : brandBackground;
   const accentColor = highContrast ? '#0000FF' : brandSecondary;
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -166,7 +176,7 @@ npm run seed:demo
             },
           ]}
         >
-          Accessibility
+          {t('settings.accessibility')}
         </Text>
 
         <View style={styles.row}>
@@ -179,7 +189,7 @@ npm run seed:demo
               },
             ]}
           >
-            Text Size
+            {t('settings.textSize')}
           </Text>
           <Pressable
             style={[
@@ -214,7 +224,7 @@ npm run seed:demo
               },
             ]}
           >
-            High Contrast
+            {t('settings.highContrast')}
           </Text>
           <Switch
             value={highContrast}
@@ -234,7 +244,7 @@ npm run seed:demo
               },
             ]}
           >
-            Reduce Motion
+            {t('settings.reduceMotion')}
           </Text>
           <Switch
             value={reduceMotion}
@@ -253,7 +263,7 @@ npm run seed:demo
             },
           ]}
         >
-          Weather Theme (Dev)
+          {t('settings.weatherTheme')}
         </Text>
 
         <View style={styles.row}>
@@ -266,7 +276,7 @@ npm run seed:demo
               },
             ]}
           >
-            Simulate Weather
+            {t('settings.simulateWeather')}
           </Text>
           <Switch
             value={!!weatherSimulation?.enabled}
@@ -287,7 +297,7 @@ npm run seed:demo
                 },
               ]}
             >
-              Weather Condition
+              {t('settings.weatherCondition')}
             </Text>
             <Pressable
               style={[
@@ -326,7 +336,7 @@ npm run seed:demo
               },
             ]}
           >
-            Weather Debug Info
+            {t('settings.weatherDebug')}
           </Text>
           <Pressable
             style={[
@@ -361,7 +371,7 @@ npm run seed:demo
               },
             ]}
           >
-            Demo Backend Helper
+            {t('settings.demoBackend')}
           </Text>
           <Pressable
             style={[
@@ -381,7 +391,7 @@ npm run seed:demo
                 },
               ]}
             >
-              Info
+              {t('common.view')}
             </Text>
           </Pressable>
         </View>

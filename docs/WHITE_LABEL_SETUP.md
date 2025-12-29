@@ -21,19 +21,25 @@ Update:
 
 Nimbus-branded assets are scoped under:
 
-- `assets/nimbus/`
-
 Default placeholders:
 
-- `assets/nimbus/nimbus-icon.png`
-- `assets/nimbus/nimbus-splash.png`
-- `assets/nimbus/nimbus-logo.png`
-- `assets/nimbus/nimbus-logo-dark.png`
-- `assets/nimbus/onboarding-1.png`
-- `assets/nimbus/onboarding-2.png`
-- `assets/nimbus/onboarding-3.png`
-
 Legacy Jars assets should be moved to:
+
+#### Automated asset replacement
+
+Use the helper script to copy your brand assets into the expected paths:
+
+```bash
+scripts/white-label-assets.sh /path/to/brand-assets
+```
+
+Expected files in the source directory:
+
+- `icon.png` → `assets/nimbus/nimbus-icon.png`
+- `splash.png` → `assets/nimbus/nimbus-splash.png`
+- Optional: `logo.png`, `logo-dark.png`, `onboarding-1.png`, `onboarding-2.png`, `onboarding-3.png`
+
+After replacing assets, rebuild the app to verify icons and splash screens.
 
 - `assets/legacy/`
 

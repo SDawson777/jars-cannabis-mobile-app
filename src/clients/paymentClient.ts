@@ -14,7 +14,7 @@ export interface PaymentPayload {
 }
 
 // eslint-disable-next-line no-undef
-async function authFetch(path: string, options: RequestInit = {}) {
+async function authFetch(path: string, options: RequestInit = {}, signal?: AbortSignal) {
   const token = await getAuthToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -22,17 +22,25 @@ async function authFetch(path: string, options: RequestInit = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  return fetchJson(`${BASE_URL}${path}`, { ...options, headers } as any);
+  return fetchJson(`${BASE_URL}${path}`, { ...options, headers, signal } as any);
 }
 
-export async function addPaymentMethod(payload: PaymentPayload) {
-  return authFetch('/payment-methods', { method: 'POST', body: JSON.stringify(payload) });
+export async function addPaymentMethod(payload: PaymentPayload, signal?: AbortSignal) {
+  return authFetch('/payment-methods', { method: 'POST', body: JSON.stringify(payload) }, signal);
 }
 
-export async function updatePaymentMethod(id: string, payload: PaymentPayload) {
-  return authFetch(`/payment-methods/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+export async function updatePaymentMethod(
+  id: string,
+  payload: PaymentPayload,
+  signal?: AbortSignal
+) {
+  return authFetch(
+    `/payment-methods/${id}`,
+    { method: 'PUT', body: JSON.stringify(payload) },
+    signal
+  );
 }
 
-export async function getPaymentMethods() {
-  return authFetch('/payment-methods', { method: 'GET' });
+export async function getPaymentMethods(signal?: AbortSignal) {
+  return authFetch('/payment-methods', { method: 'GET' }, signal);
 }

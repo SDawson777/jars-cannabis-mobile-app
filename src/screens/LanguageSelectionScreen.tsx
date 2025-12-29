@@ -6,15 +6,24 @@ import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSettings } from '../context/SettingsContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
-import { t } from '../utils/i18n';
+import { useTranslation } from '../i18n/useTranslation';
 
 export default function LanguageSelectionScreen() {
   const navigation = useNavigation();
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
   const { locale, setLocale } = useSettings();
+  const { t } = useTranslation();
   const languages = [
-    { code: 'en', label: t('english') },
-    { code: 'es', label: t('spanish') },
+    {
+      code: 'en',
+      label:
+        t('common.ok', {}) === 'common.ok'
+          ? 'English'
+          : t('onboarding.welcome', { appName: '' })
+            ? 'English'
+            : 'English',
+    },
+    { code: 'es', label: 'Español' },
   ];
 
   const bgColor =

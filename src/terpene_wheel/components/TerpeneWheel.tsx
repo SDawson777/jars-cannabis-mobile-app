@@ -114,9 +114,10 @@ const TerpeneSegment: React.FC<{
   const waveScale = useSharedValue(1);
   const waveOpacity = useSharedValue(0);
   const waveProps = useAnimatedProps(() => ({
-    // Convert React Native transform to SVG transform string
-    transform: `scale(${waveScale.value})`,
-    transformOrigin: `${CX}px ${CY}px`,
+    // Use Reanimated transform array and explicit origin for SVG
+    transform: [{ scale: waveScale.value }],
+    originX: CX,
+    originY: CY,
     opacity: waveOpacity.value,
   }));
 

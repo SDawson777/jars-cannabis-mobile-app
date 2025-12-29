@@ -1,0 +1,23 @@
+# Exclude non-essential files to reduce upload size
+node_modules/
+backend/
+coverage/
+reports/
+e2e/
+tests/
+qa/
+**/*.log
+**/*.tmp
+assets/terpene-wheel/Terpene_Wheel_Code_Kit.zip
+.git/
+.gitignore
+.DS_Store
+
+# iOS/Android build artifacts and local caches
+ios/Pods/
+ios/build/
+ios/DerivedData/
+android/app/build/
+android/build/
+android/.gradle/
+android/.idea/

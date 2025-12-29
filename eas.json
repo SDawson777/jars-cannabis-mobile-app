@@ -12,6 +12,10 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "credentialsSource": "local",
+      "android": {
+        "gradleCommand": ":app:assembleDebug"
+      },
       "node": "20.19.4",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
@@ -36,7 +40,9 @@
       "distribution": "internal",
       "node": "20.19.4",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
+        "EXPO_PUBLIC_API_URL": "https://nimbus-cannabis-mobile-production.up.railway.app",
+        "EXPO_PUBLIC_APP_ENV": "development",
+        "NODE_ENV": "development"
       }
     },
     "production": {

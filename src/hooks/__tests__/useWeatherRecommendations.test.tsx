@@ -69,14 +69,12 @@ describe('useWeatherRecommendations', () => {
   });
 
   it('should include location parameters when provided', async () => {
-    jest
-      .spyOn(apiClient, 'fetchJson')
-      .mockResolvedValueOnce({
-        condition: 'sunny',
-        tags: [],
-        description: '',
-        products: [],
-      } as any);
+    jest.spyOn(apiClient, 'fetchJson').mockResolvedValueOnce({
+      condition: 'sunny',
+      tags: [],
+      description: '',
+      products: [],
+    } as any);
 
     const { result } = renderHook(() =>
       useWeatherRecommendations({

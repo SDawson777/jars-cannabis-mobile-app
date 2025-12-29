@@ -14,7 +14,9 @@
     "done": "Done",
     "search": "Search",
     "filter": "Filter",
-    "sort": "Sort"
+    "sort": "Sort",
+    "view": "View",
+    "and": "and"
   },
   "auth": {
     "login": "Log In",
@@ -57,15 +59,76 @@
     "subtotal": "Subtotal",
     "tax": "Tax",
     "delivery": "Delivery",
-    "remove": "Remove"
+    "remove": "Remove",
+    "enterPromo": "Please enter a promo code",
+    "promoApplied": "Promo code applied!",
+    "promoFailed": "Failed to apply promo code",
+    "enterPromoPlaceholder": "Enter Promo Code",
+    "apply": "Apply",
+    "orderSummary": "Order Summary",
+    "discounts": "Discounts",
+    "estimatedTaxes": "Estimated Taxes",
+    "proceedToCheckout": "Proceed to Checkout",
+    "removeItemTitle": "Remove Item",
+    "removeItemMessage": "Are you sure you want to remove this item?"
   },
   "checkout": {
+    "steps": {
+      "delivery": "Delivery",
+      "contact": "Contact",
+      "payment": "Payment",
+      "review": "Review"
+    },
     "shippingAddress": "Shipping Address",
     "paymentMethod": "Payment Method",
     "reviewOrder": "Review Order",
     "placeOrder": "Place Order",
     "orderConfirmation": "Order Confirmation",
-    "orderNumber": "Order #{{number}}"
+    "orderNumber": "Order #{{number}}",
+    "howReceive": "How would you like to receive your order?",
+    "method": {
+      "pickup": "Pickup",
+      "delivery": "Delivery"
+    },
+    "enterDeliveryAddress": "Enter delivery address",
+    "whoPickingUp": "Who is picking up this order?",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "emailAddress": "Email Address",
+    "mustMatchId": "Must match your government-issued ID at pickup.",
+    "howPay": "How would you like to pay?",
+    "payOnline": "Pay Online",
+    "payAtPickup": "Pay at Pickup/Delivery",
+    "reviewYourOrder": "Review Your Order",
+    "review": {
+      "method": "Method:",
+      "contact": "Contact:",
+      "payment": "Payment:"
+    },
+    "payment": {
+      "online": "Online",
+      "atPickup": "At Pickup/Delivery"
+    },
+    "termsPrefix": "I agree to the",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "continue": "Continue",
+    "placeOrder": "Place Order",
+    "placing": "Placing...",
+    "paymentInitFailed": "Payment initialization failed",
+    "paymentFailed": "Payment failed",
+    "paymentSuccess": "Payment successful",
+    "orderFailed": "Order failed",
+    "enterDeliveryAddress": "Enter delivery address",
+    "fillContactFields": "Please fill in all contact fields.",
+    "acceptTerms": "Please accept Terms & Conditions.",
+    "compliance": {
+      "ageNotVerified": "Please verify your age to complete this purchase.",
+      "underage": "You must be at least {{min}} years old to make a purchase.",
+      "dailyLimitExceeded": "This order would exceed your daily THC limit.",
+      "dateOfBirthMissing": "Please provide your date of birth for age verification.",
+      "generic": "Compliance check failed."
+    }
   },
   "profile": {
     "myProfile": "My Profile",
@@ -92,6 +155,69 @@
     "unauthorized": "Please log in to continue",
     "forbidden": "You don't have permission to perform this action",
     "serverError": "Server error. Please try again later.",
+    "session_expired": "Session expired. Please log in again.",
+    "permission_required": "Permission required",
+    "permission_denied": "You don't have permission to perform this action.",
+    "biometric_not_available": "Biometric unlock not available on this device.",
     "offline": "You are offline"
+  },
+  "settings": {
+    "accessibility": "Accessibility",
+    "textSize": "Text Size",
+    "highContrast": "High Contrast",
+    "reduceMotion": "Reduce Motion",
+    "weatherTheme": "Weather Theme (Dev)",
+    "simulateWeather": "Simulate Weather",
+    "weatherCondition": "Weather Condition",
+    "weatherDebug": "Weather Debug Info",
+    "weatherDebugTitle": "Weather Debug Info",
+    "demoBackend": "Demo Backend Helper",
+    "demoBackendTitle": "Demo Backend Helper",
+    "condition": {
+      "none": "None",
+      "sunny": "Sunny",
+      "cloudy": "Cloudy",
+      "rain": "Rain",
+      "snow": "Snow"
+    }
+  },
+  "strainFinder": {
+    "title": "Find My Strain",
+    "selectEffects": "What effects are you looking for?",
+    "selectEffectsAlertTitle": "Select Effects",
+    "selectEffectsAlertMessage": "Please select at least one desired effect to get recommendations.",
+    "experienceLevel": "Experience Level",
+    "experience": {
+      "new": "New",
+      "regular": "Regular",
+      "heavy": "Heavy User"
+    },
+    "budget": "Budget",
+    "productCategories": "Product Categories (Optional)",
+    "findButton": "Find My Perfect Strain",
+    "unableToGetRecommendations": "Unable to get recommendations right now",
+    "recommendationsFound": "{{count}} Recommendations Found",
+    "newSearch": "New Search",
+    "noMatchesTitle": "No matches found",
+    "noMatchesMessage": "Try adjusting your preferences or selecting different effects."
+  },
+  "concierge": {
+    "title": "Concierge Chat",
+    "notice": "Notice",
+    "botTyping": "Bot is typing...",
+    "quickPromptsTitle": "Quick AI Budtender Questions",
+    "placeholder": "Type your message...",
+    "rateLimitError": "Too many requests. Try again in {{seconds}}s.",
+    "timeoutError": "Request timed out. Please try again.",
+    "networkError": "Network error. Check your connection and tap to retry.",
+    "genericError": "Something went wrong. Tap to retry.",
+    "retryError": "Still having trouble. Please try again later.",
+    "aiBudtenderUnavailable": "AI Budtender is temporarily unavailable. Try typing your question instead.",
+    "quick": {
+      "sleep": "Sleep Help",
+      "beginner": "Beginner",
+      "stress": "Stress Relief",
+      "energy": "Energy"
+    }
   }
 }

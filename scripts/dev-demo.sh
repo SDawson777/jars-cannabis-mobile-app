@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Minimal demo runner: starts backend (mock-friendly) and Expo web with local API base URL.
 
-export EXPO_PUBLIC_API_URL="http://localhost:8080/api/v1"
+export EXPO_PUBLIC_API_URL="http://localhost:8080"
 
 # Optional: quiet Sentry/Stripe for local demo
 export SENTRY_DSN=""

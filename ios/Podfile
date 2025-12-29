@@ -13,6 +13,23 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
+# Patch expo-localization Swift switch for Swift 6 (Xcode 26.1)
+pre_install do |installer|
+  begin
+    path = File.join(__dir__, '..', 'node_modules', 'expo-localization', 'ios', 'LocalizationModule.swift')
+    if File.exist?(path)
+      content = File.read(path)
+      updated = content.gsub('@unknown default:', 'default:')
+      if content != updated
+        File.write(path, updated)
+        Pod::UI.puts "[Podfile] Patched expo-localization LocalizationModule.swift for Swift 6 exhaustive switch."
+      end
+    end
+  rescue => e
+    Pod::UI.warn("[Podfile] Failed to patch expo-localization: #{e}")
+  end
+end
+
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
 # because `react-native-flipper` depends on (FlipperKit,...), which will be excluded. To fix this,
 # you can also exclude `react-native-flipper` in `react-native.config.js`
@@ -53,6 +70,11 @@ target 'NimbusCannabisOS' do
     :flipper_configuration => flipper_config
   )
 
+  # Ensure Firebase core is available for FIRApp configure in AppDelegate
+  # Pin to 11.x to avoid Swift 6 ownership features (sending/borrowing) in 12.x
+  pod 'FirebaseCore', '~> 11.7.0'
+  pod 'GoogleUtilities', :modular_headers => true
+
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -60,7 +82,7 @@ target 'NimbusCannabisOS' do
       :mac_catalyst_enabled => false
     )
 
-    # This is necessary for Xcode 14, because it signs resource bundles by default
+    # This is necessary for Xcode 14+, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results
       .each do |pod_name, target_installation_result|
@@ -70,6 +92,8 @@ target 'NimbusCannabisOS' do
         end
       end
     end
+
+
   end
 
   post_integrate do |installer|

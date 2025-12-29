@@ -1347,7 +1347,7 @@ type Way = { id: string; label: string };
 &nbsp;
 export default function HomeScreen() {
   const navigation = useNavigation&lt;HomeNavProp&gt;();
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = useContext(ThemeContext);
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
   const { data: user } = useContext(AuthContext);
   const { preferredStore } = useStore();
   const { data: forYou, isLoading } = useForYouToday(user?.id, preferredStore?.id);
@@ -1448,7 +1448,7 @@ export default function HomeScreen() {
   }, []);
 &nbsp;
   const bgColor =
-    colorTemp === 'warm' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#FAF8F4' </span>: colorTemp === 'cool' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#F7F9FA' </span>: jarsBackground;
+    colorTemp === 'warm' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#FAF8F4' </span>: colorTemp === 'cool' ? <span class="branch-0 cbranch-no" title="branch not covered" >'#F7F9FA' </span>: brandBackground;
 &nbsp;
   const openCart = <span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >    hapticLight();</span>
@@ -1482,7 +1482,7 @@ export default function HomeScreen() {
         &lt;/View&gt;
 &nbsp;
         &lt;Pressable style={styles.locationRow}&gt;
-          &lt;MapPin color={jarsPrimary} size={16} /&gt;
+          &lt;MapPin color={brandPrimary} size={16} /&gt;
           &lt;Text style={styles.pickupText}&gt;Pickup from:&lt;/Text&gt;
           &lt;Text style={styles.locationText}&gt;Downtown&lt;/Text&gt;
           &lt;ChevronDown color="#777" size={16} /&gt;
@@ -1495,7 +1495,7 @@ export default function HomeScreen() {
             placeholderTextColor="#777"
             style={styles.searchInput}
           /&gt;
-          &lt;Pressable style={[styles.searchBtn, { backgroundColor: jarsPrimary }]}&gt;
+          &lt;Pressable style={[styles.searchBtn, { backgroundColor: brandPrimary }]}&gt;
             &lt;Text style={styles.searchBtnText}&gt;Search&lt;/Text&gt;
           &lt;/Pressable&gt;
         &lt;/View&gt;
@@ -1508,13 +1508,13 @@ export default function HomeScreen() {
           &lt;Text style={styles.heroTitle}&gt;Price Drop&lt;/Text&gt;
           &lt;Text style={styles.heroSub}&gt;New Everyday Low Pricing&lt;/Text&gt;
           &lt;Pressable style={styles.heroBtn}&gt;
-            &lt;Text style={[styles.heroBtnText, { color: jarsPrimary }]}&gt;Shop Deli&lt;/Text&gt;
+            &lt;Text style={[styles.heroBtnText, { color: brandPrimary }]}&gt;Shop Deli&lt;/Text&gt;
           &lt;/Pressable&gt;
         &lt;/View&gt;
 &nbsp;
         {/* AI Strain Finder CTA */}
         &lt;Pressable
-          style={[styles.strainFinderCTA, { backgroundColor: jarsSecondary }]}
+          style={[styles.strainFinderCTA, { backgroundColor: brandSecondary }]}
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >            hapticLight();</span>
 <span class="cstat-no" title="statement not covered" >            navigation.navigate('StrainFinder');</span>
@@ -1550,9 +1550,9 @@ export default function HomeScreen() {
 &nbsp;
         {/* Categories */}
         &lt;View style={styles.sectionHeader}&gt;
-          &lt;Text style={[styles.sectionTitle, { color: jarsPrimary }]}&gt;Shop By Categories&lt;/Text&gt;
+          &lt;Text style={[styles.sectionTitle, { color: brandPrimary }]}&gt;Shop By Categories&lt;/Text&gt;
           &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('ShopScreen')}</span>&gt;
-            &lt;Text style={[styles.seeMore, { color: jarsPrimary }]}&gt;See More&lt;/Text&gt;
+            &lt;Text style={[styles.seeMore, { color: brandPrimary }]}&gt;See More&lt;/Text&gt;
           &lt;/Pressable&gt;
         &lt;/View&gt;
         {categoriesLoading ? (
@@ -1587,10 +1587,10 @@ export default function HomeScreen() {
 &nbsp;
         {/* Featured Products */}
         &lt;View style={styles.sectionHeader}&gt;
-          &lt;Text style={[styles.sectionTitle, { color: jarsPrimary }]}&gt;Featured Products&lt;/Text&gt;
+          &lt;Text style={[styles.sectionTitle, { color: brandPrimary }]}&gt;Featured Products&lt;/Text&gt;
           &lt;Pressable onPress={shopCTAPulse.onPress}&gt;
             &lt;Animated.Text
-              style={[styles.seeMore, { color: jarsPrimary }, shopCTAPulse.pulseStyle]}
+              style={[styles.seeMore, { color: brandPrimary }, shopCTAPulse.pulseStyle]}
             &gt;
               Shop All
             &lt;/Animated.Text&gt;
@@ -1607,7 +1607,7 @@ export default function HomeScreen() {
             {featured.map(<span class="fstat-no" title="function not covered" >it</span>em =&gt; (
 <span class="cstat-no" title="statement not covered" >              &lt;Pressable</span>
                 key={item.id}
-                style={[styles.productCard, { borderColor: jarsPrimary }]}
+                style={[styles.productCard, { borderColor: brandPrimary }]}
                 onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('ProductDetail', { slug: item.id })}</span>
               &gt;
                 {item.image ? (
@@ -1615,8 +1615,8 @@ export default function HomeScreen() {
                 ) : (
                   &lt;View style={[styles.productImage, { backgroundColor: '#E0E0E0' }]} /&gt;
                 )}
-                &lt;Text style={[styles.productName, { color: jarsPrimary }]}&gt;{item.name}&lt;/Text&gt;
-                &lt;Text style={[styles.productPrice, { color: jarsSecondary }]}&gt;
+                &lt;Text style={[styles.productName, { color: brandPrimary }]}&gt;{item.name}&lt;/Text&gt;
+                &lt;Text style={[styles.productPrice, { color: brandSecondary }]}&gt;
                   ${item.price.toFixed(2)}
                 &lt;/Text&gt;
               &lt;/Pressable&gt;
@@ -1628,9 +1628,9 @@ export default function HomeScreen() {
 &nbsp;
         {/* Your Weed Your Way */}
         &lt;View style={styles.sectionHeader}&gt;
-          &lt;Text style={[styles.sectionTitle, { color: jarsPrimary }]}&gt;Your Weed Your Way&lt;/Text&gt;
+          &lt;Text style={[styles.sectionTitle, { color: brandPrimary }]}&gt;Your Weed Your Way&lt;/Text&gt;
           &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('ShopScreen')}</span>&gt;
-            &lt;Text style={[styles.seeMore, { color: jarsPrimary }]}&gt;See More&lt;/Text&gt;
+            &lt;Text style={[styles.seeMore, { color: brandPrimary }]}&gt;See More&lt;/Text&gt;
           &lt;/Pressable&gt;
         &lt;/View&gt;
         {waysLoading ? (
@@ -1663,7 +1663,7 @@ export default function HomeScreen() {
 &nbsp;
         {/* Educational Content CTA */}
         &lt;View style={styles.sectionHeader}&gt;
-          &lt;Text style={[styles.sectionTitle, { color: jarsPrimary }]}&gt;Educational Resources&lt;/Text&gt;
+          &lt;Text style={[styles.sectionTitle, { color: brandPrimary }]}&gt;Educational Resources&lt;/Text&gt;
         &lt;/View&gt;
         &lt;Pressable
           testID="terpene-wheel-cta"
@@ -1686,8 +1686,8 @@ export default function HomeScreen() {
           style={styles.navItem}
           testID="home-tab"
         &gt;
-          &lt;Home color={jarsPrimary} size={24} /&gt;
-          &lt;Text style={[styles.navLabel, { color: jarsPrimary }]}&gt;Home&lt;/Text&gt;
+          &lt;Home color={brandPrimary} size={24} /&gt;
+          &lt;Text style={[styles.navLabel, { color: brandPrimary }]}&gt;Home&lt;/Text&gt;
         &lt;/Pressable&gt;
         &lt;Pressable
           onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >navigation.navigate('ShopScreen')}</span>
@@ -1903,7 +1903,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

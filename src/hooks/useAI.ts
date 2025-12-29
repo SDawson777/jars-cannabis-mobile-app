@@ -1,9 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useRef, useEffect } from 'react';
 import { fetchJson } from '../utils/apiClient';
-
-import { apiRequest } from '../utils/apiClient';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 // Types matching backend interfaces
 export interface RecommendProductsRequest {
@@ -64,7 +62,7 @@ export function useAiRecommendations() {
       controllerRef.current = controller;
 
       const resp = await fetchJson<RecommendationsResponse>(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/ai/recommend-products`,
+        `${API_BASE_URL}/api/ai/recommend-products`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -103,15 +101,12 @@ export function useAiBudtender() {
       const controller = new AbortController();
       controllerRef.current = controller;
 
-      const resp = await fetchJson<BudtenderResponse>(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/ai/budtender`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(request),
-          signal: controller.signal,
-        }
-      );
+      const resp = await fetchJson<BudtenderResponse>(`${API_BASE_URL}/api/ai/budtender`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      });
 
       return resp;
     },

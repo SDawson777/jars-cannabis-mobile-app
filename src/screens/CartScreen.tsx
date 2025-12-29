@@ -24,6 +24,7 @@ import { useCart } from '../hooks/useCart';
 import { useCartValidation } from '../hooks/useCartValidation';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy, hapticError } from '../utils/haptic';
+import { useTranslation } from '../i18n/useTranslation';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -113,10 +114,10 @@ export default function CartScreen() {
 
   const removeItem = (id: string) => {
     hapticHeavy();
-    Alert.alert('Remove Item', 'Are you sure you want to remove this item?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('cart.removeItemTitle'), t('cart.removeItemMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Remove',
+        text: t('cart.remove'),
         style: 'destructive',
         onPress: async () => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -131,10 +132,12 @@ export default function CartScreen() {
     ]);
   };
 
+  const { t } = useTranslation();
+
   const applyPromoCode = async () => {
     if (!promo.trim()) {
       hapticError();
-      Alert.alert('Please enter a promo code');
+      Alert.alert(t('common.error'), t('cart.enterPromo'));
       return;
     }
 
@@ -142,11 +145,11 @@ export default function CartScreen() {
       hapticMedium();
       await applyPromo(promo.trim());
       setPromo(''); // Clear the input on success
-      Alert.alert('Success', 'Promo code applied!');
+      Alert.alert(t('common.ok'), t('cart.promoApplied'));
     } catch (error) {
       hapticError();
-      const message = error instanceof Error ? error.message : 'Failed to apply promo code';
-      Alert.alert('Error', message);
+      const message = error instanceof Error ? error.message : t('cart.promoFailed');
+      Alert.alert(t('common.error'), message);
     }
   };
 
@@ -169,7 +172,7 @@ export default function CartScreen() {
         >
           <ChevronLeft color={brandPrimary} size={24} />
         </Pressable>
-        <Text style={[styles.title, { color: brandPrimary }]}>Your Cart</Text>
+        <Text style={[styles.title, { color: brandPrimary }]}>{t('cart.myCart')}</Text>
         <Pressable onPress={goToHelp}>
           <HelpCircle color={brandPrimary} size={24} />
         </Pressable>
@@ -229,7 +232,7 @@ export default function CartScreen() {
       <View style={styles.promoSection}>
         <TextInput
           style={[styles.promoInput, { borderColor: brandSecondary, color: brandPrimary }]}
-          placeholder="Enter Promo Code"
+          placeholder={t('cart.enterPromoPlaceholder')}
           placeholderTextColor={brandSecondary}
           value={promo}
           testID="coupon-input"
@@ -239,27 +242,27 @@ export default function CartScreen() {
           style={[styles.promoBtn, { backgroundColor: brandPrimary }, glowStyle]}
           onPress={applyPromoCode}
         >
-          <Text style={styles.promoBtnText}>Apply</Text>
+          <Text style={styles.promoBtnText}>{t('cart.apply')}</Text>
         </Pressable>
       </View>
 
       {/* Order Summary */}
       <View style={[styles.summary, { backgroundColor: '#FFF' }]} testID="cart-total">
-        <Text style={[styles.summaryTitle, { color: brandPrimary }]}>Order Summary</Text>
+        <Text style={[styles.summaryTitle, { color: brandPrimary }]}>{t('cart.orderSummary')}</Text>
         <View style={styles.line}>
-          <Text style={styles.lineLabel}>Subtotal</Text>
+          <Text style={styles.lineLabel}>{t('cart.subtotal')}</Text>
           <Text style={styles.lineValue}>${subtotal.toFixed(2)}</Text>
         </View>
         <View style={styles.line}>
-          <Text style={styles.lineLabel}>Discounts</Text>
+          <Text style={styles.lineLabel}>{t('cart.discounts')}</Text>
           <Text style={styles.lineValue}>−${discount.toFixed(2)}</Text>
         </View>
         <View style={styles.line}>
-          <Text style={styles.lineLabel}>Estimated Taxes</Text>
+          <Text style={styles.lineLabel}>{t('cart.estimatedTaxes')}</Text>
           <Text style={styles.lineValue}>${taxes.toFixed(2)}</Text>
         </View>
         <View style={styles.lineTotal}>
-          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalLabel}>{t('cart.total')}</Text>
           <Text style={[styles.totalValue, { color: brandPrimary }]}>${total.toFixed(2)}</Text>
         </View>
       </View>
@@ -274,7 +277,7 @@ export default function CartScreen() {
           navigation.navigate('Checkout');
         }}
       >
-        <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
+        <Text style={styles.checkoutBtnText}>{t('cart.proceedToCheckout')}</Text>
       </Pressable>
     </SafeAreaView>
   );

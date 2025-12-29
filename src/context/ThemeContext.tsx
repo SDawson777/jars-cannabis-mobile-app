@@ -169,6 +169,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+
     (async () => {
       try {
         // start with time-based
@@ -183,7 +186,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const reason = 'OpenWeather API key missing or invalid; using time-based theme.';
           logger.warn(reason);
 
-          // Log fallback event
           logEvent('weather_theme_fallback', {
             reason: 'missing_api_key',
             fallbackSource: 'time-of-day',
@@ -196,42 +198,35 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           };
 
           setDebugInfo(currentDebugInfo);
-
-          // Apply simulation if enabled
           const { temp: finalTemp, info: finalInfo } = applyWeatherSimulation(
             temp,
             currentDebugInfo
           );
-          setColorTemp(finalTemp);
-          setDebugInfo(finalInfo);
+          if (!cancelled) setColorTemp(finalTemp);
+          if (!cancelled) setDebugInfo(finalInfo);
           return;
         }
 
-        // 2. Pull measurementSystem from first locale entry
         const { measurementSystem } = getLocales()[0];
-        // measurementSystem is 'metric' | 'us' | 'uk' | null
         const usesImperial = measurementSystem === 'us';
         const units = usesImperial ? 'imperial' : 'metric';
 
-        // 3. Request permission & fetch location
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
           const { coords } = await Location.getCurrentPositionAsync({});
           const { latitude, longitude } = coords;
 
-          // 4. Fetch weather with proper units
           const url =
             `https://api.openweathermap.org/data/2.5/weather` +
             `?lat=${latitude}&lon=${longitude}` +
             `&appid=${EXPO_PUBLIC_OPENWEATHER_KEY}` +
             `&units=${units}`;
           try {
-            const data = await fetchJson<any>(url, { retries: 1 });
+            const data = await fetchJson<any>(url, { retries: 1, signal: controller.signal });
             const current = data.main?.temp as number | undefined;
-            const clouds = data.clouds?.all as number | undefined; // percent
+            const clouds = data.clouds?.all as number | undefined;
             const weatherCondition = data.weather?.[0]?.main?.toLowerCase() || 'unknown';
 
-            // Update debug info with successful OpenWeather data
             currentDebugInfo = {
               weatherSource: 'openweather',
               lastUpdated: new Date(),
@@ -252,15 +247,31 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
                 else temp = 'neutral';
               }
             }
+
+            if (clouds !== undefined) {
+              if (clouds > CLOUDY_CLOUD_THRESHOLD) {
+                temp = temp === 'warm' ? 'neutral' : 'cool';
+              } else if (clouds < SUNNY_CLOUD_THRESHOLD) {
+                temp = temp === 'cool' ? 'neutral' : 'warm';
+              }
+            }
+
+            logEvent('weather_theme_success', {
+              weatherSource: 'openweather',
+              colorTemp: temp,
+              temperature: current,
+              condition: weatherCondition,
+              cloudCover: clouds,
+              units,
+            });
           } catch (err) {
-            const status = (err && (err as any).status) || 'unknown';
-            const reason = `OpenWeather request failed with status ${status}; using time-based theme.`;
+            const statusCode = (err && (err as any).status) || 'unknown';
+            const reason = `OpenWeather request failed with status ${statusCode}; using time-based theme.`;
             logger.warn(reason);
 
-            // Log fallback event
             logEvent('weather_theme_fallback', {
               reason: 'api_error',
-              statusCode: resp.status,
+              statusCode,
               fallbackSource: 'time-of-day',
               colorTemp: temp,
             });
@@ -270,43 +281,20 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
               fallbackReason: reason,
             };
 
-            setDebugInfo(currentDebugInfo);
-
-            // Apply simulation if enabled
+            if (!cancelled) setDebugInfo(currentDebugInfo);
             const { temp: finalTemp, info: finalInfo } = applyWeatherSimulation(
               temp,
               currentDebugInfo
             );
-            setColorTemp(finalTemp);
-            setDebugInfo(finalInfo);
+            if (!cancelled) setColorTemp(finalTemp);
+            if (!cancelled) setDebugInfo(finalInfo);
+            if (!cancelled) setLoading(false);
             return;
           }
-
-          // handled above in try/catch
-
-          if (clouds !== undefined) {
-            // 5b. Adjust based on cloudiness
-            if (clouds > CLOUDY_CLOUD_THRESHOLD) {
-              temp = temp === 'warm' ? 'neutral' : 'cool';
-            } else if (clouds < SUNNY_CLOUD_THRESHOLD) {
-              temp = temp === 'cool' ? 'neutral' : 'warm';
-            }
-          }
-
-          // Log successful OpenWeather usage
-          logEvent('weather_theme_success', {
-            weatherSource: 'openweather',
-            colorTemp: temp,
-            temperature: current,
-            condition: weatherCondition,
-            cloudCover: clouds,
-            units,
-          });
         } else {
           const reason = 'Location permission denied; using time-based theme.';
           logger.warn(reason);
 
-          // Log fallback event
           logEvent('weather_theme_fallback', {
             reason: 'location_permission_denied',
             fallbackSource: 'time-of-day',
@@ -319,17 +307,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           };
         }
 
-        setDebugInfo(currentDebugInfo);
-
-        // Apply simulation if enabled
+        if (!cancelled) setDebugInfo(currentDebugInfo);
         const { temp: finalTemp, info: finalInfo } = applyWeatherSimulation(temp, currentDebugInfo);
-        setColorTemp(finalTemp);
-        setDebugInfo(finalInfo);
+        if (!cancelled) setColorTemp(finalTemp);
+        if (!cancelled) setDebugInfo(finalInfo);
       } catch (error) {
         const reason = 'ThemeContext weather failed, falling back to time-based';
         logger.warn(reason, { error });
 
-        // Log fallback event
         logEvent('weather_theme_fallback', {
           reason: 'exception',
           error: error instanceof Error ? error.message : 'unknown',
@@ -343,24 +328,30 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           fallbackReason: reason,
         };
 
-        setDebugInfo(fallbackInfo);
-
-        // Apply simulation if enabled
+        if (!cancelled) setDebugInfo(fallbackInfo);
         const { temp: finalTemp, info: finalInfo } = applyWeatherSimulation(
           computeTimeTemp(),
           fallbackInfo
         );
-        setColorTemp(finalTemp);
-        setDebugInfo(finalInfo);
+        if (!cancelled) setColorTemp(finalTemp);
+        if (!cancelled) setDebugInfo(finalInfo);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+
+    return () => {
+      cancelled = true;
+      try {
+        controller.abort();
+      } catch {
+        // ignore
+      }
+    };
   }, [weatherSimulation]); // Re-run when simulation changes
 
   // 6. Dark-mode interplay with brand colors
   const isDark = Appearance.getColorScheme() === 'dark';
-
   // Helper function to darken colors for dark mode
   const adjustColorForDarkMode = (color: string) => {
     // Simple approach: if in dark mode, darken the color by reducing the brightness

@@ -13,3 +13,7 @@ export const authClient = (axios as any).create({
 export function requestPasswordReset(email: string) {
   return authClient.post('/auth/forgot-password', { email });
 }
+
+export function requestPasswordResetWithSignal(email: string, signal?: AbortSignal) {
+  return authClient.post('/auth/forgot-password', { email }, { signal } as any);
+}

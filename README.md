@@ -55,6 +55,7 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
    - `ARCHITECTURE.md`: systems overview and request lifecycle.
    - `API_CONTRACT.md`: high-level endpoint catalog linked to `backend/openapi.yaml`.
    - `SECURITY_NOTES.md`: current threat model + rotation policies.
+   - `docs/postgres-backup.md`: PostgreSQL backup & restore procedures.
    - `docs/SEEDING.md`: how to seed the database with baseline or demo data.
    - `docs/` directory: historical audits, QA guides, and per-feature implementation notes.
 
@@ -387,6 +388,31 @@ The list of files lives in `scripts/expectedAssets.ts` and can be verified with
 The repo also includes a `Terpene_Wheel_Code_Kit.zip` archive. Run
 `npm run integrate-terpene-assets` to extract this kit into `assets/terpene-wheel`
 when you want to use the terpene wheel module.
+
+### White‑Label Asset Replacement
+
+Use the helper script to copy tenant-provided assets into the expected paths:
+
+```bash
+npm run assets:white-label -- /path/to/brand-assets
+```
+
+Expected files in the source directory:
+
+- `icon.png` → `assets/nimbus/nimbus-icon.png`
+- `splash.png` → `assets/nimbus/nimbus-splash.png`
+- Optional: `logo.png`, `logo-dark.png`, `onboarding-1.png`, `onboarding-2.png`, `onboarding-3.png`
+
+Then rebuild to verify icons and splash screens.
+
+### Admin Route Testing (local)
+
+Generate an admin JWT for testing RBAC-protected endpoints:
+
+```bash
+JWT_SECRET=test-secret-key node scripts/make-admin-jwt.js admin-user-id > admin.jwt
+curl -H "Authorization: Bearer $(cat admin.jwt)" http://localhost:3000/api/v1/admin/ping
+```
 
 🧪 Testing & Quality
 

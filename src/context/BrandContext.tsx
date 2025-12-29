@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { fetchJson } from '../utils/apiClient';
-
-import { apiRequest } from '../utils/apiClient';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 export interface Brand {
   id: string;
@@ -24,8 +23,8 @@ const BrandContext = createContext<BrandContextType | undefined>(undefined);
 // Default fallback brand for when API fails
 const DEFAULT_BRAND: Brand = {
   id: 'default',
-  name: 'Cannabis Platform',
-  slug: 'default',
+  name: (process.env.EXPO_PUBLIC_BRAND_NAME as string) || 'Cannabis Platform',
+  slug: (process.env.EXPO_PUBLIC_BRAND_SLUG as string) || 'default',
   primaryColor: '#16A34A',
   secondaryColor: '#15803D',
   logoUrl: undefined,
@@ -59,7 +58,7 @@ export function BrandProvider({ children }: BrandProviderProps) {
 
       // Try to fetch the default brand from API
       try {
-        const brandData = await fetchJson(`${process.env.EXPO_PUBLIC_API_URL}/api/brands/default`, {
+        const brandData = await fetchJson(`${API_BASE_URL}/api/brands/default`, {
           signal,
         });
         setBrandState(brandData);

@@ -168,10 +168,26 @@ curl "http://localhost:3000/api/v1/recommendations/weather/auto?lat=42.3314&lon=
 | ---- | -------------------------------- |
 | 400  | Bad Request - Invalid parameters |
 | 401  | Unauthorized - Invalid token     |
-| 403  | Forbidden - Access denied        |
-| 404  | Not Found - Resource not found   |
-| 429  | Too Many Requests - Rate limited |
-| 500  | Internal Server Error            |
+
+## Admin & RBAC
+
+Some endpoints may require elevated roles. Use `requireRole('admin')` middleware to protect admin-only routes.
+
+Example:
+
+```
+GET /api/v1/admin/ping
+Authorization: Bearer <jwt>
+
+200 OK
+{ "ok": true }
+```
+
+Ensure your JWT payload includes a `roles` array (e.g., `["admin"]`) or a `role` string with the required value.
+| 403 | Forbidden - Access denied |
+| 404 | Not Found - Resource not found |
+| 429 | Too Many Requests - Rate limited |
+| 500 | Internal Server Error |
 
 ## Rate Limiting
 

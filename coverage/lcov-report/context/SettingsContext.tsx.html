@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/27</span>
             </div>
         
             
@@ -121,7 +121,17 @@
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -145,6 +155,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -153,13 +169,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -168,6 +184,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,7 +203,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 &nbsp;
-import { setLocale as setI18nLocale } from '../utils/i18n';
+import { useI18nContext } from '../i18n/I18nProvider';
 import { saveSecure, getSecure } from '../utils/secureStorage';
 &nbsp;
 interface SettingsContextState {
@@ -203,6 +223,7 @@ const SettingsContext = <span class="cstat-no" title="statement not covered" >cr
 export const SettingsProvider: React.FC&lt;{ children: ReactNode }&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> children }) =&gt; {</span>
   const [biometricEnabled, setBiometricEnabledState] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
   const [locale, setLocaleState] = <span class="cstat-no" title="statement not covered" >useState('en');</span>
+  const i18n = <span class="cstat-no" title="statement not covered" >useI18nContext();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    (<span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
@@ -213,7 +234,12 @@ export const SettingsProvider: React.FC&lt;{ children: ReactNode }&gt; = <span c
       const storedLocale = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem('locale');</span>
 <span class="cstat-no" title="statement not covered" >      if (storedLocale) {</span>
 <span class="cstat-no" title="statement not covered" >        setLocaleState(storedLocale);</span>
-<span class="cstat-no" title="statement not covered" >        setI18nLocale(storedLocale);</span>
+        // use I18nProvider to set runtime locale
+<span class="cstat-no" title="statement not covered" >        try {</span>
+<span class="cstat-no" title="statement not covered" >          i18n?.setLocale(storedLocale as any);</span>
+        } catch (_e) {
+<span class="cstat-no" title="statement not covered" >          void 0;</span>
+        }
       }
     })();
   }, []);
@@ -225,7 +251,11 @@ export const SettingsProvider: React.FC&lt;{ children: ReactNode }&gt; = <span c
 &nbsp;
   const setLocale = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (value: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    setLocaleState(value);</span>
-<span class="cstat-no" title="statement not covered" >    setI18nLocale(value);</span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+<span class="cstat-no" title="statement not covered" >      i18n?.setLocale(value as any);</span>
+    } catch (_e) {
+<span class="cstat-no" title="statement not covered" >      void 0;</span>
+    }
 <span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem('locale', value);</span>
   };
 &nbsp;
@@ -244,7 +274,7 @@ export const useSettings = <span class="cstat-no" title="statement not covered" 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

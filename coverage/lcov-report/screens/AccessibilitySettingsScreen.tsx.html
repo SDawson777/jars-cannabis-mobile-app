@@ -494,9 +494,9 @@ type AccessibilityNavProp = NativeStackNavigationProp&lt;RootStackParamList, 'Ac
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >AccessibilitySettingsScreen(</span>) {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation&lt;AccessibilityNavProp&gt;();</span>
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
   const bgColor =
-<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;</span>
+<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;</span>
 &nbsp;
   const [prefs, setPrefs] = <span class="cstat-no" title="statement not covered" >useState&lt;AccessibilityPrefs | null&gt;(null);</span>
   const [loading, setLoading] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
@@ -559,7 +559,7 @@ export default function <span class="fstat-no" title="function not covered" >Acc
 <span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}&gt;
         &lt;View style={styles.errorContainer}&gt;
-          &lt;Text style={[styles.errorText, { color: jarsPrimary }]}&gt;Error: {error}&lt;/Text&gt;
+          &lt;Text style={[styles.errorText, { color: brandPrimary }]}&gt;Error: {error}&lt;/Text&gt;
           &lt;Button
             title="Retry"
             onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; {
@@ -570,7 +570,7 @@ export default function <span class="fstat-no" title="function not covered" >Acc
                 .catch(<span class="fstat-no" title="function not covered" >er</span>r =&gt; <span class="cstat-no" title="statement not covered" >setError(err.message))</span>
                 .finally(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setLoading(false))</span>;
             }}
-            color={jarsPrimary}
+            color={brandPrimary}
           /&gt;
         &lt;/View&gt;
       &lt;/SafeAreaView&gt;
@@ -583,43 +583,43 @@ export default function <span class="fstat-no" title="function not covered" >Acc
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}&gt;
       {/* Header */}
-      &lt;View style={[styles.header, { borderBottomColor: jarsSecondary }]}&gt;
+      &lt;View style={[styles.header, { borderBottomColor: brandSecondary }]}&gt;
         &lt;Pressable onPress={handleBack}&gt;
-          &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+          &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
         &lt;/Pressable&gt;
-        &lt;Text style={[styles.headerTitle, { color: jarsPrimary }]}&gt;Accessibility Settings&lt;/Text&gt;
+        &lt;Text style={[styles.headerTitle, { color: brandPrimary }]}&gt;Accessibility Settings&lt;/Text&gt;
         &lt;View style={{ width: 24 }} /&gt;
       &lt;/View&gt;
 &nbsp;
       &lt;ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}&gt;
         &lt;View style={styles.row}&gt;
-          &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;Dyslexia-friendly Font&lt;/Text&gt;
+          &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;Dyslexia-friendly Font&lt;/Text&gt;
           &lt;Switch
             value={prefs.dyslexiaFont}
             onValueChange={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleToggle('dyslexiaFont')}</span>
-            trackColor={{ true: jarsPrimary, false: '#ccc' }}
+            trackColor={{ true: brandPrimary, false: '#ccc' }}
           /&gt;
         &lt;/View&gt;
 &nbsp;
         &lt;View style={styles.row}&gt;
-          &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;High Contrast&lt;/Text&gt;
+          &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;High Contrast&lt;/Text&gt;
           &lt;Switch
             value={prefs.highContrast}
             onValueChange={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleToggle('highContrast')}</span>
-            trackColor={{ true: jarsPrimary, false: '#ccc' }}
+            trackColor={{ true: brandPrimary, false: '#ccc' }}
           /&gt;
         &lt;/View&gt;
 &nbsp;
         &lt;View style={styles.row}&gt;
-          &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;Reduce Motion&lt;/Text&gt;
+          &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;Reduce Motion&lt;/Text&gt;
           &lt;Switch
             value={prefs.reducedMotion}
             onValueChange={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >handleToggle('reducedMotion')}</span>
-            trackColor={{ true: jarsPrimary, false: '#ccc' }}
+            trackColor={{ true: brandPrimary, false: '#ccc' }}
           /&gt;
         &lt;/View&gt;
 &nbsp;
-        &lt;Button title="Save" onPress={handleSave} color={jarsPrimary} disabled={loading} /&gt;
+        &lt;Button title="Save" onPress={handleSave} color={brandPrimary} disabled={loading} /&gt;
       &lt;/ScrollView&gt;
     &lt;/SafeAreaView&gt;
   );
@@ -655,7 +655,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -779,7 +779,7 @@ type SignUpNavProp = NativeStackNavigationProp&lt;RootStackParamList, 'SignUp'&g
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >SignUpScreen(</span>) {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation&lt;SignUpNavProp&gt;();</span>
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
   const { signUp } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
 &nbsp;
   const [name, setName] = <span class="cstat-no" title="statement not covered" >useState('');</span>
@@ -797,13 +797,13 @@ export default function <span class="fstat-no" title="function not covered" >Sig
 &nbsp;
   // Background based on time/weather
   const bgColor =
-<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;</span>
+<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;</span>
 &nbsp;
   // Glow effect for the sign-up button
   const glowStyle =
 <span class="cstat-no" title="statement not covered" >    colorTemp === 'warm'</span>
       ? {
-          shadowColor: jarsPrimary,
+          shadowColor: brandPrimary,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
@@ -837,14 +837,14 @@ export default function <span class="fstat-no" title="function not covered" >Sig
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}&gt;
-      &lt;Text style={[styles.title, { color: jarsPrimary }]}&gt;Create Account&lt;/Text&gt;
+      &lt;Text style={[styles.title, { color: brandPrimary }]}&gt;Create Account&lt;/Text&gt;
 &nbsp;
       &lt;TextInput
         style={[
           styles.input,
           {
-            borderColor: focused === 'name' ? jarsPrimary : jarsSecondary,
-            color: jarsPrimary,
+            borderColor: focused === 'name' ? brandPrimary : brandSecondary,
+            color: brandPrimary,
           },
         ]}
         placeholder="Full Name"
@@ -861,8 +861,8 @@ export default function <span class="fstat-no" title="function not covered" >Sig
         style={[
           styles.input,
           {
-            borderColor: focused === 'email' ? jarsPrimary : jarsSecondary,
-            color: jarsPrimary,
+            borderColor: focused === 'email' ? brandPrimary : brandSecondary,
+            color: brandPrimary,
           },
         ]}
         placeholder="Email"
@@ -880,8 +880,8 @@ export default function <span class="fstat-no" title="function not covered" >Sig
         style={[
           styles.input,
           {
-            borderColor: focused === 'phone' ? jarsPrimary : jarsSecondary,
-            color: jarsPrimary,
+            borderColor: focused === 'phone' ? brandPrimary : brandSecondary,
+            color: brandPrimary,
           },
         ]}
         placeholder="Phone"
@@ -900,8 +900,8 @@ export default function <span class="fstat-no" title="function not covered" >Sig
             styles.input,
             {
               flex: 1,
-              borderColor: focused === 'password' ? jarsPrimary : jarsSecondary,
-              color: jarsPrimary,
+              borderColor: focused === 'password' ? brandPrimary : brandSecondary,
+              color: brandPrimary,
             },
           ]}
           placeholder="Password"
@@ -916,9 +916,9 @@ export default function <span class="fstat-no" title="function not covered" >Sig
         /&gt;
         &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setShowPassword(!showPassword)}</span> style={styles.eyeBtn}&gt;
           {showPassword ? (
-            &lt;EyeOff color={jarsSecondary} size={20} /&gt;
+            &lt;EyeOff color={brandSecondary} size={20} /&gt;
           ) : (
-            &lt;Eye color={jarsSecondary} size={20} /&gt;
+            &lt;Eye color={brandSecondary} size={20} /&gt;
           )}
         &lt;/Pressable&gt;
       &lt;/View&gt;
@@ -930,8 +930,8 @@ export default function <span class="fstat-no" title="function not covered" >Sig
             styles.input,
             {
               flex: 1,
-              borderColor: focused === 'confirm' ? jarsPrimary : jarsSecondary,
-              color: jarsPrimary,
+              borderColor: focused === 'confirm' ? brandPrimary : brandSecondary,
+              color: brandPrimary,
             },
           ]}
           placeholder="Confirm Password"
@@ -946,16 +946,16 @@ export default function <span class="fstat-no" title="function not covered" >Sig
         /&gt;
         &lt;Pressable onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setShowPassword(!showPassword)}</span> style={styles.eyeBtn}&gt;
           {showPassword ? (
-            &lt;EyeOff color={jarsSecondary} size={20} /&gt;
+            &lt;EyeOff color={brandSecondary} size={20} /&gt;
           ) : (
-            &lt;Eye color={jarsSecondary} size={20} /&gt;
+            &lt;Eye color={brandSecondary} size={20} /&gt;
           )}
         &lt;/Pressable&gt;
       &lt;/View&gt;
 &nbsp;
       &lt;Pressable style={styles.checkboxRow} onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setOptIn(!optIn)}</span>&gt;
-        &lt;View style={[styles.checkbox, optIn &amp;&amp; { backgroundColor: jarsPrimary }]} /&gt;
-        &lt;Text style={[styles.optText, { color: jarsPrimary }]}&gt;Email me about deals&lt;/Text&gt;
+        &lt;View style={[styles.checkbox, optIn &amp;&amp; { backgroundColor: brandPrimary }]} /&gt;
+        &lt;Text style={[styles.optText, { color: brandPrimary }]}&gt;Email me about deals&lt;/Text&gt;
       &lt;/Pressable&gt;
 &nbsp;
       &lt;Pressable
@@ -963,7 +963,7 @@ export default function <span class="fstat-no" title="function not covered" >Sig
         accessibilityLabel="Sign Up"
         style={<span class="fstat-no" title="function not covered" >({</span> pressed }) =&gt; <span class="cstat-no" title="statement not covered" >[</span>
           styles.button,
-          { backgroundColor: jarsPrimary },
+          { backgroundColor: brandPrimary },
           glowStyle,
           pressed &amp;&amp; { transform: [{ scale: 0.95 }] },
         ]}
@@ -973,7 +973,7 @@ export default function <span class="fstat-no" title="function not covered" >Sig
       &lt;/Pressable&gt;
 &nbsp;
       &lt;View style={styles.policy}&gt;
-        &lt;Text style={[styles.disclaimer, { color: jarsSecondary }]}&gt;
+        &lt;Text style={[styles.disclaimer, { color: brandSecondary }]}&gt;
           By creating an account you agree to our
         &lt;/Text&gt;
         &lt;View style={styles.legalRow}&gt;
@@ -985,9 +985,9 @@ export default function <span class="fstat-no" title="function not covered" >Sig
 <span class="cstat-no" title="statement not covered" >              navigation.navigate('Legal');</span>
             }}
           &gt;
-            &lt;Text style={[styles.linkText, { color: jarsPrimary }]}&gt;Terms &amp;amp; Conditions&lt;/Text&gt;
+            &lt;Text style={[styles.linkText, { color: brandPrimary }]}&gt;Terms &amp;amp; Conditions&lt;/Text&gt;
           &lt;/Pressable&gt;
-          &lt;Text style={[styles.disclaimer, { color: jarsSecondary }]}&gt; and &lt;/Text&gt;
+          &lt;Text style={[styles.disclaimer, { color: brandSecondary }]}&gt; and &lt;/Text&gt;
           &lt;Pressable
             accessibilityRole="link"
             accessibilityLabel="Privacy Policy"
@@ -996,13 +996,13 @@ export default function <span class="fstat-no" title="function not covered" >Sig
 <span class="cstat-no" title="statement not covered" >              navigation.navigate('Legal');</span>
             }}
           &gt;
-            &lt;Text style={[styles.linkText, { color: jarsPrimary }]}&gt;Privacy Policy&lt;/Text&gt;
+            &lt;Text style={[styles.linkText, { color: brandPrimary }]}&gt;Privacy Policy&lt;/Text&gt;
           &lt;/Pressable&gt;
         &lt;/View&gt;
       &lt;/View&gt;
 &nbsp;
       &lt;View style={styles.footer}&gt;
-        &lt;Text style={[styles.footerText, { color: jarsSecondary }]}&gt;Already have an account?&lt;/Text&gt;
+        &lt;Text style={[styles.footerText, { color: brandSecondary }]}&gt;Already have an account?&lt;/Text&gt;
         &lt;Pressable
           accessibilityRole="button"
           accessibilityLabel="Log In"
@@ -1013,7 +1013,7 @@ export default function <span class="fstat-no" title="function not covered" >Sig
           }}
           style={<span class="fstat-no" title="function not covered" >({</span> pressed }) =&gt; <span class="cstat-no" title="statement not covered" >pressed &amp;&amp; { transform: [{ scale: 0.95 }] }}</span>
         &gt;
-          &lt;Text style={[styles.linkText, { color: jarsPrimary }]}&gt;Log In&lt;/Text&gt;
+          &lt;Text style={[styles.linkText, { color: brandPrimary }]}&gt;Log In&lt;/Text&gt;
         &lt;/Pressable&gt;
       &lt;/View&gt;
     &lt;/SafeAreaView&gt;
@@ -1093,7 +1093,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -31,17 +31,11 @@ export default class ErrorBoundary extends React.Component<React.PropsWithChildr
   render() {
     if (this.state.hasError) {
       return (
-        <View
-          accessible
-          accessibilityLabel="error-boundary-fallback"
-          style={styles.container}
-        >
+        <View accessible accessibilityLabel="error-boundary-fallback" style={styles.container}>
           <Text style={styles.title} accessibilityRole="alert">
             Oops, something went wrong.
           </Text>
-          <Text style={styles.subtitle}>
-            We've logged this issue and will fix it soon.
-          </Text>
+          <Text style={styles.subtitle}>We've logged this issue and will fix it soon.</Text>
           {__DEV__ && this.state.error && (
             <Text style={styles.devError}>{this.state.error.message}</Text>
           )}

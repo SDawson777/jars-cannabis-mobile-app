@@ -35,6 +35,7 @@ import { qaRouter } from './routes/qa';
 import { recommendationsRouter } from './routes/recommendations';
 import { personalizationRouter } from './routes/personalization';
 import { awardsApiRouter } from './routes/awardsApi';
+import { adminRouter } from './routes/admin';
 import { stripeRouter } from './routes/stripe';
 import { paymentMethodsRouter } from './routes/paymentMethods';
 import { addressesRouter } from './routes/addresses';
@@ -201,6 +202,7 @@ try {
 // Register routers under both /api and /api/v1 for compatibility with tests and older clients
 // AI router mounted at /ai subpath to match mobile client expectations
 const routers = [
+  adminRouter,
   authRouter,
   brandsRouter,
   profileRouter,

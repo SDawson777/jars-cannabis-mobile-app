@@ -2,6 +2,66 @@ name: CI
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      - name: Validate env example
+        run: npm run validate:env
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test -- --runInBand --silent
+
+      - name: Prisma generate (backend)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || '' }}
+        run: npx prisma generate --schema=prisma/schema.prisma
+
+      - name: Prisma migrate deploy (dry-run)
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || '' }}
+        run: |
+          if [ -n "$DATABASE_URL" ]; then
+            npx prisma migrate resolve --applied --schema=prisma/schema.prisma || true
+            npx prisma migrate deploy --schema=prisma/schema.prisma || true
+          else
+            echo "Skipping prisma migrate deploy: DATABASE_URL not provided in secrets"
+          fi
+name: CI
+
+on:
+  push:
     branches:
       - main
       - develop

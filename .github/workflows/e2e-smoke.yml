@@ -409,7 +409,7 @@ jobs:
       - name: 🏗 Build app for E2E
         run: npm run build:e2e:android
         env:
-          EXPO_PUBLIC_API_URL: http://10.0.2.2:3000/api/v1
+          EXPO_PUBLIC_API_URL: http://10.0.2.2:3000
           CI: true
 
       - name: 🚀 Start backend server
@@ -429,7 +429,7 @@ jobs:
         run: npm run test:e2e:android
         env:
           DETOX_CONFIGURATION: android.emu.debug
-          EXPO_PUBLIC_API_URL: http://10.0.2.2:3000/api/v1
+          EXPO_PUBLIC_API_URL: http://10.0.2.2:3000
 
       - name: Shutdown emulator (fallback)
         if: always()

@@ -61,7 +61,7 @@ export function useCart() {
     }
   };
 
-  const fetchCart = async (): Promise<Cart> => {
+  const fetchCart = async ({ signal }: { signal?: AbortSignal } = {}): Promise<Cart> => {
     const _state = await NetInfo.fetch();
     if (!_state.isConnected) {
       const cached = await AsyncStorage.getItem('cart');
@@ -73,7 +73,10 @@ export function useCart() {
       }
       throw new Error('Offline');
     }
-    const data = await clientGet<CartResponse | { cart?: Cart }>(phase4Client, '/cart');
+    // Use the AbortSignal provided by React Query (if any) to allow cancellation
+    const data = await clientGet<CartResponse | { cart?: Cart }>(phase4Client, '/cart', {
+      signal,
+    });
     // backend returns { cart: { items: [...], total } } or Cart directly
     const cartPayload = (data as any)?.cart ?? (data as Cart);
     await AsyncStorage.setItem('cart', JSON.stringify(cartPayload));
@@ -88,6 +91,9 @@ export function useCart() {
 
   useEffect(() => {
     setLoadingFromCache(false);
+    return () => {
+      // Nothing to cleanup here; fetchCart handles its own controller when invoked by React Query
+    };
   }, [query.data]);
 
   const mutation = useMutation<Cart, Error, any>({

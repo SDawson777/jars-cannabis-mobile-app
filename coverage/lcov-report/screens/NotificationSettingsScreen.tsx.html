@@ -326,7 +326,7 @@ import { hapticLight } from '../utils/haptic';
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >NotificationSettingsScreen(</span>) {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation();</span>
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
 &nbsp;
   const [emailNotifications, setEmailNotifications] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
   const [smsNotifications, setSmsNotifications] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
@@ -337,7 +337,7 @@ export default function <span class="fstat-no" title="function not covered" >Not
   }, []);
 &nbsp;
   const bgColor =
-<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;</span>
+<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;</span>
 &nbsp;
   const handleBack = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    hapticLight();</span>
@@ -354,41 +354,41 @@ export default function <span class="fstat-no" title="function not covered" >Not
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}&gt;
       {/* Header */}
-      &lt;View style={[styles.header, { borderBottomColor: jarsSecondary }]}&gt;
+      &lt;View style={[styles.header, { borderBottomColor: brandSecondary }]}&gt;
         &lt;Pressable onPress={handleBack}&gt;
-          &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+          &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
         &lt;/Pressable&gt;
-        &lt;Text style={[styles.headerTitle, { color: jarsPrimary }]}&gt;Notifications&lt;/Text&gt;
+        &lt;Text style={[styles.headerTitle, { color: brandPrimary }]}&gt;Notifications&lt;/Text&gt;
         &lt;View style={{ width: 24 }} /&gt;
       &lt;/View&gt;
 &nbsp;
       &lt;ScrollView contentContainerStyle={styles.content}&gt;
-        &lt;View style={[styles.row, { borderBottomColor: jarsSecondary }]}&gt;
-          &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;Email Notifications&lt;/Text&gt;
+        &lt;View style={[styles.row, { borderBottomColor: brandSecondary }]}&gt;
+          &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;Email Notifications&lt;/Text&gt;
           &lt;Switch
             value={emailNotifications}
             onValueChange={<span class="fstat-no" title="function not covered" >v </span>=&gt; <span class="cstat-no" title="statement not covered" >toggle(setEmailNotifications, v)}</span>
-            trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
+            trackColor={{ true: brandPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           /&gt;
         &lt;/View&gt;
 &nbsp;
-        &lt;View style={[styles.row, { borderBottomColor: jarsSecondary }]}&gt;
-          &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;SMS Notifications&lt;/Text&gt;
+        &lt;View style={[styles.row, { borderBottomColor: brandSecondary }]}&gt;
+          &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;SMS Notifications&lt;/Text&gt;
           &lt;Switch
             value={smsNotifications}
             onValueChange={<span class="fstat-no" title="function not covered" >v </span>=&gt; <span class="cstat-no" title="statement not covered" >toggle(setSmsNotifications, v)}</span>
-            trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
+            trackColor={{ true: brandPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           /&gt;
         &lt;/View&gt;
 &nbsp;
         &lt;View style={[styles.row, { borderBottomWidth: 0 }]}&gt;
-          &lt;Text style={[styles.label, { color: jarsPrimary }]}&gt;Push Notifications&lt;/Text&gt;
+          &lt;Text style={[styles.label, { color: brandPrimary }]}&gt;Push Notifications&lt;/Text&gt;
           &lt;Switch
             value={pushNotifications}
             onValueChange={<span class="fstat-no" title="function not covered" >v </span>=&gt; <span class="cstat-no" title="statement not covered" >toggle(setPushNotifications, v)}</span>
-            trackColor={{ true: jarsPrimary, false: '#EEEEEE' }}
+            trackColor={{ true: brandPrimary, false: '#EEEEEE' }}
             thumbColor="#FFFFFF"
           /&gt;
         &lt;/View&gt;
@@ -424,7 +424,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

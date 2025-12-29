@@ -25,7 +25,7 @@ export const queryClient = new QueryClient({
       staleTime: 1000 * 60,
       // Retry failed queries 2 times
       retry: 2,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
       // Network mode: support offline
       networkMode: 'offlineFirst',
       // Refetch on reconnect
@@ -43,7 +43,7 @@ export const queryClient = new QueryClient({
 });
 
 // Register online/offline detection
-NetInfo.addEventListener((state) => {
+NetInfo.addEventListener(state => {
   if (state.isConnected) {
     // When back online, invalidate and refetch
     queryClient.invalidateQueries();

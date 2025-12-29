@@ -12,12 +12,82 @@ PODS:
     - ExpoModulesCore
   - EXFont (11.10.3):
     - ExpoModulesCore
+  - EXJSONUtils (0.12.3)
   - EXLocation (16.5.5):
+    - ExpoModulesCore
+  - EXManifests (0.13.2):
     - ExpoModulesCore
   - EXNotifications (0.27.8):
     - ExpoModulesCore
   - Expo (50.0.21):
     - ExpoModulesCore
+  - expo-dev-client (3.3.12):
+    - EXManifests
+    - expo-dev-launcher
+    - expo-dev-menu
+    - expo-dev-menu-interface
+    - EXUpdatesInterface
+  - expo-dev-launcher (3.6.10):
+    - EXManifests
+    - expo-dev-launcher/Main (= 3.6.10)
+    - expo-dev-menu
+    - expo-dev-menu-interface
+    - ExpoModulesCore
+    - EXUpdatesInterface
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+    - React-RCTAppDelegate
+  - expo-dev-launcher/Main (3.6.10):
+    - EXManifests
+    - expo-dev-launcher/Unsafe
+    - expo-dev-menu
+    - expo-dev-menu-interface
+    - ExpoModulesCore
+    - EXUpdatesInterface
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+    - React-RCTAppDelegate
+  - expo-dev-launcher/Unsafe (3.6.10):
+    - EXManifests
+    - expo-dev-menu
+    - expo-dev-menu-interface
+    - ExpoModulesCore
+    - EXUpdatesInterface
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+    - React-RCTAppDelegate
+  - expo-dev-menu (4.5.8):
+    - expo-dev-menu/Main (= 4.5.8)
+    - expo-dev-menu/ReactNativeCompatibles (= 4.5.8)
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - expo-dev-menu-interface (1.7.2)
+  - expo-dev-menu/Main (4.5.8):
+    - EXManifests
+    - expo-dev-menu-interface
+    - expo-dev-menu/Vendored
+    - ExpoModulesCore
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - expo-dev-menu/ReactNativeCompatibles (4.5.8):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - expo-dev-menu/SafeAreaView (4.5.8):
+    - ExpoModulesCore
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - expo-dev-menu/Vendored (4.5.8):
+    - expo-dev-menu/SafeAreaView
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
   - ExpoFileSystem (16.0.9):
     - ExpoModulesCore
   - ExpoHaptics (12.8.1):
@@ -44,6 +114,7 @@ PODS:
   - EXTaskManager (11.7.3):
     - ExpoModulesCore
     - UMAppLoader
+  - EXUpdatesInterface (0.15.3)
   - FBLazyVector (0.73.6)
   - FBReactNativeSpec (0.73.6):
     - RCT-Folly (= 2022.05.16.00)
@@ -52,8 +123,54 @@ PODS:
     - React-Core (= 0.73.6)
     - React-jsi (= 0.73.6)
     - ReactCommon/turbomodule/core (= 0.73.6)
+  - FirebaseCore (11.7.0):
+    - FirebaseCoreInternal (~> 11.7.0)
+    - GoogleUtilities/Environment (~> 8.0)
+    - GoogleUtilities/Logger (~> 8.0)
+  - FirebaseCoreInternal (11.7.0):
+    - "GoogleUtilities/NSData+zlib (~> 8.0)"
   - fmt (6.2.1)
   - glog (0.3.5)
+  - GoogleUtilities (8.1.0):
+    - GoogleUtilities/AppDelegateSwizzler (= 8.1.0)
+    - GoogleUtilities/Environment (= 8.1.0)
+    - GoogleUtilities/Logger (= 8.1.0)
+    - GoogleUtilities/MethodSwizzler (= 8.1.0)
+    - GoogleUtilities/Network (= 8.1.0)
+    - "GoogleUtilities/NSData+zlib (= 8.1.0)"
+    - GoogleUtilities/Privacy (= 8.1.0)
+    - GoogleUtilities/Reachability (= 8.1.0)
+    - GoogleUtilities/SwizzlerTestHelpers (= 8.1.0)
+    - GoogleUtilities/UserDefaults (= 8.1.0)
+  - GoogleUtilities/AppDelegateSwizzler (8.1.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Environment (8.1.0):
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Logger (8.1.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/MethodSwizzler (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Network (8.1.0):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Privacy
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (8.1.0)":
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/Privacy (8.1.0)
+  - GoogleUtilities/Reachability (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
+  - GoogleUtilities/SwizzlerTestHelpers (8.1.0):
+    - GoogleUtilities/MethodSwizzler
+  - GoogleUtilities/UserDefaults (8.1.0):
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Privacy
   - hermes-engine (0.73.6):
     - hermes-engine/Pre-built (= 0.73.6)
   - hermes-engine/Pre-built (0.73.6)
@@ -1163,16 +1280,16 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - RNSentry (7.6.0):
-    - glog
+  - RNSentry (5.20.0):
     - hermes-engine
-    - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - React-hermes
-    - Sentry/HybridSDK (= 8.57.2)
+    - Sentry/HybridSDK (= 8.21.0)
   - RNSVG (14.1.0):
     - React-Core
-  - Sentry/HybridSDK (8.57.2)
+  - Sentry/HybridSDK (8.21.0):
+    - SentryPrivate (= 8.21.0)
+  - SentryPrivate (8.21.0)
   - SocketRocket (0.6.1)
   - Stripe (23.18.3):
     - StripeApplePay (= 23.18.3)
@@ -1221,9 +1338,15 @@ DEPENDENCIES:
   - EXAV (from `../node_modules/expo-av/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXFont (from `../node_modules/expo-font/ios`)
+  - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
   - EXLocation (from `../node_modules/expo-location/ios`)
+  - EXManifests (from `../node_modules/expo-manifests/ios`)
   - EXNotifications (from `../node_modules/expo-notifications/ios`)
   - Expo (from `../node_modules/expo`)
+  - expo-dev-client (from `../node_modules/expo-dev-client/ios`)
+  - expo-dev-launcher (from `../node_modules/expo-dev-launcher`)
+  - expo-dev-menu (from `../node_modules/expo-dev-menu`)
+  - expo-dev-menu-interface (from `../node_modules/expo-dev-menu-interface/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoHaptics (from `../node_modules/expo-haptics/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
@@ -1234,9 +1357,12 @@ DEPENDENCIES:
   - ExpoSpeech (from `../node_modules/expo-speech/ios`)
   - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - EXTaskManager (from `../node_modules/expo-task-manager/ios`)
+  - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
+  - FirebaseCore (~> 11.7.0)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - GoogleUtilities
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
   - lottie-react-native (from `../node_modules/lottie-react-native`)
@@ -1305,10 +1431,14 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - FirebaseCore
+    - FirebaseCoreInternal
     - fmt
+    - GoogleUtilities
     - libevent
     - lottie-ios
     - Sentry
+    - SentryPrivate
     - SocketRocket
     - Stripe
     - StripeApplePay
@@ -1334,12 +1464,24 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-constants/ios"
   EXFont:
     :path: "../node_modules/expo-font/ios"
+  EXJSONUtils:
+    :path: "../node_modules/expo-json-utils/ios"
   EXLocation:
     :path: "../node_modules/expo-location/ios"
+  EXManifests:
+    :path: "../node_modules/expo-manifests/ios"
   EXNotifications:
     :path: "../node_modules/expo-notifications/ios"
   Expo:
     :path: "../node_modules/expo"
+  expo-dev-client:
+    :path: "../node_modules/expo-dev-client/ios"
+  expo-dev-launcher:
+    :path: "../node_modules/expo-dev-launcher"
+  expo-dev-menu:
+    :path: "../node_modules/expo-dev-menu"
+  expo-dev-menu-interface:
+    :path: "../node_modules/expo-dev-menu-interface/ios"
   ExpoFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   ExpoHaptics:
@@ -1360,6 +1502,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-web-browser/ios"
   EXTaskManager:
     :path: "../node_modules/expo-task-manager/ios"
+  EXUpdatesInterface:
+    :path: "../node_modules/expo-updates-interface/ios"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
@@ -1500,9 +1644,15 @@ SPEC CHECKSUMS:
   EXAV: e160fec51bf6bc41c3b6f7e4c72ea9fd36860cd6
   EXConstants: c82ef9280044accc91fb6082047afdc9a408f61a
   EXFont: 64e653a110eee050ad80dfcd676c4bada0a1ff92
+  EXJSONUtils: 5c42959e87be238b045ef37cc5268b16a6c0ad4a
   EXLocation: a8037ebc0dc56b2fc5aa20eef8cb52fb6e29c002
+  EXManifests: 429136cffa3ae82d1ba3b60b7243fb186615562e
   EXNotifications: 9fd42ca3c5998ae93a2ac869ed9a47467c433219
   Expo: 1b33cb8ab60cff9abf805ed6020af3d1846e457c
+  expo-dev-client: 775a683302570193a7ba71032d0b1b82f6ad1454
+  expo-dev-launcher: 4b9190f0879290b57ed89cc5c24592d4ce981f85
+  expo-dev-menu: efe7323e7f918e437a02f20063eb2b55c13dfe99
+  expo-dev-menu-interface: 44e69ddff62bbc6c5418c200e657635720b5a480
   ExpoFileSystem: df58e1eb2a4d6f1006a1ca70bddfbbf63e52fa4f
   ExpoHaptics: c91902e436f3fb0e07aa19acc118018089fa90de
   ExpoKeepAwake: 3b8cf8533b9212500565a1e41fb080fc5af29918
@@ -1513,10 +1663,14 @@ SPEC CHECKSUMS:
   ExpoSpeech: 46ddff772c2157828e439c1f74a07f10ec20ff5a
   ExpoWebBrowser: c5d027f58a0b2c1926c86ce3596c94490a639fa2
   EXTaskManager: 8c5683c2fb543cf2baa77bab4ad130b7e3829c4a
+  EXUpdatesInterface: 3e444e2093e25b7ca0999a7d8c16e8392dee70c3
   FBLazyVector: f64d1e2ea739b4d8f7e4740cde18089cd97fe864
   FBReactNativeSpec: 9f2b8b243131565335437dba74923a8d3015e780
+  FirebaseCore: 3227e35f4197a924206fbcdc0349325baf4f5de4
+  FirebaseCoreInternal: d6c17dafc8dc33614733a8b52df78fcb4394c881
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
+  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: 9cecf9953a681df7556b8cc9c74905de8f3293c0
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   lottie-ios: 3d98679b41fa6fd6aff2352b3953dbd3df8a397e
@@ -1576,9 +1730,10 @@ SPEC CHECKSUMS:
   RNReactNativeHapticFeedback: 9d07fb28f9ef1e81440181602954cb3c78d30184
   RNReanimated: 88dfb3d4b761e093b5a794a893785e15f96db949
   RNScreens: 59f615aa0782077560c8eea46c2daec3a716dba9
-  RNSentry: 2ea79859cfa6ae3a40712e3f5667c081aeb19302
+  RNSentry: 7d000686869632faae88afac126240a95ccd8609
   RNSVG: 6d5ed33b6635ed6d6ecb50744dcf127580c39ed5
-  Sentry: 83a3814c3ca042874b39c5c5bdffb6570d4d760e
+  Sentry: ebc12276bd17613a114ab359074096b6b3725203
+  SentryPrivate: d651efb234cf385ec9a1cdd3eff94b5e78a0e0fe
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Stripe: e046335ab6e3f25d39f1a55bd98620a85269cffa
   stripe-react-native: b826a7a621596be9a3971d66ad63a24c48b391f0
@@ -1592,6 +1747,6 @@ SPEC CHECKSUMS:
   UMAppLoader: 79d3ee6aa2447a1fe2e8b0d07acf2de106e55b58
   Yoga: 805bf71192903b20fc14babe48080582fee65a80
 
-PODFILE CHECKSUM: 5207489e6a8e0743f8049d960f1a7f9f75a0dc96
+PODFILE CHECKSUM: d86cf673e498ae4a46938f7ee0b9d64d6b0d9c0b
 
 COCOAPODS: 1.16.2

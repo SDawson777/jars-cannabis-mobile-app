@@ -642,7 +642,7 @@ type LoginNavProp = NativeStackNavigationProp&lt;RootStackParamList, 'Login'&gt;
 &nbsp;
 export default function <span class="fstat-no" title="function not covered" >LoginScreen(</span>) {
   const navigation = <span class="cstat-no" title="statement not covered" >useNavigation&lt;LoginNavProp&gt;();</span>
-  const { colorTemp, jarsPrimary, jarsSecondary, jarsBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground } = <span class="cstat-no" title="statement not covered" >useContext(ThemeContext);</span>
   const { signIn } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
 &nbsp;
   const [email, setEmail] = <span class="cstat-no" title="statement not covered" >useState('');</span>
@@ -655,12 +655,12 @@ export default function <span class="fstat-no" title="function not covered" >Log
   }, []);
 &nbsp;
   const bgColor =
-<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : jarsBackground;</span>
+<span class="cstat-no" title="statement not covered" >    colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;</span>
 &nbsp;
   const glowStyle =
 <span class="cstat-no" title="statement not covered" >    colorTemp === 'warm'</span>
       ? {
-          shadowColor: jarsPrimary,
+          shadowColor: brandPrimary,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
@@ -715,9 +715,9 @@ export default function <span class="fstat-no" title="function not covered" >Log
           }}
           style={<span class="fstat-no" title="function not covered" >({</span> pressed }) =&gt; <span class="cstat-no" title="statement not covered" >pressed &amp;&amp; { transform: [{ scale: 0.95 }] }}</span>
         &gt;
-          &lt;ChevronLeft color={jarsPrimary} size={24} /&gt;
+          &lt;ChevronLeft color={brandPrimary} size={24} /&gt;
         &lt;/Pressable&gt;
-        &lt;Text style={[styles.title, { color: jarsPrimary }]}&gt;Log In&lt;/Text&gt;
+        &lt;Text style={[styles.title, { color: brandPrimary }]}&gt;Log In&lt;/Text&gt;
         &lt;View style={{ width: 24 }} /&gt;
       &lt;/View&gt;
 &nbsp;
@@ -726,8 +726,8 @@ export default function <span class="fstat-no" title="function not covered" >Log
           style={[
             styles.input,
             {
-              borderColor: focused === 'email' ? jarsPrimary : jarsSecondary,
-              color: jarsPrimary,
+              borderColor: focused === 'email' ? brandPrimary : brandSecondary,
+              color: brandPrimary,
             },
           ]}
           placeholder="Email"
@@ -748,8 +748,8 @@ export default function <span class="fstat-no" title="function not covered" >Log
               styles.input,
               {
                 flex: 1,
-                borderColor: focused === 'password' ? jarsPrimary : jarsSecondary,
-                color: jarsPrimary,
+                borderColor: focused === 'password' ? brandPrimary : brandSecondary,
+                color: brandPrimary,
               },
             ]}
             placeholder="Password"
@@ -770,9 +770,9 @@ export default function <span class="fstat-no" title="function not covered" >Log
             accessibilityLabel="Toggle password visibility"
           &gt;
             {showPassword ? (
-              &lt;EyeOff color={jarsSecondary} size={20} /&gt;
+              &lt;EyeOff color={brandSecondary} size={20} /&gt;
             ) : (
-              &lt;Eye color={jarsSecondary} size={20} /&gt;
+              &lt;Eye color={brandSecondary} size={20} /&gt;
             )}
           &lt;/Pressable&gt;
           &lt;AnimatedShimmerOverlay /&gt;
@@ -790,7 +790,7 @@ export default function <span class="fstat-no" title="function not covered" >Log
           }}
           style={<span class="fstat-no" title="function not covered" >({</span> pressed }) =&gt; <span class="cstat-no" title="statement not covered" >pressed &amp;&amp; { transform: [{ scale: 0.95 }] }}</span>
         &gt;
-          &lt;Text style={[styles.link, { color: jarsPrimary }]}&gt;Forgot your password?&lt;/Text&gt;
+          &lt;Text style={[styles.link, { color: brandPrimary }]}&gt;Forgot your password?&lt;/Text&gt;
         &lt;/Pressable&gt;
 &nbsp;
         &lt;Pressable
@@ -799,7 +799,7 @@ export default function <span class="fstat-no" title="function not covered" >Log
           accessibilityHint="Submits your credentials"
           style={<span class="fstat-no" title="function not covered" >({</span> pressed }) =&gt; <span class="cstat-no" title="statement not covered" >[</span>
             styles.button,
-            { backgroundColor: jarsPrimary },
+            { backgroundColor: brandPrimary },
             glowStyle,
             pressed &amp;&amp; { transform: [{ scale: 0.95 }] },
           ]}
@@ -816,7 +816,7 @@ export default function <span class="fstat-no" title="function not covered" >Log
         &lt;/Pressable&gt;
 &nbsp;
         &lt;View style={styles.footer}&gt;
-          &lt;Text style={[styles.disclaimer, { color: jarsSecondary }]}&gt;
+          &lt;Text style={[styles.disclaimer, { color: brandSecondary }]}&gt;
             By logging in you agree to our
           &lt;/Text&gt;
           &lt;View style={styles.legalRow}&gt;
@@ -828,9 +828,9 @@ export default function <span class="fstat-no" title="function not covered" >Log
 <span class="cstat-no" title="statement not covered" >                navigation.navigate('Legal');</span>
               }}
             &gt;
-              &lt;Text style={[styles.linkText, { color: jarsPrimary }]}&gt;Terms &amp;amp; Conditions&lt;/Text&gt;
+              &lt;Text style={[styles.linkText, { color: brandPrimary }]}&gt;Terms &amp;amp; Conditions&lt;/Text&gt;
             &lt;/Pressable&gt;
-            &lt;Text style={[styles.disclaimer, { color: jarsSecondary }]}&gt; and &lt;/Text&gt;
+            &lt;Text style={[styles.disclaimer, { color: brandSecondary }]}&gt; and &lt;/Text&gt;
             &lt;Pressable
               accessibilityRole="link"
               accessibilityLabel="Privacy Policy"
@@ -839,7 +839,7 @@ export default function <span class="fstat-no" title="function not covered" >Log
 <span class="cstat-no" title="statement not covered" >                navigation.navigate('Legal');</span>
               }}
             &gt;
-              &lt;Text style={[styles.linkText, { color: jarsPrimary }]}&gt;Privacy Policy&lt;/Text&gt;
+              &lt;Text style={[styles.linkText, { color: brandPrimary }]}&gt;Privacy Policy&lt;/Text&gt;
             &lt;/Pressable&gt;
           &lt;/View&gt;
         &lt;/View&gt;
@@ -886,7 +886,7 @@ const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-15T22:51:40.769Z
+                at 2025-12-29T21:03:14.834Z
             </div>
         <script src="../prettify.js"></script>
         <script>

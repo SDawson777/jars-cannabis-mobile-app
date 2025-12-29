@@ -14,7 +14,12 @@ interface ProductPage {
   hasNextPage: boolean;
 }
 
-async function fetchPage(page: number, storeId?: string, filter?: string, signal?: AbortSignal): Promise<ProductPage> {
+async function fetchPage(
+  page: number,
+  storeId?: string,
+  filter?: string,
+  signal?: AbortSignal
+): Promise<ProductPage> {
   const data = await clientGet<{ products?: CMSProduct[] }>(phase4Client, '/products', {
     params: { page, limit: PAGE_SIZE, storeId, filter },
     // axios supports AbortSignal via `signal`

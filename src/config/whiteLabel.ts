@@ -1,9 +1,9 @@
 /**
  * White-label configuration
- * 
+ *
  * Externalize brand-specific strings, colors, and assets so they can be
  * swapped at build time or via environment variables.
- * 
+ *
  * To rebrand:
  * 1. Set EXPO_PUBLIC_BRAND_NAME in .env
  * 2. Replace assets in assets/{brandSlug}/ directory

@@ -18,6 +18,7 @@ import {
   ProductRecommendation,
 } from '../hooks/useAI';
 import { useBrandData } from '../context/BrandContext';
+import { useTranslation } from '../i18n/useTranslation';
 
 const EFFECTS_OPTIONS = [
   'Relaxed',
@@ -72,6 +73,7 @@ export default function StrainFinderScreen() {
   const navigation = useNavigation();
   const brand = useBrandData();
   const aiRecommendations = useAiRecommendations();
+  const { t } = useTranslation();
 
   const [selectedEffects, setSelectedEffects] = useState<string[]>([]);
   const [experienceLevel, setExperienceLevel] = useState<'new' | 'regular' | 'heavy'>('regular');
@@ -93,8 +95,8 @@ export default function StrainFinderScreen() {
   const handleFindStrains = () => {
     if (selectedEffects.length === 0) {
       Alert.alert(
-        'Select Effects',
-        'Please select at least one desired effect to get recommendations.'
+        t('strainFinder.selectEffectsAlertTitle'),
+        t('strainFinder.selectEffectsAlertMessage')
       );
       return;
     }
@@ -120,18 +122,18 @@ export default function StrainFinderScreen() {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
-          accessibilityLabel="Go back"
+          accessibilityLabel={t('common.back')}
         >
           <Ionicons name="arrow-back" size={24} color={brand.primaryColor} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Find My Strain</Text>
+        <Text style={styles.headerTitle}>{t('strainFinder.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {!hasResults && (
           <View style={styles.formSection}>
-            <Text style={styles.sectionTitle}>What effects are you looking for?</Text>
+            <Text style={styles.sectionTitle}>{t('strainFinder.selectEffects')}</Text>
             <View style={styles.optionsGrid}>
               {EFFECTS_OPTIONS.map(effect => (
                 <TouchableOpacity
@@ -157,7 +159,7 @@ export default function StrainFinderScreen() {
               ))}
             </View>
 
-            <Text style={styles.sectionTitle}>Experience Level</Text>
+            <Text style={styles.sectionTitle}>{t('strainFinder.experienceLevel')}</Text>
             <View style={styles.segmentedControl}>
               {(['new', 'regular', 'heavy'] as const).map(level => (
                 <TouchableOpacity
@@ -176,13 +178,17 @@ export default function StrainFinderScreen() {
                       experienceLevel === level && styles.selectedSegmentText,
                     ]}
                   >
-                    {level === 'new' ? 'New' : level === 'regular' ? 'Regular' : 'Heavy User'}
+                    {level === 'new'
+                      ? t('strainFinder.experience.new')
+                      : level === 'regular'
+                        ? t('strainFinder.experience.regular')
+                        : t('strainFinder.experience.heavy')}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={styles.sectionTitle}>Budget</Text>
+            <Text style={styles.sectionTitle}>{t('strainFinder.budget')}</Text>
             <View style={styles.segmentedControl}>
               {(['low', 'medium', 'high'] as const).map(budget => (
                 <TouchableOpacity
@@ -207,7 +213,7 @@ export default function StrainFinderScreen() {
               ))}
             </View>
 
-            <Text style={styles.sectionTitle}>Product Categories (Optional)</Text>
+            <Text style={styles.sectionTitle}>{t('strainFinder.productCategories')}</Text>
             <View style={styles.optionsGrid}>
               {CATEGORIES.map(category => (
                 <TouchableOpacity
@@ -241,7 +247,7 @@ export default function StrainFinderScreen() {
               {isLoading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text style={styles.findButtonText}>Find My Perfect Strain</Text>
+                <Text style={styles.findButtonText}>{t('strainFinder.findButton')}</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -250,12 +256,12 @@ export default function StrainFinderScreen() {
         {hasError && (
           <View style={styles.errorContainer}>
             <Ionicons name="warning-outline" size={48} color="#FF6B6B" />
-            <Text style={styles.errorTitle}>Something went wrong</Text>
+            <Text style={styles.errorTitle}>{t('errors.generic')}</Text>
             <Text style={styles.errorMessage}>
-              {aiRecommendations.error?.message || 'Unable to get recommendations right now'}
+              {aiRecommendations.error?.message || t('strainFinder.unableToGetRecommendations')}
             </Text>
             <TouchableOpacity onPress={handleFindStrains} style={styles.retryButton}>
-              <Text style={styles.retryButtonText}>Try Again</Text>
+              <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -264,7 +270,7 @@ export default function StrainFinderScreen() {
           <View style={styles.resultsSection}>
             <View style={styles.resultsHeader}>
               <Text style={styles.resultsTitle}>
-                {recommendations.length} Recommendations Found
+                {t('strainFinder.recommendationsFound', { count: recommendations.length })}
               </Text>
               <TouchableOpacity
                 onPress={() => {
@@ -277,7 +283,7 @@ export default function StrainFinderScreen() {
                 style={styles.newSearchButton}
               >
                 <Text style={[styles.newSearchText, { color: brand.primaryColor }]}>
-                  New Search
+                  {t('strainFinder.newSearch')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -285,10 +291,8 @@ export default function StrainFinderScreen() {
             {recommendations.length === 0 ? (
               <View style={styles.noResultsContainer}>
                 <Ionicons name="search-outline" size={48} color="#999" />
-                <Text style={styles.noResultsTitle}>No matches found</Text>
-                <Text style={styles.noResultsMessage}>
-                  Try adjusting your preferences or selecting different effects.
-                </Text>
+                <Text style={styles.noResultsTitle}>{t('strainFinder.noMatchesTitle')}</Text>
+                <Text style={styles.noResultsMessage}>{t('strainFinder.noMatchesMessage')}</Text>
               </View>
             ) : (
               recommendations.map((rec: ProductRecommendation, index: number) => (

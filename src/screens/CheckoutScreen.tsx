@@ -27,6 +27,7 @@ import { usePreferredStoreId } from '../../store/usePreferredStore';
 import { useCartStore } from '../../stores/useCartStore';
 import { parseAddress, isValidParsedAddress } from '../utils/address';
 import { toast } from '../utils/toast';
+import { useTranslation } from '../i18n/useTranslation';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -35,7 +36,12 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 type CheckoutNavProp = NativeStackNavigationProp<RootStackParamList, 'Checkout'>;
 
-const steps = ['Delivery', 'Contact', 'Payment', 'Review'];
+const steps = [
+  'checkout.steps.delivery',
+  'checkout.steps.contact',
+  'checkout.steps.payment',
+  'checkout.steps.review',
+];
 
 export default function CheckoutScreen() {
   const navigation = useNavigation<CheckoutNavProp>();
@@ -51,6 +57,7 @@ export default function CheckoutScreen() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { initPaymentSheet, presentPaymentSheet, isApplePaySupported, isGooglePaySupported } =
     useStripe();
+  const { t } = useTranslation();
   const { preferredStoreId } = usePreferredStoreId.getState();
   // Access cart store (currently only to ensure hydration; items implicitly used on backend)
   useCartStore(
@@ -81,20 +88,23 @@ export default function CheckoutScreen() {
         const complianceMessages = violations.map((v: any) => {
           switch (v.code) {
             case 'AGE_NOT_VERIFIED':
-              return 'Please verify your age to complete this purchase.';
+              return t('checkout.compliance.ageNotVerified');
             case 'UNDERAGE':
-              return `You must be at least ${v.message.match(/\d+/)?.[0] || 21} years old to make a purchase.`;
+              return t('checkout.compliance.underage', {
+                min: v.message.match(/\d+/)?.[0] || 21,
+              });
             case 'DAILY_THC_LIMIT_EXCEEDED':
-              return v.message || 'This order would exceed your daily THC limit.';
+              return v.message || t('checkout.compliance.dailyLimitExceeded');
             case 'DATE_OF_BIRTH_MISSING':
-              return 'Please provide your date of birth for age verification.';
+              return t('checkout.compliance.dateOfBirthMissing');
             default:
-              return v.message || 'Compliance check failed.';
+              return v.message || t('checkout.compliance.generic');
           }
         });
         setApiError(complianceMessages.join(' '));
       } else {
-        const msg = err?.response?.data?.message || err?.response?.data?.error || 'Order failed';
+        const msg =
+          err?.response?.data?.message || err?.response?.data?.error || t('checkout.orderFailed');
         setApiError(msg);
       }
     },
@@ -163,18 +173,18 @@ export default function CheckoutScreen() {
           : undefined,
       });
       if (initError) {
-        toast('Payment initialization failed');
+        toast(t('checkout.paymentInitFailed'));
         return false;
       }
       const { error } = await presentPaymentSheet();
       if (error) {
-        toast('Payment failed');
+        toast(t('checkout.paymentFailed'));
         return false;
       }
-      toast('Payment successful');
+      toast(t('checkout.paymentSuccess'));
       return true;
     } catch (__e) {
-      toast('Payment failed');
+      toast(t('checkout.paymentFailed'));
       return false;
     }
   };
@@ -182,15 +192,15 @@ export default function CheckoutScreen() {
   const onNext = async () => {
     if (step === 0 && method === 'delivery' && !address.trim()) {
       hapticHeavy();
-      return Alert.alert('Error', 'Please enter delivery address.');
+      return Alert.alert(t('common.error'), t('checkout.enterDeliveryAddress'));
     }
     if (step === 1 && (!fullName.trim() || !phone.trim() || !email.trim())) {
       hapticHeavy();
-      return Alert.alert('Error', 'Please fill in all contact fields.');
+      return Alert.alert(t('common.error'), t('checkout.fillContactFields'));
     }
     if (step === 3 && !termsAccepted) {
       hapticHeavy();
-      return Alert.alert('Error', 'Please accept Terms & Conditions.');
+      return Alert.alert(t('common.error'), t('checkout.acceptTerms'));
     }
 
     if (step < steps.length - 1) {
@@ -293,7 +303,7 @@ export default function CheckoutScreen() {
                   }}
                 >
                   <Text style={[styles.optionText, { color: brandPrimary }]}>
-                    {opt === 'pickup' ? 'Pickup' : 'Delivery'}
+                    {opt === 'pickup' ? t('checkout.method.pickup') : t('checkout.method.delivery')}
                   </Text>
                 </Pressable>
               ))}
@@ -301,7 +311,7 @@ export default function CheckoutScreen() {
             {method === 'delivery' && (
               <TextInput
                 style={[styles.input, { borderColor: brandSecondary, color: brandPrimary }]}
-                placeholder="Enter delivery address"
+                placeholder={t('checkout.enterDeliveryAddress')}
                 placeholderTextColor={brandSecondary}
                 value={address}
                 testID="delivery-address-input"
@@ -318,12 +328,12 @@ export default function CheckoutScreen() {
         {step === 1 && (
           <View style={styles.step}>
             <Text style={[styles.prompt, { color: brandPrimary }]}>
-              Who is picking up this order?
+              {t('checkout.whoPickingUp')}
             </Text>
 
             <TextInput
               style={[styles.input, { borderColor: brandSecondary, color: brandPrimary }]}
-              placeholder="Full Name"
+              placeholder={t('checkout.fullName')}
               placeholderTextColor={brandSecondary}
               value={fullName}
               onChangeText={t => {
@@ -334,7 +344,7 @@ export default function CheckoutScreen() {
 
             <TextInput
               style={[styles.input, { borderColor: brandSecondary, color: brandPrimary }]}
-              placeholder="Phone Number"
+              placeholder={t('checkout.phoneNumber')}
               placeholderTextColor={brandSecondary}
               keyboardType="phone-pad"
               value={phone}
@@ -346,7 +356,7 @@ export default function CheckoutScreen() {
 
             <TextInput
               style={[styles.input, { borderColor: brandSecondary, color: brandPrimary }]}
-              placeholder="Email Address"
+              placeholder={t('checkout.emailAddress')}
               placeholderTextColor={brandSecondary}
               keyboardType="email-address"
               value={email}
@@ -357,7 +367,7 @@ export default function CheckoutScreen() {
             />
 
             <Text style={[styles.note, { color: brandSecondary }]}>
-              Must match your government-issued ID at pickup.
+              {t('checkout.mustMatchId')}
             </Text>
           </View>
         )}
@@ -365,7 +375,7 @@ export default function CheckoutScreen() {
         {/* Step 2: Payment Method */}
         {step === 2 && (
           <View style={styles.step}>
-            <Text style={[styles.prompt, { color: brandPrimary }]}>How would you like to pay?</Text>
+            <Text style={[styles.prompt, { color: brandPrimary }]}>{t('checkout.howPay')}</Text>
             <View style={styles.optionColumn}>
               {(['online', 'atPickup'] as const).map(opt => (
                 <Pressable
@@ -384,7 +394,7 @@ export default function CheckoutScreen() {
                   }}
                 >
                   <Text style={[styles.optionText, { color: brandPrimary }]}>
-                    {opt === 'online' ? 'Pay Online' : 'Pay at Pickup/Delivery'}
+                    {opt === 'online' ? t('checkout.payOnline') : t('checkout.payAtPickup')}
                   </Text>
                 </Pressable>
               ))}
@@ -395,22 +405,30 @@ export default function CheckoutScreen() {
         {/* Step 3: Review & Terms */}
         {step === 3 && (
           <View style={styles.step}>
-            <Text style={[styles.prompt, { color: brandPrimary }]}>Review Your Order</Text>
+            <Text style={[styles.prompt, { color: brandPrimary }]}>
+              {t('checkout.reviewYourOrder')}
+            </Text>
 
             <View style={styles.reviewCard}>
-              <Text style={[styles.reviewLabel, { color: brandPrimary }]}>Method:</Text>
+              <Text style={[styles.reviewLabel, { color: brandPrimary }]}>
+                {t('checkout.review.method')}
+              </Text>
               <Text style={[styles.reviewValue, { color: brandSecondary }]}>
                 {method === 'pickup' ? 'Pickup' : address}
               </Text>
             </View>
             <View style={styles.reviewCard}>
-              <Text style={[styles.reviewLabel, { color: brandPrimary }]}>Contact:</Text>
+              <Text style={[styles.reviewLabel, { color: brandPrimary }]}>
+                {t('checkout.review.contact')}
+              </Text>
               <Text style={[styles.reviewValue, { color: brandSecondary }]}>
                 {fullName}, {phone}, {email}
               </Text>
             </View>
             <View style={styles.reviewCard}>
-              <Text style={[styles.reviewLabel, { color: brandPrimary }]}>Payment:</Text>
+              <Text style={[styles.reviewLabel, { color: brandPrimary }]}>
+                {t('checkout.review.payment')}
+              </Text>
               <Text style={[styles.reviewValue, { color: brandSecondary }]}>
                 {payment === 'online' ? 'Online' : 'At Pickup/Delivery'}
               </Text>
@@ -459,14 +477,16 @@ export default function CheckoutScreen() {
         ]}
         onPress={onNext}
         disabled={nextDisabled || createOrder.isPending}
-        accessibilityLabel={step < steps.length - 1 ? 'Continue to next step' : 'Place order'}
+        accessibilityLabel={
+          step < steps.length - 1 ? t('checkout.continue') : t('checkout.placeOrder')
+        }
       >
         <Text style={styles.nextBtnText}>
           {createOrder.isPending
-            ? 'Placing...'
+            ? t('checkout.placing')
             : step < steps.length - 1
-              ? 'Continue'
-              : 'Place Order'}
+              ? t('checkout.continue')
+              : t('checkout.placeOrder')}
         </Text>
       </Pressable>
     </SafeAreaView>

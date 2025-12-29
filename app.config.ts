@@ -63,9 +63,10 @@ const config: ExpoConfig = {
   slug: 'nimbus-cannabis-mobile',
   // Manual app versioning (controlled instead of EAS autoIncrement)
   version: '1.0.0',
+  owner: 'sdawson777',
   extra: {
     eas: {
-      projectId: 'f480819a-c0e4-430e-82bc-1a761385db05',
+      projectId: 'cf8026e9-7f1f-4ed8-ae3c-5d682f7cde13',
     },
   },
   ios: {

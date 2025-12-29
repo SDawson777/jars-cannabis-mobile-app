@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { setLocale as setI18nLocale } from '../utils/i18n';
+import { useI18nContext } from '../i18n/I18nProvider';
 import { saveSecure, getSecure } from '../utils/secureStorage';
 
 interface SettingsContextState {
@@ -22,6 +22,7 @@ const SettingsContext = createContext<SettingsContextState>({
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [biometricEnabled, setBiometricEnabledState] = useState(true);
   const [locale, setLocaleState] = useState('en');
+  const i18n = useI18nContext();
 
   useEffect(() => {
     (async () => {
@@ -32,7 +33,12 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       const storedLocale = await AsyncStorage.getItem('locale');
       if (storedLocale) {
         setLocaleState(storedLocale);
-        setI18nLocale(storedLocale);
+        // use I18nProvider to set runtime locale
+        try {
+          i18n?.setLocale(storedLocale as any);
+        } catch (_e) {
+          void 0;
+        }
       }
     })();
   }, []);
@@ -44,7 +50,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const setLocale = async (value: string) => {
     setLocaleState(value);
-    setI18nLocale(value);
+    try {
+      i18n?.setLocale(value as any);
+    } catch (_e) {
+      void 0;
+    }
     await AsyncStorage.setItem('locale', value);
   };
 
