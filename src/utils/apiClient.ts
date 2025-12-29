@@ -122,7 +122,13 @@ export function useOffline() {
     const unsub = NetInfo.addEventListener(s => mounted && setIsOnline(!!s.isConnected));
     return () => {
       mounted = false;
-      unsub();
+      // NetInfo returns a subscription object with a `remove` method
+      if (typeof unsub === 'function') {
+        // Back-compat: older versions returned a function
+        (unsub as unknown as () => void)();
+      } else if (unsub && typeof (unsub as any).remove === 'function') {
+        (unsub as any).remove();
+      }
     };
   }, []);
   return { isOnline, isOffline: !isOnline };
