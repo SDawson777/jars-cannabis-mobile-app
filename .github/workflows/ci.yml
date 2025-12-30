@@ -335,15 +335,38 @@ jobs:
           fi
           echo "✅ ios/Podfile present"
 
-      - name: Write GoogleService-Info.plist
-        if: ${{ env.GOOGLESERVICE_PLIST_BASE64 != '' }}
+      - name: Write GoogleService-Info.plist (real or stub)
         run: |
-          if echo "test" | base64 --decode >/dev/null 2>&1; then
-            echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 --decode > ios/NimbusCannabisOS/GoogleService-Info.plist
+          set -euo pipefail
+          if [ -n "${GOOGLESERVICE_PLIST_BASE64:-}" ]; then
+            echo "Writing GoogleService-Info.plist from secret"
+            if echo "test" | base64 --decode >/dev/null 2>&1; then
+              echo "${GOOGLESERVICE_PLIST_BASE64}" | base64 --decode > ios/NimbusCannabisOS/GoogleService-Info.plist
+            else
+              echo "${GOOGLESERVICE_PLIST_BASE64}" | base64 -D > ios/NimbusCannabisOS/GoogleService-Info.plist
+            fi
           else
-            echo "${{ env.GOOGLESERVICE_PLIST_BASE64 }}" | base64 -D > ios/NimbusCannabisOS/GoogleService-Info.plist
+            echo "GOOGLESERVICE_PLIST_BASE64 not set; writing stub GoogleService-Info.plist for CI simulator build"
+            cat > ios/NimbusCannabisOS/GoogleService-Info.plist <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>GOOGLE_APP_ID</key>
+  <string>1:000000000000:ios:DEADBEEFDEADBEEFDEADBEEF</string>
+  <key>GCM_SENDER_ID</key>
+  <string>000000000000</string>
+  <key>API_KEY</key>
+  <string>fake-api-key-for-ci-only</string>
+  <key>PROJECT_ID</key>
+  <string>fake-ci-project</string>
+  <key>BUNDLE_ID</key>
+  <string>com.example.ci-placeholder</string>
+</dict>
+</plist>
+PLIST
           fi
-          echo "✅ GoogleService-Info.plist written"
+          echo "✅ GoogleService-Info.plist present for build"
 
       - name: Check vendored Stripe status
         run: |
