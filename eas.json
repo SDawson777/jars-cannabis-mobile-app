@@ -14,11 +14,15 @@
       "distribution": "internal",
       "credentialsSource": "local",
       "android": {
-        "gradleCommand": ":app:assembleDebug"
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
       },
       "node": "20.19.4",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
+        "EXPO_PUBLIC_API_URL": "https://nimbus-api-preview.up.railway.app",
+        "EXPO_PUBLIC_APP_ENV": "development"
       }
     },
     "android-preview": {
