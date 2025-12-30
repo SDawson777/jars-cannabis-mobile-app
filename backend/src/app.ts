@@ -45,6 +45,7 @@ import { analyticsRouter } from './routes/analytics';
 import { logger } from './utils/logger';
 // rateLimit imported where applied per-route; not needed globally
 import { prisma } from './prismaClient';
+import errorHandler from './middleware/errorHandler';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -238,11 +239,7 @@ app.use('/api/ai', aiRouter);
 app.use('/api/v1/ai', aiRouter);
 if (isDebugEnabled) app.use('/api/v1', qaRouter);
 
-// Global error handler so nothing crashes
-app.use((err: any, req: any, res: any, _next: any) => {
-  const correlationId = req?.requestId;
-  logger.error('unhandled.error', { error: err?.message || err, correlationId });
-  res.status(500).json({ error: 'internal_error', correlationId });
-});
+// Centralized error handling (in separate middleware)
+app.use(errorHandler);
 
 export default app;

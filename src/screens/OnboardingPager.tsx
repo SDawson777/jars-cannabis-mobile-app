@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { AccessibilityInfo } from 'react-native';
 import PagerView from 'react-native-pager-view';
+import useOnboardingProgress from '../hooks/useOnboardingProgress';
 
 import AnimatedBackgroundGradient from '../components/AnimatedBackgroundGradient';
 import AudioPlayer from '../components/AudioPlayer';
@@ -35,6 +36,7 @@ const slides = [
 
 export default function OnboardingPager() {
   const [index, setIndex] = useState(0);
+  const { setLastIndex, completeOnboarding } = useOnboardingProgress();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   React.useEffect(() => {
@@ -49,7 +51,10 @@ export default function OnboardingPager() {
         style={styles.pager}
         onPageSelected={(e: any) => {
           haptics.impactLight();
-          setIndex(e.nativeEvent.position);
+          const pos = e.nativeEvent.position;
+          setIndex(pos);
+          // persist last seen index for resuming later
+          setLastIndex(pos);
         }}
       >
         {slides.map((s, i) => (
@@ -64,8 +69,9 @@ export default function OnboardingPager() {
               <Pressable
                 accessibilityRole="button"
                 style={styles.button}
-                onPress={() => {
+                onPress={async () => {
                   haptics.impactMedium();
+                  await completeOnboarding();
                   navigation.replace('AgeVerification');
                 }}
               >

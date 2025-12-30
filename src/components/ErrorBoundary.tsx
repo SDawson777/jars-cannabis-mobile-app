@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 interface State {
   hasError: boolean;
@@ -22,6 +22,14 @@ export default class ErrorBoundary extends React.Component<React.PropsWithChildr
       extra: errorInfo as any,
       tags: { boundary: 'root' },
     });
+    try {
+      // Show a simple alert to the user with a retry option
+      Alert.alert('Something went wrong', 'We logged this issue. Would you like to try again?', [
+        { text: 'Try again', onPress: this.handleReset },
+      ]);
+    } catch (_e) {
+      // If alerts are unavailable (tests/native), swallow.
+    }
   }
 
   handleReset = () => {
