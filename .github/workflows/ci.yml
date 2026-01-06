@@ -96,7 +96,7 @@ jobs:
 
   build-android-preview:
     needs: test
-    if: ${{ secrets.EXPO_TOKEN != '' }}
+    if: ${{ vars.ENABLE_MOBILE_BUILDS == 'true' }}
     runs-on: ubuntu-latest
     # outputs:
       # ftl_url: ${{ steps.ftl.outputs.results_url }}  # Commented out with Firebase Test Lab
@@ -345,7 +345,7 @@ jobs:
 
   build-ios-simulator:
     needs: test
-    if: ${{ secrets.EXPO_TOKEN != '' }}
+    if: ${{ vars.ENABLE_MOBILE_BUILDS == 'true' }}
     runs-on: macos-14
     outputs:
       appetize_url: ${{ steps.appetize.outputs.url }}
