@@ -5,8 +5,17 @@
   },
   "build": {
     "demo": {
+      "credentialsSource": "remote",
+      "distribution": "store",
+      "node": "20.19.4",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {},
       "env": {
-        "EXPO_PUBLIC_APP_ENV": "demo"
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_APP_ENV": "demo",
+        "EXPO_PUBLIC_API_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
       }
     },
     "development": {
@@ -63,6 +72,15 @@
     }
   },
   "submit": {
+    "demo": {
+      "android": {
+        "serviceAccountKeyPath": "./fastlane/google-service-account.json",
+        "track": "internal"
+      },
+      "ios": {
+        "ascAppId": "REPLACE_AT_HANDOFF"
+      }
+    },
     "production": {
       "android": {
         "serviceAccountKeyPath": "./fastlane/google-service-account.json"

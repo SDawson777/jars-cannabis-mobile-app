@@ -84,6 +84,10 @@ import { getAuthToken } from './src/utils/auth';
 import { fetchJson } from './src/utils/apiClient';
 import AppErrorHandlers from './src/components/AppErrorHandlers';
 
+const SENTRY_ENVIRONMENT =
+  process.env.EXPO_PUBLIC_APP_ENV || (__DEV__ ? 'development' : 'production');
+const SENTRY_RELEASE = process.env.EXPO_PUBLIC_SENTRY_RELEASE;
+
 Sentry.init({
   dsn:
     process.env.EXPO_PUBLIC_SENTRY_DSN ||
@@ -92,7 +96,8 @@ Sentry.init({
   enableAutoSessionTracking: true,
   enableNative: true,
   tracesSampleRate: 1.0,
-  environment: __DEV__ ? 'development' : 'production',
+  environment: SENTRY_ENVIRONMENT,
+  ...(SENTRY_RELEASE ? { release: SENTRY_RELEASE } : {}),
 });
 
 const DEBUG = process.env.EXPO_PUBLIC_DEBUG === 'true';

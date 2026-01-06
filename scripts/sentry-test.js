@@ -2,6 +2,8 @@
 const Sentry = require('@sentry/node');
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;
+const environment = process.env.EXPO_PUBLIC_APP_ENV || process.env.NODE_ENV || 'development';
+const release = process.env.EXPO_PUBLIC_SENTRY_RELEASE;
 
 if (!dsn) {
   console.error('Missing DSN. Set EXPO_PUBLIC_SENTRY_DSN or SENTRY_DSN');
@@ -10,7 +12,8 @@ if (!dsn) {
 
 Sentry.init({
   dsn,
-  environment: process.env.EXPO_PUBLIC_APP_ENV || process.env.NODE_ENV || 'development',
+  environment,
+  ...(release ? { release } : {}),
 });
 
 async function main() {
