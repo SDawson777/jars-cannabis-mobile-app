@@ -1,9 +1,9 @@
 // src/App.js
+import * as Sentry from '@sentry/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as Sentry from '@sentry/react-native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
@@ -85,7 +85,10 @@ import { fetchJson } from './src/utils/apiClient';
 import AppErrorHandlers from './src/components/AppErrorHandlers';
 
 Sentry.init({
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN,
+  dsn:
+    process.env.EXPO_PUBLIC_SENTRY_DSN ||
+    process.env.SENTRY_DSN ||
+    'https://a4c3193e8db2498487f7c7624f872e5e@o4509708991397888.ingest.us.sentry.io/4510480084107264',
   enableAutoSessionTracking: true,
   enableNative: true,
   tracesSampleRate: 1.0,

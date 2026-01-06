@@ -101,6 +101,7 @@ const config: ExpoConfig = {
         enableGooglePay: true,
       },
     ],
+    '@sentry/react-native/expo',
     [
       'expo-build-properties',
       {

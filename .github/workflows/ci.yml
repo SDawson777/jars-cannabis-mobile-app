@@ -70,6 +70,8 @@ jobs:
       EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
       EXPO_ANDROID_KEY_ALIAS: ${{ secrets.EXPO_ANDROID_KEY_ALIAS }}
       EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      EXPO_PUBLIC_SENTRY_DSN: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node 20.19.4 (npm cache)
@@ -142,6 +144,52 @@ jobs:
             --non-interactive \
             --name GOOGLE_SERVICES_JSON_BASE64 \
             --value "$GOOGLE_SERVICES_JSON_BASE64" \
+            --scope project \
+            --type string
+          echo "✅ EAS secret synchronized."
+
+      - name: Ensure EAS secret SENTRY_AUTH_TOKEN
+        if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y && sudo apt-get install -y jq
+          echo "🔐 Syncing EAS secret: SENTRY_AUTH_TOKEN"
+          npx -y eas-cli@latest whoami || true
+          EXISTING=$(npx -y eas-cli@latest secret:list --json | jq -r '.[] | select(.name=="SENTRY_AUTH_TOKEN" and .scope=="project") | .id' || true)
+          if [ -n "$EXISTING" ]; then
+            echo "Found existing secret id=$EXISTING. Deleting to update..."
+            npx -y eas-cli@latest secret:delete --id "$EXISTING" --non-interactive || true
+          fi
+          npx -y eas-cli@latest secret:create \
+            --non-interactive \
+            --name SENTRY_AUTH_TOKEN \
+            --value "$SENTRY_AUTH_TOKEN" \
+            --scope project \
+            --type string
+          echo "✅ EAS secret synchronized."
+
+      - name: Ensure EAS secret EXPO_PUBLIC_SENTRY_DSN
+        if: ${{ env.EXPO_PUBLIC_SENTRY_DSN != '' }}
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_PUBLIC_SENTRY_DSN: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y && sudo apt-get install -y jq
+          echo "🔐 Syncing EAS secret: EXPO_PUBLIC_SENTRY_DSN"
+          npx -y eas-cli@latest whoami || true
+          EXISTING=$(npx -y eas-cli@latest secret:list --json | jq -r '.[] | select(.name=="EXPO_PUBLIC_SENTRY_DSN" and .scope=="project") | .id' || true)
+          if [ -n "$EXISTING" ]; then
+            echo "Found existing secret id=$EXISTING. Deleting to update..."
+            npx -y eas-cli@latest secret:delete --id "$EXISTING" --non-interactive || true
+          fi
+          npx -y eas-cli@latest secret:create \
+            --non-interactive \
+            --name EXPO_PUBLIC_SENTRY_DSN \
+            --value "$EXPO_PUBLIC_SENTRY_DSN" \
             --scope project \
             --type string
           echo "✅ EAS secret synchronized."
@@ -267,6 +315,8 @@ jobs:
       APPETIZE_PUBLIC: ${{ vars.APPETIZE_PUBLIC }}
       GOOGLESERVICE_PLIST_BASE64: ${{ secrets.GOOGLESERVICE_PLIST_BASE64 }}
       COCOAPODS_DISABLE_STATS: 'true'
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      EXPO_PUBLIC_SENTRY_DSN: ${{ secrets.EXPO_PUBLIC_SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode 15.4
