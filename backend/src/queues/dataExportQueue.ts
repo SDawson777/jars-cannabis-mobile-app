@@ -1,8 +1,7 @@
 // backend/src/queues/dataExportQueue.ts
 import Queue from 'bull';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 
-const prisma = new PrismaClient();
 
 // Connect to Redis (default localhost:6379—override with REDIS_URL env var if needed)
 export const exportQueue = new Queue('exportQueue', {

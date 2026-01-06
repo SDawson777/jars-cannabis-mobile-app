@@ -61,6 +61,17 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
 
 Completing the steps above gives buyers a fully reproducible environment and clear launch path.
 
+## Demo Environment
+
+See [docs/DEMO_ENVIRONMENT.md](docs/DEMO_ENVIRONMENT.md) for the canonical demo endpoints, Sanity dataset, reseeding instructions, and where demo builds live.
+
+## Buyer Evaluation
+
+- Smoke test checklist (CMS repo): **replace this URL with your CMS repo** → https://github.com/<ORG>/<CMS_REPO>/blob/main/BUYER_SMOKE_TEST.md
+- Demo mode points to:
+  - API: https://nimbus-api-demo.up.railway.app
+  - CMS (authoring): https://nimbus-cms.sanity.studio (dataset: `nimbus_demo`)
+
 ## 🚀 One-Click Deployment
 
 Get the complete backend running with Docker Compose:

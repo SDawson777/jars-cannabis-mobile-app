@@ -1,5 +1,13 @@
 # JARS Cannabis Mobile App - API Reference
 
+## Health checks & error monitoring
+
+See [docs/BACKEND_HEALTH_AND_MONITORING.md](../docs/BACKEND_HEALTH_AND_MONITORING.md) for:
+
+- Health endpoints (`/healthz`, `/ready`) and how to use them in uptime monitoring
+- Backend Sentry configuration (`SENTRY_DSN`) and how to trigger a test event
+- Linkout to the CMS repo ops docs (Sentry/monitoring): **replace with your CMS repo ops URL** → https://github.com/<ORG>/<CMS_REPO>/blob/main/docs/OPS.md
+
 Base URL: `https://api.jars.app/api/v1` (Production)  
 Staging: `https://staging-api.jars.app/api/v1`  
 Local: `http://localhost:3000/api/v1`

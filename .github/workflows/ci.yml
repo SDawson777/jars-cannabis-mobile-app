@@ -47,14 +47,52 @@ jobs:
         run: npm ci --legacy-peer-deps
       - name: Install dependencies (backend)
         run: npm --prefix backend ci --legacy-peer-deps
+      - name: Verify lockfile consistency (post-install)
+        run: |
+          if ! grep -q '"picomatch"' npm-shrinkwrap.json; then
+            echo "❌ Drift detected: picomatch missing in shrinkwrap."
+            echo "Re-run: npm install && npm shrinkwrap"
+            exit 1
+          fi
+
+          npm ls > /dev/null || {
+            echo "❌ Dependency tree mismatch"
+            exit 1
+          }
+
+          echo "✅ Lockfile marker + dependency tree verified."
+      - name: Check for modified lockfiles
+        run: |
+          if ! git diff --exit-code npm-shrinkwrap.json; then
+            echo "❌ Lockfile drift detected after install (npm-shrinkwrap.json)"
+            exit 1
+          fi
+          if ! git diff --exit-code backend/package-lock.json; then
+            echo "❌ Lockfile drift detected after install (backend/package-lock.json)"
+            exit 1
+          fi
       - name: Typecheck
         run: npm run typecheck
       - name: Lint
         run: npm run lint
       - name: Prettier formatting check
         run: npm run format:check
-      - name: Run tests
-        run: npm test -- --ci --passWithNoTests
+      - name: Run tests (root, with coverage)
+        run: npm run test:ci
+      - name: Upload coverage artifact (root)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-root
+          path: coverage
+          if-no-files-found: error
+      - name: Run tests (backend)
+        run: npm --prefix backend run test:ci
+      - name: Upload coverage artifact (backend)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-backend
+          path: backend/coverage
+          if-no-files-found: error
 
   build-android-preview:
     needs: test
@@ -398,23 +436,23 @@ jobs:
           else
             echo "GOOGLESERVICE_PLIST_BASE64 not set; writing stub GoogleService-Info.plist for CI simulator build"
             cat > ios/NimbusCannabisOS/GoogleService-Info.plist <<'PLIST'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>GOOGLE_APP_ID</key>
-  <string>1:000000000000:ios:DEADBEEFDEADBEEFDEADBEEF</string>
-  <key>GCM_SENDER_ID</key>
-  <string>000000000000</string>
-  <key>API_KEY</key>
-  <string>fake-api-key-for-ci-only</string>
-  <key>PROJECT_ID</key>
-  <string>fake-ci-project</string>
-  <key>BUNDLE_ID</key>
-  <string>com.example.ci-placeholder</string>
-</dict>
-</plist>
-PLIST
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+            <dict>
+              <key>GOOGLE_APP_ID</key>
+              <string>1:000000000000:ios:DEADBEEFDEADBEEFDEADBEEF</string>
+              <key>GCM_SENDER_ID</key>
+              <string>000000000000</string>
+              <key>API_KEY</key>
+              <string>fake-api-key-for-ci-only</string>
+              <key>PROJECT_ID</key>
+              <string>fake-ci-project</string>
+              <key>BUNDLE_ID</key>
+              <string>com.example.ci-placeholder</string>
+            </dict>
+            </plist>
+            PLIST
           fi
           echo "✅ GoogleService-Info.plist present for build"
 

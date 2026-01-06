@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * GET /brands
  * List all brands with basic info
  */
-router.get('/', async (req, res) => {
+router.get('/brands', async (req, res) => {
   try {
     const brands = await prisma.brand.findMany({
       select: {
@@ -33,7 +32,7 @@ router.get('/', async (req, res) => {
  * GET /brands/:slug
  * Fetch one brand by slug
  */
-router.get('/:slug', async (req, res) => {
+router.get('/brands/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
 

@@ -5,14 +5,23 @@ module.exports = {
   testMatch: ['<rootDir>/tests/**/*.test.ts'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json', isolatedModules: true }],
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      { tsconfig: '<rootDir>/tsconfig.jest.json', isolatedModules: true },
+    ],
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testPathIgnorePatterns: ['/node_modules/'],
+  // Integration tests require external services (Postgres via DATABASE_URL, and optionally Firebase).
+  // Keep them opt-in so `npm run test:ci` is deterministic and green on a clean machine.
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/tests/integration/'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/__mocks__/**'],
-  coverageThreshold: { global: { branches: 10, functions: 10, lines: 10, statements: 10 } },
+  // Enforce a meaningful minimum coverage floor so regressions are caught,
+  // while still reflecting the current measured baseline.
+  coverageThreshold: { global: { branches: 25, functions: 25, lines: 30, statements: 30 } },
   // Mock modules that might cause issues in Node environment
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@react-native-firebase/(.*)$': '<rootDir>/tests/__mocks__/@react-native-firebase/$1.js',
+    // Map any relative import depth (./prismaClient, ../prismaClient, ../../prismaClient, etc.)
+    '^(?:\\.{1,2}\\/)+prismaClient$': '<rootDir>/tests/helpers/prismaMock.ts',
   },
 };

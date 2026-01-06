@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../prismaClient';
 import { admin, initFirebase } from '../bootstrap/firebase-admin';
 import { env } from '../env';
+import * as Sentry from '@sentry/node';
 
 export const qaRouter = Router();
 
@@ -61,6 +62,19 @@ qaRouter.post('/diag/firebase', async (req, res) => {
       .file(path)
       .getSignedUrl({ action: 'read', expires: Date.now() + 60_000 });
     res.json({ ok: true, file: path, url });
+  } catch (e: any) {
+    res.status(500).json({ ok: false, message: e?.message || String(e) });
+  }
+});
+
+// 5) Sentry test event
+qaRouter.post('/diag/sentry', async (req, res) => {
+  if (!guard(req, res)) return;
+  try {
+    const err = new Error(`backend_sentry_test:${Date.now()}`);
+    const eventId = Sentry.captureException(err);
+    await Sentry.flush(2000);
+    res.json({ ok: true, eventId });
   } catch (e: any) {
     res.status(500).json({ ok: false, message: e?.message || String(e) });
   }

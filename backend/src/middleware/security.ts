@@ -140,7 +140,7 @@ export function suspiciousActivityDetection() {
     // Path traversal
     /\.\.[/\\]/,
     // Command injection - exclude JSON context
-    /[;&|`]\s*[a-zA-Z]/,
+    /[;|`]\s*[a-zA-Z]/,
   ];
 
   return (req: Request, res: Response, next: NextFunction) => {

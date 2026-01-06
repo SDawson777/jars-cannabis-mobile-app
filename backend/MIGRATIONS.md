@@ -30,6 +30,17 @@ Notes
 - CI: set `DATABASE_URL` in your CI environment (use a temporary DB) and run the script from `backend/`.
 - If you prefer a one-off SQL application (already included in `backend/prisma/migrations/*/migration.sql`), you may apply those SQL files with your DB tooling but Prisma metadata may still need to be updated if you want to use `prisma migrate` later.
 
+Prisma ownership (avoid migration drift)
+
+If multiple codebases point to the **same Postgres database**, only **one** of them should run Prisma migrations (`prisma migrate dev/deploy`).
+
+Recommended patterns:
+
+- Single source of truth (preferred): keep **schema + migrations** in one repo/service and generate Prisma Client from that schema for any secondary consumers.
+- One migration owner + secondary read-only: the migration owner runs `migrate dev/deploy`; secondary consumers use `prisma db pull` for introspection and do **not** run migrations.
+
+In this repo, the **backend** is the intended migration owner for `backend/prisma/schema.prisma` and `backend/prisma/migrations/`.
+
 Security
 
 - Do not commit database credentials. Use CI secrets or local env files excluded from VCS.

@@ -1,11 +1,10 @@
 // backend/src/controllers/dataTransparencyController.ts
 
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 import { v4 as uuidv4 } from 'uuid';
 import { exportQueue } from '../queues/dataExportQueue';
 
-const prisma = new PrismaClient();
 
 interface RequestExportBody {
   userId: string;

@@ -120,8 +120,10 @@ ordersRouter.post(
 
     // Pricing integrity: batch fetch all products and variants to avoid N+1 queries
     // Use cache for frequently accessed prices to reduce DB load
-    const productIds = [...new Set(cart.items.map(ci => ci.productId))];
-    const variantIds = cart.items.map(ci => ci.variantId).filter(Boolean) as string[];
+    const productIds = [...new Set(cart.items.map(ci => String((ci as any).productId)))];
+    const variantIds = cart.items
+      .map(ci => ((ci as any).variantId ? String((ci as any).variantId) : null))
+      .filter(Boolean) as string[];
 
     // Check cache first for products and variants
     const uncachedProductIds: string[] = [];

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1767042678489" clover="3.2.0">
-  <project timestamp="1767042678489" name="All files">
-    <metrics statements="3525" coveredstatements="1327" conditionals="2292" coveredconditionals="775" methods="1049" coveredmethods="330" elements="6866" coveredelements="2432" complexity="0" loc="3525" ncloc="3525" packages="28" files="230" classes="230"/>
+<coverage generated="1767723271014" clover="3.2.0">
+  <project timestamp="1767723271015" name="All files">
+    <metrics statements="3561" coveredstatements="1326" conditionals="2296" coveredconditionals="770" methods="1056" coveredmethods="330" elements="6913" coveredelements="2426" complexity="0" loc="3561" ncloc="3561" packages="28" files="231" classes="231"/>
     <package name="@types">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="declarations.d.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/@types/declarations.d.ts">
@@ -165,8 +165,8 @@
         <metrics statements="7" coveredstatements="6" conditionals="2" coveredconditionals="1" methods="4" coveredmethods="4"/>
         <line num="9" count="3" type="stmt"/>
         <line num="14" count="2" type="stmt"/>
-        <line num="18" count="7" type="stmt"/>
-        <line num="20" count="7" type="stmt"/>
+        <line num="18" count="8" type="stmt"/>
+        <line num="20" count="8" type="stmt"/>
         <line num="23" count="2" type="stmt"/>
         <line num="26" count="1" type="cond" truecount="1" falsecount="1"/>
         <line num="27" count="0" type="stmt"/>
@@ -217,7 +217,7 @@
       </file>
     </package>
     <package name="components">
-      <metrics statements="282" coveredstatements="107" conditionals="205" coveredconditionals="107" methods="108" coveredmethods="29"/>
+      <metrics statements="284" coveredstatements="107" conditionals="205" coveredconditionals="107" methods="108" coveredmethods="29"/>
       <file name="ARButton.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/components/ARButton.tsx">
         <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="7" count="0" type="stmt"/>
@@ -350,17 +350,19 @@
         <line num="19" count="0" type="stmt"/>
       </file>
       <file name="ErrorBoundary.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/components/ErrorBoundary.tsx">
-        <metrics statements="10" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="5" coveredmethods="0"/>
+        <metrics statements="12" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="5" coveredmethods="0"/>
         <line num="12" count="0" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
         <line num="17" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="32" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="54" count="0" type="stmt"/>
-        <line num="58" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="40" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
       </file>
       <file name="ErrorCard.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/components/ErrorCard.tsx">
         <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
@@ -600,9 +602,9 @@
         <line num="179" count="0" type="stmt"/>
         <line num="197" count="26" type="stmt"/>
         <line num="199" count="26" type="cond" truecount="4" falsecount="0"/>
-        <line num="200" count="17" type="cond" truecount="2" falsecount="0"/>
-        <line num="201" count="16" type="cond" truecount="2" falsecount="0"/>
-        <line num="202" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="200" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="201" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="202" count="12" type="cond" truecount="2" falsecount="0"/>
         <line num="203" count="10" type="cond" truecount="2" falsecount="0"/>
         <line num="204" count="9" type="cond" truecount="2" falsecount="0"/>
         <line num="205" count="3" type="cond" truecount="2" falsecount="0"/>
@@ -1033,7 +1035,7 @@
       </file>
     </package>
     <package name="hooks">
-      <metrics statements="612" coveredstatements="360" conditionals="403" coveredconditionals="211" methods="135" coveredmethods="72"/>
+      <metrics statements="642" coveredstatements="360" conditionals="409" coveredconditionals="211" methods="142" coveredmethods="72"/>
       <file name="useAI.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/hooks/useAI.ts">
         <metrics statements="24" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="12" coveredmethods="4"/>
         <line num="51" count="3" type="stmt"/>
@@ -1145,10 +1147,10 @@
         <line num="26" count="9" type="stmt"/>
         <line num="29" count="0" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
-        <line num="32" count="8" type="stmt"/>
-        <line num="33" count="8" type="cond" truecount="1" falsecount="1"/>
+        <line num="32" count="9" type="stmt"/>
+        <line num="33" count="9" type="cond" truecount="1" falsecount="1"/>
         <line num="34" count="0" type="stmt"/>
-        <line num="36" count="8" type="stmt"/>
+        <line num="36" count="9" type="stmt"/>
       </file>
       <file name="useCMSProducts.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/hooks/useCMSProducts.ts">
         <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
@@ -1526,6 +1528,39 @@
         <line num="103" count="7" type="stmt"/>
         <line num="106" count="45" type="stmt"/>
       </file>
+      <file name="useOnboardingProgress.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/hooks/useOnboardingProgress.ts">
+        <metrics statements="30" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="7" coveredmethods="0"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="19" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="21" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+      </file>
       <file name="useOrders.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/hooks/useOrders.ts">
         <metrics statements="12" coveredstatements="0" conditionals="3" coveredconditionals="0" methods="8" coveredmethods="0"/>
         <line num="7" count="0" type="stmt"/>
@@ -1699,13 +1734,13 @@
         <line num="91" count="15" type="stmt"/>
         <line num="101" count="20" type="stmt"/>
         <line num="103" count="20" type="cond" truecount="4" falsecount="0"/>
-        <line num="104" count="3" type="stmt"/>
-        <line num="106" count="17" type="cond" truecount="2" falsecount="0"/>
+        <line num="104" count="5" type="stmt"/>
+        <line num="106" count="15" type="cond" truecount="2" falsecount="0"/>
         <line num="107" count="2" type="stmt"/>
-        <line num="109" count="15" type="cond" truecount="4" falsecount="0"/>
+        <line num="109" count="13" type="cond" truecount="4" falsecount="0"/>
         <line num="110" count="3" type="stmt"/>
-        <line num="112" count="12" type="cond" truecount="4" falsecount="0"/>
-        <line num="113" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="112" count="10" type="cond" truecount="4" falsecount="0"/>
+        <line num="113" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="115" count="8" type="cond" truecount="4" falsecount="0"/>
         <line num="116" count="2" type="stmt"/>
         <line num="118" count="6" type="cond" truecount="2" falsecount="0"/>
@@ -1905,7 +1940,7 @@
       </file>
     </package>
     <package name="screens">
-      <metrics statements="1642" coveredstatements="451" conditionals="1185" coveredconditionals="280" methods="489" coveredmethods="111"/>
+      <metrics statements="1646" coveredstatements="450" conditionals="1185" coveredconditionals="277" methods="489" coveredmethods="111"/>
       <file name="AccessibilitySettingsScreen.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/screens/AccessibilitySettingsScreen.tsx">
         <metrics statements="49" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="12" coveredmethods="0"/>
         <line num="27" count="0" type="cond" truecount="0" falsecount="4"/>
@@ -2653,22 +2688,22 @@
         <metrics statements="33" coveredstatements="29" conditionals="20" coveredconditionals="11" methods="7" coveredmethods="6"/>
         <line num="29" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="30" count="2" type="stmt"/>
-        <line num="37" count="15" type="stmt"/>
-        <line num="38" count="15" type="stmt"/>
-        <line num="39" count="15" type="stmt"/>
-        <line num="41" count="15" type="cond" truecount="1" falsecount="1"/>
-        <line num="42" count="15" type="stmt"/>
-        <line num="50" count="15" type="stmt"/>
-        <line num="51" count="15" type="stmt"/>
-        <line num="53" count="15" type="stmt"/>
+        <line num="37" count="16" type="stmt"/>
+        <line num="38" count="16" type="stmt"/>
+        <line num="39" count="16" type="stmt"/>
+        <line num="41" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="42" count="16" type="stmt"/>
+        <line num="50" count="16" type="stmt"/>
+        <line num="51" count="16" type="stmt"/>
+        <line num="53" count="16" type="stmt"/>
         <line num="54" count="6" type="stmt"/>
-        <line num="58" count="15" type="cond" truecount="2" falsecount="2"/>
-        <line num="61" count="15" type="cond" truecount="1" falsecount="1"/>
-        <line num="79" count="15" type="stmt"/>
+        <line num="58" count="16" type="cond" truecount="2" falsecount="2"/>
+        <line num="61" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="79" count="16" type="stmt"/>
         <line num="80" count="0" type="stmt"/>
         <line num="81" count="0" type="stmt"/>
         <line num="82" count="0" type="stmt"/>
-        <line num="85" count="15" type="stmt"/>
+        <line num="85" count="16" type="stmt"/>
         <line num="86" count="3" type="stmt"/>
         <line num="87" count="3" type="stmt"/>
         <line num="88" count="3" type="stmt"/>
@@ -2678,8 +2713,8 @@
         <line num="92" count="3" type="stmt"/>
         <line num="94" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="96" count="3" type="stmt"/>
-        <line num="100" count="15" type="stmt"/>
-        <line num="116" count="45" type="stmt"/>
+        <line num="100" count="16" type="stmt"/>
+        <line num="116" count="48" type="stmt"/>
         <line num="128" count="57" type="stmt"/>
         <line num="137" count="5" type="stmt"/>
         <line num="138" count="5" type="stmt"/>
@@ -2779,7 +2814,7 @@
         <line num="109" count="0" type="stmt"/>
       </file>
       <file name="HomeScreen.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/screens/HomeScreen.tsx">
-        <metrics statements="86" coveredstatements="56" conditionals="73" coveredconditionals="41" methods="42" coveredmethods="19"/>
+        <metrics statements="86" coveredstatements="55" conditionals="73" coveredconditionals="38" methods="42" coveredmethods="19"/>
         <line num="45" count="1" type="cond" truecount="3" falsecount="1"/>
         <line num="46" count="1" type="stmt"/>
         <line num="62" count="7" type="stmt"/>
@@ -2805,7 +2840,7 @@
         <line num="97" count="2" type="stmt"/>
         <line num="98" count="2" type="cond" truecount="3" falsecount="1"/>
         <line num="99" count="2" type="cond" truecount="3" falsecount="1"/>
-        <line num="100" count="2" type="cond" truecount="3" falsecount="1"/>
+        <line num="100" count="0" type="cond" truecount="0" falsecount="4"/>
         <line num="101" count="0" type="cond" truecount="0" falsecount="4"/>
         <line num="102" count="2" type="stmt"/>
         <line num="105" count="6" type="stmt"/>
@@ -3108,20 +3143,24 @@
         <line num="97" count="0" type="stmt"/>
       </file>
       <file name="OnboardingPager.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/screens/OnboardingPager.tsx">
-        <metrics statements="13" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="6" coveredmethods="0"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
+        <metrics statements="17" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="6" coveredmethods="0"/>
+        <line num="17" count="0" type="stmt"/>
         <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
         <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="68" count="0" type="stmt"/>
-        <line num="69" count="0" type="stmt"/>
-        <line num="89" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="95" count="0" type="stmt"/>
       </file>
       <file name="OnboardingScreen.tsx" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/screens/OnboardingScreen.tsx">
         <metrics statements="16" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
@@ -4094,7 +4133,7 @@
       </file>
     </package>
     <package name="utils">
-      <metrics statements="166" coveredstatements="112" conditionals="103" coveredconditionals="60" methods="46" coveredmethods="29"/>
+      <metrics statements="166" coveredstatements="112" conditionals="101" coveredconditionals="58" methods="46" coveredmethods="29"/>
       <file name="address.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/utils/address.ts">
         <metrics statements="10" coveredstatements="10" conditionals="12" coveredconditionals="11" methods="2" coveredmethods="2"/>
         <line num="20" count="1" type="stmt"/>
@@ -4194,8 +4233,8 @@
         <line num="14" count="0" type="stmt"/>
       </file>
       <file name="cmsConfig.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/utils/cmsConfig.ts">
-        <metrics statements="1" coveredstatements="1" conditionals="2" coveredconditionals="2" methods="0" coveredmethods="0"/>
-        <line num="1" count="2" type="cond" truecount="2" falsecount="0"/>
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="5" count="2" type="stmt"/>
       </file>
       <file name="deepLinkUtils.ts" path="/Users/user288522/Documents/nimbus-cannabis-mobile-1/src/utils/deepLinkUtils.ts">
         <metrics statements="49" coveredstatements="48" conditionals="20" coveredconditionals="20" methods="9" coveredmethods="9"/>

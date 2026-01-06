@@ -1,11 +1,10 @@
 // backend/src/controllers/authController.ts
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs'; // or: import * as bcrypt from 'bcryptjs'
 import { env } from '../env';
 
-const prisma = new PrismaClient();
 
 function getJwtSecret(): string {
   const s = env.JWT_SECRET;

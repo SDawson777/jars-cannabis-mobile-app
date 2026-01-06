@@ -15,7 +15,7 @@
       "env": {
         "NODE_ENV": "production",
         "EXPO_PUBLIC_APP_ENV": "demo",
-        "EXPO_PUBLIC_API_URL": "https://nimbus-cannabis-mobile-production.up.railway.app"
+        "EXPO_PUBLIC_API_URL": "https://nimbus-api-demo.up.railway.app"
       }
     },
     "development": {

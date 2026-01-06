@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { env } from './env';
 
+function isTestEnvironment() {
+  return process.env.NODE_ENV === 'test' || !!process.env.JEST_WORKER_ID;
+}
+
 // Lazily create the Prisma client so the backend can boot in demo mode without a DB.
 // The actual connection is only attempted when a route first accesses the client.
 let prismaInstance: PrismaClient | null = null;
@@ -23,9 +27,21 @@ type LazyPrismaClient = {
   [K in keyof PrismaClient]: PrismaClient[K];
 };
 
-export const prisma: LazyPrismaClient = new Proxy({} as LazyPrismaClient, {
-  get<K extends keyof PrismaClient>(_target: LazyPrismaClient, prop: K): PrismaClient[K] {
-    const client = getPrismaInstance();
-    return client[prop];
-  },
-});
+let prismaFromMock: any | undefined;
+if (isTestEnvironment()) {
+  try {
+    // Only available in the test workspace; never used in production builds.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    prismaFromMock = require('../tests/helpers/prismaMock.ts')?.prisma;
+  } catch {
+    prismaFromMock = undefined;
+  }
+}
+
+export const prisma: LazyPrismaClient = (prismaFromMock as LazyPrismaClient) ??
+  (new Proxy({} as LazyPrismaClient, {
+    get<K extends keyof PrismaClient>(_target: LazyPrismaClient, prop: K): PrismaClient[K] {
+      const client = getPrismaInstance();
+      return client[prop];
+    },
+  }) as LazyPrismaClient);

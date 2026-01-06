@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 
 // Router will be mounted at `/api/ai` and `/api/v1/ai` in app.ts. Keep handlers
 // relative (e.g. `/recommend-products`) so mounting controls the base path.
 const router = Router();
-const prisma = new PrismaClient();
 
 // Types for AI requests and responses
 interface RecommendProductsRequest {

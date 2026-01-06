@@ -1,3 +1,8 @@
+import 'dotenv/config';
+
+// Initialize Sentry as early as possible (safe if DSN is missing)
+import './utils/sentry';
+
 import app from './app';
 import { env } from './env';
 import { logger } from './utils/logger';

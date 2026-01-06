@@ -34,6 +34,10 @@ Use this checklist when rebranding the mobile app for a new tenant.
 - [ ] In `app.config.ts` and `src/navigation/linking.ts`:
   - [ ] Verify all screens under `linking.config.screens` map to correct paths.
   - [ ] Preserve legacy paths where possible; add aliases when changing.
+- [ ] Associated domain / Universal Links / App Links:
+  - [ ] iOS: update `ios.associatedDomains` in `app.config.ts` for the new domain.
+  - [ ] Android: update intent filters / host values in `android/app/src/main/AndroidManifest.xml`.
+  - [ ] Hosting: publish `apple-app-site-association` and `/.well-known/assetlinks.json` for the new domain.
 
 ## 4. Copy & UX Text
 
@@ -56,9 +60,17 @@ Back‑of‑house identifiers (change with care):
 - [ ] Global accessibility/storage keys: `NIMBUS_A11Y` / `nimbus_a11y_prefs` (or tenant‑namespaced).
 - [ ] Global window namespaces: `window.NIMBUS_*` or tenant‑specific.
 
+Brand string audit:
+
+- [ ] Search for and replace remaining `Nimbus` / `Jars` brand strings (copy, route names, deep link prefixes, test fixtures).
+- [ ] Pay special attention to `src/navigation/linking.ts` prefixes and any helpers named like `isJarsDeepLink`.
+
 ## 5. Backend & CMS
 
 - [ ] Update backend environment variables in `.env` / deployment config.
+- [ ] Update the mobile app’s tenant endpoints:
+  - [ ] `EXPO_PUBLIC_API_URL` (canonical API origin for the tenant)
+  - [ ] If applicable: `EXPO_PUBLIC_CMS_API_URL` (only if the tenant uses a separate CMS origin; this repo defaults CMS consumption to API origin via `src/utils/cmsConfig.ts`)
 - [ ] Confirm `backend/openapi.yaml` contract is still valid for the tenant.
 - [ ] Update support/contact emails (e.g., `support@nimbus.app`, `api-support@nimbus.app`).
 - [ ] Regenerate any demo or seed data to match tenant naming.

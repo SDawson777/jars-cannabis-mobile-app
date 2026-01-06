@@ -1,10 +1,10 @@
 # Demo Environment
 
-This document is the single source of truth for the Nimbus Cannabis OS **demo environment**: endpoints, dataset, demo logins, how to reseed, and how to produce demo store builds.
+This document is the single source of truth for the Nimbus Cannabis OS **demo environment**: endpoints, dataset, how to reseed, and how to produce demo builds.
 
 ## URLs
 
-### Mobile API (and CMS)
+### Mobile API (and CMS consumption)
 
 The mobile app uses `EXPO_PUBLIC_API_URL` as the single origin for:
 
@@ -13,8 +13,8 @@ The mobile app uses `EXPO_PUBLIC_API_URL` as the single origin for:
 
 **Hosted demo backend (Railway)**
 
-- Base origin: `https://nimbus-cannabis-mobile-production.up.railway.app`
-- API base (v1): `https://nimbus-cannabis-mobile-production.up.railway.app/api/v1`
+- Base origin: `https://nimbus-api-demo.up.railway.app`
+- API base (v1): `https://nimbus-api-demo.up.railway.app/api/v1`
 
 **Local demo backend (Docker)**
 
@@ -25,8 +25,14 @@ The mobile app uses `EXPO_PUBLIC_API_URL` as the single origin for:
 
 There is no separate “admin web UI” shipped in this repo.
 
+- Admin URL (hosted): `https://nimbus-admin-demo.vercel.app`
+
 - Admin functionality is exposed via protected API routes under `${EXPO_PUBLIC_API_URL}/api/v1/admin/*`.
 - See the admin JWT helper docs in [README.md](../README.md) (search for `make-admin-jwt`).
+
+### CMS (authoring)
+
+- Sanity Studio: `https://nimbus-cms.sanity.studio`
 
 ## Dataset name
 
@@ -37,29 +43,25 @@ There is no separate “admin web UI” shipped in this repo.
 
 ### Hosted demo dataset
 
-- Hosted demo typically runs the same demo seed concept (demo users/products/stores) but is managed by the deployment platform.
+- Sanity dataset: `nimbus_demo`
+- Hosted demo backend typically runs the same demo seed concept (demo users/products/stores) but is managed by the deployment platform.
 
 ## Demo user credentials
 
-There are two credential sets depending on which backend you’re pointing the app at.
+Do not commit demo credentials to git.
 
-### Hosted demo backend (Railway)
+### DEMO ONLY (credentials)
 
-From the in-app Demo Backend Helper (Settings):
+Demo credentials are stored in **1Password / a secret manager** and are not committed to git.
 
-- `buyer@demo.com` / `password123`
-- `admin@demo.com` / `admin123`
-- `manager@demo.com` / `manager123`
+- **Admin demo login**: request access to the “Nimbus Demo (Admin)” entry in your secret manager.
+- **Consumer demo login**: request access to the “Nimbus Demo (Consumer)” entry in your secret manager.
 
-### Local Docker demo seed
+If you need a “public demo login” for prospects:
 
-From [DEPLOYMENT.md](../DEPLOYMENT.md):
-
-- `demo+admin@example.com` / `demo123`
-- `demo+user@example.com` / `demo123`
-- `demo+sarah@example.com` / `demo123`
-- `demo+mike@example.com` / `demo123`
-- `demo+jessica@example.com` / `demo123`
+- Use a **non-privileged** demo user.
+- Rotate the password.
+- Keep access **read-only / scoped**.
 
 ## How to rebuild the demo DB and reseed
 
@@ -108,26 +110,14 @@ Goal: produce **store-distribution** binaries that point at the demo environment
 The `demo` profile in [eas.json](../eas.json) is configured for store builds with:
 
 - `EXPO_PUBLIC_APP_ENV=demo`
-- `EXPO_PUBLIC_API_URL=https://nimbus-cannabis-mobile-production.up.railway.app`
+- `EXPO_PUBLIC_API_URL=https://nimbus-api-demo.up.railway.app`
 
-### iOS: TestFlight build (demo)
+### iOS: Demo via simulator build (recommended)
 
-1. Build:
+This path does **not** require Apple Developer credentials.
 
-```bash
-eas build --platform ios --profile demo
-```
-
-2. Submit to TestFlight:
-
-```bash
-eas submit --platform ios --profile demo --latest
-```
-
-Prereqs:
-
-- App Store Connect app set up (bundle id matches), and `eas submit` credentials configured.
-- Update `submit.demo.ios.ascAppId` in [eas.json](../eas.json) (currently `REPLACE_AT_HANDOFF`).
+- Use the GitHub Actions CI job that produces an iOS Simulator artifact.
+- Optional: if Appetize is configured, prefer the Appetize demo link for fastest prospect access.
 
 ### Android: Internal testing track build (demo)
 
@@ -150,22 +140,39 @@ Prereqs:
 
 ## Store access instructions (short)
 
-### iOS (TestFlight)
+### iOS (Simulator)
 
-- Install Apple’s **TestFlight** app.
-- Accept the TestFlight invite link (see “Links” below).
-- Install the Nimbus demo build.
-- Open the app and sign in using the “Hosted demo backend” credentials above.
+- Download the `ios-simulator-build` artifact from GitHub Actions CI, or use the Appetize link if configured.
+- Credentials are retrieved from 1Password / your secret manager.
 
 ### Android (Internal testing)
 
 - Join the internal test via the Play Console invite link (see “Links” below).
 - Install the Nimbus demo build from Google Play.
-- Open the app and sign in using the “Hosted demo backend” credentials above.
+- Credentials are retrieved from 1Password / your secret manager.
 
 ## Links
 
-- TestFlight invite link: **TBD**
 - Google Play internal test link: **TBD**
 
 (After you generate these links in App Store Connect / Play Console, paste them here.)
+
+## Where demo builds live + how buyers request access
+
+### iOS
+
+Demo iOS builds are distributed as **simulator builds** from GitHub Actions (and optionally via Appetize).
+
+Buyers should request:
+
+- GitHub access to download CI artifacts, and/or
+- The Appetize demo link (if enabled for the repo)
+
+### Android
+
+Demo Android builds are distributed via **Google Play Console → Testing → Internal testing**.
+
+Buyers should request:
+
+- Google Play internal testing access (tester email/group invite)
+- The internal testing opt-in link (when generated)

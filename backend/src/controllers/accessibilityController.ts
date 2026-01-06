@@ -1,9 +1,8 @@
 // backend/src/controllers/accessibilityController.ts
 
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prismaClient';
 
-const prisma = new PrismaClient();
 
 // Typed query and body shapes
 type GetSettingsQuery = { userId: string };

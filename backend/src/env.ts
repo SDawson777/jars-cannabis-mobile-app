@@ -43,6 +43,10 @@ const prodEnvSchema = z.object({
 
   // Stripe
   STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
+  // Analytics integrity (optional)
+  ANALYTICS_HMAC_SECRET: z.string().optional(),
 
   // Weather API (with defaults)
   WEATHER_API_URL: z.string().url().optional().default('https://api.openweathermap.org/data/2.5'),
@@ -104,6 +108,10 @@ const testEnvSchema = z.object({
 
   // Stripe (with test defaults)
   STRIPE_SECRET_KEY: z.string().min(1).optional().default('sk_test_test'),
+  STRIPE_WEBHOOK_SECRET: z.string().optional().default(''),
+
+  // Analytics integrity (optional)
+  ANALYTICS_HMAC_SECRET: z.string().optional().default(''),
 
   // Weather API (with defaults)
   WEATHER_API_URL: z.string().url().optional().default('https://api.openweathermap.org/data/2.5'),

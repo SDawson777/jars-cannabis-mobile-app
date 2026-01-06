@@ -6,6 +6,9 @@ type FirebaseFirestore = typeof FirebaseFirestoreNS;
 
 let app: admin.app.App | null = null;
 
+const isTestEnvironment =
+  process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
+
 function serviceAccountFromEnv(): admin.ServiceAccount {
   const b64 = env.FIREBASE_SERVICE_ACCOUNT_BASE64;
   if (!b64) throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 missing');
@@ -29,6 +32,14 @@ export function initFirebase(): admin.app.App {
     app = admin.app();
     return app;
   }
+
+  // In test runs we intentionally do not require real credentials.
+  // Many backend unit tests should run without any external dependencies.
+  if (isTestEnvironment) {
+    app = admin.initializeApp();
+    return app;
+  }
+
   const cred = admin.credential.cert(serviceAccountFromEnv());
   app = admin.initializeApp({ credential: cred });
   return app;
@@ -48,9 +59,6 @@ export function getFirestore(): FirebaseFirestore.Firestore {
 /** Re-export admin for convenience. */
 export { admin };
 
-/** Convenience export for existing code that expects `db`. */
-export const db: FirebaseFirestore.Firestore = getFirestore();
-
 /** Default export keeps old imports working. */
-const firebaseAdmin = { admin, initFirebase, getAdmin, getFirestore, db };
+const firebaseAdmin = { admin, initFirebase, getAdmin, getFirestore };
 export default firebaseAdmin;

@@ -129,10 +129,13 @@ app.use((req: any, res: any, next) => {
   next();
 });
 
-// Basic liveness
-app.get('/api/v1/health', (_req, res) => res.json({ ok: true }));
+// Basic liveness (used by Dockerfile HEALTHCHECK)
+function handleHealth(_req: any, res: any) {
+  res.json({ ok: true });
+}
+
 // Single readiness endpoint with real prisma probe (lightweight) + external service checks
-app.get('/api/v1/ready', async (req, res) => {
+async function handleReady(req: any, res: any) {
   let db: 'ok' | 'fail' = 'ok';
   let cache: 'ok' | 'fail' | 'not_configured' = 'not_configured';
   let openai: 'ok' | 'fail' | 'not_configured' = 'not_configured';
@@ -192,7 +195,15 @@ app.get('/api/v1/ready', async (req, res) => {
   const ready = db === 'ok' || process.env.NODE_ENV === 'test';
   if (!ready) (req as any).log?.error?.('readiness.failed', { checks });
   res.status(ready ? 200 : 503).json({ ready, checks });
-});
+}
+
+// Canonical API v1 probes
+app.get('/api/v1/health', handleHealth);
+app.get('/api/v1/ready', handleReady);
+
+// Platform-friendly probe aliases (no /api/v1 prefix)
+app.get('/healthz', handleHealth);
+app.get('/ready', handleReady);
 
 try {
   initFirebase();
