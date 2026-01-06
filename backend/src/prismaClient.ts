@@ -38,7 +38,8 @@ if (isTestEnvironment()) {
   }
 }
 
-export const prisma: LazyPrismaClient = (prismaFromMock as LazyPrismaClient) ??
+export const prisma: LazyPrismaClient =
+  (prismaFromMock as LazyPrismaClient) ??
   (new Proxy({} as LazyPrismaClient, {
     get<K extends keyof PrismaClient>(_target: LazyPrismaClient, prop: K): PrismaClient[K] {
       const client = getPrismaInstance();

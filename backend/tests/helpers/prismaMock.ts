@@ -284,7 +284,9 @@ export const prisma = {
     },
     deleteMany: async ({ where: { id } }: any) => {
       for (const c of Object.values(carts)) {
-        (c as any).items = (c as any).items.filter((x: any) => !(id && id.in && id.in.includes(x.id)));
+        (c as any).items = (c as any).items.filter(
+          (x: any) => !(id && id.in && id.in.includes(x.id))
+        );
       }
       return { count: 0 };
     },
@@ -306,12 +308,16 @@ export const prisma = {
       return items.slice(skip, skip + take);
     },
     findUnique: async ({ where: { id } }: any) => seededProducts.find(p => p.id === id) ?? null,
-    findManyBySlug: async ({ where: { slug } }: any) => seededProducts.find(p => p.slug === slug) ?? null,
-    findManyByCategory: async ({ where: { category } }: any) => seededProducts.filter(p => p.category === category),
+    findManyBySlug: async ({ where: { slug } }: any) =>
+      seededProducts.find(p => p.slug === slug) ?? null,
+    findManyByCategory: async ({ where: { category } }: any) =>
+      seededProducts.filter(p => p.category === category),
   },
   journalEntry: {
     findMany: async ({ where = {}, orderBy = {}, take, skip }: any) => {
-      const all = Object.values(journalEntries).filter((e: any) => !where.userId || e.userId === where.userId);
+      const all = Object.values(journalEntries).filter(
+        (e: any) => !where.userId || e.userId === where.userId
+      );
       if ((orderBy as any).updatedAt === 'desc') {
         all.sort((a: any, b: any) => (a.updatedAt < b.updatedAt ? 1 : -1));
       } else {
@@ -373,7 +379,9 @@ export const prisma = {
   },
   paymentMethod: {
     findMany: async ({ where = {} }: any) => {
-      const all = Object.values(paymentMethods).filter((pm: any) => !where.userId || pm.userId === where.userId);
+      const all = Object.values(paymentMethods).filter(
+        (pm: any) => !where.userId || pm.userId === where.userId
+      );
       all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
       return all;
     },
@@ -413,7 +421,9 @@ export const prisma = {
   },
   address: {
     findMany: async ({ where = {} }: any) => {
-      const all = Object.values(addresses).filter((a: any) => !where.userId || a.userId === where.userId);
+      const all = Object.values(addresses).filter(
+        (a: any) => !where.userId || a.userId === where.userId
+      );
       all.sort((a: any, b: any) => (a.createdAt < b.createdAt ? 1 : -1));
       return all;
     },
@@ -484,7 +494,9 @@ export const prisma = {
     },
     findFirst: async ({ where = {} }: any) =>
       (Object.values(mockOrders) as any[]).find(
-        (o: any) => o.id === (where as any).id && (!(where as any).userId || o.userId === (where as any).userId)
+        (o: any) =>
+          o.id === (where as any).id &&
+          (!(where as any).userId || o.userId === (where as any).userId)
       ) ?? null,
     findUnique: async ({ where: { id } }: any) => mockOrders[id] ?? null,
     create: async ({ data }: any) => {
@@ -526,7 +538,8 @@ export const prisma = {
       carts[data.userId] = c;
       return c;
     },
-    findUnique: async ({ where: { id } }: any) => (Object.values(carts) as any[]).find((c: any) => c.id === id) ?? null,
+    findUnique: async ({ where: { id } }: any) =>
+      (Object.values(carts) as any[]).find((c: any) => c.id === id) ?? null,
     update: async ({ where: { id }, data }: any) => {
       const c = (Object.values(carts) as any[]).find((x: any) => x.id === id);
       if (!c) throw new Error('Not found');
@@ -602,6 +615,9 @@ export const prisma = {
   // Minimal shims for tables used by profile routes
   userPreference: {
     findUnique: async ({ where: { userId } }: any) => null,
-    upsert: async ({ where: { userId }, create, update }: any) => ({ userId, ...(update || create) }),
+    upsert: async ({ where: { userId }, create, update }: any) => ({
+      userId,
+      ...(update || create),
+    }),
   },
 } as any;

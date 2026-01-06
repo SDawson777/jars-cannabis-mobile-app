@@ -3,7 +3,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prismaClient';
 
-
 // Typed query and body shapes
 type GetSettingsQuery = { userId: string };
 type UpdateBody = {

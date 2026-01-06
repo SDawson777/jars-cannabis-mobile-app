@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs'; // or: import * as bcrypt from 'bcryptjs'
 import { env } from '../env';
 
-
 function getJwtSecret(): string {
   const s = env.JWT_SECRET;
   if (!s) throw new Error('JWT_SECRET is not set');
