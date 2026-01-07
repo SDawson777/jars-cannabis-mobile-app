@@ -43,7 +43,7 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
    - All `.env` and `.env.*` files are gitignored—keep secrets in local files or platform secret managers instead of committing them.
    - Optional but recommended: start Redis locally (Docker compose) to exercise rate limiting, caching, and push backoff logic.
 3. **Running the stack**
-   - Backend: `npm run dev:backend` (or `npm --prefix backend run dev`) boots Express on `http://localhost:3000` with health probes at `/api/v1/health` and `/api/v1/ready`.
+   - Backend: `npm run dev:backend` (or `npm --prefix backend run dev`) boots Express on `http://localhost:3000` with liveness/readiness probes at `/api/v1/health` and `/api/v1/ready`.
    - Mobile: `npm run start` (Expo) for the dev menu, or `npm run ios` / `npm run android` for platform targets. Point `EXPO_PUBLIC_API_URL` to your backend URL.
 4. **Quality gates before merging/deploying**
    - `npm run lint`, `npm run typecheck`, `npm test`, `npm --prefix backend run test:ci`, and `npm run smoke` (Postman collection) must all pass.
@@ -55,6 +55,7 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
    - `ARCHITECTURE.md`: systems overview and request lifecycle.
    - `API_CONTRACT.md`: high-level endpoint catalog linked to `backend/openapi.yaml`.
    - `SECURITY_NOTES.md`: current threat model + rotation policies.
+   - `docs/SECURITY_NOTES.md`: includes health/readiness probes + Sentry verification steps.
    - `docs/postgres-backup.md`: PostgreSQL backup & restore procedures.
    - `docs/SEEDING.md`: how to seed the database with baseline or demo data.
    - `docs/` directory: historical audits, QA guides, and per-feature implementation notes.
@@ -67,10 +68,13 @@ See [docs/DEMO_ENVIRONMENT.md](docs/DEMO_ENVIRONMENT.md) for the canonical demo 
 
 ## Buyer Evaluation
 
-- Smoke test checklist (CMS repo): **replace this URL with your CMS repo** → https://github.com/<ORG>/<CMS_REPO>/blob/main/BUYER_SMOKE_TEST.md
+- Smoke test checklist (CMS): https://github.com/SDawson777/nimbus-cms/blob/main/BUYER_SMOKE_TEST.md
 - Demo mode points to:
-  - API: https://nimbus-api-demo.up.railway.app
+  - API origin: https://nimbus-api-demo.up.railway.app (API base: https://nimbus-api-demo.up.railway.app/api/v1)
   - CMS (authoring): https://nimbus-cms.sanity.studio (dataset: `nimbus_demo`)
+- Local/dev env values:
+  - Mobile: set `EXPO_PUBLIC_API_URL=http://localhost:3000` (or your hosted API origin)
+  - Backend: copy `backend/.env.example` → `backend/.env` and set at minimum `DATABASE_URL` and `JWT_SECRET` (plus any integration keys you enable)
 
 ## 🚀 One-Click Deployment
 
@@ -78,15 +82,14 @@ Get the complete backend running with Docker Compose:
 
 ```bash
 # Clone repository
-git clone https://github.com/SDawson777/jars-cannabis-mobile-app.git
+git clone https://github.com/SDawson777/nimbus-cannabis-mobile.git
 cd nimbus-cannabis-mobile
 
-# Configure environment
-cp .env.docker.example .env
-
 # Start everything (PostgreSQL + Redis + Backend API)
-docker-compose up
+docker compose up
 ```
+
+`docker-compose up` also works on older Docker installs.
 
 **Backend available at**: `http://localhost:3000`  
 **Full instructions**: See [DEPLOYMENT.md](DEPLOYMENT.md)
@@ -169,7 +172,7 @@ npm run install:all                  # Automated installation (both root and bac
 1. Clone the repository
 
 ```bash
-git clone https://github.com/SDawson777/jars-cannabis-mobile-app.git
+git clone https://github.com/SDawson777/nimbus-cannabis-mobile.git
 cd nimbus-cannabis-mobile
 ```
 
@@ -231,10 +234,10 @@ For immediate testing with realistic fake data:
 
 ```bash
 # 1. Start backend with Docker (includes database)
-docker-compose up -d
+docker compose up -d
 
 # 2. Populate comprehensive demo data
-docker-compose exec backend npm run seed:demo
+docker compose exec backend npm run seed:demo
 
 # 3. Start mobile app with demo backend
 EXPO_PUBLIC_API_URL=http://localhost:3000 npx expo start
@@ -356,7 +359,7 @@ This project resolves Node.js version compatibility issues through:
 
 iOS builds are configured to work without Firebase native modules:
 
-- Firebase imports commented out in `ios/JARS/AppDelegate.mm`
+- Firebase imports commented out in `ios/NimbusCannabisOS/AppDelegate.mm`
 - CocoaPods configuration excludes Firebase iOS modules via `react-native.config.js`
 - Expo SDK 50 compatible versions used (e.g., `expo-localization@14.8.4`)
 
@@ -562,7 +565,7 @@ yarn format:check              # Prettier format validation
 📦 Project Structure
 
 ```plaintext
-jars-cannabis-mobile-app/
+nimbus-cannabis-mobile/
 ├─ backend/            # Node.js/Express/Prisma backend
 ├─ src/                # React Native app source
 │  ├─ screens/
@@ -780,7 +783,7 @@ yarn install --ignore-engines
 ```bash
 # Error: 'Firebase/Firebase.h' file not found
 # Solution: Firebase iOS modules are disabled by design
-# Check ios/JARS/AppDelegate.mm - imports should be commented out
+# Check ios/NimbusCannabisOS/AppDelegate.mm - imports should be commented out
 ```
 
 **3. Yarn Version Conflicts**

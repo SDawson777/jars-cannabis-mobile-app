@@ -1,6 +1,10 @@
 # Security Notes
 
-_Last reviewed: January 2025 — Next review due: April 2025_
+This file remains for backwards compatibility.
+
+Canonical security documentation now lives in `docs/SECURITY_NOTES.md`.
+
+_Last reviewed: January 2026_
 
 ## 1. Threat Model Snapshot
 
@@ -58,4 +62,4 @@ _Last reviewed: January 2025 — Next review due: April 2025_
 - Enforce branch protection: passing CI + one approval required for `main`.
 - Use `git-crypt` or secure vault for sharing real secrets outside CI; avoid messaging apps.
 
-Staying aligned with these controls keeps the JARS platform within tolerance for the buyer handoff and future audits.
+Staying aligned with these controls keeps the Nimbus platform within tolerance for buyer handoff and future audits.
