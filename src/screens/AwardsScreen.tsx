@@ -1,9 +1,9 @@
 // src/screens/AwardsScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, Settings } from 'lucide-react-native';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -28,7 +28,7 @@ import { phase4Client } from '../api/phase4Client';
 import { clientGet } from '../api/http';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
-import { trackEvent } from '../utils/analytics'; // ensure exported in utils/analytics
+import { trackEvent, trackScreenView } from '../utils/analytics';
 import { hapticLight, hapticMedium } from '../utils/haptic';
 import { toast } from '../utils/toast';
 
@@ -86,7 +86,17 @@ export default function AwardsScreen() {
 
   const user = data?.user ?? { name: '---', tier: '', points: 0, progress: 0 };
   const progressAnim = useRef(new Animated.Value(user.progress)).current;
-  // Rewards now provided by API via `rewards` list
+
+  // Track screen view
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('AwardsScreen', { 
+        points: user.points, 
+        tier: user.tier, 
+        awards_count: awards.length 
+      });
+    }, [user.points, user.tier, awards.length])
+  );
 
   const prevAwardsCount = useRef(awards.length);
 

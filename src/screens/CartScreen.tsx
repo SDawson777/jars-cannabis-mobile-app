@@ -1,8 +1,8 @@
 // src/screens/CartScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChevronLeft, Trash2, HelpCircle } from 'lucide-react-native';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -25,6 +25,7 @@ import { useCartValidation } from '../hooks/useCartValidation';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy, hapticError } from '../utils/haptic';
 import { useTranslation } from '../i18n/useTranslation';
+import { trackScreenView, trackCommerceEvent } from '../utils/analytics';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -45,6 +46,13 @@ export default function CartScreen() {
   const [promo, setPromo] = useState('');
 
   const { validating } = useCartValidation();
+
+  // Track screen view
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('CartScreen', { itemCount: items.length });
+    }, [items.length])
+  );
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -105,6 +113,8 @@ export default function CartScreen() {
       );
       try {
         await updateCart({ items: updatedItems });
+        // Track add/remove from cart based on delta
+        trackCommerceEvent(delta > 0 ? 'add_to_cart' : 'remove_from_cart', id, { quantity: Math.abs(delta) });
       } catch (error) {
         // Error handling - could show toast or retry
         console.error('Failed to update cart:', error);
@@ -114,6 +124,7 @@ export default function CartScreen() {
 
   const removeItem = (id: string) => {
     hapticHeavy();
+    const item = items.find((i: { id: string }) => i.id === id);
     Alert.alert(t('cart.removeItemTitle'), t('cart.removeItemMessage'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
@@ -124,6 +135,7 @@ export default function CartScreen() {
           const updatedItems = items.filter((i: { id: string }) => i.id !== id);
           try {
             await updateCart({ items: updatedItems });
+            trackCommerceEvent('remove_from_cart', id, { quantity: item?.quantity ?? 1 });
           } catch (error) {
             console.error('Failed to remove item:', error);
           }

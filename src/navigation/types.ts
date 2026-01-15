@@ -24,7 +24,7 @@ export type RootStackParamList = {
   StoreSelection: undefined;
   HomeScreen: undefined;
   // Allow optional weather-based filtering when navigating from Weather rail
-  ShopScreen: { weatherFilter?: string } | undefined;
+  ShopScreen: { weatherFilter?: string; dealId?: string } | undefined;
   ProductList: undefined;
   ProductDetail: { slug: string };
   CartScreen: undefined;
@@ -71,4 +71,6 @@ export type RootStackParamList = {
   EthicalAIDashboard: undefined;
   LanguageSelection: undefined;
   StrainFinder: undefined;
+  /** Deals & Promotions screen */
+  DealsScreen: undefined;
 };

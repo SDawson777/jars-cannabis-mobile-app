@@ -51,6 +51,11 @@ describe('ProductDetailScreen integration', () => {
       brandPrimary: '#000',
       brandSecondary: '#666',
       brandBackground: '#fff',
+      brandAccent: '#000',
+      cornerRadius: 8,
+      logoUrl: '',
+      elevation: 'soft' as const,
+      cmsTheme: null,
       loading: false,
       debugInfo: {
         weatherSource: 'time-of-day' as const,

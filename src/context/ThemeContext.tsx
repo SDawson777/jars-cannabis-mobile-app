@@ -2,6 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'expo-localization';
 import { fetchJson } from '../utils/apiClient';
+import { API_BASE_URL } from '../utils/apiConfig';
 import * as Location from 'expo-location';
 import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { Appearance } from 'react-native';
@@ -9,7 +10,10 @@ import { Appearance } from 'react-native';
 import logger from '../lib/logger';
 import { logEvent } from '../utils/analytics';
 import { useBrandData } from './BrandContext';
+import type { CMSTheme } from '../types/cmsExtra';
+
 const EXPO_PUBLIC_OPENWEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_KEY as string;
+const CMS_THEME_CACHE_KEY = 'cms:theme';
 
 // Tuned threshold constants
 const COOL_THRESHOLD_METRIC = 12; // °C below which we consider it 'cool'
@@ -47,23 +51,45 @@ interface ThemeContextValue {
   brandPrimary: string;
   brandSecondary: string;
   brandBackground: string;
+  brandAccent: string;
+  cornerRadius: number;
+  logoUrl: string | undefined;
+  elevation: 'flat' | 'soft' | 'prominent';
   loading: boolean;
   debugInfo: DebugInfo;
+  cmsTheme: CMSTheme | null;
   // Dev simulation controls
   weatherSimulation: WeatherSimulation;
   setWeatherSimulation: (simulation: WeatherSimulation) => void;
 }
 
+// Default CMS theme fallback
+const DEFAULT_CMS_THEME: CMSTheme = {
+  brandSlug: 'default',
+  primaryColor: '#2E5D46',
+  secondaryColor: '#8CD24C',
+  backgroundColor: '#F9F9F9',
+  accentColor: '#FFD700',
+  cornerRadius: 12,
+  darkModeEnabled: false,
+  elevation: 'soft',
+};
+
 export const ThemeContext = createContext<ThemeContextValue>({
   colorTemp: 'neutral',
-  brandPrimary: '#2E5D46',
-  brandSecondary: '#8CD24C',
-  brandBackground: '#F9F9F9',
+  brandPrimary: DEFAULT_CMS_THEME.primaryColor,
+  brandSecondary: DEFAULT_CMS_THEME.secondaryColor,
+  brandBackground: DEFAULT_CMS_THEME.backgroundColor || '#F9F9F9',
+  brandAccent: DEFAULT_CMS_THEME.accentColor || '#FFD700',
+  cornerRadius: DEFAULT_CMS_THEME.cornerRadius || 12,
+  logoUrl: undefined,
+  elevation: DEFAULT_CMS_THEME.elevation || 'soft',
   loading: false,
   debugInfo: {
     weatherSource: 'time-of-day',
     lastUpdated: new Date(),
   },
+  cmsTheme: null,
   weatherSimulation: {
     enabled: false,
     condition: null,
@@ -81,6 +107,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const [colorTemp, setColorTemp] = useState<ColorTemp>('neutral');
   const [loading, setLoading] = useState<boolean>(true);
+  const [cmsTheme, setCmsTheme] = useState<CMSTheme | null>(null);
   const [debugInfo, setDebugInfo] = useState<DebugInfo>({
     weatherSource: 'time-of-day',
     lastUpdated: new Date(),
@@ -89,6 +116,47 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     enabled: false,
     condition: null,
   });
+
+  // Fetch CMS theme on mount
+  useEffect(() => {
+    let cancelled = false;
+    
+    (async () => {
+      try {
+        // Try to load cached theme first for faster startup
+        const cached = await AsyncStorage.getItem(CMS_THEME_CACHE_KEY);
+        if (cached && !cancelled) {
+          setCmsTheme(JSON.parse(cached) as CMSTheme);
+        }
+
+        // Fetch fresh theme from CMS
+        const brandSlug = brand.slug || process.env.EXPO_PUBLIC_BRAND_SLUG || 'default';
+        const themeData = await fetchJson<CMSTheme>(
+          `${API_BASE_URL}/content/theme?brand=${brandSlug}`,
+          { retries: 2 }
+        );
+        
+        if (!cancelled && themeData) {
+          setCmsTheme(themeData);
+          await AsyncStorage.setItem(CMS_THEME_CACHE_KEY, JSON.stringify(themeData));
+          
+          logEvent('cms_theme_loaded', {
+            brandSlug: themeData.brandSlug,
+            darkModeEnabled: themeData.darkModeEnabled,
+          });
+        }
+      } catch (err) {
+        logger.warn('Failed to fetch CMS theme, using defaults', { err });
+        if (!cancelled && !cmsTheme) {
+          setCmsTheme(DEFAULT_CMS_THEME);
+        }
+      }
+    })();
+    
+    return () => {
+      cancelled = true;
+    };
+  }, [brand.slug]);
 
   // Load weather simulation settings from storage
   useEffect(() => {
@@ -351,7 +419,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [weatherSimulation]); // Re-run when simulation changes
 
   // 6. Dark-mode interplay with brand colors
-  const isDark = Appearance.getColorScheme() === 'dark';
+  // Use CMS theme's darkModeEnabled setting if available, otherwise fall back to system
+  const systemDark = Appearance.getColorScheme() === 'dark';
+  const isDark = cmsTheme?.darkModeEnabled ?? systemDark;
+  
   // Helper function to darken colors for dark mode
   const adjustColorForDarkMode = (color: string) => {
     // Simple approach: if in dark mode, darken the color by reducing the brightness
@@ -367,13 +438,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
 
+  // Resolve colors: prefer CMS theme, fallback to brand context, then defaults
+  const resolvedPrimary = cmsTheme?.primaryColor || brand.primaryColor || DEFAULT_CMS_THEME.primaryColor;
+  const resolvedSecondary = cmsTheme?.secondaryColor || brand.secondaryColor || DEFAULT_CMS_THEME.secondaryColor;
+  const resolvedBackground = cmsTheme?.backgroundColor || DEFAULT_CMS_THEME.backgroundColor || '#F9F9F9';
+  const resolvedAccent = cmsTheme?.accentColor || DEFAULT_CMS_THEME.accentColor || '#FFD700';
+
   const value: ThemeContextValue = {
     colorTemp,
-    brandPrimary: adjustColorForDarkMode(brand.primaryColor),
-    brandSecondary: adjustColorForDarkMode(brand.secondaryColor),
-    brandBackground: isDark ? '#121212' : '#F9F9F9',
+    brandPrimary: adjustColorForDarkMode(resolvedPrimary),
+    brandSecondary: adjustColorForDarkMode(resolvedSecondary),
+    brandBackground: isDark ? '#121212' : resolvedBackground,
+    brandAccent: adjustColorForDarkMode(resolvedAccent),
+    cornerRadius: cmsTheme?.cornerRadius ?? DEFAULT_CMS_THEME.cornerRadius ?? 12,
+    logoUrl: cmsTheme?.logoUrl || brand.logoUrl,
+    elevation: cmsTheme?.elevation ?? DEFAULT_CMS_THEME.elevation ?? 'soft',
     loading,
     debugInfo,
+    cmsTheme,
     weatherSimulation,
     setWeatherSimulation: updateWeatherSimulation,
   };

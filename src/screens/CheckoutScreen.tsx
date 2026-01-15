@@ -1,9 +1,9 @@
 // src/screens/CheckoutScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useStripe } from '@stripe/stripe-react-native';
 import { ChevronLeft, HelpCircle } from 'lucide-react-native';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import {
   View,
   SafeAreaView,
@@ -28,6 +28,7 @@ import { useCartStore } from '../../stores/useCartStore';
 import { parseAddress, isValidParsedAddress } from '../utils/address';
 import { toast } from '../utils/toast';
 import { useTranslation } from '../i18n/useTranslation';
+import { trackScreenView, trackCommerceEvent, logEvent } from '../utils/analytics';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -55,20 +56,49 @@ export default function CheckoutScreen() {
   const [email, setEmail] = useState('');
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Get cart items for analytics
+  const cartItems = useCartStore(
+    (state: { items: { id: string; quantity: number; price?: number; [key: string]: any }[] }) => state.items
+  );
+  const cartTotal = cartItems.reduce((sum: number, item: any) => sum + (item.price || 0) * item.quantity, 0);
+  const cartItemCount = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
+
+  // Track screen view on mount (begin_checkout)
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('CheckoutScreen', { step: 0, item_count: cartItemCount });
+      trackCommerceEvent('begin_checkout', cartItems.map((item: any) => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price
+      })), { total: cartTotal });
+    }, [cartItemCount, cartTotal])
+  );
+
   const { initPaymentSheet, presentPaymentSheet, isApplePaySupported, isGooglePaySupported } =
     useStripe();
   const { t } = useTranslation();
   const { preferredStoreId } = usePreferredStoreId.getState();
-  // Access cart store (currently only to ensure hydration; items implicitly used on backend)
-  useCartStore(
-    (state: { items: { id: string; quantity: number; [key: string]: any }[] }) => state.items
-  );
 
   // Access cart store for clearing after success (direct getState usage later to avoid re-renders)
   const [apiError, setApiError] = useState<string | null>(null);
   const createOrder = useCreateOrder({
     onSuccess: order => {
       hapticMedium();
+      
+      // Track purchase event
+      trackCommerceEvent('purchase', cartItems.map((item: any) => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price
+      })), { 
+        order_id: order.id, 
+        total: cartTotal,
+        payment_method: payment === 'online' ? 'card' : 'pay_at_pickup',
+        delivery_method: method
+      });
+      
       // Clear cart store (local) since backend empties cart
       try {
         const { setItems } = useCartStore.getState() as any;
@@ -81,6 +111,9 @@ export default function CheckoutScreen() {
     onError: err => {
       hapticHeavy();
       console.log('Order error:', err?.response?.data);
+      
+      // Track checkout error
+      logEvent('checkout_error', { error: err?.response?.data?.error || 'unknown' });
 
       // Handle compliance violations with specific messaging
       if (err?.response?.data?.error === 'compliance_violation') {

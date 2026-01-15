@@ -9,11 +9,13 @@ import {
   StyleSheet,
   LayoutAnimation,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useAccessibilityStore } from '../state/accessibilityStore';
 import { useTextScaling } from '../hooks/useTextScaling';
 import { ThemeContext } from '../context/ThemeContext';
 import { useTranslation } from '../i18n/useTranslation';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 export default function AppSettingsScreen() {
   const {
@@ -27,6 +29,14 @@ export default function AppSettingsScreen() {
   const { scaleSize } = useTextScaling();
   const { textSize, setTextSize, highContrast, setHighContrast, reduceMotion, setReduceMotion } =
     useAccessibilityStore();
+  const { isEnabled: pushEnabled, isLoading: pushLoading, togglePush } = usePushNotifications();
+
+  const handlePushToggle = async (value: boolean) => {
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+    await togglePush(value);
+  };
 
   const handleTextSizeCycle = () => {
     if (!reduceMotion) {
@@ -252,6 +262,42 @@ npm run seed:demo
             trackColor={{ false: '#E0E0E0', true: accentColor }}
             thumbColor="#FFFFFF"
           />
+        </View>
+
+        <Text
+          style={[
+            styles.section,
+            {
+              color: textColor,
+              fontSize: scaleSize(18),
+            },
+          ]}
+        >
+          {t('settings.notifications') || 'Notifications'}
+        </Text>
+
+        <View style={styles.row}>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: textColor,
+                fontSize: scaleSize(16),
+              },
+            ]}
+          >
+            {t('settings.pushNotifications') || 'Push Notifications'}
+          </Text>
+          {pushLoading ? (
+            <ActivityIndicator size="small" color={accentColor} />
+          ) : (
+            <Switch
+              value={!!pushEnabled}
+              onValueChange={handlePushToggle}
+              trackColor={{ false: '#E0E0E0', true: accentColor }}
+              thumbColor="#FFFFFF"
+            />
+          )}
         </View>
 
         <Text

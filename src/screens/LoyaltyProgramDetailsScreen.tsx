@@ -1,8 +1,8 @@
 // src/screens/LoyaltyProgramDetailsScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react-native';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -22,6 +22,7 @@ import PointsProgressBar from '../components/PointsProgressBar';
 import { LoyaltyContext } from '../context/LoyaltyContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { hapticLight } from '../utils/haptic';
+import { trackScreenView, logEvent } from '../utils/analytics';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -34,11 +35,22 @@ export default function LoyaltyProgramDetailsScreen() {
   const { data: loyalty } = useContext(LoyaltyContext);
   const queryClient = useQueryClient();
 
+  const points = loyalty?.points ?? 0;
+  const tier = (loyalty as any)?.tier ?? (loyalty as any)?.level ?? 'Bronze';
+
+  // Track screen view
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('LoyaltyProgramDetailsScreen', { points, tier });
+    }, [points, tier])
+  );
+
   const redeemMutation = useMutation({
     mutationFn: async () => {
       await clientPost<void, any>(phase4Client, '/loyalty/redeem');
     },
     onSuccess: () => {
+      logEvent('loyalty_redeem_success', { points });
       queryClient.invalidateQueries({ queryKey: ['loyaltyStatus'] });
     },
   });
@@ -49,7 +61,6 @@ export default function LoyaltyProgramDetailsScreen() {
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;
-  const points = loyalty?.points ?? 0;
   const target = 140;
   const pointsAway = Math.max(0, target - points);
 

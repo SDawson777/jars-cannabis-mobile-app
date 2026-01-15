@@ -42,6 +42,11 @@ const theme = {
   brandPrimary: '#222',
   brandSecondary: '#666',
   brandBackground: '#fff',
+  brandAccent: '#222',
+  cornerRadius: 8,
+  logoUrl: '',
+  elevation: 'soft' as const,
+  cmsTheme: null,
   loading: false,
   debugInfo: {
     weatherSource: 'time-of-day' as const,

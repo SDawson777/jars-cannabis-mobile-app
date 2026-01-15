@@ -47,6 +47,11 @@ const mockThemeContext = {
   brandPrimary: '#2E8B57',
   brandSecondary: '#FFD700',
   brandBackground: '#F9F9F9',
+  brandAccent: '#2E8B57',
+  cornerRadius: 8,
+  logoUrl: '',
+  elevation: 'soft' as const,
+  cmsTheme: null,
   loading: false,
   debugInfo: {
     weatherSource: 'time-of-day' as const,

@@ -159,3 +159,210 @@ contentRouter.get('/content/articles/:slug', async (req, res) => {
   });
   return res.json(demo);
 });
+
+// GET /content/theme - Fetch CMS-managed theme tokens
+contentRouter.get('/content/theme', async (req, res) => {
+  const brandSlug = (req.query.brand as string) || 'default';
+  
+  try {
+    // Try to fetch from database if available
+    if ((prisma as any).brand && typeof (prisma as any).brand.findFirst === 'function') {
+      const brandTheme = await (prisma as any).brand.findFirst({
+        where: { slug: brandSlug },
+      });
+      if (brandTheme) {
+        return res.json({
+          brandSlug: brandTheme.slug,
+          primaryColor: brandTheme.primaryColor || '#2E5D46',
+          secondaryColor: brandTheme.secondaryColor || '#8CD24C',
+          backgroundColor: brandTheme.backgroundColor || '#F9F9F9',
+          accentColor: brandTheme.accentColor || '#FFD700',
+          cornerRadius: brandTheme.cornerRadius ?? 12,
+          logoUrl: brandTheme.logoUrl,
+          darkModeEnabled: brandTheme.darkModeEnabled ?? false,
+          elevation: brandTheme.elevation || 'soft',
+          fontFamily: brandTheme.fontFamily,
+        });
+      }
+    }
+  } catch {
+    // Fall through to demo theme
+  }
+
+  // Demo/default theme
+  return res.json({
+    brandSlug,
+    primaryColor: '#2E5D46',
+    secondaryColor: '#8CD24C',
+    backgroundColor: '#F9F9F9',
+    accentColor: '#FFD700',
+    cornerRadius: 12,
+    logoUrl: undefined,
+    darkModeEnabled: false,
+    elevation: 'soft',
+  });
+});
+
+// GET /content/deals - Fetch active deals/promotions
+contentRouter.get('/content/deals', async (req, res) => {
+  try {
+    if ((prisma as any).deal && typeof (prisma as any).deal.findMany === 'function') {
+      const deals = await (prisma as any).deal.findMany({
+        orderBy: { startDate: 'desc' },
+      });
+      return res.json(deals.map((d: any) => ({
+        id: d.id,
+        title: d.title,
+        description: d.description,
+        discountType: d.discountType,
+        discountValue: d.discountValue,
+        startDate: d.startDate?.toISOString?.() || d.startDate,
+        endDate: d.endDate?.toISOString?.() || d.endDate,
+        imageUrl: d.imageUrl,
+        productIds: d.productIds,
+        categoryIds: d.categoryIds,
+        isActive: d.isActive ?? true,
+      })));
+    }
+  } catch {
+    // Fall through to demo deals
+  }
+
+  // Demo deals
+  const now = new Date();
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  return res.json([
+    {
+      id: 'deal-1',
+      title: 'First Timer Special',
+      description: '20% off your first order',
+      discountType: 'percent',
+      discountValue: 20,
+      startDate: now.toISOString(),
+      endDate: nextWeek.toISOString(),
+      imageUrl: 'https://placehold.co/800x400',
+      isActive: true,
+    },
+    {
+      id: 'deal-2',
+      title: 'Daily Flash Sale',
+      description: 'Select concentrates 15% off today only',
+      discountType: 'percent',
+      discountValue: 15,
+      startDate: now.toISOString(),
+      endDate: tomorrow.toISOString(),
+      categoryIds: ['concentrates'],
+      isActive: true,
+    },
+    {
+      id: 'deal-3',
+      title: 'Bundle & Save',
+      description: 'Buy 2, get 1 free on all edibles',
+      discountType: 'bogo',
+      startDate: now.toISOString(),
+      endDate: nextWeek.toISOString(),
+      categoryIds: ['edibles'],
+      isActive: true,
+    },
+  ]);
+});
+
+// GET /content/filters - Product category filters
+contentRouter.get('/content/filters', async (req, res) => {
+  try {
+    if ((prisma as any).category && typeof (prisma as any).category.findMany === 'function') {
+      const categories = await (prisma as any).category.findMany({
+        where: { active: true },
+        orderBy: { sortOrder: 'asc' },
+      });
+      return res.json(categories.map((c: any) => ({
+        id: c.id || c.slug,
+        label: c.name || c.label,
+        slug: c.slug,
+        iconRef: c.iconRef,
+        weight: c.sortOrder ?? c.weight ?? 0,
+      })));
+    }
+  } catch {
+    // Fall through to demo filters
+  }
+
+  // Demo filters matching the home categories
+  return res.json([
+    { id: 'flower', label: 'Flower', slug: 'flower', weight: 100 },
+    { id: 'vapes', label: 'Vapes', slug: 'vapes', weight: 90 },
+    { id: 'edibles', label: 'Edibles', slug: 'edibles', weight: 80 },
+    { id: 'pre-rolls', label: 'Pre-rolls', slug: 'pre-rolls', weight: 70 },
+    { id: 'concentrates', label: 'Concentrates', slug: 'concentrates', weight: 60 },
+    { id: 'gear', label: 'Gear', slug: 'gear', weight: 50 },
+    { id: 'topicals', label: 'Topicals', slug: 'topicals', weight: 40 },
+    { id: 'tinctures', label: 'Tinctures', slug: 'tinctures', weight: 30 },
+  ]);
+});
+
+// GET /content/copy - Localized app copy for various contexts
+contentRouter.get('/content/copy', async (req, res) => {
+  const context = (req.query.context as string) || 'general';
+  const locale = (req.query.locale as string) || 'en-US';
+
+  try {
+    if ((prisma as any).appCopy && typeof (prisma as any).appCopy.findMany === 'function') {
+      const items = await (prisma as any).appCopy.findMany({
+        where: { context, locale },
+      });
+      return res.json(items.map((c: any) => ({
+        key: c.key,
+        text: c.text,
+      })));
+    }
+  } catch {
+    // Fall through to demo copy
+  }
+
+  // Demo copy based on context
+  const demoCopy: Record<string, Array<{ key: string; text: string }>> = {
+    onboarding: [
+      { key: 'welcome.title', text: 'Welcome to Nimbus' },
+      { key: 'welcome.subtitle', text: 'Your premium cannabis shopping experience' },
+      { key: 'step1.title', text: 'Browse Products' },
+      { key: 'step1.description', text: 'Explore our curated selection of cannabis products' },
+      { key: 'step2.title', text: 'Add to Cart' },
+      { key: 'step2.description', text: 'Select your favorites and add them to your cart' },
+      { key: 'step3.title', text: 'Checkout' },
+      { key: 'step3.description', text: 'Complete your order for pickup or delivery' },
+    ],
+    emptyStates: [
+      { key: 'cart.empty', text: 'Your cart is empty' },
+      { key: 'cart.emptyAction', text: 'Start shopping' },
+      { key: 'orders.empty', text: 'No orders yet' },
+      { key: 'favorites.empty', text: 'No favorites saved' },
+      { key: 'search.noResults', text: 'No products found' },
+    ],
+    awards: [
+      { key: 'badge.earned', text: 'Congratulations!' },
+      { key: 'badge.earnedDescription', text: "You've earned a new badge" },
+      { key: 'points.earned', text: 'Points earned!' },
+      { key: 'tier.upgraded', text: 'Level up!' },
+    ],
+    accessibility: [
+      { key: 'statement.title', text: 'Accessibility Statement' },
+      { key: 'statement.body', text: 'We are committed to ensuring digital accessibility for people with disabilities.' },
+    ],
+    dataTransparency: [
+      { key: 'privacy.title', text: 'Your Data' },
+      { key: 'privacy.description', text: 'Learn how we collect and use your data' },
+      { key: 'preferences.title', text: 'Data Preferences' },
+    ],
+    ageGate: [
+      { key: 'title', text: 'Age Verification Required' },
+      { key: 'description', text: 'You must be 21 or older to enter' },
+      { key: 'confirm', text: 'I am 21 or older' },
+      { key: 'deny', text: 'I am under 21' },
+    ],
+  };
+
+  return res.json(demoCopy[context] || []);
+});
+

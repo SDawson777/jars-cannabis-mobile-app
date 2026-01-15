@@ -36,3 +36,21 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ error: 'Invalid token' });
   }
 }
+
+/**
+ * Optional auth middleware - sets req.user if token is valid, but doesn't reject if missing
+ */
+export function optionalAuth(req: Request, res: Response, next: NextFunction) {
+  const h = req.headers.authorization || '';
+  const token = h.startsWith('Bearer ') ? h.slice(7) : null;
+  if (!token) {
+    return next(); // No token, continue without user
+  }
+  try {
+    (req as any).user = jwt.verify(token, env.JWT_SECRET);
+    return next();
+  } catch {
+    // Invalid token, but still allow request without user
+    return next();
+  }
+}

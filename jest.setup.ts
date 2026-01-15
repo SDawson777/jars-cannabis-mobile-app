@@ -19,6 +19,12 @@ jest.mock('expo-secure-store', () => ({
   setItemAsync: jest.fn(),
   deleteItemAsync: jest.fn(),
 }));
+jest.mock('expo-crypto', () => ({
+  digestStringAsync: jest.fn().mockResolvedValue('mock-signature'),
+  CryptoDigestAlgorithm: {
+    SHA256: 'SHA256',
+  },
+}));
 
 // Built-in matchers for RTL (prefer new entry; fallback to deprecated jest-native)
 try {

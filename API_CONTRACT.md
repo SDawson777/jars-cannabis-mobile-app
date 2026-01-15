@@ -96,12 +96,33 @@ x-correlation-id: 123e4567-e89b-12d3-a456-426614174000
 
 ### 2.8 Content, Community & Analytics
 
-| Method | Path                | Description                                      |
-| ------ | ------------------- | ------------------------------------------------ |
-| GET    | `/content/legal`    | Terms, privacy, and compliance copy blocks.      |
-| GET    | `/content/filters`  | Filter metadata for discovery screens.           |
-| GET    | `/community/posts`  | Social/community feed (placeholder).             |
-| POST   | `/analytics/events` | Batched analytics events forwarded to warehouse. |
+| Method | Path                    | Description                                             |
+| ------ | ----------------------- | ------------------------------------------------------- |
+| GET    | `/content/legal`        | Terms, privacy, and compliance copy blocks.             |
+| GET    | `/content/filters`      | Filter metadata for discovery screens.                  |
+| GET    | `/content/products`     | CMS-managed product content, badges, and featured text. |
+| GET    | `/content/copy`         | Retrieve copy blocks by context (see below).            |
+| GET    | `/community/posts`      | Social/community feed (placeholder).                    |
+| POST   | `/analytics/events`     | Batched analytics events forwarded to warehouse.        |
+
+#### Copy Contexts (`/content/copy?context=<context>`)
+
+| Context             | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| `onboarding`        | Welcome screens, first-time user tooltips, preference wizard copy.          |
+| `emptyStates`       | Empty cart, no orders, no favorites, no journal entries messaging.          |
+| `awards`            | Loyalty program descriptions, tier explanations, reward redemption text.    |
+| `accessibility`     | Screen reader hints, alt text defaults, reduced motion explanations.        |
+| `dataTransparency`  | Data collection notices, privacy explanations, consent copy.                |
+
+#### Analytics Headers
+
+When posting to `/analytics/events`, include these headers for authenticated analytics:
+
+| Header                  | Description                                                      |
+| ----------------------- | ---------------------------------------------------------------- |
+| `X-Analytics-Key`       | Public analytics API key (from `EXPO_PUBLIC_ANALYTICS_KEY`).     |
+| `X-Analytics-Signature` | HMAC-SHA256 of request body using `ANALYTICS_SIGNING_SECRET`.    |
 
 ### 2.9 Utility & Internal
 
@@ -167,5 +188,62 @@ x-correlation-id: 123e4567-e89b-12d3-a456-426614174000
   2. Mobile client release that consumes new contract.
   3. Deprecation notice added to this document and release notes.
 - Minor additions (new fields, optional params) must be backwards compatible and reflected in the schema with `nullable` or default values.
+
+## 6. Environment Variables Reference
+
+The following environment variables are required for full API functionality:
+
+| Variable                      | Description                                                  | Required |
+| ----------------------------- | ------------------------------------------------------------ | -------- |
+| `DATABASE_URL`                | PostgreSQL connection string.                                | Yes      |
+| `JWT_SECRET`                  | Secret for signing/verifying JWT tokens.                     | Yes      |
+| `STRIPE_SECRET_KEY`           | Stripe API secret key for payments.                          | Yes      |
+| `STRIPE_WEBHOOK_SECRET`       | Stripe webhook signature verification.                       | Yes      |
+| `OPENAI_API_KEY`              | OpenAI API key for concierge AI.                             | No       |
+| `REDIS_URL`                   | Redis connection for caching and rate limiting.              | No       |
+| `EXPO_PUBLIC_API_URL`         | Base URL for mobile client API calls.                        | Yes      |
+| `EXPO_PUBLIC_ANALYTICS_KEY`   | Public analytics key for mobile client.                      | No       |
+| `ANALYTICS_SIGNING_SECRET`    | HMAC secret for analytics event signatures.                  | No       |
+| `MAPBOX_ACCESS_TOKEN`         | Mapbox API token for geolocation features.                   | No       |
+| `FIREBASE_PROJECT_ID`         | Firebase project for push notifications.                     | No       |
+| `SENTRY_DSN`                  | Sentry DSN for error tracking.                               | No       |
+
+See `ENVIRONMENT_VARIABLES.md` for complete documentation.
+
+## 7. Personalization Guidance
+
+### Personalization Engine Overview
+
+The personalization system uses multiple signals to tailor the user experience:
+
+1. **Preference Signals**: Stored in `/preferences` - strain types, effects, consumption methods.
+2. **Behavioral Signals**: Order history, browse patterns, journal entries.
+3. **Contextual Signals**: Time of day, weather, location, device type.
+4. **Social Signals**: Community engagement, reviews, follows.
+
+### Key Personalization Endpoints
+
+| Endpoint                     | Signals Used                              | Output                                     |
+| ---------------------------- | ----------------------------------------- | ------------------------------------------ |
+| `/personalization/home`      | Preferences + orders + time               | Personalized home screen product shelves   |
+| `/recommendations`           | Weather + preferences + journal           | Strain recommendations with explanations   |
+| `/ai/recommendations`        | All signals + AI analysis                 | Deep personalized suggestions with reasons |
+| `/dynamic-home/layout`       | User tier + behavior + experiments        | Dynamic home screen layout and sections    |
+
+### Personalization Response Structure
+
+All personalization endpoints return:
+- `items[]`: Recommended products/content
+- `reasoning`: Why each item was selected (for transparency)
+- `confidence`: 0-1 score indicating recommendation strength
+- `signals`: Which user signals influenced the result
+- `fallback`: Boolean indicating if generic results were used
+
+### A/B Testing Integration
+
+Personalization supports experiment assignment via:
+- `X-Experiment-Bucket` header (if assigned)
+- Query param `?experiment=<id>` for QA
+- Automatic assignment stored in user profile
 
 For questions or clarifications, contact `api-support@jars.app` or the backend team listed in `PRODUCTION_READINESS.md`.

@@ -67,4 +67,27 @@ export async function clientPut<TReq, TRes>(
   return res.data;
 }
 
+export async function clientPatch<TReq, TRes>(
+  client: AxiosInstance,
+  url: string,
+  data?: TReq,
+  config?: AxiosRequestConfig
+): Promise<TRes> {
+  const payload = data as unknown as any;
+  const res =
+    config === undefined
+      ? await client.patch<TRes>(url, payload)
+      : await client.patch<TRes>(url, payload, config);
+  return res.data;
+}
+
+export async function clientDelete<T>(
+  client: AxiosInstance,
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> {
+  const res = await client.delete<T>(url, config);
+  return res.data;
+}
+
 export default api;

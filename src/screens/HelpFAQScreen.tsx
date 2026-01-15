@@ -1,7 +1,7 @@
 // src/screens/HelpFAQScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ChevronLeft } from 'lucide-react-native';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -20,6 +20,7 @@ import { useCMSPreview } from '../context/CMSPreviewContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { useFAQQuery } from '../hooks/useFAQ';
 import { hapticLight } from '../utils/haptic';
+import { trackScreenView, trackContentView, trackContentClick } from '../utils/analytics';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -32,6 +33,20 @@ export default function HelpFAQScreen() {
   const [openIds, setOpenIds] = useState<string[]>([]);
   const { data, isLoading, isError } = useFAQQuery();
   const { preview } = useCMSPreview();
+
+  // Track screen view
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('HelpFAQScreen');
+    }, [])
+  );
+
+  // Track FAQ view when data loads
+  useEffect(() => {
+    if (data && data.length > 0) {
+      trackContentView('faq', 'faq_list', { count: data.length });
+    }
+  }, [data]);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -46,8 +61,9 @@ export default function HelpFAQScreen() {
     navigation.goBack();
   };
 
-  const toggleFAQ = (id: string) => {
+  const toggleFAQ = (id: string, question: string) => {
     hapticLight();
+    trackContentClick('faq', id, { question });
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setOpenIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
   };
@@ -93,7 +109,7 @@ export default function HelpFAQScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         {data.map((item: { id: string; question: string; answer: string }) => (
           <View key={item.id} style={styles.faqItem}>
-            <Pressable onPress={() => toggleFAQ(item.id)}>
+            <Pressable onPress={() => toggleFAQ(item.id, item.question)}>
               <Text style={[styles.question, { color: brandPrimary }]}>{item.question}</Text>
             </Pressable>
             {openIds.includes(item.id) && (

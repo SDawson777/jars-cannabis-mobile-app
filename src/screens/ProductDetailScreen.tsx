@@ -1,5 +1,5 @@
-import { useRoute, RouteProp } from '@react-navigation/native';
-import React, { useEffect, useContext, useState } from 'react';
+import { useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useContext, useState, useCallback } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -20,6 +20,7 @@ import { useStore } from '../context/StoreContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { useProductDetails } from '../hooks/useProductDetails';
 import type { RootStackParamList } from '../navigation/types';
+import { trackScreenView, trackContentView, trackCommerceEvent } from '../utils/analytics';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -37,6 +38,25 @@ export default function ProductDetailScreen() {
     preferredStore?.id
   );
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+
+  // Track screen view
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('ProductDetailScreen', { slug });
+    }, [slug])
+  );
+
+  // Track product view when data loads
+  useEffect(() => {
+    if (data) {
+      const product = (data as any)?.product ?? data;
+      trackCommerceEvent('view_item', slug, { 
+        name: product?.name,
+        price: product?.price,
+      });
+      trackContentView('product', slug, { name: product?.name });
+    }
+  }, [data, slug]);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

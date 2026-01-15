@@ -37,6 +37,7 @@ import CommunityGardenScreen from './src/screens/CommunityGardenScreen';
 import ConciergeChatScreen from './src/screens/ConciergeChatScreen';
 import ContactUsScreen from './src/screens/ContactUsScreen';
 import DataTransparencyScreen from './src/screens/DataTransparencyScreen';
+import DealsScreen from './src/screens/DealsScreen';
 import EditAddressScreen from './src/screens/EditAddressScreen';
 import EditPaymentScreen from './src/screens/EditPaymentScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
@@ -400,6 +401,7 @@ function App() {
                                     name="EthicalAIDashboard"
                                     component={EthicalAIDashboardScreen}
                                   />
+                                  <Stack.Screen name="DealsScreen" component={DealsScreen} />
                                 </Stack.Navigator>
                               </View>
                             </NavigationContainer>

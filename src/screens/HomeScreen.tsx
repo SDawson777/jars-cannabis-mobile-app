@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.tsx
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   MapPin,
@@ -11,7 +11,7 @@ import {
   Home,
   Menu,
 } from 'lucide-react-native';
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useCallback } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -27,7 +27,6 @@ import {
 } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { phase4Client } from '../api/phase4Client';
 import ForYouTodayCard from '../components/ForYouTodayCard';
 import ForYouTodaySkeleton from '../components/ForYouTodaySkeleton';
 import WeatherForYouRail from '../components/WeatherForYouRail';
@@ -38,9 +37,14 @@ import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { useStore } from '../context/StoreContext';
 import { useForYouToday } from '../hooks/useForYouToday';
+import { useDeals } from '../hooks/useDeals';
+import { useCategories, type Category } from '../hooks/useCategories';
+import { useWaysToShop, type WayToShop } from '../hooks/useRecommendations';
+import type { CMSDeal } from '../types/cmsExtra';
 import { usePulseCTA } from '../hooks/usePulse';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
+import { trackScreenView, trackContentClick, trackContentView } from '../utils/analytics';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -48,7 +52,6 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
 
-type Category = { id: string; label: string; emoji: string };
 type FeaturedProduct = {
   id: string;
   name: string;
@@ -56,7 +59,6 @@ type FeaturedProduct = {
   image: string;
   description: string;
 };
-type Way = { id: string; label: string };
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeNavProp>();
@@ -64,28 +66,64 @@ export default function HomeScreen() {
   const { data: user } = useContext(AuthContext);
   const { preferredStore } = useStore();
   const { data: forYou, isLoading } = useForYouToday(user?.id, preferredStore?.id);
+  const { data: deals } = useDeals();
+  
+  // Use CMS hooks instead of stubbed endpoints
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: ways = [], isLoading: waysLoading } = useWaysToShop(user?.id);
+
+  // Featured products from deals (transform deals to featured format)
+  const featured: FeaturedProduct[] = (deals || []).slice(0, 3).map((deal: CMSDeal) => ({
+    id: deal.id,
+    name: deal.title,
+    price: deal.discountValue || 0,
+    image: deal.imageUrl || 'https://placehold.co/200',
+    description: deal.description,
+  }));
+  const featuredLoading = !deals;
+
+  // Track screen view on focus
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('HomeScreen', { userId: user?.id });
+    }, [user?.id])
+  );
 
   // Pulse animations for key CTAs
-  const terpeneWheelPulse = usePulseCTA(() => navigation.navigate('TerpeneWheel'), {
+  const terpeneWheelPulse = usePulseCTA(() => {
+    trackContentClick('feature', 'terpene_wheel');
+    navigation.navigate('TerpeneWheel');
+  }, {
     maxScale: 1.02,
     duration: 200,
   });
 
-  const shopCTAPulse = usePulseCTA(() => navigation.navigate('ShopScreen'), {
+  const shopCTAPulse = usePulseCTA(() => {
+    trackContentClick('cta', 'shop_now');
+    navigation.navigate('ShopScreen');
+  }, {
     maxScale: 1.02,
     duration: 200,
   });
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [featured, setFeatured] = useState<FeaturedProduct[]>([]);
-  const [featuredLoading, setFeaturedLoading] = useState(true);
-  const [ways, setWays] = useState<Way[]>([]);
-  const [waysLoading, setWaysLoading] = useState(true);
   // Basic lightweight weather condition placeholder. In future, integrate real weather API.
   const [weatherCondition, setWeatherCondition] = useState<string | null>(null);
   const [weatherPrefEnabled, _setWeatherPrefEnabled, weatherPrefHydrated] =
     useWeatherRecommendationsPreference();
+
+  // Track deals view when loaded
+  useEffect(() => {
+    if (deals && deals.length > 0) {
+      trackContentView('deals', 'home_deals_rail', { count: deals.length });
+    }
+  }, [deals]);
+
+  // Track categories loaded
+  useEffect(() => {
+    if (categories.length > 0) {
+      trackContentView('categories', 'home_categories', { count: categories.length });
+    }
+  }, [categories]);
 
   // Derive a pseudo-condition from time of day to avoid external dependencies and keep clutter low.
   useEffect(() => {
@@ -104,60 +142,6 @@ export default function HomeScreen() {
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    phase4Client
-      .get<Category[]>('/home/categories')
-      .then((res: { data: Category[] }) => {
-        if (mounted) setCategories(res.data || []);
-      })
-      .catch(() => {
-        if (mounted) setCategories([]);
-      })
-      .finally(() => {
-        if (mounted) setCategoriesLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    phase4Client
-      .get<FeaturedProduct[]>('/home/featured')
-      .then((res: { data: FeaturedProduct[] }) => {
-        if (mounted) setFeatured(res.data || []);
-      })
-      .catch(() => {
-        if (mounted) setFeatured([]);
-      })
-      .finally(() => {
-        if (mounted) setFeaturedLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    phase4Client
-      .get<Way[]>('/home/ways')
-      .then((res: { data: Way[] }) => {
-        if (mounted) setWays(res.data || []);
-      })
-      .catch(() => {
-        if (mounted) setWays([]);
-      })
-      .finally(() => {
-        if (mounted) setWaysLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const bgColor =
@@ -281,7 +265,7 @@ export default function HomeScreen() {
           </View>
         ) : categories.length > 0 ? (
           <View style={styles.categoryGrid}>
-            {categories.map(cat => (
+            {categories.map((cat: Category) => (
               <Pressable
                 key={cat.id}
                 onPress={() => navigation.navigate('ShopScreen')}
@@ -359,7 +343,7 @@ export default function HomeScreen() {
           </View>
         ) : ways.length > 0 ? (
           <View style={styles.waysGrid}>
-            {ways.map(w => (
+            {ways.map((w: WayToShop) => (
               <Pressable
                 key={w.id}
                 onPress={() => navigation.navigate('ShopScreen')}
@@ -411,7 +395,10 @@ export default function HomeScreen() {
           <Text style={styles.navLabel}>Shop</Text>
         </Pressable>
         <Pressable
-          onPress={() => navigation.navigate('Favorites')}
+          onPress={() => {
+            trackContentClick('nav', 'deals_tab');
+            navigation.navigate('DealsScreen');
+          }}
           style={styles.navItem}
           testID="deals-tab"
         >

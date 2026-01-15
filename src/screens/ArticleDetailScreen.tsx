@@ -1,8 +1,8 @@
 // src/screens/ArticleDetailScreen.tsx
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChevronLeft } from 'lucide-react-native';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -21,6 +21,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { useArticleBySlug } from '../hooks/useArticleBySlug';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
+import { trackContentView, trackScreenView } from '../utils/analytics';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -37,6 +38,20 @@ export default function ArticleDetailScreen() {
   const { data, isLoading, isError } = useArticleBySlug(slug);
 
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
+
+  // Track screen view
+  useFocusEffect(
+    useCallback(() => {
+      trackScreenView('ArticleDetailScreen', { slug });
+    }, [slug])
+  );
+
+  // Track content view when article loads
+  useEffect(() => {
+    if (data) {
+      trackContentView('article', slug, { title: data.title });
+    }
+  }, [data, slug]);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
