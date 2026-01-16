@@ -11,15 +11,23 @@ const router = Router();
 
 router.get('/articles', async (req: Request, res: Response) => {
   try {
-    const { category: _category, tags: _tags, effects: _effects, difficulty: _difficulty, search: _search, cursor: _cursor } = req.query;
-    
+    const {
+      category: _category,
+      tags: _tags,
+      effects: _effects,
+      difficulty: _difficulty,
+      search: _search,
+      cursor: _cursor,
+    } = req.query;
+
     res.json({
       articles: [
         {
           id: 'article-1',
           title: 'Understanding Terpenes',
           slug: 'understanding-terpenes',
-          excerpt: 'Learn about the aromatic compounds that give cannabis its unique flavors and effects.',
+          excerpt:
+            'Learn about the aromatic compounds that give cannabis its unique flavors and effects.',
           content: 'Full article content here...',
           author: { id: 'author-1', name: 'Dr. Jane Smith', bio: 'Cannabis researcher' },
           category: 'education',
@@ -368,9 +376,27 @@ router.get('/categories', async (req: Request, res: Response) => {
   try {
     res.json({
       categories: [
-        { category: 'education', name: 'Education', description: 'Learn the basics', articleCount: 50, icon: 'book' },
-        { category: 'recipes', name: 'Recipes', description: 'Cannabis cooking', articleCount: 30, icon: 'utensils' },
-        { category: 'wellness', name: 'Wellness', description: 'Health routines', articleCount: 20, icon: 'heart' },
+        {
+          category: 'education',
+          name: 'Education',
+          description: 'Learn the basics',
+          articleCount: 50,
+          icon: 'book',
+        },
+        {
+          category: 'recipes',
+          name: 'Recipes',
+          description: 'Cannabis cooking',
+          articleCount: 30,
+          icon: 'utensils',
+        },
+        {
+          category: 'wellness',
+          name: 'Wellness',
+          description: 'Health routines',
+          articleCount: 20,
+          icon: 'heart',
+        },
       ],
     });
   } catch (error) {

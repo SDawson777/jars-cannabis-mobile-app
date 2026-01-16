@@ -11,8 +11,14 @@ const router = Router();
 
 router.get('/stores/nearby', async (req: Request, res: Response) => {
   try {
-    const { lat: _lat, lng: _lng, radius: _radius = 25, services: _services, limit: _limit = 20 } = req.query;
-    
+    const {
+      lat: _lat,
+      lng: _lng,
+      radius: _radius = 25,
+      services: _services,
+      limit: _limit = 20,
+    } = req.query;
+
     // Mock nearby stores with distance/traffic info
     res.json({
       stores: [
@@ -87,7 +93,7 @@ router.get('/stores/nearby', async (req: Request, res: Response) => {
 router.get('/map/search', async (req: Request, res: Response) => {
   try {
     const { q: _q } = req.query;
-    
+
     res.json({
       results: [
         {
@@ -113,7 +119,7 @@ router.get('/map/search', async (req: Request, res: Response) => {
 router.get('/map/directions', async (req: Request, res: Response) => {
   try {
     const { originLat, originLng, destLat, destLng, mode: _mode = 'driving' } = req.query;
-    
+
     res.json({
       distance: 3700, // meters
       duration: 480, // seconds (8 minutes)
@@ -175,7 +181,7 @@ router.get('/map/travel-times', async (req: Request, res: Response) => {
   try {
     const { storeIds } = req.query;
     const ids = (storeIds as string)?.split(',') || [];
-    
+
     const times: Record<string, { distance: number; duration: number; trafficLevel: string }> = {};
     ids.forEach((id: string, index: number) => {
       times[id] = {
@@ -184,7 +190,7 @@ router.get('/map/travel-times', async (req: Request, res: Response) => {
         trafficLevel: index % 2 === 0 ? 'moderate' : 'low',
       };
     });
-    
+
     res.json(times);
   } catch (error) {
     console.error('Error fetching travel times:', error);
@@ -221,7 +227,7 @@ router.get('/geofences', async (req: Request, res: Response) => {
 router.post('/geofences', async (req: Request, res: Response) => {
   try {
     const { storeId, radiusMeters = 500, triggerOnEntry = true, triggerOnExit = false } = req.body;
-    
+
     res.status(201).json({
       id: `geofence-${Date.now()}`,
       storeId,
@@ -241,19 +247,22 @@ router.post('/geofences', async (req: Request, res: Response) => {
 router.post('/geofences/events', async (req: Request, res: Response) => {
   try {
     const { geofenceId, eventType, coordinates } = req.body;
-    
+
     // Could trigger local deals notification here
-    const deal = eventType === 'entry' ? {
-      id: 'deal-1',
-      storeId: 'store-1',
-      title: '10% Off First Visit',
-      description: 'Welcome! Enjoy 10% off your first purchase today.',
-      discountType: 'percentage',
-      discountValue: 10,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      code: 'WELCOME10',
-    } : undefined;
-    
+    const deal =
+      eventType === 'entry'
+        ? {
+            id: 'deal-1',
+            storeId: 'store-1',
+            title: '10% Off First Visit',
+            description: 'Welcome! Enjoy 10% off your first purchase today.',
+            discountType: 'percentage',
+            discountValue: 10,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            code: 'WELCOME10',
+          }
+        : undefined;
+
     res.status(201).json({
       id: `event-${Date.now()}`,
       geofenceId,
@@ -273,7 +282,7 @@ router.post('/geofences/events', async (req: Request, res: Response) => {
 router.get('/deals/local', async (req: Request, res: Response) => {
   try {
     const { storeId } = req.query;
-    
+
     res.json({
       deals: [
         {

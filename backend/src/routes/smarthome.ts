@@ -39,7 +39,7 @@ router.get('/smarthome/connections', async (req: Request, res: Response) => {
 router.get('/smarthome/connections/:provider', async (req: Request, res: Response) => {
   try {
     const { provider } = req.params;
-    
+
     res.json({
       provider,
       state: 'not_linked',
@@ -54,14 +54,14 @@ router.get('/smarthome/connections/:provider', async (req: Request, res: Respons
 router.post('/smarthome/link', async (req: Request, res: Response) => {
   try {
     const { provider, permissions: _permissions, redirectUri } = req.body;
-    
+
     // In production, this would generate real OAuth URLs
     const authUrls: Record<string, string> = {
       alexa: 'https://alexa.amazon.com/spa/skill-account-linking',
       google_home: 'https://accounts.google.com/o/oauth2/auth',
       apple_home: 'https://appleid.apple.com/auth/authorize',
     };
-    
+
     res.json({
       authUrl: `${authUrls[provider] || authUrls.alexa}?client_id=nimbus&state=${Date.now()}&redirect_uri=${redirectUri || 'nimbus://oauth'}`,
       state: String(Date.now()),
@@ -75,7 +75,7 @@ router.post('/smarthome/link', async (req: Request, res: Response) => {
 router.post('/smarthome/link/complete', async (req: Request, res: Response) => {
   try {
     const { provider, code: _code, state: _state } = req.body;
-    
+
     res.json({
       provider,
       state: 'linked',
@@ -125,7 +125,10 @@ router.get('/smarthome/skills', async (req: Request, res: Response) => {
               id: 'cap-2',
               name: 'Strain Suggestions',
               description: 'Get personalized strain recommendations',
-              examplePhrases: ['Alexa, ask Nimbus for a relaxing strain', 'What should I try tonight?'],
+              examplePhrases: [
+                'Alexa, ask Nimbus for a relaxing strain',
+                'What should I try tonight?',
+              ],
               isEnabled: true,
               requiresAuth: true,
             },
@@ -166,20 +169,23 @@ router.get('/smarthome/skills', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/smarthome/skills/:skillId/capabilities/:capabilityId', async (req: Request, res: Response) => {
-  try {
-    const { capabilityId } = req.params;
-    const { enabled } = req.body;
-    
-    res.json({
-      id: capabilityId,
-      isEnabled: enabled,
-    });
-  } catch (error) {
-    console.error('Error updating capability:', error);
-    res.status(500).json({ error: 'Failed to update capability' });
+router.post(
+  '/smarthome/skills/:skillId/capabilities/:capabilityId',
+  async (req: Request, res: Response) => {
+    try {
+      const { capabilityId } = req.params;
+      const { enabled } = req.body;
+
+      res.json({
+        id: capabilityId,
+        isEnabled: enabled,
+      });
+    } catch (error) {
+      console.error('Error updating capability:', error);
+      res.status(500).json({ error: 'Failed to update capability' });
+    }
   }
-});
+);
 
 // ============================================
 // Devices Routes
@@ -209,7 +215,7 @@ router.get('/smarthome/devices', async (req: Request, res: Response) => {
 router.post('/smarthome/devices/sync', async (req: Request, res: Response) => {
   try {
     const { provider } = req.body;
-    
+
     res.json({
       devices: [
         {
@@ -251,7 +257,7 @@ router.get('/smarthome/routines', async (req: Request, res: Response) => {
             {
               type: 'suggestion',
               config: {
-                message: 'Time to wind down! Here\'s a relaxing strain for tonight.',
+                message: "Time to wind down! Here's a relaxing strain for tonight.",
                 suggestionType: 'strain',
               },
             },
@@ -270,7 +276,7 @@ router.get('/smarthome/routines', async (req: Request, res: Response) => {
 router.post('/smarthome/routines', async (req: Request, res: Response) => {
   try {
     const routine = req.body;
-    
+
     res.status(201).json({
       id: `routine-${Date.now()}`,
       ...routine,
@@ -286,7 +292,7 @@ router.post('/smarthome/routines/:routineId/toggle', async (req: Request, res: R
   try {
     const { routineId } = req.params;
     const { enabled } = req.body;
-    
+
     res.json({
       id: routineId,
       isEnabled: enabled,
@@ -322,7 +328,7 @@ router.get('/smarthome/reminders/orders', async (req: Request, res: Response) =>
 router.post('/smarthome/reminders/orders', async (req: Request, res: Response) => {
   try {
     const reminder = req.body;
-    
+
     res.status(201).json({
       id: `reminder-${Date.now()}`,
       ...reminder,
@@ -363,7 +369,7 @@ router.get('/smarthome/timers/consumption', async (req: Request, res: Response) 
 router.post('/smarthome/timers/consumption', async (req: Request, res: Response) => {
   try {
     const timer = req.body;
-    
+
     res.status(201).json({
       id: `timer-${Date.now()}`,
       ...timer,
@@ -375,20 +381,23 @@ router.post('/smarthome/timers/consumption', async (req: Request, res: Response)
   }
 });
 
-router.post('/smarthome/timers/consumption/:timerId/toggle', async (req: Request, res: Response) => {
-  try {
-    const { timerId } = req.params;
-    const { active } = req.body;
-    
-    res.json({
-      id: timerId,
-      isActive: active,
-    });
-  } catch (error) {
-    console.error('Error toggling timer:', error);
-    res.status(500).json({ error: 'Failed to toggle timer' });
+router.post(
+  '/smarthome/timers/consumption/:timerId/toggle',
+  async (req: Request, res: Response) => {
+    try {
+      const { timerId } = req.params;
+      const { active } = req.body;
+
+      res.json({
+        id: timerId,
+        isActive: active,
+      });
+    } catch (error) {
+      console.error('Error toggling timer:', error);
+      res.status(500).json({ error: 'Failed to toggle timer' });
+    }
   }
-});
+);
 
 // ============================================
 // Quick Actions Routes

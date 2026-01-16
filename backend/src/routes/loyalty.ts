@@ -24,14 +24,14 @@ loyaltyRouter.get('/loyalty/status', requireAuth, async (req, res) => {
  */
 loyaltyRouter.get('/loyalty/profile', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
-  
+
   try {
     const status = await prisma.loyaltyStatus.upsert({
       where: { userId: uid },
       update: {},
       create: { userId: uid, points: 0, tier: 'Bronze' },
     });
-    
+
     // Calculate tier progress
     const tierThresholds: Record<string, { min: number; max: number; next: string | null }> = {
       Bronze: { min: 0, max: 1000, next: 'Silver' },
@@ -40,13 +40,11 @@ loyaltyRouter.get('/loyalty/profile', requireAuth, async (req: Request, res: Res
       Platinum: { min: 15000, max: 50000, next: 'Diamond' },
       Diamond: { min: 50000, max: Infinity, next: null },
     };
-    
+
     const currentTier = tierThresholds[status.tier] || tierThresholds.Bronze;
     const lifetimePoints = status.points; // In production, track separately
-    const pointsToNextTier = currentTier.next 
-      ? Math.max(0, currentTier.max - lifetimePoints)
-      : 0;
-    
+    const pointsToNextTier = currentTier.next ? Math.max(0, currentTier.max - lifetimePoints) : 0;
+
     res.json({
       userId: uid,
       currentTier: status.tier,
@@ -54,7 +52,10 @@ loyaltyRouter.get('/loyalty/profile', requireAuth, async (req: Request, res: Res
       lifetimePoints,
       pointsToNextTier,
       nextTier: currentTier.next,
-      tierProgress: Math.min(100, ((lifetimePoints - currentTier.min) / (currentTier.max - currentTier.min)) * 100),
+      tierProgress: Math.min(
+        100,
+        ((lifetimePoints - currentTier.min) / (currentTier.max - currentTier.min)) * 100
+      ),
       memberSince: status.createdAt || new Date().toISOString(),
       referralCode: `NIMBUS${uid.slice(-6).toUpperCase()}`,
     });
@@ -77,11 +78,7 @@ loyaltyRouter.get('/loyalty/tiers', optionalAuth, async (req: Request, res: Resp
       maxPoints: 999,
       pointsMultiplier: 1.0,
       color: '#CD7F32',
-      benefits: [
-        'Earn 1 point per dollar spent',
-        'Birthday reward',
-        'Member-only offers',
-      ],
+      benefits: ['Earn 1 point per dollar spent', 'Birthday reward', 'Member-only offers'],
     },
     {
       id: 'silver',
@@ -146,7 +143,7 @@ loyaltyRouter.get('/loyalty/tiers', optionalAuth, async (req: Request, res: Resp
       ],
     },
   ];
-  
+
   res.json({ tiers });
 });
 
@@ -157,15 +154,15 @@ loyaltyRouter.get('/loyalty/tiers', optionalAuth, async (req: Request, res: Resp
 loyaltyRouter.get('/loyalty/rewards', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
   const { category } = req.query;
-  
+
   try {
     const status = await prisma.loyaltyStatus.findUnique({
       where: { userId: uid },
     });
-    
+
     const userPoints = status?.points || 0;
     const userTier = status?.tier || 'Bronze';
-    
+
     // Mock rewards catalog
     let rewards = [
       {
@@ -235,11 +232,11 @@ loyaltyRouter.get('/loyalty/rewards', requireAuth, async (req: Request, res: Res
         expiresAfterRedemption: 60,
       },
     ];
-    
+
     if (category) {
       rewards = rewards.filter(r => r.category === category);
     }
-    
+
     res.json({
       rewards,
       userPoints,
@@ -258,33 +255,33 @@ loyaltyRouter.get('/loyalty/rewards', requireAuth, async (req: Request, res: Res
 loyaltyRouter.post('/loyalty/rewards/redeem', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
   const { rewardId } = req.body;
-  
+
   if (!rewardId) {
     return res.status(400).json({ error: 'rewardId is required' });
   }
-  
+
   try {
     const status = await prisma.loyaltyStatus.findUnique({
       where: { userId: uid },
     });
-    
+
     if (!status) {
       return res.status(404).json({ error: 'Loyalty account not found' });
     }
-    
+
     // In production, verify reward exists and check points/tier requirements
     const pointsCost = 500; // Example
-    
+
     if (status.points < pointsCost) {
       return res.status(400).json({ error: 'Insufficient points' });
     }
-    
+
     // Deduct points
     await prisma.loyaltyStatus.update({
       where: { userId: uid },
       data: { points: status.points - pointsCost },
     });
-    
+
     const redemption = {
       id: `redemption-${Date.now()}`,
       rewardId,
@@ -293,7 +290,7 @@ loyaltyRouter.post('/loyalty/rewards/redeem', requireAuth, async (req: Request, 
       code: `REWARD-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
       status: 'active',
     };
-    
+
     res.json({
       redemption,
       pointsRemaining: status.points - pointsCost,
@@ -311,7 +308,7 @@ loyaltyRouter.post('/loyalty/rewards/redeem', requireAuth, async (req: Request, 
 loyaltyRouter.get('/loyalty/transactions', requireAuth, async (req: Request, res: Response) => {
   const _uid = (req as any).user.userId as string;
   const { cursor: _cursor, limit: _limit = '20' } = req.query;
-  
+
   try {
     // Mock transactions
     const transactions = [
@@ -353,7 +350,7 @@ loyaltyRouter.get('/loyalty/transactions', requireAuth, async (req: Request, res
         createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
       },
     ];
-    
+
     res.json({
       transactions,
       hasMore: false,
@@ -380,7 +377,7 @@ loyaltyRouter.get('/loyalty/badges', requireAuth, async (req, res) => {
  */
 loyaltyRouter.get('/loyalty/referral', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
-  
+
   try {
     res.json({
       referralCode: `NIMBUS${uid.slice(-6).toUpperCase()}`,
@@ -425,14 +422,14 @@ loyaltyRouter.get('/loyalty/referral', requireAuth, async (req: Request, res: Re
  */
 loyaltyRouter.post('/loyalty/referral/send', requireAuth, async (req: Request, res: Response) => {
   const { email, phone, method } = req.body;
-  
+
   if (!email && !phone) {
     return res.status(400).json({ error: 'Email or phone is required' });
   }
-  
+
   try {
     // In production, send referral invite
-    res.json({ 
+    res.json({
       success: true,
       message: `Referral invite sent via ${method || 'email'}`,
     });
@@ -449,11 +446,11 @@ loyaltyRouter.post('/loyalty/referral/send', requireAuth, async (req: Request, r
 loyaltyRouter.post('/loyalty/referral/apply', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
   const { referralCode } = req.body;
-  
+
   if (!referralCode) {
     return res.status(400).json({ error: 'referralCode is required' });
   }
-  
+
   try {
     // In production, validate code and apply bonus
     await prisma.loyaltyStatus.upsert({
@@ -461,7 +458,7 @@ loyaltyRouter.post('/loyalty/referral/apply', requireAuth, async (req: Request, 
       update: { points: { increment: 500 } },
       create: { userId: uid, points: 500, tier: 'Bronze' },
     });
-    
+
     res.json({
       success: true,
       pointsEarned: 500,
@@ -479,7 +476,7 @@ loyaltyRouter.post('/loyalty/referral/apply', requireAuth, async (req: Request, 
  */
 loyaltyRouter.get('/loyalty/coupons', requireAuth, async (req: Request, res: Response) => {
   const { includeUsed } = req.query;
-  
+
   try {
     const coupons = [
       {
@@ -527,11 +524,9 @@ loyaltyRouter.get('/loyalty/coupons', requireAuth, async (req: Request, res: Res
         source: 'promo',
       },
     ];
-    
-    const filtered = includeUsed === 'true' 
-      ? coupons 
-      : coupons.filter(c => !c.isUsed);
-    
+
+    const filtered = includeUsed === 'true' ? coupons : coupons.filter(c => !c.isUsed);
+
     res.json({ coupons: filtered });
   } catch (error) {
     console.error('Coupons error:', error);
@@ -545,11 +540,11 @@ loyaltyRouter.get('/loyalty/coupons', requireAuth, async (req: Request, res: Res
  */
 loyaltyRouter.post('/loyalty/coupons/clip', requireAuth, async (req: Request, res: Response) => {
   const { couponId } = req.body;
-  
+
   if (!couponId) {
     return res.status(400).json({ error: 'couponId is required' });
   }
-  
+
   try {
     // In production, update coupon status in database
     res.json({
@@ -569,42 +564,46 @@ loyaltyRouter.post('/loyalty/coupons/clip', requireAuth, async (req: Request, re
  * POST /loyalty/calculate-points
  * Calculate points that would be earned for a purchase
  */
-loyaltyRouter.post('/loyalty/calculate-points', requireAuth, async (req: Request, res: Response) => {
-  const uid = (req as any).user.userId as string;
-  const { subtotal, productIds: _productIds } = req.body;
-  
-  if (typeof subtotal !== 'number' || subtotal < 0) {
-    return res.status(400).json({ error: 'Valid subtotal is required' });
+loyaltyRouter.post(
+  '/loyalty/calculate-points',
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const uid = (req as any).user.userId as string;
+    const { subtotal, productIds: _productIds } = req.body;
+
+    if (typeof subtotal !== 'number' || subtotal < 0) {
+      return res.status(400).json({ error: 'Valid subtotal is required' });
+    }
+
+    try {
+      const status = await prisma.loyaltyStatus.findUnique({
+        where: { userId: uid },
+      });
+
+      const tier = status?.tier || 'Bronze';
+      const multipliers: Record<string, number> = {
+        Bronze: 1.0,
+        Silver: 1.25,
+        Gold: 1.5,
+        Platinum: 2.0,
+        Diamond: 3.0,
+      };
+
+      const multiplier = multipliers[tier] || 1.0;
+      const basePoints = Math.floor(subtotal);
+      const bonusPoints = Math.floor(basePoints * (multiplier - 1));
+      const totalPoints = basePoints + bonusPoints;
+
+      res.json({
+        basePoints,
+        bonusPoints,
+        totalPoints,
+        multiplier,
+        tier,
+      });
+    } catch (error) {
+      console.error('Calculate points error:', error);
+      res.status(500).json({ error: 'Failed to calculate points' });
+    }
   }
-  
-  try {
-    const status = await prisma.loyaltyStatus.findUnique({
-      where: { userId: uid },
-    });
-    
-    const tier = status?.tier || 'Bronze';
-    const multipliers: Record<string, number> = {
-      Bronze: 1.0,
-      Silver: 1.25,
-      Gold: 1.5,
-      Platinum: 2.0,
-      Diamond: 3.0,
-    };
-    
-    const multiplier = multipliers[tier] || 1.0;
-    const basePoints = Math.floor(subtotal);
-    const bonusPoints = Math.floor(basePoints * (multiplier - 1));
-    const totalPoints = basePoints + bonusPoints;
-    
-    res.json({
-      basePoints,
-      bonusPoints,
-      totalPoints,
-      multiplier,
-      tier,
-    });
-  } catch (error) {
-    console.error('Calculate points error:', error);
-    res.status(500).json({ error: 'Failed to calculate points' });
-  }
-});
+);

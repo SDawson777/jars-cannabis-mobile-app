@@ -15,14 +15,17 @@ interface ArticleQueryParams {
   channel?: string;
 }
 
-async function fetchArticles(params: ArticleQueryParams = {}, preview: boolean): Promise<CMSArticle[]> {
+async function fetchArticles(
+  params: ArticleQueryParams = {},
+  preview: boolean
+): Promise<CMSArticle[]> {
   const state = await NetInfo.fetch();
   const queryString = new URLSearchParams();
   if (params.page) queryString.set('page', String(params.page));
   if (params.limit) queryString.set('limit', String(params.limit));
   if (params.tag) queryString.set('tag', params.tag);
   if (params.channel) queryString.set('channel', params.channel);
-  
+
   const path = `/content/articles${queryString.toString() ? `?${queryString.toString()}` : ''}`;
   const cacheKey = `${CACHE_KEY}:${path}${preview ? ':preview' : ''}`;
 
@@ -52,7 +55,7 @@ async function fetchArticles(params: ArticleQueryParams = {}, preview: boolean):
 
 export function useEducationalArticles(params: ArticleQueryParams = {}) {
   const { preview } = useCMSPreview();
-  
+
   return useQuery<CMSArticle[], Error>({
     queryKey: ['cmsArticles', params, preview],
     queryFn: () => fetchArticles(params, preview),

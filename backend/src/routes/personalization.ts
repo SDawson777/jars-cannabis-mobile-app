@@ -68,8 +68,15 @@ personalizationRouter.get('/personalization/home', async (req, res) => {
  */
 personalizationRouter.post('/personalization/apply', async (req, res) => {
   try {
-    const { slugs, userId: _userId, sessionId: _sessionId, channel, locationState, preferences } = req.body;
-    
+    const {
+      slugs,
+      userId: _userId,
+      sessionId: _sessionId,
+      channel,
+      locationState,
+      preferences,
+    } = req.body;
+
     if (!Array.isArray(slugs) || slugs.length === 0) {
       return res.status(400).json({ error: 'slugs array is required' });
     }
@@ -79,7 +86,7 @@ personalizationRouter.post('/personalization/apply', async (req, res) => {
       try {
         // Check for active personalization rules
         const rules = await (prisma as any).personalizationRule?.findMany?.({
-          where: { 
+          where: {
             active: true,
             ...(channel ? { channels: { has: channel } } : {}),
           },
@@ -95,7 +102,8 @@ personalizationRouter.post('/personalization/apply', async (req, res) => {
           for (const rule of rules) {
             // Time-based rules (e.g., morning deals boost)
             if (rule.type === 'time_boost' && rule.config) {
-              const config = typeof rule.config === 'string' ? JSON.parse(rule.config) : rule.config;
+              const config =
+                typeof rule.config === 'string' ? JSON.parse(rule.config) : rule.config;
               if (hour >= (config.startHour || 0) && hour < (config.endHour || 24)) {
                 (config.targetSlugs || []).forEach((slug: string) => {
                   boosts[slug] = (boosts[slug] || 0) + (config.boostScore || 10);
@@ -105,7 +113,8 @@ personalizationRouter.post('/personalization/apply', async (req, res) => {
 
             // Location-based rules
             if (rule.type === 'location_boost' && locationState && rule.config) {
-              const config = typeof rule.config === 'string' ? JSON.parse(rule.config) : rule.config;
+              const config =
+                typeof rule.config === 'string' ? JSON.parse(rule.config) : rule.config;
               if (config.states?.includes(locationState)) {
                 (config.targetSlugs || []).forEach((slug: string) => {
                   boosts[slug] = (boosts[slug] || 0) + (config.boostScore || 5);
@@ -115,13 +124,15 @@ personalizationRouter.post('/personalization/apply', async (req, res) => {
 
             // User preference-based rules
             if (rule.type === 'preference_boost' && preferences && rule.config) {
-              const config = typeof rule.config === 'string' ? JSON.parse(rule.config) : rule.config;
+              const config =
+                typeof rule.config === 'string' ? JSON.parse(rule.config) : rule.config;
               const matchedPrefs = Object.keys(preferences).filter(
                 k => config.preferenceKeys?.includes(k) && preferences[k]
               );
               if (matchedPrefs.length > 0) {
                 (config.targetSlugs || []).forEach((slug: string) => {
-                  boosts[slug] = (boosts[slug] || 0) + (config.boostScore || 3) * matchedPrefs.length;
+                  boosts[slug] =
+                    (boosts[slug] || 0) + (config.boostScore || 3) * matchedPrefs.length;
                 });
               }
             }

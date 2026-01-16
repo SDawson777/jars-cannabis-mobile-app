@@ -144,7 +144,12 @@ communityRouter.get('/community/feed', async (_req: Request, res: Response) => {
         {
           id: 'post-1',
           authorId: 'user-456',
-          author: { id: 'user-456', username: 'reviewer', displayName: 'Product Reviewer', isVerified: true },
+          author: {
+            id: 'user-456',
+            username: 'reviewer',
+            displayName: 'Product Reviewer',
+            isVerified: true,
+          },
           type: 'review',
           content: 'Great strain for relaxation!',
           productId: 'prod-123',
@@ -176,7 +181,12 @@ communityRouter.get('/community/posts/:postId', async (req: Request, res: Respon
     res.json({
       id: postId,
       authorId: 'user-456',
-      author: { id: 'user-456', username: 'reviewer', displayName: 'Product Reviewer', isVerified: true },
+      author: {
+        id: 'user-456',
+        username: 'reviewer',
+        displayName: 'Product Reviewer',
+        isVerified: true,
+      },
       type: 'review',
       content: 'Great strain!',
       rating: 5,
@@ -202,7 +212,12 @@ communityRouter.post('/community/posts', async (req: Request, res: Response) => 
     res.status(201).json({
       id: `post-${Date.now()}`,
       authorId: 'user-123',
-      author: { id: 'user-123', username: 'cannabisuser', displayName: 'Cannabis User', isVerified: true },
+      author: {
+        id: 'user-123',
+        username: 'cannabisuser',
+        displayName: 'Cannabis User',
+        isVerified: true,
+      },
       ...post,
       likeCount: 0,
       commentCount: 0,
@@ -291,7 +306,12 @@ communityRouter.post('/community/posts/:postId/comments', async (req: Request, r
       id: `comment-${Date.now()}`,
       postId: req.params.postId,
       authorId: 'user-123',
-      author: { id: 'user-123', username: 'cannabisuser', displayName: 'Cannabis User', isVerified: true },
+      author: {
+        id: 'user-123',
+        username: 'cannabisuser',
+        displayName: 'Cannabis User',
+        isVerified: true,
+      },
       content,
       likeCount: 0,
       isLiked: false,
@@ -305,30 +325,44 @@ communityRouter.post('/community/posts/:postId/comments', async (req: Request, r
   }
 });
 
-communityRouter.post('/community/comments/:commentId/like', async (_req: Request, res: Response) => {
-  try {
-    res.status(204).send();
-  } catch (error) {
-    console.error('Error liking comment:', error);
-    res.status(500).json({ error: 'Failed to like comment' });
+communityRouter.post(
+  '/community/comments/:commentId/like',
+  async (_req: Request, res: Response) => {
+    try {
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error liking comment:', error);
+      res.status(500).json({ error: 'Failed to like comment' });
+    }
   }
-});
+);
 
-communityRouter.delete('/community/comments/:commentId/like', async (_req: Request, res: Response) => {
-  try {
-    res.status(204).send();
-  } catch (error) {
-    console.error('Error unliking comment:', error);
-    res.status(500).json({ error: 'Failed to unlike comment' });
+communityRouter.delete(
+  '/community/comments/:commentId/like',
+  async (_req: Request, res: Response) => {
+    try {
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error unliking comment:', error);
+      res.status(500).json({ error: 'Failed to unlike comment' });
+    }
   }
-});
+);
 
 // Badge & Points Routes
 communityRouter.get('/community/me/badges', async (_req: Request, res: Response) => {
   try {
     res.json({
       badges: [
-        { id: 'badge-1', name: 'First Review', description: 'Posted your first review', iconUrl: '/badges/first-review.png', category: 'engagement', rarity: 'common', earnedAt: '2023-06-15T00:00:00Z' },
+        {
+          id: 'badge-1',
+          name: 'First Review',
+          description: 'Posted your first review',
+          iconUrl: '/badges/first-review.png',
+          category: 'engagement',
+          rarity: 'common',
+          earnedAt: '2023-06-15T00:00:00Z',
+        },
       ],
     });
   } catch (error) {
@@ -350,8 +384,26 @@ communityRouter.get('/community/badges', async (_req: Request, res: Response) =>
   try {
     res.json({
       badges: [
-        { id: 'badge-1', name: 'First Review', description: 'Post your first review', iconUrl: '/badges/first-review.png', category: 'engagement', rarity: 'common', requirement: 'Post 1 review', progress: 100 },
-        { id: 'badge-2', name: 'Connoisseur', description: 'Review 50 products', iconUrl: '/badges/connoisseur.png', category: 'expertise', rarity: 'epic', requirement: 'Review 50 products', progress: 50 },
+        {
+          id: 'badge-1',
+          name: 'First Review',
+          description: 'Post your first review',
+          iconUrl: '/badges/first-review.png',
+          category: 'engagement',
+          rarity: 'common',
+          requirement: 'Post 1 review',
+          progress: 100,
+        },
+        {
+          id: 'badge-2',
+          name: 'Connoisseur',
+          description: 'Review 50 products',
+          iconUrl: '/badges/connoisseur.png',
+          category: 'expertise',
+          rarity: 'epic',
+          requirement: 'Review 50 products',
+          progress: 50,
+        },
       ],
     });
   } catch (error) {
@@ -365,8 +417,18 @@ communityRouter.get('/community/me/points', async (_req: Request, res: Response)
     res.json({
       total: 2500,
       history: [
-        { id: 'pts-1', points: 100, reason: 'Posted a review', createdAt: new Date().toISOString() },
-        { id: 'pts-2', points: 50, reason: 'Received 10 likes', createdAt: new Date().toISOString() },
+        {
+          id: 'pts-1',
+          points: 100,
+          reason: 'Posted a review',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'pts-2',
+          points: 50,
+          reason: 'Received 10 likes',
+          createdAt: new Date().toISOString(),
+        },
       ],
     });
   } catch (error) {
@@ -379,7 +441,15 @@ communityRouter.get('/community/leaderboard', async (_req: Request, res: Respons
   try {
     res.json({
       leaderboard: [
-        { rank: 1, userId: 'user-top', username: 'topreviewer', displayName: 'Top Reviewer', points: 10000, badgeCount: 25, tier: 'platinum' },
+        {
+          rank: 1,
+          userId: 'user-top',
+          username: 'topreviewer',
+          displayName: 'Top Reviewer',
+          points: 10000,
+          badgeCount: 25,
+          tier: 'platinum',
+        },
       ],
     });
   } catch (error) {

@@ -50,7 +50,7 @@ export default function ProductDetailScreen() {
   useEffect(() => {
     if (data) {
       const product = (data as any)?.product ?? data;
-      trackCommerceEvent('view_item', slug, { 
+      trackCommerceEvent('view_item', slug, {
         name: product?.name,
         price: product?.price,
       });

@@ -12,7 +12,7 @@ const router = Router();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const { type: _type, folderId: _folderId } = req.query;
-    
+
     res.json({
       favorites: [
         {
@@ -214,11 +214,9 @@ router.get('/past-orders', async (req: Request, res: Response) => {
           id: 'order-1',
           orderNumber: 'NMB-2024-001',
           status: 'delivered',
-          total: 125.50,
+          total: 125.5,
           itemCount: 3,
-          items: [
-            { productId: 'prod-1', name: 'Blue Dream', quantity: 1, price: 45 },
-          ],
+          items: [{ productId: 'prod-1', name: 'Blue Dream', quantity: 1, price: 45 }],
           createdAt: new Date().toISOString(),
           deliveredAt: new Date().toISOString(),
         },
@@ -237,11 +235,9 @@ router.get('/last-order', async (req: Request, res: Response) => {
       id: 'order-1',
       orderNumber: 'NMB-2024-001',
       status: 'delivered',
-      total: 125.50,
+      total: 125.5,
       itemCount: 3,
-      items: [
-        { productId: 'prod-1', name: 'Blue Dream', quantity: 1, price: 45 },
-      ],
+      items: [{ productId: 'prod-1', name: 'Blue Dream', quantity: 1, price: 45 }],
       createdAt: new Date().toISOString(),
     });
   } catch (error) {
@@ -255,9 +251,7 @@ router.post('/reorder/:orderId', async (req: Request, res: Response) => {
     const { orderId: _orderId } = req.params;
     res.json({
       cartId: 'cart-123',
-      addedItems: [
-        { productId: 'prod-1', name: 'Blue Dream', quantity: 1 },
-      ],
+      addedItems: [{ productId: 'prod-1', name: 'Blue Dream', quantity: 1 }],
       unavailableItems: [],
     });
   } catch (error) {

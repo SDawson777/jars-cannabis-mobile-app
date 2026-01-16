@@ -10,7 +10,7 @@ const CACHE_KEY = 'cms:theme';
 async function fetchTheme(brandSlug?: string): Promise<CMSTheme> {
   const state = await NetInfo.fetch();
   const path = brandSlug ? `/content/theme?brand=${brandSlug}` : '/content/theme';
-  
+
   if (!state.isConnected) {
     const cached = await AsyncStorage.getItem(CACHE_KEY);
     if (cached) {

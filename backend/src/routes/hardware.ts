@@ -37,7 +37,7 @@ router.get('/hardware/devices', async (req: Request, res: Response) => {
 router.get('/hardware/discover', async (req: Request, res: Response) => {
   try {
     const { types: _types } = req.query;
-    
+
     res.json({
       devices: [
         {
@@ -69,7 +69,7 @@ router.get('/hardware/discover', async (req: Request, res: Response) => {
 router.post('/hardware/devices/pair', async (req: Request, res: Response) => {
   try {
     const { deviceId, name } = req.body;
-    
+
     res.status(201).json({
       id: deviceId,
       type: 'smart_scale',
@@ -120,7 +120,7 @@ router.post('/hardware/devices/:deviceId/disconnect', async (req: Request, res: 
 router.get('/hardware/scales/:deviceId/readings', async (req: Request, res: Response) => {
   try {
     const { deviceId } = req.params;
-    
+
     res.json({
       readings: [
         {
@@ -151,7 +151,7 @@ router.get('/hardware/scales/:deviceId/readings', async (req: Request, res: Resp
 router.post('/hardware/scales/:deviceId/sync-to-journal', async (req: Request, res: Response) => {
   try {
     const { deviceId: _deviceId } = req.params;
-    
+
     res.json({
       success: true,
       readings: [],
@@ -180,7 +180,7 @@ router.post('/hardware/scales/:deviceId/tare', async (req: Request, res: Respons
 router.get('/hardware/trackers/:deviceId/readings', async (req: Request, res: Response) => {
   try {
     const { deviceId } = req.params;
-    
+
     res.json({
       readings: [
         {
@@ -224,7 +224,7 @@ router.post('/hardware/trackers/:deviceId/sessions/start', async (req: Request, 
   try {
     const { deviceId } = req.params;
     const { productId, strain } = req.body;
-    
+
     res.status(201).json({
       id: `session-${Date.now()}`,
       deviceId,
@@ -238,32 +238,35 @@ router.post('/hardware/trackers/:deviceId/sessions/start', async (req: Request, 
   }
 });
 
-router.post('/hardware/trackers/:deviceId/sessions/:sessionId/end', async (req: Request, res: Response) => {
-  try {
-    const { deviceId, sessionId } = req.params;
-    const { effects, mood, notes } = req.body;
-    
-    res.json({
-      id: sessionId,
-      deviceId,
-      sessionStart: new Date(Date.now() - 900000).toISOString(),
-      sessionEnd: new Date().toISOString(),
-      duration: 900,
-      puffs: 8,
-      effects,
-      mood,
-      notes,
-    });
-  } catch (error) {
-    console.error('Error ending session:', error);
-    res.status(500).json({ error: 'Failed to end session' });
+router.post(
+  '/hardware/trackers/:deviceId/sessions/:sessionId/end',
+  async (req: Request, res: Response) => {
+    try {
+      const { deviceId, sessionId } = req.params;
+      const { effects, mood, notes } = req.body;
+
+      res.json({
+        id: sessionId,
+        deviceId,
+        sessionStart: new Date(Date.now() - 900000).toISOString(),
+        sessionEnd: new Date().toISOString(),
+        duration: 900,
+        puffs: 8,
+        effects,
+        mood,
+        notes,
+      });
+    } catch (error) {
+      console.error('Error ending session:', error);
+      res.status(500).json({ error: 'Failed to end session' });
+    }
   }
-});
+);
 
 router.post('/hardware/sync', async (req: Request, res: Response) => {
   try {
     const { deviceId: _deviceId } = req.body;
-    
+
     res.json({
       success: true,
       readings: [],
@@ -340,7 +343,7 @@ router.get('/wallet/loyalty-card', async (req: Request, res: Response) => {
 router.post('/wallet/passes/add-to-wallet', async (req: Request, res: Response) => {
   try {
     const { passId, provider } = req.body;
-    
+
     res.json({
       passUrl: `https://nimbus.app/wallet/pass/${passId}?provider=${provider}`,
       success: true,
@@ -354,7 +357,7 @@ router.post('/wallet/passes/add-to-wallet', async (req: Request, res: Response) 
 router.post('/wallet/loyalty-card/generate', async (req: Request, res: Response) => {
   try {
     const { provider, storeId } = req.body;
-    
+
     res.status(201).json({
       id: `loyalty-${Date.now()}`,
       type: 'loyalty_card',

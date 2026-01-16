@@ -7,16 +7,86 @@ const router = Router();
 
 // Default home sections
 const DEFAULT_SECTIONS = [
-  { id: 'hero', type: 'hero_banner', title: 'Featured', position: 0, visible: true, collapsed: false },
-  { id: 'deals', type: 'deals', title: 'Today\'s Deals', position: 1, visible: true, collapsed: false },
-  { id: 'categories', type: 'categories', title: 'Categories', position: 2, visible: true, collapsed: false },
-  { id: 'recommended', type: 'recommended', title: 'Recommended for You', position: 3, visible: true, collapsed: false },
-  { id: 'new', type: 'new_arrivals', title: 'New Arrivals', position: 4, visible: true, collapsed: false },
-  { id: 'popular', type: 'popular', title: 'Popular Products', position: 5, visible: true, collapsed: false },
-  { id: 'favorites', type: 'favorites', title: 'Your Favorites', position: 6, visible: true, collapsed: false },
-  { id: 'reorder', type: 'quick_reorder', title: 'Quick Reorder', position: 7, visible: true, collapsed: false },
-  { id: 'loyalty', type: 'loyalty_status', title: 'Your Rewards', position: 8, visible: true, collapsed: false },
-  { id: 'events', type: 'events', title: 'Upcoming Events', position: 9, visible: true, collapsed: false },
+  {
+    id: 'hero',
+    type: 'hero_banner',
+    title: 'Featured',
+    position: 0,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'deals',
+    type: 'deals',
+    title: "Today's Deals",
+    position: 1,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'categories',
+    type: 'categories',
+    title: 'Categories',
+    position: 2,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'recommended',
+    type: 'recommended',
+    title: 'Recommended for You',
+    position: 3,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'new',
+    type: 'new_arrivals',
+    title: 'New Arrivals',
+    position: 4,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'popular',
+    type: 'popular',
+    title: 'Popular Products',
+    position: 5,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'favorites',
+    type: 'favorites',
+    title: 'Your Favorites',
+    position: 6,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'reorder',
+    type: 'quick_reorder',
+    title: 'Quick Reorder',
+    position: 7,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'loyalty',
+    type: 'loyalty_status',
+    title: 'Your Rewards',
+    position: 8,
+    visible: true,
+    collapsed: false,
+  },
+  {
+    id: 'events',
+    type: 'events',
+    title: 'Upcoming Events',
+    position: 9,
+    visible: true,
+    collapsed: false,
+  },
 ];
 
 // ============================================
@@ -91,12 +161,17 @@ router.get('/sections', async (req: Request, res: Response) => {
 router.get('/sections/:sectionId/data', async (req: Request, res: Response) => {
   try {
     const { sectionId } = req.params;
-    
+
     // Return different data based on section type
     const sectionData: Record<string, unknown> = {
       hero: {
         banners: [
-          { id: 'banner-1', image: 'https://example.com/banner.jpg', link: '/deals', title: 'Summer Sale' },
+          {
+            id: 'banner-1',
+            image: 'https://example.com/banner.jpg',
+            link: '/deals',
+            title: 'Summer Sale',
+          },
         ],
       },
       deals: {
@@ -132,7 +207,7 @@ router.get('/sections/:sectionId/data', async (req: Request, res: Response) => {
         events: [],
       },
     };
-    
+
     res.json({
       sectionId,
       data: sectionData[sectionId] || {},

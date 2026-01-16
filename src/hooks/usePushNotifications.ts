@@ -74,11 +74,11 @@ export function usePushNotifications() {
       // Store locally
       await AsyncStorage.setItem(PUSH_TOKEN_KEY, pushToken);
       await AsyncStorage.setItem(PUSH_ENABLED_KEY, 'true');
-      
+
       setToken(pushToken);
       setIsEnabled(true);
       logEvent('push_registered', { platform: Platform.OS });
-      
+
       return pushToken;
     } catch (err: any) {
       const message = err?.message || 'Failed to register for push notifications';
@@ -99,10 +99,10 @@ export function usePushNotifications() {
       // Clear local storage
       await AsyncStorage.removeItem(PUSH_TOKEN_KEY);
       await AsyncStorage.setItem(PUSH_ENABLED_KEY, 'false');
-      
+
       // Optionally: Tell backend to remove token
       // await phase4Client.delete('/profile/push-token');
-      
+
       setToken(null);
       setIsEnabled(false);
       logEvent('push_disabled', {});
@@ -114,13 +114,16 @@ export function usePushNotifications() {
   }, []);
 
   // Toggle push notifications
-  const togglePush = useCallback(async (enabled: boolean): Promise<void> => {
-    if (enabled) {
-      await registerForPush();
-    } else {
-      await unregisterFromPush();
-    }
-  }, [registerForPush, unregisterFromPush]);
+  const togglePush = useCallback(
+    async (enabled: boolean): Promise<void> => {
+      if (enabled) {
+        await registerForPush();
+      } else {
+        await unregisterFromPush();
+      }
+    },
+    [registerForPush, unregisterFromPush]
+  );
 
   // Listen for notification received while app is foregrounded
   useEffect(() => {

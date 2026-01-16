@@ -18,7 +18,9 @@ router.get('/', async (req: Request, res: Response) => {
           image: 'https://example.com/workshop.jpg',
           type: 'workshop',
           startTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          endTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(),
+          endTime: new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000
+          ).toISOString(),
           timezone: 'America/Los_Angeles',
           isVirtual: false,
           location: '123 Main St, Los Angeles, CA',

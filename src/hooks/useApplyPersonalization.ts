@@ -12,7 +12,7 @@ let sessionId: string | null = null;
 
 async function getSessionId(): Promise<string> {
   if (sessionId) return sessionId;
-  
+
   try {
     const stored = await AsyncStorage.getItem('personalization_session_id');
     if (stored) {
@@ -22,7 +22,7 @@ async function getSessionId(): Promise<string> {
   } catch {
     // ignore storage errors
   }
-  
+
   // Generate new session ID
   sessionId = uuidv4();
   try {
@@ -44,7 +44,7 @@ async function applyPersonalization(
   preferences?: Record<string, any>
 ): Promise<PersonalizationResponse> {
   const session = await getSessionId();
-  
+
   const payload: PersonalizationRequest = {
     slugs,
     userId,
@@ -90,7 +90,8 @@ export function useApplyPersonalization() {
       userId?: string;
       locationState?: string;
       preferences?: Record<string, any>;
-    }) => applyPersonalization(params.slugs, params.userId, params.locationState, params.preferences),
+    }) =>
+      applyPersonalization(params.slugs, params.userId, params.locationState, params.preferences),
   });
 }
 
@@ -102,13 +103,13 @@ export function reorderByPersonalization<T extends { slug?: string; id?: string;
   rankedSlugs: string[]
 ): T[] {
   if (!rankedSlugs.length) return items;
-  
+
   const slugMap = new Map<string, T>();
   items.forEach(item => {
     const key = item.slug || item.id || item.__id;
     if (key) slugMap.set(key, item);
   });
-  
+
   const ordered: T[] = [];
   rankedSlugs.forEach(slug => {
     const item = slugMap.get(slug);
@@ -117,9 +118,9 @@ export function reorderByPersonalization<T extends { slug?: string; id?: string;
       slugMap.delete(slug);
     }
   });
-  
+
   // Add any remaining items not in ranked list
   slugMap.forEach(item => ordered.push(item));
-  
+
   return ordered;
 }

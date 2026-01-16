@@ -24,7 +24,8 @@ const knowledgeBase = {
       cbd: '<1%',
       effects: ['Relaxed', 'Happy', 'Euphoric', 'Creative', 'Uplifted'],
       terpenes: ['Myrcene', 'Pinene', 'Caryophyllene'],
-      description: 'A sweet berry aroma with full-body relaxation and gentle cerebral invigoration.',
+      description:
+        'A sweet berry aroma with full-body relaxation and gentle cerebral invigoration.',
       medicalUses: ['Stress', 'Depression', 'Pain', 'Fatigue'],
     },
     'og-kush': {
@@ -40,11 +41,13 @@ const knowledgeBase = {
   guidelines: {
     dosing: {
       title: 'Dosing Guidelines',
-      content: 'Start low, go slow. For edibles, begin with 2.5-5mg THC and wait 2 hours before taking more.',
+      content:
+        'Start low, go slow. For edibles, begin with 2.5-5mg THC and wait 2 hours before taking more.',
     },
     storage: {
       title: 'Storage Tips',
-      content: 'Store cannabis in a cool, dark place in an airtight container. Keep away from children and pets.',
+      content:
+        'Store cannabis in a cool, dark place in an airtight container. Keep away from children and pets.',
     },
   },
 };
@@ -247,13 +250,12 @@ conciergeRouter.post('/concierge/chat/stream', async (req, res) => {
       }
     }
 
-    sendEvent('done', { 
-      messageId: reqId, 
+    sendEvent('done', {
+      messageId: reqId,
       fullContent,
-      usage: { tokens: fullContent.length / 4 } // Approximate
+      usage: { tokens: fullContent.length / 4 }, // Approximate
     });
     res.end();
-
   } catch (e: any) {
     const code = e?.code || 'stream_error';
     const msg = e?.message || 'Streaming error';
@@ -284,9 +286,11 @@ conciergeRouter.get('/concierge/knowledge/search', async (req, res) => {
 
     // Search strains
     Object.values(knowledgeBase.strains).forEach((strain: any) => {
-      if (strain.name.toLowerCase().includes(queryStr) ||
-          strain.description.toLowerCase().includes(queryStr) ||
-          strain.effects.some((e: string) => e.toLowerCase().includes(queryStr))) {
+      if (
+        strain.name.toLowerCase().includes(queryStr) ||
+        strain.description.toLowerCase().includes(queryStr) ||
+        strain.effects.some((e: string) => e.toLowerCase().includes(queryStr))
+      ) {
         results.push({
           type: 'strain',
           id: strain.name.toLowerCase().replace(/\s+/g, '-'),
@@ -299,8 +303,10 @@ conciergeRouter.get('/concierge/knowledge/search', async (req, res) => {
 
     // Search guidelines
     Object.values(knowledgeBase.guidelines).forEach((guide: any) => {
-      if (guide.title.toLowerCase().includes(queryStr) ||
-          guide.content.toLowerCase().includes(queryStr)) {
+      if (
+        guide.title.toLowerCase().includes(queryStr) ||
+        guide.content.toLowerCase().includes(queryStr)
+      ) {
         results.push({
           type: 'guide',
           id: guide.title.toLowerCase().replace(/\s+/g, '-'),
@@ -352,7 +358,7 @@ conciergeRouter.get('/concierge/knowledge/usage-guidelines', async (req, res) =>
     if (topicKey && (knowledgeBase.guidelines as any)[topicKey]) {
       return res.json((knowledgeBase.guidelines as any)[topicKey]);
     }
-    
+
     res.json({
       guidelines: Object.values(knowledgeBase.guidelines),
     });
@@ -400,7 +406,9 @@ conciergeRouter.get('/concierge/knowledge/legal/:state', async (req, res) => {
 
     const info = legalInfo[state.toUpperCase()];
     if (!info) {
-      return res.status(404).json({ error: 'State not found', availableStates: Object.keys(legalInfo) });
+      return res
+        .status(404)
+        .json({ error: 'State not found', availableStates: Object.keys(legalInfo) });
     }
 
     res.json(info);
@@ -424,7 +432,7 @@ conciergeRouter.post('/concierge/feedback', async (req, res) => {
 
   try {
     logger.debug('[concierge] feedback', { messageId, sessionId, userId, rating, helpful });
-    
+
     res.json({
       id: `fb-${Date.now()}`,
       messageId,

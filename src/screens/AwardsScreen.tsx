@@ -90,10 +90,10 @@ export default function AwardsScreen() {
   // Track screen view
   useFocusEffect(
     useCallback(() => {
-      trackScreenView('AwardsScreen', { 
-        points: user.points, 
-        tier: user.tier, 
-        awards_count: awards.length 
+      trackScreenView('AwardsScreen', {
+        points: user.points,
+        tier: user.tier,
+        awards_count: awards.length,
       });
     }, [user.points, user.tier, awards.length])
   );

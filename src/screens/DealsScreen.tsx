@@ -33,7 +33,8 @@ type DealsNavProp = NativeStackNavigationProp<RootStackParamList, 'DealsScreen'>
 
 export default function DealsScreen() {
   const navigation = useNavigation<DealsNavProp>();
-  const { colorTemp, brandPrimary, brandSecondary, brandBackground, cornerRadius } = useContext(ThemeContext);
+  const { colorTemp, brandPrimary, brandSecondary, brandBackground, cornerRadius } =
+    useContext(ThemeContext);
   const { data: deals, isLoading, isError, refetch } = useDeals();
 
   // Track screen view
@@ -62,7 +63,7 @@ export default function DealsScreen() {
   const handleDealPress = (deal: CMSDeal) => {
     hapticLight();
     trackContentClick('deal', deal.id, { title: deal.title });
-    
+
     // Navigate to shop with deal filter
     navigation.navigate('ShopScreen', { dealId: deal.id } as any);
   };
@@ -109,7 +110,10 @@ export default function DealsScreen() {
         ]}
       >
         <Text style={{ color: brandSecondary, marginBottom: 16 }}>Unable to load deals.</Text>
-        <Pressable onPress={() => refetch()} style={[styles.retryBtn, { backgroundColor: brandPrimary }]}>
+        <Pressable
+          onPress={() => refetch()}
+          style={[styles.retryBtn, { backgroundColor: brandPrimary }]}
+        >
           <Text style={{ color: '#fff' }}>Retry</Text>
         </Pressable>
       </SafeAreaView>
@@ -124,7 +128,10 @@ export default function DealsScreen() {
       {item.imageUrl && (
         <Image
           source={{ uri: item.imageUrl }}
-          style={[styles.dealImage, { borderTopLeftRadius: cornerRadius, borderTopRightRadius: cornerRadius }]}
+          style={[
+            styles.dealImage,
+            { borderTopLeftRadius: cornerRadius, borderTopRightRadius: cornerRadius },
+          ]}
           resizeMode="cover"
         />
       )}

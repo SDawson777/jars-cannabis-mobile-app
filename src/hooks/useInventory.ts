@@ -67,7 +67,11 @@ export function useProductInventory(productId: string, storeId?: string) {
 /**
  * Hook to check product availability across multiple stores
  */
-export function useProductAvailabilityByStore(productId: string, latitude?: number, longitude?: number) {
+export function useProductAvailabilityByStore(
+  productId: string,
+  latitude?: number,
+  longitude?: number
+) {
   return useQuery<StoreAvailability[], Error>({
     queryKey: ['availability', productId, latitude, longitude],
     queryFn: async () => {
@@ -93,7 +97,10 @@ export function usePurchaseLimits(state?: string) {
     queryKey: ['purchaseLimits', state],
     queryFn: async () => {
       const params = state ? `?state=${state}` : '';
-      const res = await clientGet<{ limits: PurchaseLimit[] }>(phase4Client, `/compliance/purchase-limits${params}`);
+      const res = await clientGet<{ limits: PurchaseLimit[] }>(
+        phase4Client,
+        `/compliance/purchase-limits${params}`
+      );
       return res.limits || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -109,7 +116,15 @@ export function useCheckPurchaseLimit() {
     Error,
     { productId: string; quantity: number; storeId?: string }
   >({
-    mutationFn: async ({ productId, quantity, storeId }: { productId: string; quantity: number; storeId?: string }) => {
+    mutationFn: async ({
+      productId,
+      quantity,
+      storeId,
+    }: {
+      productId: string;
+      quantity: number;
+      storeId?: string;
+    }) => {
       return clientPost(phase4Client, '/compliance/check-limit', { productId, quantity, storeId });
     },
   });
@@ -137,14 +152,13 @@ export function useBackInStockSubscriptions() {
  */
 export function useSubscribeBackInStock() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<BackInStockSubscription, Error, { productId: string; storeId?: string }>({
     mutationFn: async ({ productId, storeId }: { productId: string; storeId?: string }) => {
-      const result = await clientPost<{ productId: string; storeId?: string }, BackInStockSubscription>(
-        phase4Client,
-        '/inventory/back-in-stock/subscribe',
-        { productId, storeId }
-      );
+      const result = await clientPost<
+        { productId: string; storeId?: string },
+        BackInStockSubscription
+      >(phase4Client, '/inventory/back-in-stock/subscribe', { productId, storeId });
       logEvent('back_in_stock_subscribed', { productId, storeId });
       return result;
     },
@@ -159,10 +173,14 @@ export function useSubscribeBackInStock() {
  */
 export function useUnsubscribeBackInStock() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (subscriptionId: string) => {
-      await clientPost<object, void>(phase4Client, `/inventory/back-in-stock/${subscriptionId}/unsubscribe`, {});
+      await clientPost<object, void>(
+        phase4Client,
+        `/inventory/back-in-stock/${subscriptionId}/unsubscribe`,
+        {}
+      );
       logEvent('back_in_stock_unsubscribed', { subscriptionId });
     },
     onSuccess: () => {
@@ -180,7 +198,15 @@ export function useReserveInventory() {
     Error,
     { productId: string; quantity: number; storeId: string }
   >({
-    mutationFn: async ({ productId, quantity, storeId }: { productId: string; quantity: number; storeId: string }) => {
+    mutationFn: async ({
+      productId,
+      quantity,
+      storeId,
+    }: {
+      productId: string;
+      quantity: number;
+      storeId: string;
+    }) => {
       return clientPost(phase4Client, '/inventory/reserve', { productId, quantity, storeId });
     },
   });

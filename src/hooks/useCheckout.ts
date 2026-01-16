@@ -78,8 +78,12 @@ export function usePaymentMethods() {
  */
 export function useAddPaymentMethod() {
   const queryClient = useQueryClient();
-  
-  return useMutation<PaymentMethod, Error, { stripePaymentMethodId: string; setAsDefault?: boolean }>({
+
+  return useMutation<
+    PaymentMethod,
+    Error,
+    { stripePaymentMethodId: string; setAsDefault?: boolean }
+  >({
     mutationFn: async (payload: { stripePaymentMethodId: string; setAsDefault?: boolean }) => {
       const result = await clientPost<typeof payload, PaymentMethod>(
         phase4Client,
@@ -100,10 +104,14 @@ export function useAddPaymentMethod() {
  */
 export function useDeletePaymentMethod() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (paymentMethodId: string) => {
-      await clientPost<object, void>(phase4Client, `/payment-methods/${paymentMethodId}/delete`, {});
+      await clientPost<object, void>(
+        phase4Client,
+        `/payment-methods/${paymentMethodId}/delete`,
+        {}
+      );
       logEvent('payment_method_deleted', { paymentMethodId });
     },
     onSuccess: () => {
@@ -157,14 +165,13 @@ export function useCreateCheckoutSession() {
 export function useApplyCoupon() {
   const queryClient = useQueryClient();
   const setAppliedCoupon = useCartStore((state: any) => state.setAppliedCoupon);
-  
+
   return useMutation<{ discount: number; description: string }, Error, string>({
     mutationFn: async (couponCode: string) => {
-      const result = await clientPost<{ code: string }, { discount: number; description: string; valid: boolean }>(
-        phase4Client,
-        '/checkout/apply-coupon',
-        { code: couponCode }
-      );
+      const result = await clientPost<
+        { code: string },
+        { discount: number; description: string; valid: boolean }
+      >(phase4Client, '/checkout/apply-coupon', { code: couponCode });
       if (!result.valid) {
         throw new Error('Invalid coupon code');
       }
@@ -184,7 +191,7 @@ export function useApplyCoupon() {
 export function useRemoveCoupon() {
   const queryClient = useQueryClient();
   const setAppliedCoupon = useCartStore((state: any) => state.setAppliedCoupon);
-  
+
   return useMutation<void, Error, void>({
     mutationFn: async () => {
       await clientPost<object, void>(phase4Client, '/checkout/remove-coupon', {});
@@ -203,7 +210,7 @@ export function useRemoveCoupon() {
 export function usePlaceOrder() {
   const queryClient = useQueryClient();
   const clearCart = useCartStore((state: any) => state.clearCart);
-  
+
   return useMutation<OrderConfirmation, Error, PlaceOrderPayload>({
     mutationFn: async (payload: PlaceOrderPayload) => {
       const confirmation = await clientPost<PlaceOrderPayload, OrderConfirmation>(
@@ -230,12 +237,16 @@ export function usePlaceOrder() {
  * Hook to validate cart before checkout
  */
 export function useValidateCheckout() {
-  return useMutation<{
-    valid: boolean;
-    errors?: string[];
-    unavailableItems?: string[];
-    priceChanges?: Array<{ productId: string; oldPrice: number; newPrice: number }>;
-  }, Error, void>({
+  return useMutation<
+    {
+      valid: boolean;
+      errors?: string[];
+      unavailableItems?: string[];
+      priceChanges?: Array<{ productId: string; oldPrice: number; newPrice: number }>;
+    },
+    Error,
+    void
+  >({
     mutationFn: async () => {
       return await clientPost(phase4Client, '/checkout/validate', {});
     },
@@ -246,15 +257,17 @@ export function useValidateCheckout() {
  * Combined checkout state hook
  */
 export function useCheckoutFlow() {
-  const [step, setStep] = useState<'address' | 'shipping' | 'payment' | 'review' | 'processing' | 'complete'>('address');
+  const [step, setStep] = useState<
+    'address' | 'shipping' | 'payment' | 'review' | 'processing' | 'complete'
+  >('address');
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [selectedShippingOptionId, setSelectedShippingOptionId] = useState<string | null>(null);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
-  
+
   const { data: paymentMethods } = usePaymentMethods();
   const { data: shippingOptions } = useShippingOptions(selectedAddressId || undefined);
   const placeOrder = usePlaceOrder();
-  
+
   const goToNextStep = useCallback(() => {
     const steps = ['address', 'shipping', 'payment', 'review', 'processing', 'complete'] as const;
     const currentIndex = steps.indexOf(step);
@@ -262,7 +275,7 @@ export function useCheckoutFlow() {
       setStep(steps[currentIndex + 1]);
     }
   }, [step]);
-  
+
   const goToPreviousStep = useCallback(() => {
     const steps = ['address', 'shipping', 'payment', 'review', 'processing', 'complete'] as const;
     const currentIndex = steps.indexOf(step);
@@ -270,30 +283,33 @@ export function useCheckoutFlow() {
       setStep(steps[currentIndex - 1]);
     }
   }, [step]);
-  
-  const submitOrder = useCallback(async (notes?: string, tipAmount?: number) => {
-    if (!selectedAddressId || !selectedPaymentMethodId) {
-      throw new Error('Missing required checkout information');
-    }
-    
-    setStep('processing');
-    
-    try {
-      const confirmation = await placeOrder.mutateAsync({
-        paymentMethodId: selectedPaymentMethodId,
-        shippingAddressId: selectedAddressId,
-        shippingOptionId: selectedShippingOptionId || undefined,
-        notes,
-        tipAmount,
-      });
-      setStep('complete');
-      return confirmation;
-    } catch (error) {
-      setStep('review');
-      throw error;
-    }
-  }, [selectedAddressId, selectedPaymentMethodId, selectedShippingOptionId, placeOrder]);
-  
+
+  const submitOrder = useCallback(
+    async (notes?: string, tipAmount?: number) => {
+      if (!selectedAddressId || !selectedPaymentMethodId) {
+        throw new Error('Missing required checkout information');
+      }
+
+      setStep('processing');
+
+      try {
+        const confirmation = await placeOrder.mutateAsync({
+          paymentMethodId: selectedPaymentMethodId,
+          shippingAddressId: selectedAddressId,
+          shippingOptionId: selectedShippingOptionId || undefined,
+          notes,
+          tipAmount,
+        });
+        setStep('complete');
+        return confirmation;
+      } catch (error) {
+        setStep('review');
+        throw error;
+      }
+    },
+    [selectedAddressId, selectedPaymentMethodId, selectedShippingOptionId, placeOrder]
+  );
+
   return {
     step,
     setStep,

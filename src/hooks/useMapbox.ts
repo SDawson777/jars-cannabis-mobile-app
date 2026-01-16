@@ -165,15 +165,17 @@ export function useUserLocation(options?: {
       }
 
       const position = await new Promise<GeoPosition>((resolve, reject) => {
-        const nav = globalThis.navigator as {
-          geolocation?: {
-            getCurrentPosition: (
-              s: (p: GeoPosition) => void,
-              e: (e: { message: string }) => void,
-              o: object
-            ) => void;
-          };
-        } | undefined;
+        const nav = globalThis.navigator as
+          | {
+              geolocation?: {
+                getCurrentPosition: (
+                  s: (p: GeoPosition) => void,
+                  e: (e: { message: string }) => void,
+                  o: object
+                ) => void;
+              };
+            }
+          | undefined;
 
         if (nav?.geolocation) {
           nav.geolocation.getCurrentPosition(resolve, reject, {
@@ -204,26 +206,28 @@ export function useUserLocation(options?: {
   }, [options?.enableHighAccuracy, options?.timeout, options?.maximumAge]);
 
   const startWatching = useCallback(() => {
-    const nav = globalThis.navigator as {
-      geolocation?: {
-        watchPosition: (
-          s: (p: { coords: { latitude: number; longitude: number } }) => void,
-          e: (e: { message: string }) => void,
-          o: object
-        ) => number;
-        clearWatch: (id: number) => void;
-      };
-    } | undefined;
+    const nav = globalThis.navigator as
+      | {
+          geolocation?: {
+            watchPosition: (
+              s: (p: { coords: { latitude: number; longitude: number } }) => void,
+              e: (e: { message: string }) => void,
+              o: object
+            ) => number;
+            clearWatch: (id: number) => void;
+          };
+        }
+      | undefined;
 
     if (nav?.geolocation && watchIdRef.current === null) {
       watchIdRef.current = nav.geolocation.watchPosition(
-        (position) => {
+        position => {
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           });
         },
-        (err) => {
+        err => {
           setError(err.message);
         },
         {
@@ -237,9 +241,11 @@ export function useUserLocation(options?: {
   }, [options?.enableHighAccuracy, options?.timeout, options?.maximumAge]);
 
   const stopWatching = useCallback(() => {
-    const nav = globalThis.navigator as {
-      geolocation?: { clearWatch: (id: number) => void };
-    } | undefined;
+    const nav = globalThis.navigator as
+      | {
+          geolocation?: { clearWatch: (id: number) => void };
+        }
+      | undefined;
 
     if (nav?.geolocation && watchIdRef.current !== null) {
       nav.geolocation.clearWatch(watchIdRef.current);
@@ -282,19 +288,15 @@ export function useNearbyStores(options?: {
   return useQuery<Store[], Error>({
     queryKey: ['stores', 'nearby', options],
     queryFn: async () => {
-      const res = await clientGet<{ stores: Store[] }>(
-        phase4Client,
-        '/stores/nearby',
-        {
-          params: {
-            lat: options?.coordinates?.latitude,
-            lng: options?.coordinates?.longitude,
-            radius: options?.radiusMiles || 25,
-            services: options?.services?.join(','),
-            limit: options?.limit || 20,
-          },
-        }
-      );
+      const res = await clientGet<{ stores: Store[] }>(phase4Client, '/stores/nearby', {
+        params: {
+          lat: options?.coordinates?.latitude,
+          lng: options?.coordinates?.longitude,
+          radius: options?.radiusMiles || 25,
+          services: options?.services?.join(','),
+          limit: options?.limit || 20,
+        },
+      });
       return res.stores;
     },
     enabled: !!options?.coordinates,
@@ -325,11 +327,9 @@ export function useMapSearch() {
   const search = useQuery<SearchResult[], Error>({
     queryKey: ['map', 'search', query],
     queryFn: async () => {
-      const res = await clientGet<{ results: SearchResult[] }>(
-        phase4Client,
-        '/map/search',
-        { params: { q: query } }
-      );
+      const res = await clientGet<{ results: SearchResult[] }>(phase4Client, '/map/search', {
+        params: { q: query },
+      });
       return res.results;
     },
     enabled: query.length >= 2,
@@ -383,24 +383,22 @@ export function useDirections(options: {
 /**
  * Hook to get estimated travel time to multiple stores
  */
-export function useTravelTimes(options: {
-  origin?: Coordinates;
-  storeIds: string[];
-}) {
-  return useQuery<Record<string, { distance: number; duration: number; trafficLevel: string }>, Error>({
+export function useTravelTimes(options: { origin?: Coordinates; storeIds: string[] }) {
+  return useQuery<
+    Record<string, { distance: number; duration: number; trafficLevel: string }>,
+    Error
+  >({
     queryKey: ['map', 'travel-times', options],
     queryFn: async () => {
-      return await clientGet<Record<string, { distance: number; duration: number; trafficLevel: string }>>(
-        phase4Client,
-        '/map/travel-times',
-        {
-          params: {
-            originLat: options.origin?.latitude,
-            originLng: options.origin?.longitude,
-            storeIds: options.storeIds.join(','),
-          },
-        }
-      );
+      return await clientGet<
+        Record<string, { distance: number; duration: number; trafficLevel: string }>
+      >(phase4Client, '/map/travel-times', {
+        params: {
+          originLat: options.origin?.latitude,
+          originLng: options.origin?.longitude,
+          storeIds: options.storeIds.join(','),
+        },
+      });
     },
     enabled: !!options.origin && options.storeIds.length > 0,
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -418,10 +416,7 @@ export function useGeofences() {
   return useQuery<Geofence[], Error>({
     queryKey: ['geofences'],
     queryFn: async () => {
-      const res = await clientGet<{ geofences: Geofence[] }>(
-        phase4Client,
-        '/geofences'
-      );
+      const res = await clientGet<{ geofences: Geofence[] }>(phase4Client, '/geofences');
       return res.geofences;
     },
   });
@@ -433,18 +428,23 @@ export function useGeofences() {
 export function useRegisterGeofence() {
   const queryClient = useQueryClient();
 
-  return useMutation<Geofence, Error, {
-    storeId: string;
-    radiusMeters?: number;
-    triggerOnEntry?: boolean;
-    triggerOnExit?: boolean;
-  }>({
-    mutationFn: async (params: { storeId: string; radiusMeters?: number; triggerOnEntry?: boolean; triggerOnExit?: boolean }) => {
-      return await clientPost<typeof params, Geofence>(
-        phase4Client,
-        '/geofences',
-        params
-      );
+  return useMutation<
+    Geofence,
+    Error,
+    {
+      storeId: string;
+      radiusMeters?: number;
+      triggerOnEntry?: boolean;
+      triggerOnExit?: boolean;
+    }
+  >({
+    mutationFn: async (params: {
+      storeId: string;
+      radiusMeters?: number;
+      triggerOnEntry?: boolean;
+      triggerOnExit?: boolean;
+    }) => {
+      return await clientPost<typeof params, Geofence>(phase4Client, '/geofences', params);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['geofences'] });
@@ -460,12 +460,20 @@ export function useGeofenceEvents() {
   const queryClient = useQueryClient();
   const [recentEvents, setRecentEvents] = useState<GeofenceEvent[]>([]);
 
-  const reportEvent = useMutation<GeofenceEvent, Error, {
-    geofenceId: string;
-    eventType: 'entry' | 'exit' | 'dwell';
-    coordinates: Coordinates;
-  }>({
-    mutationFn: async (event: { geofenceId: string; eventType: 'entry' | 'exit' | 'dwell'; coordinates: Coordinates }) => {
+  const reportEvent = useMutation<
+    GeofenceEvent,
+    Error,
+    {
+      geofenceId: string;
+      eventType: 'entry' | 'exit' | 'dwell';
+      coordinates: Coordinates;
+    }
+  >({
+    mutationFn: async (event: {
+      geofenceId: string;
+      eventType: 'entry' | 'exit' | 'dwell';
+      coordinates: Coordinates;
+    }) => {
       const result = await clientPost<typeof event, GeofenceEvent>(
         phase4Client,
         '/geofences/events',
@@ -478,7 +486,7 @@ export function useGeofenceEvents() {
       return result;
     },
     onSuccess: (event: GeofenceEvent) => {
-      setRecentEvents((prev) => [event, ...prev].slice(0, 10));
+      setRecentEvents(prev => [event, ...prev].slice(0, 10));
       queryClient.invalidateQueries({ queryKey: ['deals', 'local'] });
     },
   });
@@ -497,11 +505,9 @@ export function useLocalDeals(storeId?: string) {
   return useQuery<LocalDeal[], Error>({
     queryKey: ['deals', 'local', storeId],
     queryFn: async () => {
-      const res = await clientGet<{ deals: LocalDeal[] }>(
-        phase4Client,
-        '/deals/local',
-        { params: { storeId } }
-      );
+      const res = await clientGet<{ deals: LocalDeal[] }>(phase4Client, '/deals/local', {
+        params: { storeId },
+      });
       return res.deals;
     },
     enabled: !!storeId,
@@ -527,7 +533,7 @@ export function useMapSettings() {
   });
 
   const updateSettings = useCallback((updates: Partial<MapSettings>) => {
-    setSettings((prev) => ({ ...prev, ...updates }));
+    setSettings(prev => ({ ...prev, ...updates }));
     logEvent('map_settings_updated', updates);
   }, []);
 

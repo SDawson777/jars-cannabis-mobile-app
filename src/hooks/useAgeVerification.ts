@@ -94,10 +94,7 @@ export function useVerificationStatus() {
   return useQuery<VerificationStatus, Error>({
     queryKey: ['verification', 'status'],
     queryFn: async () => {
-      return await clientGet<VerificationStatus>(
-        phase4Client,
-        '/verification/status'
-      );
+      return await clientGet<VerificationStatus>(phase4Client, '/verification/status');
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -108,7 +105,7 @@ export function useVerificationStatus() {
  */
 export function useCanPurchase() {
   const { data: status, isLoading } = useVerificationStatus();
-  
+
   return {
     canPurchase: status?.ageVerified && status?.locationVerified,
     requiresIdVerification: status && !status.idVerified,
@@ -127,7 +124,7 @@ export function useCanPurchase() {
  */
 export function useSubmitIDVerification() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<IDVerificationResult, Error, IDVerificationRequest>({
     mutationFn: async (request: IDVerificationRequest) => {
       const result = await clientPost<IDVerificationRequest, IDVerificationResult>(
@@ -135,7 +132,7 @@ export function useSubmitIDVerification() {
         '/verification/id/submit',
         request
       );
-      logEvent('id_verification_submitted', { 
+      logEvent('id_verification_submitted', {
         documentType: request.documentType,
         success: result.success,
         verified: result.verified,
@@ -179,11 +176,15 @@ export function useIDVerificationStatus(verificationId: string) {
  */
 export function useSelfAttestation() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ verified: boolean; expiresAt: string }, Error, { 
-    dateOfBirth: string;
-    agreedToTerms: boolean;
-  }>({
+
+  return useMutation<
+    { verified: boolean; expiresAt: string },
+    Error,
+    {
+      dateOfBirth: string;
+      agreedToTerms: boolean;
+    }
+  >({
     mutationFn: async (data: { dateOfBirth: string; agreedToTerms: boolean }) => {
       const result = await clientPost<typeof data, { verified: boolean; expiresAt: string }>(
         phase4Client,
@@ -213,11 +214,9 @@ export function useLocationGate(location?: GeoLocation) {
       if (!location) {
         throw new Error('Location required');
       }
-      return await clientGet<LocationGateStatus>(
-        phase4Client,
-        '/verification/location/check',
-        { params: { lat: location.latitude, lng: location.longitude } }
-      );
+      return await clientGet<LocationGateStatus>(phase4Client, '/verification/location/check', {
+        params: { lat: location.latitude, lng: location.longitude },
+      });
     },
     enabled: !!location,
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -229,7 +228,7 @@ export function useLocationGate(location?: GeoLocation) {
  */
 export function useVerifyLocation() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<LocationGateStatus, Error, GeoLocation>({
     mutationFn: async (location: GeoLocation) => {
       const result = await clientPost<GeoLocation, LocationGateStatus>(
@@ -237,7 +236,7 @@ export function useVerifyLocation() {
         '/verification/location/verify',
         location
       );
-      logEvent('location_verified', { 
+      logEvent('location_verified', {
         allowed: result.allowed,
         state: result.state,
       });
@@ -256,11 +255,11 @@ export function useCurrentLocation() {
   const [location, setLocation] = useState<GeoLocation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const requestLocation = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // In React Native, we'd use expo-location or react-native-geolocation
       // This is a placeholder for the actual implementation
@@ -273,7 +272,17 @@ export function useCurrentLocation() {
         coords: GeoPositionCoords;
       }
       const position = await new Promise<GeoPosition>((resolve, reject) => {
-        const nav = globalThis.navigator as { geolocation?: { getCurrentPosition: (s: (p: GeoPosition) => void, e: (e: Error) => void, o: object) => void } } | undefined;
+        const nav = globalThis.navigator as
+          | {
+              geolocation?: {
+                getCurrentPosition: (
+                  s: (p: GeoPosition) => void,
+                  e: (e: Error) => void,
+                  o: object
+                ) => void;
+              };
+            }
+          | undefined;
         if (nav && 'geolocation' in nav && nav.geolocation) {
           nav.geolocation.getCurrentPosition(resolve, reject, {
             enableHighAccuracy: true,
@@ -284,13 +293,13 @@ export function useCurrentLocation() {
           reject(new Error('Geolocation not supported'));
         }
       });
-      
+
       const newLocation: GeoLocation = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         accuracy: position.coords.accuracy ?? undefined,
       };
-      
+
       setLocation(newLocation);
       return newLocation;
     } catch (err) {
@@ -301,7 +310,7 @@ export function useCurrentLocation() {
       setIsLoading(false);
     }
   }, []);
-  
+
   return {
     location,
     error,
@@ -318,26 +327,26 @@ export function useCurrentLocation() {
  * Hook to get regulations for a specific state
  */
 export function useStateRegulationsForVerification(stateCode: string) {
-  return useQuery<{
-    state: string;
-    stateCode: string;
-    legalStatus: 'recreational' | 'medical' | 'decriminalized' | 'illegal';
-    minAge: number;
-    medicalCardRequired: boolean;
-    purchaseLimits: Record<string, string>;
-    deliveryRules: {
-      allowed: boolean;
-      hoursOfOperation?: string;
-      idRequiredAtDelivery: boolean;
-    };
-    restrictions: string[];
-  }, Error>({
+  return useQuery<
+    {
+      state: string;
+      stateCode: string;
+      legalStatus: 'recreational' | 'medical' | 'decriminalized' | 'illegal';
+      minAge: number;
+      medicalCardRequired: boolean;
+      purchaseLimits: Record<string, string>;
+      deliveryRules: {
+        allowed: boolean;
+        hoursOfOperation?: string;
+        idRequiredAtDelivery: boolean;
+      };
+      restrictions: string[];
+    },
+    Error
+  >({
     queryKey: ['verification', 'regulations', stateCode],
     queryFn: async () => {
-      return await clientGet(
-        phase4Client,
-        `/verification/regulations/${stateCode}`
-      );
+      return await clientGet(phase4Client, `/verification/regulations/${stateCode}`);
     },
     enabled: !!stateCode,
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
@@ -359,10 +368,10 @@ export function useVerificationSession() {
     verifiedAt?: string;
     expiresAt?: string;
   } | null>(null);
-  
+
   useEffect(() => {
     // Load session from storage
-    AsyncStorage.getItem(VERIFICATION_SESSION_KEY).then((data) => {
+    AsyncStorage.getItem(VERIFICATION_SESSION_KEY).then(data => {
       if (data) {
         const parsed = JSON.parse(data);
         // Check if not expired
@@ -374,7 +383,7 @@ export function useVerificationSession() {
       }
     });
   }, []);
-  
+
   const saveSession = useCallback(async (verified: boolean, expiresAt: string) => {
     const newSession = {
       ageVerified: verified,
@@ -384,12 +393,12 @@ export function useVerificationSession() {
     await AsyncStorage.setItem(VERIFICATION_SESSION_KEY, JSON.stringify(newSession));
     setSession(newSession);
   }, []);
-  
+
   const clearSession = useCallback(async () => {
     await AsyncStorage.removeItem(VERIFICATION_SESSION_KEY);
     setSession(null);
   }, []);
-  
+
   return {
     session,
     isVerified: session?.ageVerified ?? false,
@@ -406,34 +415,37 @@ export function useVerificationSession() {
  * Hook to verify if delivery is allowed to an address
  */
 export function useDeliveryAddressVerification() {
-  return useMutation<{
-    allowed: boolean;
-    reason?: string;
-    restrictions?: string[];
-    alternativeOptions?: string[];
-  }, Error, {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  }>({
+  return useMutation<
+    {
+      allowed: boolean;
+      reason?: string;
+      restrictions?: string[];
+      alternativeOptions?: string[];
+    },
+    Error,
+    {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+    }
+  >({
     mutationFn: async (address: {
       street: string;
       city: string;
       state: string;
       zipCode: string;
     }) => {
-      const result = await clientPost<typeof address, {
-        allowed: boolean;
-        reason?: string;
-        restrictions?: string[];
-        alternativeOptions?: string[];
-      }>(
-        phase4Client,
-        '/verification/delivery-address',
-        address
-      );
-      logEvent('delivery_address_verified', { 
+      const result = await clientPost<
+        typeof address,
+        {
+          allowed: boolean;
+          reason?: string;
+          restrictions?: string[];
+          alternativeOptions?: string[];
+        }
+      >(phase4Client, '/verification/delivery-address', address);
+      logEvent('delivery_address_verified', {
         allowed: result.allowed,
         state: address.state,
       });

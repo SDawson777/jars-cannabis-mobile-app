@@ -56,7 +56,7 @@ export function useAddresses() {
  */
 export function useCreateAddress() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<Address, Error, CreateAddressPayload>({
     mutationFn: async (payload: CreateAddressPayload) => {
       const result = await clientPost<CreateAddressPayload, Address>(
@@ -78,7 +78,7 @@ export function useCreateAddress() {
  */
 export function useUpdateAddress() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<Address, Error, { id: string; data: Partial<CreateAddressPayload> }>({
     mutationFn: async ({ id, data }: { id: string; data: Partial<CreateAddressPayload> }) => {
       const result = await clientPost<Partial<CreateAddressPayload>, Address>(
@@ -99,7 +99,7 @@ export function useUpdateAddress() {
  */
 export function useDeleteAddress() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (addressId: string) => {
       await clientDelete<void>(phase4Client, `/addresses/${addressId}`);
@@ -131,7 +131,7 @@ export function useValidateAddress() {
  */
 export function useSetDefaultAddress() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (addressId: string) => {
       await clientPost<object, void>(phase4Client, `/addresses/${addressId}/default`, {});

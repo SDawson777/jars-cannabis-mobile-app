@@ -67,7 +67,7 @@ export default function HomeScreen() {
   const { preferredStore } = useStore();
   const { data: forYou, isLoading } = useForYouToday(user?.id, preferredStore?.id);
   const { data: deals } = useDeals();
-  
+
   // Use CMS hooks instead of stubbed endpoints
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const { data: ways = [], isLoading: waysLoading } = useWaysToShop(user?.id);
@@ -90,21 +90,27 @@ export default function HomeScreen() {
   );
 
   // Pulse animations for key CTAs
-  const terpeneWheelPulse = usePulseCTA(() => {
-    trackContentClick('feature', 'terpene_wheel');
-    navigation.navigate('TerpeneWheel');
-  }, {
-    maxScale: 1.02,
-    duration: 200,
-  });
+  const terpeneWheelPulse = usePulseCTA(
+    () => {
+      trackContentClick('feature', 'terpene_wheel');
+      navigation.navigate('TerpeneWheel');
+    },
+    {
+      maxScale: 1.02,
+      duration: 200,
+    }
+  );
 
-  const shopCTAPulse = usePulseCTA(() => {
-    trackContentClick('cta', 'shop_now');
-    navigation.navigate('ShopScreen');
-  }, {
-    maxScale: 1.02,
-    duration: 200,
-  });
+  const shopCTAPulse = usePulseCTA(
+    () => {
+      trackContentClick('cta', 'shop_now');
+      navigation.navigate('ShopScreen');
+    },
+    {
+      maxScale: 1.02,
+      duration: 200,
+    }
+  );
 
   // Basic lightweight weather condition placeholder. In future, integrate real weather API.
   const [weatherCondition, setWeatherCondition] = useState<string | null>(null);

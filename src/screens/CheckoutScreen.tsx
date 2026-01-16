@@ -59,20 +59,28 @@ export default function CheckoutScreen() {
 
   // Get cart items for analytics
   const cartItems = useCartStore(
-    (state: { items: { id: string; quantity: number; price?: number; [key: string]: any }[] }) => state.items
+    (state: { items: { id: string; quantity: number; price?: number; [key: string]: any }[] }) =>
+      state.items
   );
-  const cartTotal = cartItems.reduce((sum: number, item: any) => sum + (item.price || 0) * item.quantity, 0);
+  const cartTotal = cartItems.reduce(
+    (sum: number, item: any) => sum + (item.price || 0) * item.quantity,
+    0
+  );
   const cartItemCount = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
 
   // Track screen view on mount (begin_checkout)
   useFocusEffect(
     useCallback(() => {
       trackScreenView('CheckoutScreen', { step: 0, item_count: cartItemCount });
-      trackCommerceEvent('begin_checkout', cartItems.map((item: any) => ({
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price
-      })), { total: cartTotal });
+      trackCommerceEvent(
+        'begin_checkout',
+        cartItems.map((item: any) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        { total: cartTotal }
+      );
     }, [cartItemCount, cartTotal])
   );
 
@@ -86,19 +94,23 @@ export default function CheckoutScreen() {
   const createOrder = useCreateOrder({
     onSuccess: order => {
       hapticMedium();
-      
+
       // Track purchase event
-      trackCommerceEvent('purchase', cartItems.map((item: any) => ({
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price
-      })), { 
-        order_id: order.id, 
-        total: cartTotal,
-        payment_method: payment === 'online' ? 'card' : 'pay_at_pickup',
-        delivery_method: method
-      });
-      
+      trackCommerceEvent(
+        'purchase',
+        cartItems.map((item: any) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        {
+          order_id: order.id,
+          total: cartTotal,
+          payment_method: payment === 'online' ? 'card' : 'pay_at_pickup',
+          delivery_method: method,
+        }
+      );
+
       // Clear cart store (local) since backend empties cart
       try {
         const { setItems } = useCartStore.getState() as any;
@@ -111,7 +123,7 @@ export default function CheckoutScreen() {
     onError: err => {
       hapticHeavy();
       console.log('Order error:', err?.response?.data);
-      
+
       // Track checkout error
       logEvent('checkout_error', { error: err?.response?.data?.error || 'unknown' });
 

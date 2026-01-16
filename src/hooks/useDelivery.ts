@@ -39,7 +39,14 @@ export interface DeliveryEstimate {
 export interface OrderTracking {
   orderId: string;
   orderNumber: string;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled';
+  status:
+    | 'pending'
+    | 'confirmed'
+    | 'preparing'
+    | 'ready'
+    | 'out_for_delivery'
+    | 'delivered'
+    | 'cancelled';
   statusHistory: {
     status: string;
     timestamp: string;
@@ -86,7 +93,7 @@ export function useDeliveryWindows(addressId: string, date?: string) {
       const params = new URLSearchParams();
       params.append('addressId', addressId);
       if (date) params.append('date', date);
-      
+
       const res = await clientGet<{ windows: DeliveryWindow[] }>(
         phase4Client,
         `/delivery/windows?${params}`
@@ -107,7 +114,7 @@ export function usePickupWindows(storeId: string, date?: string) {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (date) params.append('date', date);
-      
+
       const res = await clientGet<{ windows: PickupWindow[] }>(
         phase4Client,
         `/stores/${storeId}/pickup-windows?${params}`
@@ -129,7 +136,7 @@ export function useDeliveryEstimate(addressId: string, cartTotal?: number) {
       const params = new URLSearchParams();
       params.append('addressId', addressId);
       if (cartTotal !== undefined) params.append('cartTotal', String(cartTotal));
-      
+
       return clientGet<DeliveryEstimate>(phase4Client, `/delivery/estimate?${params}`);
     },
     enabled: !!addressId,
@@ -142,7 +149,7 @@ export function useDeliveryEstimate(addressId: string, cartTotal?: number) {
  */
 export function useScheduleDelivery() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<ScheduledDelivery, Error, { orderId: string; windowId: string }>({
     mutationFn: async ({ orderId, windowId }: { orderId: string; windowId: string }) => {
       const result = await clientPost<{ orderId: string; windowId: string }, ScheduledDelivery>(
@@ -165,18 +172,32 @@ export function useScheduleDelivery() {
  */
 export function useSchedulePickup() {
   const queryClient = useQueryClient();
-  
-  return useMutation<ScheduledDelivery, Error, { orderId: string; storeId: string; windowId: string }>({
-    mutationFn: async ({ orderId, storeId, windowId }: { orderId: string; storeId: string; windowId: string }) => {
-      const result = await clientPost<{ orderId: string; storeId: string; windowId: string }, ScheduledDelivery>(
-        phase4Client,
-        '/pickup/schedule',
-        { orderId, storeId, windowId }
-      );
+
+  return useMutation<
+    ScheduledDelivery,
+    Error,
+    { orderId: string; storeId: string; windowId: string }
+  >({
+    mutationFn: async ({
+      orderId,
+      storeId,
+      windowId,
+    }: {
+      orderId: string;
+      storeId: string;
+      windowId: string;
+    }) => {
+      const result = await clientPost<
+        { orderId: string; storeId: string; windowId: string },
+        ScheduledDelivery
+      >(phase4Client, '/pickup/schedule', { orderId, storeId, windowId });
       logEvent('pickup_scheduled', { orderId, storeId, windowId });
       return result;
     },
-    onSuccess: (_data: ScheduledDelivery, variables: { orderId: string; storeId: string; windowId: string }) => {
+    onSuccess: (
+      _data: ScheduledDelivery,
+      variables: { orderId: string; storeId: string; windowId: string }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['orders', variables.orderId] });
       queryClient.invalidateQueries({ queryKey: ['pickup'] });
     },
@@ -202,13 +223,16 @@ export function useOrderTracking(orderId: string) {
  * Hook to get live driver location (for active deliveries)
  */
 export function useDriverLocation(orderId: string, enabled: boolean = true) {
-  return useQuery<{
-    latitude: number;
-    longitude: number;
-    heading?: number;
-    eta?: string;
-    updatedAt: string;
-  }, Error>({
+  return useQuery<
+    {
+      latitude: number;
+      longitude: number;
+      heading?: number;
+      eta?: string;
+      updatedAt: string;
+    },
+    Error
+  >({
     queryKey: ['orders', orderId, 'driver-location'],
     queryFn: async () => {
       return clientGet(phase4Client, `/orders/${orderId}/driver-location`);
@@ -224,7 +248,7 @@ export function useDriverLocation(orderId: string, enabled: boolean = true) {
  */
 export function useUpdateDeliveryInstructions() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { orderId: string; instructions: string }>({
     mutationFn: async ({ orderId, instructions }: { orderId: string; instructions: string }) => {
       await clientPost<{ instructions: string }, void>(
@@ -244,9 +268,17 @@ export function useUpdateDeliveryInstructions() {
  */
 export function useConfirmDelivery() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { orderId: string; signature?: string; rating?: number }>({
-    mutationFn: async ({ orderId, signature, rating }: { orderId: string; signature?: string; rating?: number }) => {
+    mutationFn: async ({
+      orderId,
+      signature,
+      rating,
+    }: {
+      orderId: string;
+      signature?: string;
+      rating?: number;
+    }) => {
       await clientPost<{ signature?: string; rating?: number }, void>(
         phase4Client,
         `/orders/${orderId}/confirm-delivery`,
@@ -254,7 +286,10 @@ export function useConfirmDelivery() {
       );
       logEvent('delivery_confirmed', { orderId, hasRating: !!rating });
     },
-    onSuccess: (_data: void, variables: { orderId: string; signature?: string; rating?: number }) => {
+    onSuccess: (
+      _data: void,
+      variables: { orderId: string; signature?: string; rating?: number }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['orders', variables.orderId] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },

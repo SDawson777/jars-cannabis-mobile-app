@@ -33,14 +33,14 @@ searchRouter.get('/search/products', optionalAuth, async (req: Request, res: Res
     onSale: _onSale,
     sort = 'relevance',
   } = req.query;
-  
+
   try {
     const pageNum = parseInt(page as string);
     const limitNum = Math.min(100, parseInt(limit as string));
-    
+
     // Build query (in production, use Algolia/Elasticsearch)
     const where: any = {};
-    
+
     if (q) {
       where.OR = [
         { name: { contains: q as string, mode: 'insensitive' } },
@@ -48,7 +48,7 @@ searchRouter.get('/search/products', optionalAuth, async (req: Request, res: Res
         { brand: { contains: q as string, mode: 'insensitive' } },
       ];
     }
-    
+
     if (category) where.category = category;
     if (subcategory) where.subcategory = subcategory;
     if (strainType) where.strainType = strainType;
@@ -57,21 +57,25 @@ searchRouter.get('/search/products', optionalAuth, async (req: Request, res: Res
       if (priceMin) where.defaultPrice.gte = parseFloat(priceMin as string);
       if (priceMax) where.defaultPrice.lte = parseFloat(priceMax as string);
     }
-    
+
     // Get products
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
         take: limitNum,
         skip: (pageNum - 1) * limitNum,
-        orderBy: sort === 'price_asc' ? { defaultPrice: 'asc' } 
-               : sort === 'price_desc' ? { defaultPrice: 'desc' }
-               : sort === 'newest' ? { createdAt: 'desc' }
-               : { name: 'asc' },
+        orderBy:
+          sort === 'price_asc'
+            ? { defaultPrice: 'asc' }
+            : sort === 'price_desc'
+              ? { defaultPrice: 'desc' }
+              : sort === 'newest'
+                ? { createdAt: 'desc' }
+                : { name: 'asc' },
       }),
       prisma.product.count({ where }),
     ]);
-    
+
     // Transform results
     const results = products.map(p => ({
       id: p.id,
@@ -85,7 +89,7 @@ searchRouter.get('/search/products', optionalAuth, async (req: Request, res: Res
       inStock: true, // Would check inventory in production
       matchScore: q ? 0.9 : undefined,
     }));
-    
+
     // Generate facets (simplified)
     const facets = {
       categories: [
@@ -126,7 +130,7 @@ searchRouter.get('/search/products', optionalAuth, async (req: Request, res: Res
         { min: 30, max: 100, count: 15 },
       ],
     };
-    
+
     res.json({
       results,
       total,
@@ -148,15 +152,15 @@ searchRouter.get('/search/products', optionalAuth, async (req: Request, res: Res
  */
 searchRouter.get('/search/suggest', optionalAuth, async (req: Request, res: Response) => {
   const { q } = req.query;
-  
+
   if (!q || (q as string).length < 2) {
     return res.json({ suggestions: [] });
   }
-  
+
   try {
     // In production, use search service for suggestions
     const query = (q as string).toLowerCase();
-    
+
     const suggestions = [
       { type: 'product', text: `${q} Cartridge`, slug: 'blue-dream-cartridge' },
       { type: 'product', text: `${q} Flower`, slug: 'blue-dream-flower' },
@@ -165,7 +169,7 @@ searchRouter.get('/search/suggest', optionalAuth, async (req: Request, res: Resp
       { type: 'effect', text: 'Relaxed', slug: 'relaxed' },
       { type: 'query', text: `${q} indica` },
     ].filter(s => s.text.toLowerCase().includes(query));
-    
+
     res.json({ suggestions: suggestions.slice(0, 8) });
   } catch (error) {
     console.error('Suggest error:', error);
@@ -199,18 +203,18 @@ searchRouter.get('/search/trending', async (_req: Request, res: Response) => {
  */
 searchRouter.get('/search/by-effect', optionalAuth, async (req: Request, res: Response) => {
   const { effect, limit = '20' } = req.query;
-  
+
   if (!effect) {
     return res.status(400).json({ error: 'effect parameter is required' });
   }
-  
+
   try {
     // In production, query products with matching effect tags
     const products = await prisma.product.findMany({
       take: parseInt(limit as string),
       orderBy: { name: 'asc' },
     });
-    
+
     const results = products.map(p => ({
       id: p.id,
       name: p.name,
@@ -220,7 +224,7 @@ searchRouter.get('/search/by-effect', optionalAuth, async (req: Request, res: Re
       imageUrl: p.imageUrl,
       inStock: true,
     }));
-    
+
     res.json({ results });
   } catch (error) {
     console.error('Search by effect error:', error);
@@ -234,18 +238,18 @@ searchRouter.get('/search/by-effect', optionalAuth, async (req: Request, res: Re
  */
 searchRouter.get('/search/by-terpenes', optionalAuth, async (req: Request, res: Response) => {
   const { terpenes, limit = '20' } = req.query;
-  
+
   if (!terpenes) {
     return res.status(400).json({ error: 'terpenes parameter is required' });
   }
-  
+
   try {
     // In production, query products with matching terpene profiles
     const products = await prisma.product.findMany({
       take: parseInt(limit as string),
       orderBy: { name: 'asc' },
     });
-    
+
     const results = products.map(p => ({
       id: p.id,
       name: p.name,
@@ -255,7 +259,7 @@ searchRouter.get('/search/by-terpenes', optionalAuth, async (req: Request, res: 
       imageUrl: p.imageUrl,
       inStock: true,
     }));
-    
+
     res.json({ results });
   } catch (error) {
     console.error('Search by terpenes error:', error);

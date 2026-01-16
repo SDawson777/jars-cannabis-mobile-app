@@ -120,7 +120,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Fetch CMS theme on mount
   useEffect(() => {
     let cancelled = false;
-    
+
     (async () => {
       try {
         // Try to load cached theme first for faster startup
@@ -135,11 +135,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           `${API_BASE_URL}/content/theme?brand=${brandSlug}`,
           { retries: 2 }
         );
-        
+
         if (!cancelled && themeData) {
           setCmsTheme(themeData);
           await AsyncStorage.setItem(CMS_THEME_CACHE_KEY, JSON.stringify(themeData));
-          
+
           logEvent('cms_theme_loaded', {
             brandSlug: themeData.brandSlug,
             darkModeEnabled: themeData.darkModeEnabled,
@@ -152,7 +152,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         }
       }
     })();
-    
+
     return () => {
       cancelled = true;
     };
@@ -422,7 +422,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Use CMS theme's darkModeEnabled setting if available, otherwise fall back to system
   const systemDark = Appearance.getColorScheme() === 'dark';
   const isDark = cmsTheme?.darkModeEnabled ?? systemDark;
-  
+
   // Helper function to darken colors for dark mode
   const adjustColorForDarkMode = (color: string) => {
     // Simple approach: if in dark mode, darken the color by reducing the brightness
@@ -439,9 +439,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   // Resolve colors: prefer CMS theme, fallback to brand context, then defaults
-  const resolvedPrimary = cmsTheme?.primaryColor || brand.primaryColor || DEFAULT_CMS_THEME.primaryColor;
-  const resolvedSecondary = cmsTheme?.secondaryColor || brand.secondaryColor || DEFAULT_CMS_THEME.secondaryColor;
-  const resolvedBackground = cmsTheme?.backgroundColor || DEFAULT_CMS_THEME.backgroundColor || '#F9F9F9';
+  const resolvedPrimary =
+    cmsTheme?.primaryColor || brand.primaryColor || DEFAULT_CMS_THEME.primaryColor;
+  const resolvedSecondary =
+    cmsTheme?.secondaryColor || brand.secondaryColor || DEFAULT_CMS_THEME.secondaryColor;
+  const resolvedBackground =
+    cmsTheme?.backgroundColor || DEFAULT_CMS_THEME.backgroundColor || '#F9F9F9';
   const resolvedAccent = cmsTheme?.accentColor || DEFAULT_CMS_THEME.accentColor || '#FFD700';
 
   const value: ThemeContextValue = {

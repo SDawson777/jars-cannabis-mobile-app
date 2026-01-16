@@ -14,32 +14,32 @@ export interface NotificationPreferences {
   orderReady: boolean;
   orderOutForDelivery: boolean;
   orderDelivered: boolean;
-  
+
   // Deals & promotions
   dailyDeals: boolean;
   flashSales: boolean;
   personalizedOffers: boolean;
   newProductAlerts: boolean;
-  
+
   // Loyalty & rewards
   pointsEarned: boolean;
   rewardsAvailable: boolean;
   tierUpgrade: boolean;
   pointsExpiring: boolean;
-  
+
   // Compliance & safety
   recallAlerts: boolean;
   complianceUpdates: boolean;
-  
+
   // Account
   securityAlerts: boolean;
   accountUpdates: boolean;
-  
+
   // Engagement
   backInStock: boolean;
   priceDrops: boolean;
   recommendationsDigest: boolean;
-  
+
   // Quiet hours
   quietHoursEnabled: boolean;
   quietHoursStart?: string; // HH:mm format
@@ -126,7 +126,7 @@ export function useNotificationPreferences() {
  */
 export function useUpdateNotificationPreferences() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<NotificationPreferences, Error, Partial<NotificationPreferences>>({
     mutationFn: async (updates: Partial<NotificationPreferences>) => {
       const result = await clientPost<Partial<NotificationPreferences>, NotificationPreferences>(
@@ -167,9 +167,21 @@ export function useNotificationChannels() {
  */
 export function useToggleNotificationChannel() {
   const queryClient = useQueryClient();
-  
-  return useMutation<void, Error, { channelId: string; enabled: boolean; method?: 'push' | 'email' | 'sms' }>({
-    mutationFn: async ({ channelId, enabled, method }: { channelId: string; enabled: boolean; method?: 'push' | 'email' | 'sms' }) => {
+
+  return useMutation<
+    void,
+    Error,
+    { channelId: string; enabled: boolean; method?: 'push' | 'email' | 'sms' }
+  >({
+    mutationFn: async ({
+      channelId,
+      enabled,
+      method,
+    }: {
+      channelId: string;
+      enabled: boolean;
+      method?: 'push' | 'email' | 'sms';
+    }) => {
       await clientPost<{ enabled: boolean; method?: string }, void>(
         phase4Client,
         `/notifications/channels/${channelId}/toggle`,
@@ -189,21 +201,24 @@ export function useToggleNotificationChannel() {
 export function useQuietHours() {
   const { data: preferences } = useNotificationPreferences();
   const updatePreferences = useUpdateNotificationPreferences();
-  
-  const setQuietHours = useCallback(async (start: string, end: string) => {
-    await updatePreferences.mutateAsync({
-      quietHoursEnabled: true,
-      quietHoursStart: start,
-      quietHoursEnd: end,
-    });
-  }, [updatePreferences]);
-  
+
+  const setQuietHours = useCallback(
+    async (start: string, end: string) => {
+      await updatePreferences.mutateAsync({
+        quietHoursEnabled: true,
+        quietHoursStart: start,
+        quietHoursEnd: end,
+      });
+    },
+    [updatePreferences]
+  );
+
   const disableQuietHours = useCallback(async () => {
     await updatePreferences.mutateAsync({
       quietHoursEnabled: false,
     });
   }, [updatePreferences]);
-  
+
   return {
     enabled: preferences?.quietHoursEnabled || false,
     start: preferences?.quietHoursStart,
@@ -220,7 +235,9 @@ export function useQuietHours() {
 export function useSubscribeToTopic() {
   return useMutation<void, Error, string>({
     mutationFn: async (topic: string) => {
-      await clientPost<{ topic: string }, void>(phase4Client, '/notifications/subscribe', { topic });
+      await clientPost<{ topic: string }, void>(phase4Client, '/notifications/subscribe', {
+        topic,
+      });
       logEvent('notification_topic_subscribed', { topic });
     },
   });
@@ -232,7 +249,9 @@ export function useSubscribeToTopic() {
 export function useUnsubscribeFromTopic() {
   return useMutation<void, Error, string>({
     mutationFn: async (topic: string) => {
-      await clientPost<{ topic: string }, void>(phase4Client, '/notifications/unsubscribe', { topic });
+      await clientPost<{ topic: string }, void>(phase4Client, '/notifications/unsubscribe', {
+        topic,
+      });
       logEvent('notification_topic_unsubscribed', { topic });
     },
   });
@@ -243,7 +262,7 @@ export function useUnsubscribeFromTopic() {
  */
 export function useNotificationHistory() {
   const [notifications, setNotifications] = useState<ScheduledNotification[]>([]);
-  
+
   const fetchHistory = useCallback(async () => {
     try {
       const res = await clientGet<{ notifications: ScheduledNotification[] }>(
@@ -255,7 +274,7 @@ export function useNotificationHistory() {
       // Silent fail
     }
   }, []);
-  
+
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
       await clientPost<object, void>(phase4Client, `/notifications/${notificationId}/read`, {});
@@ -264,7 +283,7 @@ export function useNotificationHistory() {
       // Silent fail
     }
   }, []);
-  
+
   const markAllAsRead = useCallback(async () => {
     try {
       await clientPost<object, void>(phase4Client, '/notifications/read-all', {});
@@ -273,7 +292,7 @@ export function useNotificationHistory() {
       // Silent fail
     }
   }, []);
-  
+
   return {
     notifications,
     fetchHistory,

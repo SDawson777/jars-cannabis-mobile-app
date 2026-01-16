@@ -12,13 +12,13 @@ const router = Router();
 router.post('/process', async (req: Request, res: Response) => {
   try {
     const { transcript, context: _context } = req.body;
-    
+
     // Simple intent detection (in production, use NLP service)
     let intent = 'unknown';
     let entities: Record<string, unknown> = {};
-    
+
     const lowerTranscript = transcript.toLowerCase();
-    
+
     if (lowerTranscript.includes('search') || lowerTranscript.includes('find')) {
       intent = 'search_products';
       const match = lowerTranscript.match(/(?:search|find)\s+(?:for\s+)?(.+)/);
@@ -40,7 +40,7 @@ router.post('/process', async (req: Request, res: Response) => {
     } else if (lowerTranscript.includes('help')) {
       intent = 'help';
     }
-    
+
     res.json({
       id: `cmd-${Date.now()}`,
       transcript,
@@ -191,21 +191,26 @@ router.post('/google/actions', async (req: Request, res: Response) => {
 function getResponseForIntent(intent: string): string {
   const responses: Record<string, string> = {
     search_products: 'I found some products for you.',
-    add_to_cart: 'I\'ve added that to your cart.',
-    view_cart: 'Here\'s what\'s in your cart.',
+    add_to_cart: "I've added that to your cart.",
+    view_cart: "Here's what's in your cart.",
     checkout: 'Let me start the checkout process for you.',
     reorder: 'I can help you reorder your last purchase.',
     track_order: 'Let me check on your order status.',
     store_hours: 'Our store is open from 9 AM to 9 PM today.',
-    recommendation: 'Based on your preferences, I\'d recommend trying...',
+    recommendation: "Based on your preferences, I'd recommend trying...",
     help: 'I can help you search products, manage your cart, track orders, or get recommendations.',
-    unknown: 'I\'m not sure I understood that. Could you try again?',
+    unknown: "I'm not sure I understood that. Could you try again?",
   };
   return responses[intent] || responses.unknown;
 }
 
-function getActionsForIntent(intent: string): Array<{ type: string; label: string; payload: Record<string, unknown> }> {
-  const actions: Record<string, Array<{ type: string; label: string; payload: Record<string, unknown> }>> = {
+function getActionsForIntent(
+  intent: string
+): Array<{ type: string; label: string; payload: Record<string, unknown> }> {
+  const actions: Record<
+    string,
+    Array<{ type: string; label: string; payload: Record<string, unknown> }>
+  > = {
     view_cart: [{ type: 'navigate', label: 'View Cart', payload: { screen: 'Cart' } }],
     checkout: [{ type: 'navigate', label: 'Checkout', payload: { screen: 'Checkout' } }],
     reorder: [{ type: 'add_to_cart', label: 'Reorder', payload: { fromLastOrder: true } }],

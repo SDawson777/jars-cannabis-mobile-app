@@ -114,7 +114,10 @@ export function useLoyaltyRewards(category?: string) {
     queryKey: ['loyalty', 'rewards', category],
     queryFn: async () => {
       const params = category ? `?category=${category}` : '';
-      const res = await clientGet<{ rewards: LoyaltyReward[] }>(phase4Client, `/loyalty/rewards${params}`);
+      const res = await clientGet<{ rewards: LoyaltyReward[] }>(
+        phase4Client,
+        `/loyalty/rewards${params}`
+      );
       return res.rewards || [];
     },
     staleTime: 10 * 60 * 1000,
@@ -126,14 +129,13 @@ export function useLoyaltyRewards(category?: string) {
  */
 export function useRedeemReward() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ couponCode: string; expiresAt: string }, Error, string>({
     mutationFn: async (rewardId: string) => {
-      const result = await clientPost<{ rewardId: string }, { couponCode: string; expiresAt: string }>(
-        phase4Client,
-        '/loyalty/redeem',
-        { rewardId }
-      );
+      const result = await clientPost<
+        { rewardId: string },
+        { couponCode: string; expiresAt: string }
+      >(phase4Client, '/loyalty/redeem', { rewardId });
       logEvent('loyalty_reward_redeemed', { rewardId });
       return result;
     },
@@ -149,17 +151,24 @@ export function useRedeemReward() {
  * Hook to fetch loyalty transaction history
  */
 export function useLoyaltyTransactions(type?: LoyaltyTransaction['type']) {
-  return useInfiniteQuery<{ transactions: LoyaltyTransaction[]; hasMore: boolean; nextCursor?: string }, Error>({
+  return useInfiniteQuery<
+    { transactions: LoyaltyTransaction[]; hasMore: boolean; nextCursor?: string },
+    Error
+  >({
     queryKey: ['loyalty', 'transactions', type],
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const params = new URLSearchParams();
       if (type) params.append('type', type);
       if (pageParam) params.append('cursor', pageParam);
       params.append('limit', '20');
-      
+
       return clientGet(phase4Client, `/loyalty/transactions?${params}`);
     },
-    getNextPageParam: (lastPage: { transactions: LoyaltyTransaction[]; hasMore: boolean; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: {
+      transactions: LoyaltyTransaction[];
+      hasMore: boolean;
+      nextCursor?: string;
+    }) => lastPage.nextCursor,
     initialPageParam: undefined,
     staleTime: 2 * 60 * 1000,
   });
@@ -200,7 +209,7 @@ export function useSendReferral() {
  */
 export function useApplyReferralCode() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ success: boolean; bonusPoints: number }, Error, string>({
     mutationFn: async (code: string) => {
       const result = await clientPost<{ code: string }, { success: boolean; bonusPoints: number }>(
@@ -225,7 +234,10 @@ export function useDigitalCoupons(includeUsed: boolean = false) {
     queryKey: ['wallet', 'coupons', includeUsed],
     queryFn: async () => {
       const params = includeUsed ? '?includeUsed=true' : '';
-      const res = await clientGet<{ coupons: DigitalCoupon[] }>(phase4Client, `/wallet/coupons${params}`);
+      const res = await clientGet<{ coupons: DigitalCoupon[] }>(
+        phase4Client,
+        `/wallet/coupons${params}`
+      );
       return res.coupons || [];
     },
     staleTime: 5 * 60 * 1000,
@@ -237,7 +249,7 @@ export function useDigitalCoupons(includeUsed: boolean = false) {
  */
 export function useClipCoupon() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<DigitalCoupon, Error, string>({
     mutationFn: async (couponId: string) => {
       const result = await clientPost<{ couponId: string }, DigitalCoupon>(
@@ -259,11 +271,11 @@ export function useClipCoupon() {
  */
 export function useCalculatePoints(cartTotal: number) {
   const { data: profile } = useLoyaltyProfile();
-  
+
   const basePoints = Math.floor(cartTotal);
   const multiplier = profile?.tier?.multiplier || 1;
   const earnedPoints = Math.floor(basePoints * multiplier);
-  
+
   return {
     basePoints,
     multiplier,

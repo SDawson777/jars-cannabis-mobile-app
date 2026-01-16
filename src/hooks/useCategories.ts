@@ -61,10 +61,10 @@ async function fetchCategories(): Promise<Category[]> {
   try {
     const res = await cmsClient.get<any[]>('/content/filters');
     const categories = transformCategories(res.data || []);
-    
+
     // Sort by weight descending
     categories.sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0));
-    
+
     // Cache for offline use
     await AsyncStorage.setItem(cacheKey, JSON.stringify(categories));
     return categories;

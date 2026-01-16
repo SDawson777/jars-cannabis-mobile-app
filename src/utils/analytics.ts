@@ -21,7 +21,7 @@ async function generateSignature(payload: string): Promise<string> {
   if (!ANALYTICS_SECRET) {
     return '';
   }
-  
+
   try {
     // Use expo-crypto for HMAC-SHA256
     const digest = await Crypto.digestStringAsync(
@@ -67,7 +67,7 @@ export function logEvent(name: string, data: Record<string, any>) {
  */
 function sanitizeData(data: Record<string, any>): Record<string, any> {
   const sanitized = { ...data };
-  
+
   // Remove common PII fields
   const piiFields = ['email', 'phone', 'password', 'ssn', 'address', 'creditCard', 'cardNumber'];
   piiFields.forEach(field => {
@@ -75,7 +75,7 @@ function sanitizeData(data: Record<string, any>): Record<string, any> {
       delete sanitized[field];
     }
   });
-  
+
   return sanitized;
 }
 
@@ -97,20 +97,24 @@ async function flushEvents() {
 
   try {
     const authToken = await getAuthToken();
-    
+
     // Send events individually (backend expects single event per request)
     for (const evt of events) {
-      const payload = JSON.stringify({ event: evt.event, data: evt.data, timestamp: evt.timestamp });
+      const payload = JSON.stringify({
+        event: evt.event,
+        data: evt.data,
+        timestamp: evt.timestamp,
+      });
       const signature = await generateSignature(payload);
-      
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      
+
       if (signature) {
         headers['x-analytics-signature'] = signature;
       }
-      
+
       if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
@@ -138,7 +142,11 @@ async function flushEvents() {
 /**
  * Track a content view event
  */
-export function trackContentView(contentType: string, contentId: string, metadata?: Record<string, any>) {
+export function trackContentView(
+  contentType: string,
+  contentId: string,
+  metadata?: Record<string, any>
+) {
   logEvent('content_view', {
     contentType,
     contentId,
@@ -149,7 +157,11 @@ export function trackContentView(contentType: string, contentId: string, metadat
 /**
  * Track a content click event
  */
-export function trackContentClick(contentType: string, contentId: string, metadata?: Record<string, any>) {
+export function trackContentClick(
+  contentType: string,
+  contentId: string,
+  metadata?: Record<string, any>
+) {
   logEvent('content_click', {
     contentType,
     contentId,
@@ -176,14 +188,14 @@ export function trackCommerceEvent(
   metadata?: Record<string, any>
 ) {
   const eventData: Record<string, any> = { ...metadata };
-  
+
   if (typeof productIdOrItems === 'string') {
     eventData.productId = productIdOrItems;
   } else if (Array.isArray(productIdOrItems)) {
     eventData.items = productIdOrItems;
     eventData.item_count = productIdOrItems.length;
   }
-  
+
   logEvent(`commerce_${action}`, eventData);
 }
 

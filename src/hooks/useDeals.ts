@@ -9,7 +9,7 @@ const CACHE_KEY = 'cms:deals';
 
 async function fetchDeals(): Promise<CMSDeal[]> {
   const state = await NetInfo.fetch();
-  
+
   if (!state.isConnected) {
     const cached = await AsyncStorage.getItem(CACHE_KEY);
     if (cached) {
@@ -20,7 +20,7 @@ async function fetchDeals(): Promise<CMSDeal[]> {
 
   try {
     const res = await cmsClient.get<CMSDeal[] | { items: CMSDeal[] }>('/content/deals');
-    const deals = Array.isArray(res.data) ? res.data : res.data.items ?? [];
+    const deals = Array.isArray(res.data) ? res.data : (res.data.items ?? []);
     await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(deals));
     return deals;
   } catch (err) {

@@ -41,7 +41,7 @@ export interface Article {
   relatedArticles?: string[];
 }
 
-export type ArticleCategory = 
+export type ArticleCategory =
   | 'education'
   | 'recipes'
   | 'wellness'
@@ -175,7 +175,8 @@ export function useArticles(options?: {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { articles: Article[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { articles: Article[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -186,10 +187,7 @@ export function useArticle(slug: string) {
   return useQuery<Article, Error>({
     queryKey: ['education', 'article', slug],
     queryFn: async () => {
-      const article = await clientGet<Article>(
-        phase4Client,
-        `/education/articles/${slug}`
-      );
+      const article = await clientGet<Article>(phase4Client, `/education/articles/${slug}`);
       logEvent('article_viewed', { articleId: article.id, category: article.category });
       return article;
     },
@@ -219,7 +217,7 @@ export function useFeaturedArticles() {
  */
 export function useLikeArticle() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { articleId: string; like: boolean }>({
     mutationFn: async ({ articleId, like }: { articleId: string; like: boolean }) => {
       await clientPost<{ like: boolean }, void>(
@@ -240,7 +238,7 @@ export function useLikeArticle() {
  */
 export function useSaveArticle() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { articleId: string; save: boolean }>({
     mutationFn: async ({ articleId, save }: { articleId: string; save: boolean }) => {
       await clientPost<{ save: boolean }, void>(
@@ -306,10 +304,7 @@ export function useRecipe(slug: string) {
   return useQuery<Recipe, Error>({
     queryKey: ['education', 'recipe', slug],
     queryFn: async () => {
-      const recipe = await clientGet<Recipe>(
-        phase4Client,
-        `/education/recipes/${slug}`
-      );
+      const recipe = await clientGet<Recipe>(phase4Client, `/education/recipes/${slug}`);
       logEvent('recipe_viewed', { recipeId: recipe.id, difficulty: recipe.difficulty });
       return recipe;
     },
@@ -339,7 +334,7 @@ export function useFeaturedRecipes() {
  */
 export function useSaveRecipe() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { recipeId: string; save: boolean }>({
     mutationFn: async ({ recipeId, save }: { recipeId: string; save: boolean }) => {
       await clientPost<{ save: boolean }, void>(
@@ -387,10 +382,7 @@ export function useWellnessRoutine(slug: string) {
   return useQuery<WellnessRoutine, Error>({
     queryKey: ['education', 'wellness', slug],
     queryFn: async () => {
-      return await clientGet<WellnessRoutine>(
-        phase4Client,
-        `/education/wellness/${slug}`
-      );
+      return await clientGet<WellnessRoutine>(phase4Client, `/education/wellness/${slug}`);
     },
     enabled: !!slug,
   });
@@ -401,7 +393,7 @@ export function useWellnessRoutine(slug: string) {
  */
 export function useStartRoutine() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ trackingId: string }, Error, string>({
     mutationFn: async (routineId: string) => {
       const result = await clientPost<{ routineId: string }, { trackingId: string }>(
@@ -470,10 +462,7 @@ export function useLearningProgress() {
   return useQuery<LearningProgress, Error>({
     queryKey: ['education', 'progress'],
     queryFn: async () => {
-      return await clientGet<LearningProgress>(
-        phase4Client,
-        '/education/progress'
-      );
+      return await clientGet<LearningProgress>(phase4Client, '/education/progress');
     },
   });
 }
@@ -483,24 +472,24 @@ export function useLearningProgress() {
  */
 export function useTrackProgress() {
   const queryClient = useQueryClient();
-  
-  return useMutation<void, Error, {
-    contentType: 'article' | 'recipe' | 'routine';
-    contentId: string;
-    timeSpent: number; // seconds
-    completed: boolean;
-  }>({
+
+  return useMutation<
+    void,
+    Error,
+    {
+      contentType: 'article' | 'recipe' | 'routine';
+      contentId: string;
+      timeSpent: number; // seconds
+      completed: boolean;
+    }
+  >({
     mutationFn: async (progress: {
       contentType: 'article' | 'recipe' | 'routine';
       contentId: string;
       timeSpent: number;
       completed: boolean;
     }) => {
-      await clientPost<typeof progress, void>(
-        phase4Client,
-        '/education/progress/track',
-        progress
-      );
+      await clientPost<typeof progress, void>(phase4Client, '/education/progress/track', progress);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['education', 'progress'] });
@@ -516,22 +505,27 @@ export function useTrackProgress() {
  * Hook to fetch content categories
  */
 export function useContentCategories() {
-  return useQuery<{
-    category: ArticleCategory;
-    name: string;
-    description: string;
-    articleCount: number;
-    icon: string;
-  }[], Error>({
+  return useQuery<
+    {
+      category: ArticleCategory;
+      name: string;
+      description: string;
+      articleCount: number;
+      icon: string;
+    }[],
+    Error
+  >({
     queryKey: ['education', 'categories'],
     queryFn: async () => {
-      const res = await clientGet<{ categories: {
-        category: ArticleCategory;
-        name: string;
-        description: string;
-        articleCount: number;
-        icon: string;
-      }[] }>(phase4Client, '/education/categories');
+      const res = await clientGet<{
+        categories: {
+          category: ArticleCategory;
+          name: string;
+          description: string;
+          articleCount: number;
+          icon: string;
+        }[];
+      }>(phase4Client, '/education/categories');
       return res.categories;
     },
     staleTime: 60 * 60 * 1000, // 1 hour
@@ -563,18 +557,17 @@ export function usePopularTags() {
  * Hook to search educational content
  */
 export function useSearchEducation(query: string) {
-  return useQuery<{
-    articles: Article[];
-    recipes: Recipe[];
-    routines: WellnessRoutine[];
-  }, Error>({
+  return useQuery<
+    {
+      articles: Article[];
+      recipes: Recipe[];
+      routines: WellnessRoutine[];
+    },
+    Error
+  >({
     queryKey: ['education', 'search', query],
     queryFn: async () => {
-      return await clientGet(
-        phase4Client,
-        '/education/search',
-        { params: { q: query } }
-      );
+      return await clientGet(phase4Client, '/education/search', { params: { q: query } });
     },
     enabled: query.length >= 2,
   });

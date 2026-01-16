@@ -84,7 +84,7 @@ router.get('/:appointmentId', async (req: Request, res: Response) => {
 router.get('/slots', async (req: Request, res: Response) => {
   try {
     const { storeId: _storeId, date, appointmentType: _appointmentType, budtenderId } = req.query;
-    
+
     // Generate available time slots
     const slots = [];
     const baseDate = new Date(date as string);
@@ -93,7 +93,7 @@ router.get('/slots', async (req: Request, res: Response) => {
       startTime.setHours(hour, 0, 0, 0);
       const endTime = new Date(startTime);
       endTime.setMinutes(30);
-      
+
       slots.push({
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -102,7 +102,7 @@ router.get('/slots', async (req: Request, res: Response) => {
         budtenderName: 'Alex',
       });
     }
-    
+
     res.json({ slots });
   } catch (error) {
     console.error('Error fetching slots:', error);

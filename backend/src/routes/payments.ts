@@ -20,7 +20,7 @@ router.get('/payments/processors', async (req: Request, res: Response) => {
           isEnabled: true,
           isConfigured: false, // Wired for future use
           supportedMethods: ['bank_account', 'debit_card'],
-          fees: { percentage: 2.5, flatFee: 0.30 },
+          fees: { percentage: 2.5, flatFee: 0.3 },
           features: {
             supportsRefunds: true,
             supportsPartialRefunds: true,
@@ -54,7 +54,7 @@ router.get('/payments/processors', async (req: Request, res: Response) => {
           isEnabled: true,
           isConfigured: false,
           supportedMethods: ['bank_account'],
-          fees: { percentage: 1.5, flatFee: 0.20 },
+          fees: { percentage: 1.5, flatFee: 0.2 },
           features: {
             supportsRefunds: true,
             supportsPartialRefunds: false,
@@ -182,7 +182,7 @@ router.post('/payments/methods/default', async (req: Request, res: Response) => 
 router.post('/payments/intents', async (req: Request, res: Response) => {
   try {
     const { amount, currency = 'USD', orderId, paymentMethodId, processor, metadata } = req.body;
-    
+
     res.status(201).json({
       id: `pi-${Date.now()}`,
       processor: processor || 'hypur',
@@ -223,7 +223,7 @@ router.get('/payments/intents/:intentId', async (req: Request, res: Response) =>
 router.post('/payments/intents/:intentId/confirm', async (req: Request, res: Response) => {
   try {
     const { intentId } = req.params;
-    
+
     res.json({
       success: true,
       paymentIntentId: intentId,
@@ -256,7 +256,7 @@ router.post('/payments/intents/:intentId/cancel', async (req: Request, res: Resp
 router.post('/payments/refunds', async (req: Request, res: Response) => {
   try {
     const { paymentIntentId, amount: _amount, reason: _reason } = req.body;
-    
+
     res.status(201).json({
       success: true,
       paymentIntentId,
@@ -276,7 +276,7 @@ router.post('/payments/refunds', async (req: Request, res: Response) => {
 router.get('/pos/terminals', async (req: Request, res: Response) => {
   try {
     const { storeId } = req.query;
-    
+
     res.json({
       terminals: [
         {
@@ -308,7 +308,7 @@ router.get('/pos/terminals', async (req: Request, res: Response) => {
 router.post('/pos/transactions', async (req: Request, res: Response) => {
   try {
     const { terminalId, amount, tip, orderId, paymentMethod } = req.body;
-    
+
     res.status(201).json({
       id: `pos-${Date.now()}`,
       type: 'sale',
@@ -330,7 +330,7 @@ router.post('/pos/transactions', async (req: Request, res: Response) => {
 router.get('/pos/transactions/:transactionId', async (req: Request, res: Response) => {
   try {
     const { transactionId } = req.params;
-    
+
     res.json({
       id: transactionId,
       type: 'sale',

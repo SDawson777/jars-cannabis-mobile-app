@@ -200,9 +200,17 @@ export function useSegments() {
  */
 export function useCreateSegment() {
   const queryClient = useQueryClient();
-  
-  return useMutation<SegmentDefinition, Error, { name: string; description?: string; conditions: SegmentCondition[] }>({
-    mutationFn: async (segment: { name: string; description?: string; conditions: SegmentCondition[] }) => {
+
+  return useMutation<
+    SegmentDefinition,
+    Error,
+    { name: string; description?: string; conditions: SegmentCondition[] }
+  >({
+    mutationFn: async (segment: {
+      name: string;
+      description?: string;
+      conditions: SegmentCondition[];
+    }) => {
       return await clientPost<typeof segment, SegmentDefinition>(
         phase4Client,
         '/analytics/segments',
@@ -222,11 +230,9 @@ export function useSegmentUsers(segmentId: string, limit = 100) {
   return useQuery<{ userId: string; attributes: Record<string, unknown> }[], Error>({
     queryKey: ['analytics', 'segments', segmentId, 'users'],
     queryFn: async () => {
-      const res = await clientGet<{ users: { userId: string; attributes: Record<string, unknown> }[] }>(
-        phase4Client,
-        `/analytics/segments/${segmentId}/users`,
-        { params: { limit } }
-      );
+      const res = await clientGet<{
+        users: { userId: string; attributes: Record<string, unknown> }[];
+      }>(phase4Client, `/analytics/segments/${segmentId}/users`, { params: { limit } });
       return res.users;
     },
     enabled: !!segmentId,
@@ -286,11 +292,9 @@ export function useFunnelAnalysis(funnelId: string, dateRange: DateRange) {
   return useQuery<ConversionFunnel, Error>({
     queryKey: ['analytics', 'funnels', funnelId, dateRange],
     queryFn: async () => {
-      return await clientGet<ConversionFunnel>(
-        phase4Client,
-        `/analytics/funnels/${funnelId}`,
-        { params: { start: dateRange.start, end: dateRange.end } }
-      );
+      return await clientGet<ConversionFunnel>(phase4Client, `/analytics/funnels/${funnelId}`, {
+        params: { start: dateRange.start, end: dateRange.end },
+      });
     },
     enabled: !!funnelId,
   });
@@ -301,8 +305,12 @@ export function useFunnelAnalysis(funnelId: string, dateRange: DateRange) {
  */
 export function useCreateFunnel() {
   const queryClient = useQueryClient();
-  
-  return useMutation<ConversionFunnel, Error, { name: string; steps: { name: string; eventName: string }[] }>({
+
+  return useMutation<
+    ConversionFunnel,
+    Error,
+    { name: string; steps: { name: string; eventName: string }[] }
+  >({
     mutationFn: async (funnel: { name: string; steps: { name: string; eventName: string }[] }) => {
       return await clientPost<typeof funnel, ConversionFunnel>(
         phase4Client,
@@ -327,11 +335,9 @@ export function useABTests(status?: 'running' | 'completed' | 'paused') {
   return useQuery<ABTestResult[], Error>({
     queryKey: ['analytics', 'ab-tests', status],
     queryFn: async () => {
-      const res = await clientGet<{ tests: ABTestResult[] }>(
-        phase4Client,
-        '/analytics/ab-tests',
-        { params: status ? { status } : undefined }
-      );
+      const res = await clientGet<{ tests: ABTestResult[] }>(phase4Client, '/analytics/ab-tests', {
+        params: status ? { status } : undefined,
+      });
       return res.tests;
     },
   });
@@ -344,10 +350,7 @@ export function useABTest(testId: string) {
   return useQuery<ABTestResult, Error>({
     queryKey: ['analytics', 'ab-tests', testId],
     queryFn: async () => {
-      return await clientGet<ABTestResult>(
-        phase4Client,
-        `/analytics/ab-tests/${testId}`
-      );
+      return await clientGet<ABTestResult>(phase4Client, `/analytics/ab-tests/${testId}`);
     },
     enabled: !!testId,
     refetchInterval: 60 * 1000, // Refresh every minute for live tests
@@ -359,24 +362,24 @@ export function useABTest(testId: string) {
  */
 export function useCreateABTest() {
   const queryClient = useQueryClient();
-  
-  return useMutation<ABTestResult, Error, {
-    name: string;
-    variants: { name: string; traffic: number }[];
-    goalEvent: string;
-    targetSegmentId?: string;
-  }>({
+
+  return useMutation<
+    ABTestResult,
+    Error,
+    {
+      name: string;
+      variants: { name: string; traffic: number }[];
+      goalEvent: string;
+      targetSegmentId?: string;
+    }
+  >({
     mutationFn: async (test: {
       name: string;
       variants: { name: string; traffic: number }[];
       goalEvent: string;
       targetSegmentId?: string;
     }) => {
-      return await clientPost<typeof test, ABTestResult>(
-        phase4Client,
-        '/analytics/ab-tests',
-        test
-      );
+      return await clientPost<typeof test, ABTestResult>(phase4Client, '/analytics/ab-tests', test);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['analytics', 'ab-tests'] });
@@ -398,7 +401,13 @@ export function useCampaignMetrics(dateRange: DateRange, campaignIds?: string[])
       const res = await clientGet<{ campaigns: CampaignMetrics[] }>(
         phase4Client,
         '/analytics/campaigns',
-        { params: { start: dateRange.start, end: dateRange.end, campaignIds: campaignIds?.join(',') } }
+        {
+          params: {
+            start: dateRange.start,
+            end: dateRange.end,
+            campaignIds: campaignIds?.join(','),
+          },
+        }
       );
       return res.campaigns;
     },
@@ -428,13 +437,17 @@ export function useDeepLinkMetrics(dateRange: DateRange) {
  */
 export function useCreateDeepLink() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ linkId: string; url: string; shortUrl: string }, Error, {
-    destination: string;
-    campaign?: string;
-    source?: string;
-    medium?: string;
-  }>({
+
+  return useMutation<
+    { linkId: string; url: string; shortUrl: string },
+    Error,
+    {
+      destination: string;
+      campaign?: string;
+      source?: string;
+      medium?: string;
+    }
+  >({
     mutationFn: async (params: {
       destination: string;
       campaign?: string;
@@ -461,11 +474,14 @@ export function useCreateDeepLink() {
  * Hook to fetch real-time active users
  */
 export function useRealTimeUsers() {
-  return useQuery<{
-    activeUsers: number;
-    byPage: { page: string; count: number }[];
-    byLocation: { location: string; count: number }[];
-  }, Error>({
+  return useQuery<
+    {
+      activeUsers: number;
+      byPage: { page: string; count: number }[];
+      byLocation: { location: string; count: number }[];
+    },
+    Error
+  >({
     queryKey: ['analytics', 'realtime', 'users'],
     queryFn: async () => {
       return await clientGet<{
@@ -482,11 +498,14 @@ export function useRealTimeUsers() {
  * Hook to fetch real-time events stream
  */
 export function useRealTimeEvents() {
-  return useQuery<{
-    events: { eventName: string; count: number; trend: number }[];
-    conversions: number;
-    revenue: number;
-  }, Error>({
+  return useQuery<
+    {
+      events: { eventName: string; count: number; trend: number }[];
+      conversions: number;
+      revenue: number;
+    },
+    Error
+  >({
     queryKey: ['analytics', 'realtime', 'events'],
     queryFn: async () => {
       return await clientGet<{

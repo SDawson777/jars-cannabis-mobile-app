@@ -120,10 +120,7 @@ export function usePairedDevices() {
   return useQuery<HardwareDevice[], Error>({
     queryKey: ['hardware', 'devices'],
     queryFn: async () => {
-      const res = await clientGet<{ devices: HardwareDevice[] }>(
-        phase4Client,
-        '/hardware/devices'
-      );
+      const res = await clientGet<{ devices: HardwareDevice[] }>(phase4Client, '/hardware/devices');
       return res.devices;
     },
   });
@@ -149,7 +146,7 @@ export function useScanDevices() {
       logEvent('hardware_scan_started', { deviceTypes });
 
       // Simulated delay for scanning
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         scanTimeoutRef.current = setTimeout(resolve, 3000);
       });
 
@@ -202,10 +199,14 @@ export function useScanDevices() {
 export function usePairDevice() {
   const queryClient = useQueryClient();
 
-  return useMutation<HardwareDevice, Error, {
-    deviceId: string;
-    name?: string;
-  }>({
+  return useMutation<
+    HardwareDevice,
+    Error,
+    {
+      deviceId: string;
+      name?: string;
+    }
+  >({
     mutationFn: async (params: { deviceId: string; name?: string }) => {
       const result = await clientPost<typeof params, HardwareDevice>(
         phase4Client,
@@ -299,11 +300,14 @@ export function useDeviceConnection(deviceId: string) {
 /**
  * Hook to get readings from a smart scale
  */
-export function useScaleReadings(deviceId: string, options?: {
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
-}) {
+export function useScaleReadings(
+  deviceId: string,
+  options?: {
+    limit?: number;
+    startDate?: string;
+    endDate?: string;
+  }
+) {
   return useQuery<SmartScaleReading[], Error>({
     queryKey: ['hardware', 'scale', deviceId, 'readings', options],
     queryFn: async () => {
@@ -324,12 +328,20 @@ export function useScaleReadings(deviceId: string, options?: {
 export function useSyncScaleToJournal() {
   const queryClient = useQueryClient();
 
-  return useMutation<DeviceSyncResult, Error, {
-    deviceId: string;
-    readingIds?: string[];
-    autoTagProduct?: boolean;
-  }>({
-    mutationFn: async (params: { deviceId: string; readingIds?: string[]; autoTagProduct?: boolean }) => {
+  return useMutation<
+    DeviceSyncResult,
+    Error,
+    {
+      deviceId: string;
+      readingIds?: string[];
+      autoTagProduct?: boolean;
+    }
+  >({
+    mutationFn: async (params: {
+      deviceId: string;
+      readingIds?: string[];
+      autoTagProduct?: boolean;
+    }) => {
       const result = await clientPost<typeof params, DeviceSyncResult>(
         phase4Client,
         `/hardware/scales/${params.deviceId}/sync-to-journal`,
@@ -371,11 +383,14 @@ export function useTareScale() {
 /**
  * Hook to get readings from a consumption tracker
  */
-export function useTrackerReadings(deviceId: string, options?: {
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
-}) {
+export function useTrackerReadings(
+  deviceId: string,
+  options?: {
+    limit?: number;
+    startDate?: string;
+    endDate?: string;
+  }
+) {
   return useQuery<ConsumptionTrackerReading[], Error>({
     queryKey: ['hardware', 'tracker', deviceId, 'readings', options],
     queryFn: async () => {
@@ -396,12 +411,20 @@ export function useTrackerReadings(deviceId: string, options?: {
 export function useSyncTrackerToJournal() {
   const queryClient = useQueryClient();
 
-  return useMutation<DeviceSyncResult, Error, {
-    deviceId: string;
-    sessionIds?: string[];
-    includeMoodData?: boolean;
-  }>({
-    mutationFn: async (params: { deviceId: string; sessionIds?: string[]; includeMoodData?: boolean }) => {
+  return useMutation<
+    DeviceSyncResult,
+    Error,
+    {
+      deviceId: string;
+      sessionIds?: string[];
+      includeMoodData?: boolean;
+    }
+  >({
+    mutationFn: async (params: {
+      deviceId: string;
+      sessionIds?: string[];
+      includeMoodData?: boolean;
+    }) => {
       const result = await clientPost<typeof params, DeviceSyncResult>(
         phase4Client,
         `/hardware/trackers/${params.deviceId}/sync-to-journal`,
@@ -424,11 +447,15 @@ export function useSyncTrackerToJournal() {
  * Hook to start a tracked consumption session
  */
 export function useStartTrackedSession() {
-  return useMutation<ConsumptionTrackerReading, Error, {
-    deviceId: string;
-    productId?: string;
-    strain?: string;
-  }>({
+  return useMutation<
+    ConsumptionTrackerReading,
+    Error,
+    {
+      deviceId: string;
+      productId?: string;
+      strain?: string;
+    }
+  >({
     mutationFn: async (params: { deviceId: string; productId?: string; strain?: string }) => {
       const result = await clientPost<typeof params, ConsumptionTrackerReading>(
         phase4Client,
@@ -447,14 +474,24 @@ export function useStartTrackedSession() {
 export function useEndTrackedSession() {
   const queryClient = useQueryClient();
 
-  return useMutation<ConsumptionTrackerReading, Error, {
-    deviceId: string;
-    sessionId: string;
-    effects?: string[];
-    mood?: number;
-    notes?: string;
-  }>({
-    mutationFn: async (params: { deviceId: string; sessionId: string; effects?: string[]; mood?: number; notes?: string }) => {
+  return useMutation<
+    ConsumptionTrackerReading,
+    Error,
+    {
+      deviceId: string;
+      sessionId: string;
+      effects?: string[];
+      mood?: number;
+      notes?: string;
+    }
+  >({
+    mutationFn: async (params: {
+      deviceId: string;
+      sessionId: string;
+      effects?: string[];
+      mood?: number;
+      notes?: string;
+    }) => {
       const result = await clientPost<typeof params, ConsumptionTrackerReading>(
         phase4Client,
         `/hardware/trackers/${params.deviceId}/sessions/${params.sessionId}/end`,
@@ -483,10 +520,7 @@ export function useDigitalPasses() {
   return useQuery<DigitalPass[], Error>({
     queryKey: ['wallet', 'passes'],
     queryFn: async () => {
-      const res = await clientGet<{ passes: DigitalPass[] }>(
-        phase4Client,
-        '/wallet/passes'
-      );
+      const res = await clientGet<{ passes: DigitalPass[] }>(phase4Client, '/wallet/passes');
       return res.passes;
     },
   });
@@ -500,10 +534,7 @@ export function useLoyaltyCard() {
     queryKey: ['wallet', 'loyalty-card'],
     queryFn: async () => {
       try {
-        return await clientGet<LoyaltyCard>(
-          phase4Client,
-          '/wallet/loyalty-card'
-        );
+        return await clientGet<LoyaltyCard>(phase4Client, '/wallet/loyalty-card');
       } catch {
         return null;
       }
@@ -517,10 +548,14 @@ export function useLoyaltyCard() {
 export function useAddToWallet() {
   const queryClient = useQueryClient();
 
-  return useMutation<{ passUrl: string; success: boolean }, Error, {
-    passId: string;
-    provider: WalletProvider;
-  }>({
+  return useMutation<
+    { passUrl: string; success: boolean },
+    Error,
+    {
+      passId: string;
+      provider: WalletProvider;
+    }
+  >({
     mutationFn: async (params: { passId: string; provider: WalletProvider }) => {
       const result = await clientPost<typeof params, { passUrl: string; success: boolean }>(
         phase4Client,
@@ -545,10 +580,14 @@ export function useAddToWallet() {
 export function useGenerateLoyaltyPass() {
   const queryClient = useQueryClient();
 
-  return useMutation<LoyaltyCard, Error, {
-    provider: WalletProvider;
-    storeId?: string;
-  }>({
+  return useMutation<
+    LoyaltyCard,
+    Error,
+    {
+      provider: WalletProvider;
+      storeId?: string;
+    }
+  >({
     mutationFn: async (params: { provider: WalletProvider; storeId?: string }) => {
       const result = await clientPost<typeof params, LoyaltyCard>(
         phase4Client,
@@ -598,10 +637,7 @@ export function useWalletSupport() {
 /**
  * Hook to automatically sync all connected devices
  */
-export function useAutoSync(options?: {
-  intervalMinutes?: number;
-  syncOnConnect?: boolean;
-}) {
+export function useAutoSync(options?: { intervalMinutes?: number; syncOnConnect?: boolean }) {
   const queryClient = useQueryClient();
   const { data: devices } = usePairedDevices();
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
@@ -620,11 +656,9 @@ export function useAutoSync(options?: {
 
       for (const device of connectedDevices) {
         try {
-          await clientPost<{ deviceId: string }, DeviceSyncResult>(
-            phase4Client,
-            '/hardware/sync',
-            { deviceId: device.id }
-          );
+          await clientPost<{ deviceId: string }, DeviceSyncResult>(phase4Client, '/hardware/sync', {
+            deviceId: device.id,
+          });
         } catch (err) {
           console.error(`Failed to sync device ${device.id}:`, err);
         }

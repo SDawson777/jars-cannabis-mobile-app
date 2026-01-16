@@ -106,10 +106,7 @@ export function useWebhooks() {
   return useQuery<WebhookEndpoint[], Error>({
     queryKey: ['webhooks'],
     queryFn: async () => {
-      const res = await clientGet<{ webhooks: WebhookEndpoint[] }>(
-        phase4Client,
-        '/webhooks'
-      );
+      const res = await clientGet<{ webhooks: WebhookEndpoint[] }>(phase4Client, '/webhooks');
       return res.webhooks;
     },
   });
@@ -122,10 +119,7 @@ export function useWebhook(webhookId: string) {
   return useQuery<WebhookEndpoint, Error>({
     queryKey: ['webhooks', webhookId],
     queryFn: async () => {
-      return await clientGet<WebhookEndpoint>(
-        phase4Client,
-        `/webhooks/${webhookId}`
-      );
+      return await clientGet<WebhookEndpoint>(phase4Client, `/webhooks/${webhookId}`);
     },
     enabled: !!webhookId,
   });
@@ -136,17 +130,17 @@ export function useWebhook(webhookId: string) {
  */
 export function useCreateWebhook() {
   const queryClient = useQueryClient();
-  
-  return useMutation<WebhookEndpoint, Error, {
-    name: string;
-    url: string;
-    events: WebhookEventType[];
-  }>({
-    mutationFn: async (webhook: {
+
+  return useMutation<
+    WebhookEndpoint,
+    Error,
+    {
       name: string;
       url: string;
       events: WebhookEventType[];
-    }) => {
+    }
+  >({
+    mutationFn: async (webhook: { name: string; url: string; events: WebhookEventType[] }) => {
       const result = await clientPost<typeof webhook, WebhookEndpoint>(
         phase4Client,
         '/webhooks',
@@ -166,12 +160,19 @@ export function useCreateWebhook() {
  */
 export function useUpdateWebhook() {
   const queryClient = useQueryClient();
-  
-  return useMutation<WebhookEndpoint, Error, {
-    webhookId: string;
-    updates: Partial<Pick<WebhookEndpoint, 'name' | 'url' | 'events' | 'isActive'>>;
-  }>({
-    mutationFn: async ({ webhookId, updates }: {
+
+  return useMutation<
+    WebhookEndpoint,
+    Error,
+    {
+      webhookId: string;
+      updates: Partial<Pick<WebhookEndpoint, 'name' | 'url' | 'events' | 'isActive'>>;
+    }
+  >({
+    mutationFn: async ({
+      webhookId,
+      updates,
+    }: {
       webhookId: string;
       updates: Partial<Pick<WebhookEndpoint, 'name' | 'url' | 'events' | 'isActive'>>;
     }) => {
@@ -194,7 +195,7 @@ export function useUpdateWebhook() {
  */
 export function useDeleteWebhook() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (webhookId: string) => {
       await clientDelete(phase4Client, `/webhooks/${webhookId}`);
@@ -210,13 +211,16 @@ export function useDeleteWebhook() {
  * Hook to test a webhook endpoint
  */
 export function useTestWebhook() {
-  return useMutation<{ success: boolean; responseStatus?: number; latencyMs: number }, Error, string>({
+  return useMutation<
+    { success: boolean; responseStatus?: number; latencyMs: number },
+    Error,
+    string
+  >({
     mutationFn: async (webhookId: string) => {
-      const result = await clientPost<Record<string, never>, { success: boolean; responseStatus?: number; latencyMs: number }>(
-        phase4Client,
-        `/webhooks/${webhookId}/test`,
-        {}
-      );
+      const result = await clientPost<
+        Record<string, never>,
+        { success: boolean; responseStatus?: number; latencyMs: number }
+      >(phase4Client, `/webhooks/${webhookId}/test`, {});
       return result;
     },
   });
@@ -225,7 +229,10 @@ export function useTestWebhook() {
 /**
  * Hook to fetch webhook delivery history
  */
-export function useWebhookDeliveries(webhookId: string, options?: { limit?: number; success?: boolean }) {
+export function useWebhookDeliveries(
+  webhookId: string,
+  options?: { limit?: number; success?: boolean }
+) {
   return useQuery<WebhookDelivery[], Error>({
     queryKey: ['webhooks', webhookId, 'deliveries', options],
     queryFn: async () => {
@@ -245,7 +252,7 @@ export function useWebhookDeliveries(webhookId: string, options?: { limit?: numb
  */
 export function useRetryWebhookDelivery() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<WebhookDelivery, Error, { webhookId: string; deliveryId: string }>({
     mutationFn: async ({ webhookId, deliveryId }: { webhookId: string; deliveryId: string }) => {
       const result = await clientPost<Record<string, never>, WebhookDelivery>(
@@ -286,12 +293,16 @@ export function useIntegrations() {
  */
 export function useConnectIntegration() {
   const queryClient = useQueryClient();
-  
-  return useMutation<IntegrationConnector, Error, {
-    type: IntegrationConnector['type'];
-    provider: string;
-    config: Record<string, unknown>;
-  }>({
+
+  return useMutation<
+    IntegrationConnector,
+    Error,
+    {
+      type: IntegrationConnector['type'];
+      provider: string;
+      config: Record<string, unknown>;
+    }
+  >({
     mutationFn: async (params: {
       type: IntegrationConnector['type'];
       provider: string;
@@ -316,7 +327,7 @@ export function useConnectIntegration() {
  */
 export function useDisconnectIntegration() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (integrationId: string) => {
       await clientPost<Record<string, never>, void>(
@@ -337,14 +348,13 @@ export function useDisconnectIntegration() {
  */
 export function useSyncIntegration() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ syncedCount: number; errors: string[] }, Error, string>({
     mutationFn: async (integrationId: string) => {
-      const result = await clientPost<Record<string, never>, { syncedCount: number; errors: string[] }>(
-        phase4Client,
-        `/integrations/${integrationId}/sync`,
-        {}
-      );
+      const result = await clientPost<
+        Record<string, never>,
+        { syncedCount: number; errors: string[] }
+      >(phase4Client, `/integrations/${integrationId}/sync`, {});
       return result;
     },
     onSuccess: () => {
@@ -379,12 +389,16 @@ export function useCRMContacts(options?: { segment?: string; tag?: string; limit
  */
 export function useSyncContactToCRM() {
   const queryClient = useQueryClient();
-  
-  return useMutation<CRMContact, Error, {
-    userId: string;
-    customFields?: Record<string, unknown>;
-    tags?: string[];
-  }>({
+
+  return useMutation<
+    CRMContact,
+    Error,
+    {
+      userId: string;
+      customFields?: Record<string, unknown>;
+      tags?: string[];
+    }
+  >({
     mutationFn: async (params: {
       userId: string;
       customFields?: Record<string, unknown>;
@@ -429,14 +443,18 @@ export function useMarketingCampaigns(status?: MarketingCampaign['status']) {
  */
 export function useCreateMarketingCampaign() {
   const queryClient = useQueryClient();
-  
-  return useMutation<MarketingCampaign, Error, {
-    name: string;
-    platform: string;
-    audienceSegmentId?: string;
-    content: { subject?: string; body: string; templateId?: string };
-    scheduledAt?: string;
-  }>({
+
+  return useMutation<
+    MarketingCampaign,
+    Error,
+    {
+      name: string;
+      platform: string;
+      audienceSegmentId?: string;
+      content: { subject?: string; body: string; templateId?: string };
+      scheduledAt?: string;
+    }
+  >({
     mutationFn: async (campaign: {
       name: string;
       platform: string;
@@ -466,13 +484,19 @@ export function useCreateMarketingCampaign() {
  * Hook to get available webhook event types
  */
 export function useWebhookEventTypes() {
-  return useQuery<{ eventType: WebhookEventType; description: string; payloadExample: Record<string, unknown> }[], Error>({
+  return useQuery<
+    { eventType: WebhookEventType; description: string; payloadExample: Record<string, unknown> }[],
+    Error
+  >({
     queryKey: ['webhooks', 'event-types'],
     queryFn: async () => {
-      const res = await clientGet<{ eventTypes: { eventType: WebhookEventType; description: string; payloadExample: Record<string, unknown> }[] }>(
-        phase4Client,
-        '/webhooks/event-types'
-      );
+      const res = await clientGet<{
+        eventTypes: {
+          eventType: WebhookEventType;
+          description: string;
+          payloadExample: Record<string, unknown>;
+        }[];
+      }>(phase4Client, '/webhooks/event-types');
       return res.eventTypes;
     },
     staleTime: 60 * 60 * 1000, // 1 hour

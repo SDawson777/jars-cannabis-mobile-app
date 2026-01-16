@@ -163,7 +163,7 @@ contentRouter.get('/content/articles/:slug', async (req, res) => {
 // GET /content/theme - Fetch CMS-managed theme tokens
 contentRouter.get('/content/theme', async (req, res) => {
   const brandSlug = (req.query.brand as string) || 'default';
-  
+
   try {
     // Try to fetch from database if available
     if ((prisma as any).brand && typeof (prisma as any).brand.findFirst === 'function') {
@@ -210,19 +210,21 @@ contentRouter.get('/content/deals', async (req, res) => {
       const deals = await (prisma as any).deal.findMany({
         orderBy: { startDate: 'desc' },
       });
-      return res.json(deals.map((d: any) => ({
-        id: d.id,
-        title: d.title,
-        description: d.description,
-        discountType: d.discountType,
-        discountValue: d.discountValue,
-        startDate: d.startDate?.toISOString?.() || d.startDate,
-        endDate: d.endDate?.toISOString?.() || d.endDate,
-        imageUrl: d.imageUrl,
-        productIds: d.productIds,
-        categoryIds: d.categoryIds,
-        isActive: d.isActive ?? true,
-      })));
+      return res.json(
+        deals.map((d: any) => ({
+          id: d.id,
+          title: d.title,
+          description: d.description,
+          discountType: d.discountType,
+          discountValue: d.discountValue,
+          startDate: d.startDate?.toISOString?.() || d.startDate,
+          endDate: d.endDate?.toISOString?.() || d.endDate,
+          imageUrl: d.imageUrl,
+          productIds: d.productIds,
+          categoryIds: d.categoryIds,
+          isActive: d.isActive ?? true,
+        }))
+      );
     }
   } catch {
     // Fall through to demo deals
@@ -232,7 +234,7 @@ contentRouter.get('/content/deals', async (req, res) => {
   const now = new Date();
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  
+
   return res.json([
     {
       id: 'deal-1',
@@ -277,13 +279,15 @@ contentRouter.get('/content/filters', async (req, res) => {
         where: { active: true },
         orderBy: { sortOrder: 'asc' },
       });
-      return res.json(categories.map((c: any) => ({
-        id: c.id || c.slug,
-        label: c.name || c.label,
-        slug: c.slug,
-        iconRef: c.iconRef,
-        weight: c.sortOrder ?? c.weight ?? 0,
-      })));
+      return res.json(
+        categories.map((c: any) => ({
+          id: c.id || c.slug,
+          label: c.name || c.label,
+          slug: c.slug,
+          iconRef: c.iconRef,
+          weight: c.sortOrder ?? c.weight ?? 0,
+        }))
+      );
     }
   } catch {
     // Fall through to demo filters
@@ -312,10 +316,12 @@ contentRouter.get('/content/copy', async (req, res) => {
       const items = await (prisma as any).appCopy.findMany({
         where: { context, locale },
       });
-      return res.json(items.map((c: any) => ({
-        key: c.key,
-        text: c.text,
-      })));
+      return res.json(
+        items.map((c: any) => ({
+          key: c.key,
+          text: c.text,
+        }))
+      );
     }
   } catch {
     // Fall through to demo copy
@@ -348,7 +354,10 @@ contentRouter.get('/content/copy', async (req, res) => {
     ],
     accessibility: [
       { key: 'statement.title', text: 'Accessibility Statement' },
-      { key: 'statement.body', text: 'We are committed to ensuring digital accessibility for people with disabilities.' },
+      {
+        key: 'statement.body',
+        text: 'We are committed to ensuring digital accessibility for people with disabilities.',
+      },
     ],
     dataTransparency: [
       { key: 'privacy.title', text: 'Your Data' },
@@ -365,4 +374,3 @@ contentRouter.get('/content/copy', async (req, res) => {
 
   return res.json(demoCopy[context] || []);
 });
-

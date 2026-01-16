@@ -12,7 +12,13 @@ import { logEvent } from '../utils/analytics';
 // Types
 // ============================================
 
-export type PaymentProcessor = 'hypur' | 'dutchie_pay' | 'aeropay' | 'canpay' | 'paytender' | 'merrco';
+export type PaymentProcessor =
+  | 'hypur'
+  | 'dutchie_pay'
+  | 'aeropay'
+  | 'canpay'
+  | 'paytender'
+  | 'merrco';
 
 export type PaymentMethodType = 'bank_account' | 'debit_card' | 'ach' | 'cash' | 'credit';
 
@@ -171,10 +177,7 @@ export function usePaymentMethods() {
   return useQuery<PaymentMethod[], Error>({
     queryKey: ['payments', 'methods'],
     queryFn: async () => {
-      const res = await clientGet<{ methods: PaymentMethod[] }>(
-        phase4Client,
-        '/payments/methods'
-      );
+      const res = await clientGet<{ methods: PaymentMethod[] }>(phase4Client, '/payments/methods');
       return res.methods;
     },
   });
@@ -186,16 +189,28 @@ export function usePaymentMethods() {
 export function useAddPaymentMethod() {
   const queryClient = useQueryClient();
 
-  return useMutation<PaymentMethod, Error, {
-    processor: PaymentProcessor;
-    type: PaymentMethodType;
-    token?: string; // Tokenized payment info from processor SDK
-    bankAccountNumber?: string; // For ACH (should be tokenized in production)
-    routingNumber?: string;
-    nickname?: string;
-    setAsDefault?: boolean;
-  }>({
-    mutationFn: async (params: { processor: PaymentProcessor; type: PaymentMethodType; token?: string; bankAccountNumber?: string; routingNumber?: string; nickname?: string; setAsDefault?: boolean }) => {
+  return useMutation<
+    PaymentMethod,
+    Error,
+    {
+      processor: PaymentProcessor;
+      type: PaymentMethodType;
+      token?: string; // Tokenized payment info from processor SDK
+      bankAccountNumber?: string; // For ACH (should be tokenized in production)
+      routingNumber?: string;
+      nickname?: string;
+      setAsDefault?: boolean;
+    }
+  >({
+    mutationFn: async (params: {
+      processor: PaymentProcessor;
+      type: PaymentMethodType;
+      token?: string;
+      bankAccountNumber?: string;
+      routingNumber?: string;
+      nickname?: string;
+      setAsDefault?: boolean;
+    }) => {
       const result = await clientPost<typeof params, PaymentMethod>(
         phase4Client,
         '/payments/methods',
@@ -258,15 +273,26 @@ export function useSetDefaultPaymentMethod() {
  * Hook to create a payment intent
  */
 export function useCreatePaymentIntent() {
-  return useMutation<PaymentIntent, Error, {
-    amount: number;
-    currency?: string;
-    orderId?: string;
-    paymentMethodId?: string;
-    processor?: PaymentProcessor;
-    metadata?: Record<string, string>;
-  }>({
-    mutationFn: async (params: { amount: number; currency?: string; orderId?: string; paymentMethodId?: string; processor?: PaymentProcessor; metadata?: Record<string, string> }) => {
+  return useMutation<
+    PaymentIntent,
+    Error,
+    {
+      amount: number;
+      currency?: string;
+      orderId?: string;
+      paymentMethodId?: string;
+      processor?: PaymentProcessor;
+      metadata?: Record<string, string>;
+    }
+  >({
+    mutationFn: async (params: {
+      amount: number;
+      currency?: string;
+      orderId?: string;
+      paymentMethodId?: string;
+      processor?: PaymentProcessor;
+      metadata?: Record<string, string>;
+    }) => {
       const result = await clientPost<typeof params, PaymentIntent>(
         phase4Client,
         '/payments/intents',
@@ -287,13 +313,22 @@ export function useCreatePaymentIntent() {
 export function useConfirmPayment() {
   const queryClient = useQueryClient();
 
-  return useMutation<PaymentResult, Error, {
-    paymentIntentId: string;
-    paymentMethodId?: string;
-    tip?: Tip;
-    saveMethod?: boolean;
-  }>({
-    mutationFn: async (params: { paymentIntentId: string; paymentMethodId?: string; tip?: Tip; saveMethod?: boolean }) => {
+  return useMutation<
+    PaymentResult,
+    Error,
+    {
+      paymentIntentId: string;
+      paymentMethodId?: string;
+      tip?: Tip;
+      saveMethod?: boolean;
+    }
+  >({
+    mutationFn: async (params: {
+      paymentIntentId: string;
+      paymentMethodId?: string;
+      tip?: Tip;
+      saveMethod?: boolean;
+    }) => {
       const result = await clientPost<typeof params, PaymentResult>(
         phase4Client,
         `/payments/intents/${params.paymentIntentId}/confirm`,
@@ -337,10 +372,7 @@ export function usePaymentStatus(paymentIntentId: string) {
   return useQuery<PaymentIntent, Error>({
     queryKey: ['payments', 'intents', paymentIntentId],
     queryFn: async () => {
-      return await clientGet<PaymentIntent>(
-        phase4Client,
-        `/payments/intents/${paymentIntentId}`
-      );
+      return await clientGet<PaymentIntent>(phase4Client, `/payments/intents/${paymentIntentId}`);
     },
     enabled: !!paymentIntentId,
     refetchInterval: (query: { state: { data?: PaymentIntent } }) => {
@@ -396,11 +428,9 @@ export function usePOSTerminals(storeId: string) {
   return useQuery<POSTerminal[], Error>({
     queryKey: ['pos', 'terminals', storeId],
     queryFn: async () => {
-      const res = await clientGet<{ terminals: POSTerminal[] }>(
-        phase4Client,
-        `/pos/terminals`,
-        { params: { storeId } }
-      );
+      const res = await clientGet<{ terminals: POSTerminal[] }>(phase4Client, `/pos/terminals`, {
+        params: { storeId },
+      });
       return res.terminals;
     },
     enabled: !!storeId,
@@ -412,14 +442,24 @@ export function usePOSTerminals(storeId: string) {
  * Hook to initiate a POS transaction
  */
 export function useInitiatePOSTransaction() {
-  return useMutation<POSTransaction, Error, {
-    terminalId: string;
-    amount: number;
-    tip?: number;
-    orderId?: string;
-    paymentMethod: PaymentMethodType;
-  }>({
-    mutationFn: async (params: { terminalId: string; amount: number; tip?: number; orderId?: string; paymentMethod: PaymentMethodType }) => {
+  return useMutation<
+    POSTransaction,
+    Error,
+    {
+      terminalId: string;
+      amount: number;
+      tip?: number;
+      orderId?: string;
+      paymentMethod: PaymentMethodType;
+    }
+  >({
+    mutationFn: async (params: {
+      terminalId: string;
+      amount: number;
+      tip?: number;
+      orderId?: string;
+      paymentMethod: PaymentMethodType;
+    }) => {
       const result = await clientPost<typeof params, POSTransaction>(
         phase4Client,
         '/pos/transactions',
@@ -441,10 +481,7 @@ export function usePOSTransactionStatus(transactionId: string) {
   return useQuery<POSTransaction, Error>({
     queryKey: ['pos', 'transactions', transactionId],
     queryFn: async () => {
-      return await clientGet<POSTransaction>(
-        phase4Client,
-        `/pos/transactions/${transactionId}`
-      );
+      return await clientGet<POSTransaction>(phase4Client, `/pos/transactions/${transactionId}`);
     },
     enabled: !!transactionId,
     refetchInterval: (query: { state: { data?: POSTransaction } }) => {
@@ -521,7 +558,9 @@ export function useTipCalculator(subtotal: number) {
  * Comprehensive hook for managing the entire payment flow
  */
 export function usePaymentFlow() {
-  const [step, setStep] = useState<'select_method' | 'processing' | 'confirm' | 'complete' | 'error'>('select_method');
+  const [step, setStep] = useState<
+    'select_method' | 'processing' | 'confirm' | 'complete' | 'error'
+  >('select_method');
   const [currentIntent, setCurrentIntent] = useState<PaymentIntent | null>(null);
   const [error, setError] = useState<string | null>(null);
 

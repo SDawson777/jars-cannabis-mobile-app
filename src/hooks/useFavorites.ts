@@ -79,10 +79,7 @@ export interface PastOrder {
 /**
  * Hook to fetch all favorites
  */
-export function useFavorites(options?: {
-  itemType?: FavoriteItem['itemType'];
-  folderId?: string;
-}) {
+export function useFavorites(options?: { itemType?: FavoriteItem['itemType']; folderId?: string }) {
   return useInfiniteQuery<{ favorites: FavoriteItem[]; nextCursor?: string }, Error>({
     queryKey: ['favorites', 'list', options],
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
@@ -93,7 +90,8 @@ export function useFavorites(options?: {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { favorites: FavoriteItem[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { favorites: FavoriteItem[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -104,11 +102,9 @@ export function useFavoriteProducts() {
   return useQuery<FavoriteItem[], Error>({
     queryKey: ['favorites', 'products'],
     queryFn: async () => {
-      const res = await clientGet<{ favorites: FavoriteItem[] }>(
-        phase4Client,
-        '/favorites',
-        { params: { itemType: 'product' } }
-      );
+      const res = await clientGet<{ favorites: FavoriteItem[] }>(phase4Client, '/favorites', {
+        params: { itemType: 'product' },
+      });
       return res.favorites;
     },
   });
@@ -136,16 +132,20 @@ export function useIsFavorite(itemType: FavoriteItem['itemType'], itemId: string
  */
 export function useAddToFavorites() {
   const queryClient = useQueryClient();
-  
-  return useMutation<FavoriteItem, Error, {
-    itemType: FavoriteItem['itemType'];
-    itemId: string;
-    folderId?: string;
-    notes?: string;
-    tags?: string[];
-    notifyOnSale?: boolean;
-    notifyOnRestock?: boolean;
-  }>({
+
+  return useMutation<
+    FavoriteItem,
+    Error,
+    {
+      itemType: FavoriteItem['itemType'];
+      itemId: string;
+      folderId?: string;
+      notes?: string;
+      tags?: string[];
+      notifyOnSale?: boolean;
+      notifyOnRestock?: boolean;
+    }
+  >({
     mutationFn: async (favorite: {
       itemType: FavoriteItem['itemType'];
       itemId: string;
@@ -163,15 +163,21 @@ export function useAddToFavorites() {
       logEvent('favorite_added', { itemType: favorite.itemType, itemId: favorite.itemId });
       return result;
     },
-    onSuccess: (_: FavoriteItem, { itemType, itemId }: {
-      itemType: FavoriteItem['itemType'];
-      itemId: string;
-      folderId?: string;
-      notes?: string;
-      tags?: string[];
-      notifyOnSale?: boolean;
-      notifyOnRestock?: boolean;
-    }) => {
+    onSuccess: (
+      _: FavoriteItem,
+      {
+        itemType,
+        itemId,
+      }: {
+        itemType: FavoriteItem['itemType'];
+        itemId: string;
+        folderId?: string;
+        notes?: string;
+        tags?: string[];
+        notifyOnSale?: boolean;
+        notifyOnRestock?: boolean;
+      }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['favorites'] });
       queryClient.setQueryData(['favorites', 'check', itemType, itemId], true);
     },
@@ -183,13 +189,22 @@ export function useAddToFavorites() {
  */
 export function useRemoveFromFavorites() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { itemType: FavoriteItem['itemType']; itemId: string }>({
-    mutationFn: async ({ itemType, itemId }: { itemType: FavoriteItem['itemType']; itemId: string }) => {
+    mutationFn: async ({
+      itemType,
+      itemId,
+    }: {
+      itemType: FavoriteItem['itemType'];
+      itemId: string;
+    }) => {
       await clientDelete(phase4Client, `/favorites/${itemType}/${itemId}`);
       logEvent('favorite_removed', { itemType, itemId });
     },
-    onSuccess: (_: void, { itemType, itemId }: { itemType: FavoriteItem['itemType']; itemId: string }) => {
+    onSuccess: (
+      _: void,
+      { itemType, itemId }: { itemType: FavoriteItem['itemType']; itemId: string }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['favorites'] });
       queryClient.setQueryData(['favorites', 'check', itemType, itemId], false);
     },
@@ -202,19 +217,18 @@ export function useRemoveFromFavorites() {
 export function useToggleFavorite() {
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
-  
-  const toggle = useCallback(async (
-    itemType: FavoriteItem['itemType'],
-    itemId: string,
-    isFavorite: boolean
-  ) => {
-    if (isFavorite) {
-      await removeFromFavorites.mutateAsync({ itemType, itemId });
-    } else {
-      await addToFavorites.mutateAsync({ itemType, itemId });
-    }
-  }, [addToFavorites, removeFromFavorites]);
-  
+
+  const toggle = useCallback(
+    async (itemType: FavoriteItem['itemType'], itemId: string, isFavorite: boolean) => {
+      if (isFavorite) {
+        await removeFromFavorites.mutateAsync({ itemType, itemId });
+      } else {
+        await addToFavorites.mutateAsync({ itemType, itemId });
+      }
+    },
+    [addToFavorites, removeFromFavorites]
+  );
+
   return {
     toggle,
     isPending: addToFavorites.isPending || removeFromFavorites.isPending,
@@ -226,18 +240,25 @@ export function useToggleFavorite() {
  */
 export function useUpdateFavorite() {
   const queryClient = useQueryClient();
-  
-  return useMutation<FavoriteItem, Error, {
-    favoriteId: string;
-    updates: {
-      notes?: string;
-      tags?: string[];
-      folderId?: string;
-      notifyOnSale?: boolean;
-      notifyOnRestock?: boolean;
-    };
-  }>({
-    mutationFn: async ({ favoriteId, updates }: {
+
+  return useMutation<
+    FavoriteItem,
+    Error,
+    {
+      favoriteId: string;
+      updates: {
+        notes?: string;
+        tags?: string[];
+        folderId?: string;
+        notifyOnSale?: boolean;
+        notifyOnRestock?: boolean;
+      };
+    }
+  >({
+    mutationFn: async ({
+      favoriteId,
+      updates,
+    }: {
       favoriteId: string;
       updates: {
         notes?: string;
@@ -285,12 +306,16 @@ export function useFavoriteFolders() {
  */
 export function useCreateFavoriteFolder() {
   const queryClient = useQueryClient();
-  
-  return useMutation<FavoriteFolder, Error, {
-    name: string;
-    color?: string;
-    icon?: string;
-  }>({
+
+  return useMutation<
+    FavoriteFolder,
+    Error,
+    {
+      name: string;
+      color?: string;
+      icon?: string;
+    }
+  >({
     mutationFn: async (folder: { name: string; color?: string; icon?: string }) => {
       const result = await clientPost<typeof folder, FavoriteFolder>(
         phase4Client,
@@ -311,7 +336,7 @@ export function useCreateFavoriteFolder() {
  */
 export function useDeleteFavoriteFolder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (folderId: string) => {
       await clientDelete(phase4Client, `/favorites/folders/${folderId}`);
@@ -329,7 +354,7 @@ export function useDeleteFavoriteFolder() {
  */
 export function useMoveFavoritesToFolder() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { favoriteIds: string[]; folderId: string }>({
     mutationFn: async ({ favoriteIds, folderId }: { favoriteIds: string[]; folderId: string }) => {
       await clientPost<{ favoriteIds: string[]; folderId: string }, void>(
@@ -356,10 +381,7 @@ export function useFrequentlyOrdered() {
   return useQuery<ReorderItem[], Error>({
     queryKey: ['reorder', 'frequent'],
     queryFn: async () => {
-      const res = await clientGet<{ items: ReorderItem[] }>(
-        phase4Client,
-        '/reorder/frequent'
-      );
+      const res = await clientGet<{ items: ReorderItem[] }>(phase4Client, '/reorder/frequent');
       return res.items;
     },
   });
@@ -379,7 +401,8 @@ export function usePastOrders() {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { orders: PastOrder[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { orders: PastOrder[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -390,10 +413,7 @@ export function useLastOrder() {
   return useQuery<PastOrder | null, Error>({
     queryKey: ['reorder', 'last'],
     queryFn: async () => {
-      const res = await clientGet<{ order: PastOrder | null }>(
-        phase4Client,
-        '/reorder/last'
-      );
+      const res = await clientGet<{ order: PastOrder | null }>(phase4Client, '/reorder/last');
       return res.order;
     },
   });
@@ -404,21 +424,24 @@ export function useLastOrder() {
  */
 export function useReorderFromOrder() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ cartId: string; addedItems: number; unavailableItems: string[] }, Error, {
-    orderId: string;
-    items?: string[]; // Optional: specific item IDs to reorder
-  }>({
+
+  return useMutation<
+    { cartId: string; addedItems: number; unavailableItems: string[] },
+    Error,
+    {
+      orderId: string;
+      items?: string[]; // Optional: specific item IDs to reorder
+    }
+  >({
     mutationFn: async ({ orderId, items }: { orderId: string; items?: string[] }) => {
-      const result = await clientPost<{ orderId: string; items?: string[] }, { 
-        cartId: string; 
-        addedItems: number; 
-        unavailableItems: string[] 
-      }>(
-        phase4Client,
-        '/reorder',
-        { orderId, items }
-      );
+      const result = await clientPost<
+        { orderId: string; items?: string[] },
+        {
+          cartId: string;
+          addedItems: number;
+          unavailableItems: string[];
+        }
+      >(phase4Client, '/reorder', { orderId, items });
       logEvent('reorder_from_order', { orderId, itemCount: result.addedItems });
       return result;
     },
@@ -433,11 +456,15 @@ export function useReorderFromOrder() {
  */
 export function useQuickAddToCart() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ cartId: string }, Error, {
-    productId: string;
-    quantity: number;
-  }>({
+
+  return useMutation<
+    { cartId: string },
+    Error,
+    {
+      productId: string;
+      quantity: number;
+    }
+  >({
     mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) => {
       const result = await clientPost<{ productId: string; quantity: number }, { cartId: string }>(
         phase4Client,
@@ -458,22 +485,25 @@ export function useQuickAddToCart() {
  */
 export function useBulkAddToCart() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ 
-    cartId: string; 
-    added: number; 
-    unavailable: string[] 
-  }, Error, { productId: string; quantity: number }[]>({
+
+  return useMutation<
+    {
+      cartId: string;
+      added: number;
+      unavailable: string[];
+    },
+    Error,
+    { productId: string; quantity: number }[]
+  >({
     mutationFn: async (items: { productId: string; quantity: number }[]) => {
-      const result = await clientPost<{ items: typeof items }, { 
-        cartId: string; 
-        added: number; 
-        unavailable: string[] 
-      }>(
-        phase4Client,
-        '/cart/bulk-add',
-        { items }
-      );
+      const result = await clientPost<
+        { items: typeof items },
+        {
+          cartId: string;
+          added: number;
+          unavailable: string[];
+        }
+      >(phase4Client, '/cart/bulk-add', { items });
       logEvent('bulk_add_to_cart', { itemCount: result.added });
       return result;
     },
@@ -494,33 +524,42 @@ const LOCAL_FAVORITES_KEY = '@nimbus/local_favorites';
  */
 export function useLocalFavoritesCache() {
   const [localFavorites, setLocalFavorites] = useState<Set<string>>(new Set());
-  
+
   useEffect(() => {
-    AsyncStorage.getItem(LOCAL_FAVORITES_KEY).then((data) => {
+    AsyncStorage.getItem(LOCAL_FAVORITES_KEY).then(data => {
       if (data) {
         setLocalFavorites(new Set(JSON.parse(data)));
       }
     });
   }, []);
-  
-  const addLocal = useCallback(async (itemKey: string) => {
-    const newFavorites = new Set(localFavorites);
-    newFavorites.add(itemKey);
-    setLocalFavorites(newFavorites);
-    await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify([...newFavorites]));
-  }, [localFavorites]);
-  
-  const removeLocal = useCallback(async (itemKey: string) => {
-    const newFavorites = new Set(localFavorites);
-    newFavorites.delete(itemKey);
-    setLocalFavorites(newFavorites);
-    await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify([...newFavorites]));
-  }, [localFavorites]);
-  
-  const isLocalFavorite = useCallback((itemKey: string) => {
-    return localFavorites.has(itemKey);
-  }, [localFavorites]);
-  
+
+  const addLocal = useCallback(
+    async (itemKey: string) => {
+      const newFavorites = new Set(localFavorites);
+      newFavorites.add(itemKey);
+      setLocalFavorites(newFavorites);
+      await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify([...newFavorites]));
+    },
+    [localFavorites]
+  );
+
+  const removeLocal = useCallback(
+    async (itemKey: string) => {
+      const newFavorites = new Set(localFavorites);
+      newFavorites.delete(itemKey);
+      setLocalFavorites(newFavorites);
+      await AsyncStorage.setItem(LOCAL_FAVORITES_KEY, JSON.stringify([...newFavorites]));
+    },
+    [localFavorites]
+  );
+
+  const isLocalFavorite = useCallback(
+    (itemKey: string) => {
+      return localFavorites.has(itemKey);
+    },
+    [localFavorites]
+  );
+
   return {
     localFavorites,
     addLocal,
@@ -575,11 +614,15 @@ export function useFavoritesBackInStock() {
  * Hook to share favorites list
  */
 export function useShareFavorites() {
-  return useMutation<{ shareUrl: string; expiresAt: string }, Error, {
-    favoriteIds?: string[];
-    folderId?: string;
-    message?: string;
-  }>({
+  return useMutation<
+    { shareUrl: string; expiresAt: string },
+    Error,
+    {
+      favoriteIds?: string[];
+      folderId?: string;
+      message?: string;
+    }
+  >({
     mutationFn: async (shareData: {
       favoriteIds?: string[];
       folderId?: string;
@@ -590,9 +633,9 @@ export function useShareFavorites() {
         '/favorites/share',
         shareData
       );
-      logEvent('favorites_shared', { 
+      logEvent('favorites_shared', {
         hasFolder: !!shareData.folderId,
-        itemCount: shareData.favoriteIds?.length 
+        itemCount: shareData.favoriteIds?.length,
       });
       return result;
     },

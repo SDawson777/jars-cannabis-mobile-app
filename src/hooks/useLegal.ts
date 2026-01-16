@@ -16,10 +16,8 @@ interface FullLegalContent {
 async function fetchLegalContent(stateCode?: string): Promise<FullLegalContent> {
   const cacheKey = `cms:legal${stateCode ? `:${stateCode}` : ''}`;
   const state = await NetInfo.fetch();
-  
-  const path = stateCode 
-    ? `/content/legal?state=${stateCode}` 
-    : '/content/legal';
+
+  const path = stateCode ? `/content/legal?state=${stateCode}` : '/content/legal';
 
   if (!state.isConnected) {
     const cached = await AsyncStorage.getItem(cacheKey);
@@ -54,13 +52,15 @@ export function useLegal(stateCode?: string) {
 /** Hook for a specific legal document type */
 export function useLegalByType(type: 'terms' | 'privacy' | 'accessibility', stateCode?: string) {
   const query = useLegal(stateCode);
-  
+
   return {
     ...query,
-    data: query.data ? {
-      title: type.charAt(0).toUpperCase() + type.slice(1),
-      body: query.data[type] || '',
-      lastUpdated: query.data.lastUpdated?.[type],
-    } as LegalContent & { lastUpdated?: string | null } : undefined,
+    data: query.data
+      ? ({
+          title: type.charAt(0).toUpperCase() + type.slice(1),
+          body: query.data[type] || '',
+          lastUpdated: query.data.lastUpdated?.[type],
+        } as LegalContent & { lastUpdated?: string | null })
+      : undefined,
   };
 }

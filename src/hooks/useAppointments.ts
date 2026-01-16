@@ -36,7 +36,7 @@ export interface Appointment {
   updatedAt: string;
 }
 
-export type AppointmentType = 
+export type AppointmentType =
   | 'consultation'
   | 'pickup'
   | 'workshop'
@@ -117,7 +117,8 @@ export function useAppointments(options?: {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { appointments: Appointment[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { appointments: Appointment[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -145,10 +146,7 @@ export function useAppointment(appointmentId: string) {
   return useQuery<Appointment, Error>({
     queryKey: ['appointments', 'detail', appointmentId],
     queryFn: async () => {
-      return await clientGet<Appointment>(
-        phase4Client,
-        `/appointments/${appointmentId}`
-      );
+      return await clientGet<Appointment>(phase4Client, `/appointments/${appointmentId}`);
     },
     enabled: !!appointmentId,
   });
@@ -166,11 +164,9 @@ export function useAvailableSlots(options: {
   return useQuery<TimeSlot[], Error>({
     queryKey: ['appointments', 'slots', options],
     queryFn: async () => {
-      const res = await clientGet<{ slots: TimeSlot[] }>(
-        phase4Client,
-        '/appointments/slots',
-        { params: options }
-      );
+      const res = await clientGet<{ slots: TimeSlot[] }>(phase4Client, '/appointments/slots', {
+        params: options,
+      });
       return res.slots;
     },
     enabled: !!options.storeId && !!options.date && !!options.appointmentType,
@@ -182,16 +178,20 @@ export function useAvailableSlots(options: {
  */
 export function useBookAppointment() {
   const queryClient = useQueryClient();
-  
-  return useMutation<Appointment, Error, {
-    storeId: string;
-    type: AppointmentType;
-    startTime: string;
-    budtenderId?: string;
-    notes?: string;
-    isVirtual?: boolean;
-    addToCalendar?: boolean;
-  }>({
+
+  return useMutation<
+    Appointment,
+    Error,
+    {
+      storeId: string;
+      type: AppointmentType;
+      startTime: string;
+      budtenderId?: string;
+      notes?: string;
+      isVirtual?: boolean;
+      addToCalendar?: boolean;
+    }
+  >({
     mutationFn: async (booking: {
       storeId: string;
       type: AppointmentType;
@@ -223,13 +223,21 @@ export function useBookAppointment() {
  */
 export function useRescheduleAppointment() {
   const queryClient = useQueryClient();
-  
-  return useMutation<Appointment, Error, {
-    appointmentId: string;
-    newStartTime: string;
-    reason?: string;
-  }>({
-    mutationFn: async ({ appointmentId, newStartTime, reason }: {
+
+  return useMutation<
+    Appointment,
+    Error,
+    {
+      appointmentId: string;
+      newStartTime: string;
+      reason?: string;
+    }
+  >({
+    mutationFn: async ({
+      appointmentId,
+      newStartTime,
+      reason,
+    }: {
       appointmentId: string;
       newStartTime: string;
       reason?: string;
@@ -254,7 +262,7 @@ export function useRescheduleAppointment() {
  */
 export function useCancelAppointment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { appointmentId: string; reason?: string }>({
     mutationFn: async ({ appointmentId, reason }: { appointmentId: string; reason?: string }) => {
       await clientPost<{ reason?: string }, void>(
@@ -275,7 +283,7 @@ export function useCancelAppointment() {
  */
 export function useConfirmAppointment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<Appointment, Error, string>({
     mutationFn: async (appointmentId: string) => {
       const result = await clientPost<Record<string, never>, Appointment>(
@@ -355,7 +363,8 @@ export function useStoreEvents(options?: {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { events: StoreEvent[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { events: StoreEvent[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -366,10 +375,7 @@ export function useStoreEvent(eventId: string) {
   return useQuery<StoreEvent, Error>({
     queryKey: ['events', 'detail', eventId],
     queryFn: async () => {
-      return await clientGet<StoreEvent>(
-        phase4Client,
-        `/events/${eventId}`
-      );
+      return await clientGet<StoreEvent>(phase4Client, `/events/${eventId}`);
     },
     enabled: !!eventId,
   });
@@ -380,13 +386,17 @@ export function useStoreEvent(eventId: string) {
  */
 export function useRegisterForEvent() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ registrationId: string }, Error, {
-    eventId: string;
-    attendees?: number;
-    notes?: string;
-    addToCalendar?: boolean;
-  }>({
+
+  return useMutation<
+    { registrationId: string },
+    Error,
+    {
+      eventId: string;
+      attendees?: number;
+      notes?: string;
+      addToCalendar?: boolean;
+    }
+  >({
     mutationFn: async (registration: {
       eventId: string;
       attendees?: number;
@@ -413,7 +423,7 @@ export function useRegisterForEvent() {
  */
 export function useCancelEventRegistration() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (eventId: string) => {
       await clientDelete(phase4Client, `/events/${eventId}/register`);
@@ -433,10 +443,7 @@ export function useRegisteredEvents() {
   return useQuery<StoreEvent[], Error>({
     queryKey: ['events', 'registered'],
     queryFn: async () => {
-      const res = await clientGet<{ events: StoreEvent[] }>(
-        phase4Client,
-        '/events/registered'
-      );
+      const res = await clientGet<{ events: StoreEvent[] }>(phase4Client, '/events/registered');
       return res.events;
     },
   });
@@ -467,16 +474,19 @@ export function useCalendarIntegrations() {
  */
 export function useConnectCalendar() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ authUrl: string }, Error, {
-    provider: CalendarIntegration['provider'];
-  }>({
+
+  return useMutation<
+    { authUrl: string },
+    Error,
+    {
+      provider: CalendarIntegration['provider'];
+    }
+  >({
     mutationFn: async ({ provider }: { provider: CalendarIntegration['provider'] }) => {
-      const result = await clientPost<{ provider: CalendarIntegration['provider'] }, { authUrl: string }>(
-        phase4Client,
-        '/calendar/connect',
-        { provider }
-      );
+      const result = await clientPost<
+        { provider: CalendarIntegration['provider'] },
+        { authUrl: string }
+      >(phase4Client, '/calendar/connect', { provider });
       logEvent('calendar_connect_started', { provider });
       return result;
     },
@@ -491,7 +501,7 @@ export function useConnectCalendar() {
  */
 export function useDisconnectCalendar() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, CalendarIntegration['provider']>({
     mutationFn: async (provider: CalendarIntegration['provider']) => {
       await clientDelete(phase4Client, `/calendar/integrations/${provider}`);
@@ -508,7 +518,7 @@ export function useDisconnectCalendar() {
  */
 export function useSyncCalendar() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ synced: number }, Error, CalendarIntegration['provider']>({
     mutationFn: async (provider: CalendarIntegration['provider']) => {
       const result = await clientPost<Record<string, never>, { synced: number }>(
@@ -553,11 +563,18 @@ export function useAddToDeviceCalendar() {
  * Hook to set appointment reminders
  */
 export function useSetReminder() {
-  return useMutation<void, Error, {
-    appointmentId: string;
-    reminderTimes: number[]; // minutes before
-  }>({
-    mutationFn: async ({ appointmentId, reminderTimes }: {
+  return useMutation<
+    void,
+    Error,
+    {
+      appointmentId: string;
+      reminderTimes: number[]; // minutes before
+    }
+  >({
+    mutationFn: async ({
+      appointmentId,
+      reminderTimes,
+    }: {
       appointmentId: string;
       reminderTimes: number[];
     }) => {

@@ -9,12 +9,36 @@ const router = Router();
 const SUPPORTED_LOCALES = [
   { code: 'en-US', name: 'English (US)', nativeName: 'English', direction: 'ltr', isDefault: true },
   { code: 'es-ES', name: 'Spanish', nativeName: 'Español', direction: 'ltr', isDefault: false },
-  { code: 'es-MX', name: 'Spanish (Mexico)', nativeName: 'Español (México)', direction: 'ltr', isDefault: false },
+  {
+    code: 'es-MX',
+    name: 'Spanish (Mexico)',
+    nativeName: 'Español (México)',
+    direction: 'ltr',
+    isDefault: false,
+  },
   { code: 'fr-FR', name: 'French', nativeName: 'Français', direction: 'ltr', isDefault: false },
-  { code: 'fr-CA', name: 'French (Canada)', nativeName: 'Français (Canada)', direction: 'ltr', isDefault: false },
+  {
+    code: 'fr-CA',
+    name: 'French (Canada)',
+    nativeName: 'Français (Canada)',
+    direction: 'ltr',
+    isDefault: false,
+  },
   { code: 'de-DE', name: 'German', nativeName: 'Deutsch', direction: 'ltr', isDefault: false },
-  { code: 'pt-BR', name: 'Portuguese (Brazil)', nativeName: 'Português (Brasil)', direction: 'ltr', isDefault: false },
-  { code: 'zh-CN', name: 'Chinese (Simplified)', nativeName: '中文（简体）', direction: 'ltr', isDefault: false },
+  {
+    code: 'pt-BR',
+    name: 'Portuguese (Brazil)',
+    nativeName: 'Português (Brasil)',
+    direction: 'ltr',
+    isDefault: false,
+  },
+  {
+    code: 'zh-CN',
+    name: 'Chinese (Simplified)',
+    nativeName: '中文（简体）',
+    direction: 'ltr',
+    isDefault: false,
+  },
   { code: 'ja-JP', name: 'Japanese', nativeName: '日本語', direction: 'ltr', isDefault: false },
   { code: 'ko-KR', name: 'Korean', nativeName: '한국어', direction: 'ltr', isDefault: false },
 ];
@@ -82,11 +106,11 @@ router.get('/locales/:locale', async (req: Request, res: Response) => {
   try {
     const { locale } = req.params;
     const localeInfo = SUPPORTED_LOCALES.find(l => l.code === locale);
-    
+
     if (!localeInfo) {
       return res.status(404).json({ error: 'Locale not found' });
     }
-    
+
     res.json(localeInfo);
   } catch (error) {
     console.error('Error fetching locale info:', error);
@@ -102,9 +126,9 @@ router.get('/translations/:locale', async (req: Request, res: Response) => {
   try {
     const { locale } = req.params;
     const { namespace } = req.query;
-    
+
     let translations = TRANSLATIONS[locale] || TRANSLATIONS['en-US'];
-    
+
     // Filter by namespace if provided
     if (namespace) {
       const filtered: Record<string, string> = {};
@@ -115,7 +139,7 @@ router.get('/translations/:locale', async (req: Request, res: Response) => {
       });
       translations = filtered;
     }
-    
+
     res.json({
       locale,
       namespace: namespace || 'all',
@@ -133,11 +157,11 @@ router.post('/translations/batch', async (req: Request, res: Response) => {
   try {
     const { locales } = req.body;
     const bundles: Record<string, Record<string, string>> = {};
-    
+
     for (const locale of locales) {
       bundles[locale] = TRANSLATIONS[locale] || TRANSLATIONS['en-US'];
     }
-    
+
     res.json({ bundles });
   } catch (error) {
     console.error('Error fetching translation bundles:', error);
@@ -153,7 +177,7 @@ router.get('/content/:contentType/:contentId', async (req: Request, res: Respons
   try {
     const { contentType, contentId } = req.params;
     const { locale = 'en-US' } = req.query;
-    
+
     res.json({
       id: contentId,
       type: contentType,
@@ -210,10 +234,10 @@ router.post('/settings', async (req: Request, res: Response) => {
 router.post('/detect', async (req: Request, res: Response) => {
   try {
     const { acceptLanguage, timezone: _timezone, region: _region } = req.body;
-    
+
     // Simple detection logic
     let detectedLocale = 'en-US';
-    
+
     if (acceptLanguage) {
       const preferred = acceptLanguage.split(',')[0]?.split(';')[0];
       const match = SUPPORTED_LOCALES.find(
@@ -223,7 +247,7 @@ router.post('/detect', async (req: Request, res: Response) => {
         detectedLocale = match.code;
       }
     }
-    
+
     res.json({
       detectedLocale,
       confidence: 0.9,

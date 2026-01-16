@@ -52,7 +52,7 @@ export function useJournalEntries(options?: { limit?: number }) {
       const params = new URLSearchParams();
       if (options?.limit) params.append('limit', String(options.limit));
       if (pageParam) params.append('cursor', pageParam as string);
-      
+
       const url = `/journal/entries${params.toString() ? `?${params}` : ''}`;
       return clientGet<JournalEntriesResponse>(phase4Client, url);
     },
@@ -80,7 +80,7 @@ export function useJournalEntry(entryId: string) {
  */
 export function useCreateJournalEntry() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<JournalEntry, Error, CreateJournalEntryPayload>({
     mutationFn: async (payload: CreateJournalEntryPayload) => {
       const result = await clientPost<CreateJournalEntryPayload, JournalEntry>(
@@ -88,7 +88,7 @@ export function useCreateJournalEntry() {
         '/journal/entries',
         payload
       );
-      logEvent('journal_entry_created', { 
+      logEvent('journal_entry_created', {
         hasProduct: !!payload.productId,
         method: payload.consumptionMethod,
         rating: payload.rating,
@@ -106,22 +106,33 @@ export function useCreateJournalEntry() {
  */
 export function useUpdateJournalEntry() {
   const queryClient = useQueryClient();
-  
-  return useMutation<JournalEntry, Error, { id: string; data: Partial<CreateJournalEntryPayload> }>({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<CreateJournalEntryPayload> }) => {
-      const result = await clientPut<Partial<CreateJournalEntryPayload>, JournalEntry>(
-        phase4Client,
-        `/journal/entries/${id}`,
-        data
-      );
-      logEvent('journal_entry_updated', { entryId: id });
-      return result;
-    },
-    onSuccess: (_data: JournalEntry, variables: { id: string; data: Partial<CreateJournalEntryPayload> }) => {
-      queryClient.invalidateQueries({ queryKey: ['journal'] });
-      queryClient.invalidateQueries({ queryKey: ['journal', 'entry', variables.id] });
-    },
-  });
+
+  return useMutation<JournalEntry, Error, { id: string; data: Partial<CreateJournalEntryPayload> }>(
+    {
+      mutationFn: async ({
+        id,
+        data,
+      }: {
+        id: string;
+        data: Partial<CreateJournalEntryPayload>;
+      }) => {
+        const result = await clientPut<Partial<CreateJournalEntryPayload>, JournalEntry>(
+          phase4Client,
+          `/journal/entries/${id}`,
+          data
+        );
+        logEvent('journal_entry_updated', { entryId: id });
+        return result;
+      },
+      onSuccess: (
+        _data: JournalEntry,
+        variables: { id: string; data: Partial<CreateJournalEntryPayload> }
+      ) => {
+        queryClient.invalidateQueries({ queryKey: ['journal'] });
+        queryClient.invalidateQueries({ queryKey: ['journal', 'entry', variables.id] });
+      },
+    }
+  );
 }
 
 /**
@@ -129,7 +140,7 @@ export function useUpdateJournalEntry() {
  */
 export function useDeleteJournalEntry() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (entryId: string) => {
       await clientDelete<void>(phase4Client, `/journal/entries/${entryId}`);
@@ -145,13 +156,16 @@ export function useDeleteJournalEntry() {
  * Hook to fetch journal statistics
  */
 export function useJournalStats() {
-  return useQuery<{
-    totalEntries: number;
-    favoriteStrain?: string;
-    preferredMethod?: string;
-    averageRating?: number;
-    recentMoods?: string[];
-  }, Error>({
+  return useQuery<
+    {
+      totalEntries: number;
+      favoriteStrain?: string;
+      preferredMethod?: string;
+      averageRating?: number;
+      recentMoods?: string[];
+    },
+    Error
+  >({
     queryKey: ['journal', 'stats'],
     queryFn: async () => {
       return clientGet(phase4Client, '/journal/stats');
@@ -252,23 +266,27 @@ export interface ConsumptionSummary {
  */
 export function useCreateDetailedEntry() {
   const queryClient = useQueryClient();
-  
-  return useMutation<JournalEntry, Error, {
-    productId?: string;
-    productName?: string;
-    strainName?: string;
-    consumptionMethod: JournalEntry['consumptionMethod'];
-    detailedDosage: DetailedDosage;
-    mood: MoodEntry;
-    effects: EffectEntry[];
-    tags: string[];
-    notes?: string;
-    images?: string[];
-    promptResponses?: Record<string, string | number | boolean | string[]>;
-    location?: { lat: number; lng: number; name?: string };
-    activity?: string;
-    sessionDuration?: number; // minutes
-  }>({
+
+  return useMutation<
+    JournalEntry,
+    Error,
+    {
+      productId?: string;
+      productName?: string;
+      strainName?: string;
+      consumptionMethod: JournalEntry['consumptionMethod'];
+      detailedDosage: DetailedDosage;
+      mood: MoodEntry;
+      effects: EffectEntry[];
+      tags: string[];
+      notes?: string;
+      images?: string[];
+      promptResponses?: Record<string, string | number | boolean | string[]>;
+      location?: { lat: number; lng: number; name?: string };
+      activity?: string;
+      sessionDuration?: number; // minutes
+    }
+  >({
     mutationFn: async (entry: {
       productId?: string;
       productName?: string;
@@ -309,17 +327,17 @@ export function useCreateDetailedEntry() {
  */
 export function useLogMoodCheckIn() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ id: string }, Error, {
-    mood: MoodLevel;
-    tags: string[];
-    notes?: string;
-  }>({
-    mutationFn: async (checkIn: {
+
+  return useMutation<
+    { id: string },
+    Error,
+    {
       mood: MoodLevel;
       tags: string[];
       notes?: string;
-    }) => {
+    }
+  >({
+    mutationFn: async (checkIn: { mood: MoodLevel; tags: string[]; notes?: string }) => {
       const result = await clientPost<typeof checkIn, { id: string }>(
         phase4Client,
         '/journal/mood-checkin',
@@ -339,14 +357,21 @@ export function useLogMoodCheckIn() {
  */
 export function useUpdateMoodAfter() {
   const queryClient = useQueryClient();
-  
-  return useMutation<JournalEntry, Error, {
-    entryId: string;
-    moodAfter: MoodLevel;
-    additionalEffects?: EffectEntry[];
-    notes?: string;
-  }>({
-    mutationFn: async ({ entryId, ...data }: {
+
+  return useMutation<
+    JournalEntry,
+    Error,
+    {
+      entryId: string;
+      moodAfter: MoodLevel;
+      additionalEffects?: EffectEntry[];
+      notes?: string;
+    }
+  >({
+    mutationFn: async ({
+      entryId,
+      ...data
+    }: {
       entryId: string;
       moodAfter: MoodLevel;
       additionalEffects?: EffectEntry[];
@@ -360,12 +385,17 @@ export function useUpdateMoodAfter() {
       logEvent('mood_after_updated', { entryId, moodAfter: data.moodAfter });
       return result;
     },
-    onSuccess: (_: JournalEntry, { entryId }: {
-      entryId: string;
-      moodAfter: MoodLevel;
-      additionalEffects?: EffectEntry[];
-      notes?: string;
-    }) => {
+    onSuccess: (
+      _: JournalEntry,
+      {
+        entryId,
+      }: {
+        entryId: string;
+        moodAfter: MoodLevel;
+        additionalEffects?: EffectEntry[];
+        notes?: string;
+      }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['journal', 'entry', entryId] });
       queryClient.invalidateQueries({ queryKey: ['journal', 'mood'] });
     },
@@ -383,11 +413,9 @@ export function useJournalPrompts(category?: JournalPrompt['category']) {
   return useQuery<JournalPrompt[], Error>({
     queryKey: ['journal', 'prompts', category],
     queryFn: async () => {
-      const res = await clientGet<{ prompts: JournalPrompt[] }>(
-        phase4Client,
-        '/journal/prompts',
-        { params: category ? { category } : undefined }
-      );
+      const res = await clientGet<{ prompts: JournalPrompt[] }>(phase4Client, '/journal/prompts', {
+        params: category ? { category } : undefined,
+      });
       return res.prompts;
     },
     staleTime: 60 * 60 * 1000, // 1 hour
@@ -412,22 +440,18 @@ export function useJournalTags() {
  */
 export function useCreateJournalTag() {
   const queryClient = useQueryClient();
-  
-  return useMutation<JournalTag, Error, {
-    name: string;
-    color: string;
-    category: JournalTag['category'];
-  }>({
-    mutationFn: async (tag: {
+
+  return useMutation<
+    JournalTag,
+    Error,
+    {
       name: string;
       color: string;
       category: JournalTag['category'];
-    }) => {
-      const result = await clientPost<typeof tag, JournalTag>(
-        phase4Client,
-        '/journal/tags',
-        tag
-      );
+    }
+  >({
+    mutationFn: async (tag: { name: string; color: string; category: JournalTag['category'] }) => {
+      const result = await clientPost<typeof tag, JournalTag>(phase4Client, '/journal/tags', tag);
       logEvent('journal_tag_created', { category: tag.category });
       return result;
     },
@@ -448,11 +472,9 @@ export function useSuggestedTags(context: {
   return useQuery<string[], Error>({
     queryKey: ['journal', 'tags', 'suggested', context],
     queryFn: async () => {
-      const res = await clientGet<{ tags: string[] }>(
-        phase4Client,
-        '/journal/tags/suggested',
-        { params: context }
-      );
+      const res = await clientGet<{ tags: string[] }>(phase4Client, '/journal/tags/suggested', {
+        params: context,
+      });
       return res.tags;
     },
     enabled: !!(context.strain || context.method || context.effects?.length),
@@ -470,11 +492,9 @@ export function useMoodChartData(period: 'week' | 'month' | 'year' = 'month') {
   return useQuery<JournalChartData, Error>({
     queryKey: ['journal', 'charts', 'mood', period],
     queryFn: async () => {
-      return await clientGet<JournalChartData>(
-        phase4Client,
-        '/journal/charts/mood',
-        { params: { period } }
-      );
+      return await clientGet<JournalChartData>(phase4Client, '/journal/charts/mood', {
+        params: { period },
+      });
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -487,11 +507,9 @@ export function useDosageChartData(period: 'week' | 'month' | 'year' = 'month') 
   return useQuery<JournalChartData, Error>({
     queryKey: ['journal', 'charts', 'dosage', period],
     queryFn: async () => {
-      return await clientGet<JournalChartData>(
-        phase4Client,
-        '/journal/charts/dosage',
-        { params: { period } }
-      );
+      return await clientGet<JournalChartData>(phase4Client, '/journal/charts/dosage', {
+        params: { period },
+      });
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -501,17 +519,16 @@ export function useDosageChartData(period: 'week' | 'month' | 'year' = 'month') 
  * Hook to fetch effects frequency chart
  */
 export function useEffectsChartData(period: 'week' | 'month' | 'year' = 'month') {
-  return useQuery<{
-    effects: { effect: string; positive: number; negative: number }[];
-    period: string;
-  }, Error>({
+  return useQuery<
+    {
+      effects: { effect: string; positive: number; negative: number }[];
+      period: string;
+    },
+    Error
+  >({
     queryKey: ['journal', 'charts', 'effects', period],
     queryFn: async () => {
-      return await clientGet(
-        phase4Client,
-        '/journal/charts/effects',
-        { params: { period } }
-      );
+      return await clientGet(phase4Client, '/journal/charts/effects', { params: { period } });
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -524,11 +541,9 @@ export function useConsumptionSummary(period: 'week' | 'month' | 'year' = 'month
   return useQuery<ConsumptionSummary, Error>({
     queryKey: ['journal', 'summary', period],
     queryFn: async () => {
-      return await clientGet<ConsumptionSummary>(
-        phase4Client,
-        '/journal/summary',
-        { params: { period } }
-      );
+      return await clientGet<ConsumptionSummary>(phase4Client, '/journal/summary', {
+        params: { period },
+      });
     },
     staleTime: 10 * 60 * 1000,
   });
@@ -559,11 +574,14 @@ export function useJournalInsights() {
  * Hook to find effect correlations
  */
 export function useEffectCorrelations() {
-  return useQuery<{
-    strainEffects: { strain: string; topEffects: string[] }[];
-    methodEffects: { method: string; topEffects: string[] }[];
-    timeEffects: { timeOfDay: string; topEffects: string[] }[];
-  }, Error>({
+  return useQuery<
+    {
+      strainEffects: { strain: string; topEffects: string[] }[];
+      methodEffects: { method: string; topEffects: string[] }[];
+      timeEffects: { timeOfDay: string; topEffects: string[] }[];
+    },
+    Error
+  >({
     queryKey: ['journal', 'correlations', 'effects'],
     queryFn: async () => {
       return await clientGet(phase4Client, '/journal/correlations/effects');
@@ -576,12 +594,15 @@ export function useEffectCorrelations() {
  * Hook to find mood patterns
  */
 export function useMoodPatterns() {
-  return useQuery<{
-    bestTimeOfDay: string;
-    bestDayOfWeek: string;
-    optimalDosage: DetailedDosage;
-    moodTriggers: { trigger: string; impact: 'positive' | 'negative' }[];
-  }, Error>({
+  return useQuery<
+    {
+      bestTimeOfDay: string;
+      bestDayOfWeek: string;
+      optimalDosage: DetailedDosage;
+      moodTriggers: { trigger: string; impact: 'positive' | 'negative' }[];
+    },
+    Error
+  >({
     queryKey: ['journal', 'patterns', 'mood'],
     queryFn: async () => {
       return await clientGet(phase4Client, '/journal/patterns/mood');
@@ -594,11 +615,14 @@ export function useMoodPatterns() {
  * Hook to get personalized recommendations based on journal
  */
 export function useJournalRecommendations() {
-  return useQuery<{
-    strains: { id: string; name: string; reason: string; confidence: number }[];
-    dosage: { recommended: DetailedDosage; reason: string };
-    timing: { bestTime: string; reason: string };
-  }, Error>({
+  return useQuery<
+    {
+      strains: { id: string; name: string; reason: string; confidence: number }[];
+      dosage: { recommended: DetailedDosage; reason: string };
+      timing: { bestTime: string; reason: string };
+    },
+    Error
+  >({
     queryKey: ['journal', 'recommendations'],
     queryFn: async () => {
       return await clientGet(phase4Client, '/journal/recommendations');
@@ -614,26 +638,29 @@ export function useJournalRecommendations() {
 /**
  * Hook to search journal entries
  */
-export function useSearchJournal(query: string, filters?: {
-  startDate?: string;
-  endDate?: string;
-  mood?: MoodLevel[];
-  effects?: string[];
-  strains?: string[];
-  methods?: JournalEntry['consumptionMethod'][];
-  tags?: string[];
-}) {
+export function useSearchJournal(
+  query: string,
+  filters?: {
+    startDate?: string;
+    endDate?: string;
+    mood?: MoodLevel[];
+    effects?: string[];
+    strains?: string[];
+    methods?: JournalEntry['consumptionMethod'][];
+    tags?: string[];
+  }
+) {
   return useQuery<JournalEntry[], Error>({
     queryKey: ['journal', 'search', query, filters],
     queryFn: async () => {
-      const res = await clientGet<{ entries: JournalEntry[] }>(
-        phase4Client,
-        '/journal/search',
-        { params: { q: query, ...filters } }
-      );
+      const res = await clientGet<{ entries: JournalEntry[] }>(phase4Client, '/journal/search', {
+        params: { q: query, ...filters },
+      });
       return res.entries;
     },
-    enabled: query.length >= 2 || Object.values(filters || {}).some(v => v && (Array.isArray(v) ? v.length > 0 : true)),
+    enabled:
+      query.length >= 2 ||
+      Object.values(filters || {}).some(v => v && (Array.isArray(v) ? v.length > 0 : true)),
   });
 }
 
@@ -679,12 +706,16 @@ export function useStrainJournalEntries(strainName: string) {
  * Hook to export journal data
  */
 export function useExportJournal() {
-  return useMutation<{ downloadUrl: string }, Error, {
-    format: 'pdf' | 'csv' | 'json';
-    startDate?: string;
-    endDate?: string;
-    includeImages?: boolean;
-  }>({
+  return useMutation<
+    { downloadUrl: string },
+    Error,
+    {
+      format: 'pdf' | 'csv' | 'json';
+      startDate?: string;
+      endDate?: string;
+      includeImages?: boolean;
+    }
+  >({
     mutationFn: async (options: {
       format: 'pdf' | 'csv' | 'json';
       startDate?: string;
@@ -706,13 +737,17 @@ export function useExportJournal() {
  * Hook to share a journal entry (anonymized)
  */
 export function useShareJournalEntry() {
-  return useMutation<{ shareUrl: string }, Error, {
-    entryId: string;
-    includeStrain: boolean;
-    includeDosage: boolean;
-    includeEffects: boolean;
-    expiresIn?: number; // hours
-  }>({
+  return useMutation<
+    { shareUrl: string },
+    Error,
+    {
+      entryId: string;
+      includeStrain: boolean;
+      includeDosage: boolean;
+      includeEffects: boolean;
+      expiresIn?: number; // hours
+    }
+  >({
     mutationFn: async (options: {
       entryId: string;
       includeStrain: boolean;
@@ -740,13 +775,17 @@ export function useShareJournalEntry() {
  */
 export function useSetJournalReminder() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ id: string }, Error, {
-    type: 'log_session' | 'mood_checkin' | 'follow_up';
-    time: string; // HH:mm
-    days: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[];
-    enabled: boolean;
-  }>({
+
+  return useMutation<
+    { id: string },
+    Error,
+    {
+      type: 'log_session' | 'mood_checkin' | 'follow_up';
+      time: string; // HH:mm
+      days: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[];
+      enabled: boolean;
+    }
+  >({
     mutationFn: async (reminder: {
       type: 'log_session' | 'mood_checkin' | 'follow_up';
       time: string;
@@ -771,22 +810,27 @@ export function useSetJournalReminder() {
  * Hook to fetch journal reminders
  */
 export function useJournalReminders() {
-  return useQuery<{
-    id: string;
-    type: string;
-    time: string;
-    days: string[];
-    enabled: boolean;
-  }[], Error>({
+  return useQuery<
+    {
+      id: string;
+      type: string;
+      time: string;
+      days: string[];
+      enabled: boolean;
+    }[],
+    Error
+  >({
     queryKey: ['journal', 'reminders'],
     queryFn: async () => {
-      const res = await clientGet<{ reminders: {
-        id: string;
-        type: string;
-        time: string;
-        days: string[];
-        enabled: boolean;
-      }[] }>(phase4Client, '/journal/reminders');
+      const res = await clientGet<{
+        reminders: {
+          id: string;
+          type: string;
+          time: string;
+          days: string[];
+          enabled: boolean;
+        }[];
+      }>(phase4Client, '/journal/reminders');
       return res.reminders;
     },
   });

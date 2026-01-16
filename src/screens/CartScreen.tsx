@@ -114,7 +114,9 @@ export default function CartScreen() {
       try {
         await updateCart({ items: updatedItems });
         // Track add/remove from cart based on delta
-        trackCommerceEvent(delta > 0 ? 'add_to_cart' : 'remove_from_cart', id, { quantity: Math.abs(delta) });
+        trackCommerceEvent(delta > 0 ? 'add_to_cart' : 'remove_from_cart', id, {
+          quantity: Math.abs(delta),
+        });
       } catch (error) {
         // Error handling - could show toast or retry
         console.error('Failed to update cart:', error);

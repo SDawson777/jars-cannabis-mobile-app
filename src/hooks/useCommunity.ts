@@ -97,10 +97,7 @@ export function useUserProfile(userId: string) {
   return useQuery<UserProfile, Error>({
     queryKey: ['community', 'profile', userId],
     queryFn: async () => {
-      return await clientGet<UserProfile>(
-        phase4Client,
-        `/community/users/${userId}`
-      );
+      return await clientGet<UserProfile>(phase4Client, `/community/users/${userId}`);
     },
     enabled: !!userId,
   });
@@ -123,9 +120,15 @@ export function useMyProfile() {
  */
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
-  
-  return useMutation<UserProfile, Error, Partial<Pick<UserProfile, 'displayName' | 'bio' | 'avatarUrl'>>>({
-    mutationFn: async (updates: Partial<Pick<UserProfile, 'displayName' | 'bio' | 'avatarUrl'>>) => {
+
+  return useMutation<
+    UserProfile,
+    Error,
+    Partial<Pick<UserProfile, 'displayName' | 'bio' | 'avatarUrl'>>
+  >({
+    mutationFn: async (
+      updates: Partial<Pick<UserProfile, 'displayName' | 'bio' | 'avatarUrl'>>
+    ) => {
       const result = await clientPost<typeof updates, UserProfile>(
         phase4Client,
         '/community/me',
@@ -149,7 +152,7 @@ export function useUpdateProfile() {
  */
 export function useFollowUser() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (userId: string) => {
       await clientPost<Record<string, never>, void>(
@@ -172,7 +175,7 @@ export function useFollowUser() {
  */
 export function useUnfollowUser() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (userId: string) => {
       await clientDelete(phase4Client, `/community/users/${userId}/follow`);
@@ -200,7 +203,8 @@ export function useFollowers(userId: string) {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { users: UserProfile[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { users: UserProfile[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
     enabled: !!userId,
   });
 }
@@ -219,7 +223,8 @@ export function useFollowing(userId: string) {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { users: UserProfile[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { users: UserProfile[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
     enabled: !!userId,
   });
 }
@@ -247,7 +252,8 @@ export function useCommunityFeed(options?: {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { posts: CommunityPost[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { posts: CommunityPost[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -258,10 +264,7 @@ export function usePost(postId: string) {
   return useQuery<CommunityPost, Error>({
     queryKey: ['community', 'post', postId],
     queryFn: async () => {
-      return await clientGet<CommunityPost>(
-        phase4Client,
-        `/community/posts/${postId}`
-      );
+      return await clientGet<CommunityPost>(phase4Client, `/community/posts/${postId}`);
     },
     enabled: !!postId,
   });
@@ -272,16 +275,20 @@ export function usePost(postId: string) {
  */
 export function useCreatePost() {
   const queryClient = useQueryClient();
-  
-  return useMutation<CommunityPost, Error, {
-    type: CommunityPost['type'];
-    content: string;
-    images?: string[];
-    productId?: string;
-    rating?: number;
-    effects?: string[];
-    tags?: string[];
-  }>({
+
+  return useMutation<
+    CommunityPost,
+    Error,
+    {
+      type: CommunityPost['type'];
+      content: string;
+      images?: string[];
+      productId?: string;
+      rating?: number;
+      effects?: string[];
+      tags?: string[];
+    }
+  >({
     mutationFn: async (post: {
       type: CommunityPost['type'];
       content: string;
@@ -311,7 +318,7 @@ export function useCreatePost() {
  */
 export function useDeletePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (postId: string) => {
       await clientDelete(phase4Client, `/community/posts/${postId}`);
@@ -332,11 +339,15 @@ export function useDeletePost() {
  */
 export function useLikePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { postId: string; like: boolean }>({
     mutationFn: async ({ postId, like }: { postId: string; like: boolean }) => {
       if (like) {
-        await clientPost<Record<string, never>, void>(phase4Client, `/community/posts/${postId}/like`, {});
+        await clientPost<Record<string, never>, void>(
+          phase4Client,
+          `/community/posts/${postId}/like`,
+          {}
+        );
       } else {
         await clientDelete(phase4Client, `/community/posts/${postId}/like`);
       }
@@ -354,11 +365,15 @@ export function useLikePost() {
  */
 export function useSavePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { postId: string; save: boolean }>({
     mutationFn: async ({ postId, save }: { postId: string; save: boolean }) => {
       if (save) {
-        await clientPost<Record<string, never>, void>(phase4Client, `/community/posts/${postId}/save`, {});
+        await clientPost<Record<string, never>, void>(
+          phase4Client,
+          `/community/posts/${postId}/save`,
+          {}
+        );
       } else {
         await clientDelete(phase4Client, `/community/posts/${postId}/save`);
       }
@@ -384,7 +399,8 @@ export function useSavedPosts() {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { posts: CommunityPost[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { posts: CommunityPost[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
   });
 }
 
@@ -406,7 +422,8 @@ export function useComments(postId: string) {
       );
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { comments: Comment[]; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: { comments: Comment[]; nextCursor?: string }) =>
+      lastPage.nextCursor,
     enabled: !!postId,
   });
 }
@@ -416,22 +433,35 @@ export function useComments(postId: string) {
  */
 export function useAddComment() {
   const queryClient = useQueryClient();
-  
-  return useMutation<Comment, Error, { postId: string; content: string; parentCommentId?: string }>({
-    mutationFn: async ({ postId, content, parentCommentId }: { postId: string; content: string; parentCommentId?: string }) => {
-      const result = await clientPost<{ content: string; parentCommentId?: string }, Comment>(
-        phase4Client,
-        `/community/posts/${postId}/comments`,
-        { content, parentCommentId }
-      );
-      logEvent('comment_added', { postId, isReply: !!parentCommentId });
-      return result;
-    },
-    onSuccess: (_: Comment, { postId }: { postId: string; content: string; parentCommentId?: string }) => {
-      queryClient.invalidateQueries({ queryKey: ['community', 'comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['community', 'post', postId] });
-    },
-  });
+
+  return useMutation<Comment, Error, { postId: string; content: string; parentCommentId?: string }>(
+    {
+      mutationFn: async ({
+        postId,
+        content,
+        parentCommentId,
+      }: {
+        postId: string;
+        content: string;
+        parentCommentId?: string;
+      }) => {
+        const result = await clientPost<{ content: string; parentCommentId?: string }, Comment>(
+          phase4Client,
+          `/community/posts/${postId}/comments`,
+          { content, parentCommentId }
+        );
+        logEvent('comment_added', { postId, isReply: !!parentCommentId });
+        return result;
+      },
+      onSuccess: (
+        _: Comment,
+        { postId }: { postId: string; content: string; parentCommentId?: string }
+      ) => {
+        queryClient.invalidateQueries({ queryKey: ['community', 'comments', postId] });
+        queryClient.invalidateQueries({ queryKey: ['community', 'post', postId] });
+      },
+    }
+  );
 }
 
 /**
@@ -439,11 +469,22 @@ export function useAddComment() {
  */
 export function useLikeComment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { postId: string; commentId: string; like: boolean }>({
-    mutationFn: async ({ commentId, like }: { postId: string; commentId: string; like: boolean }) => {
+    mutationFn: async ({
+      commentId,
+      like,
+    }: {
+      postId: string;
+      commentId: string;
+      like: boolean;
+    }) => {
       if (like) {
-        await clientPost<Record<string, never>, void>(phase4Client, `/community/comments/${commentId}/like`, {});
+        await clientPost<Record<string, never>, void>(
+          phase4Client,
+          `/community/comments/${commentId}/like`,
+          {}
+        );
       } else {
         await clientDelete(phase4Client, `/community/comments/${commentId}/like`);
       }
@@ -489,15 +530,18 @@ export function useAvailableBadges() {
  * Hook to fetch points history
  */
 export function usePointsHistory() {
-  return useQuery<{
-    total: number;
-    history: {
-      id: string;
-      points: number;
-      reason: string;
-      createdAt: string;
-    }[];
-  }, Error>({
+  return useQuery<
+    {
+      total: number;
+      history: {
+        id: string;
+        points: number;
+        reason: string;
+        createdAt: string;
+      }[];
+    },
+    Error
+  >({
     queryKey: ['community', 'points', 'history'],
     queryFn: async () => {
       return await clientGet(phase4Client, '/community/me/points');
@@ -531,12 +575,16 @@ export function useLeaderboard(timeframe: 'weekly' | 'monthly' | 'alltime' = 'we
  * Hook to report content
  */
 export function useReportContent() {
-  return useMutation<void, Error, {
-    contentType: 'post' | 'comment' | 'user';
-    contentId: string;
-    reason: 'spam' | 'harassment' | 'inappropriate' | 'misinformation' | 'other';
-    details?: string;
-  }>({
+  return useMutation<
+    void,
+    Error,
+    {
+      contentType: 'post' | 'comment' | 'user';
+      contentId: string;
+      reason: 'spam' | 'harassment' | 'inappropriate' | 'misinformation' | 'other';
+      details?: string;
+    }
+  >({
     mutationFn: async (report: {
       contentType: 'post' | 'comment' | 'user';
       contentId: string;
@@ -554,10 +602,14 @@ export function useReportContent() {
  */
 export function useBlockUser() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (userId: string) => {
-      await clientPost<Record<string, never>, void>(phase4Client, `/community/users/${userId}/block`, {});
+      await clientPost<Record<string, never>, void>(
+        phase4Client,
+        `/community/users/${userId}/block`,
+        {}
+      );
       logEvent('user_blocked', { userId });
     },
     onSuccess: () => {

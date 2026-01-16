@@ -73,7 +73,7 @@ router.post('/mood/after', async (req: Request, res: Response) => {
 router.get('/prompts', async (req: Request, res: Response) => {
   try {
     const { category } = req.query;
-    
+
     const prompts = [
       {
         id: 'prompt-1',
@@ -100,15 +100,13 @@ router.get('/prompts', async (req: Request, res: Response) => {
         id: 'prompt-4',
         text: 'What effects are you hoping for?',
         category: 'effects',
-        helpText: 'We\'ll help you track if you achieved your goals',
+        helpText: "We'll help you track if you achieved your goals",
         isRequired: false,
       },
     ];
-    
-    const filtered = category 
-      ? prompts.filter(p => p.category === category)
-      : prompts;
-    
+
+    const filtered = category ? prompts.filter(p => p.category === category) : prompts;
+
     res.json({ prompts: filtered });
   } catch (error) {
     console.error('Error fetching prompts:', error);
@@ -174,12 +172,12 @@ router.get('/tags/suggested', async (req: Request, res: Response) => {
 router.get('/charts/mood', async (req: Request, res: Response) => {
   try {
     const { startDate, endDate, granularity: _granularity } = req.query;
-    
+
     // Generate mock mood data
     const dataPoints = [];
     const start = new Date(startDate as string);
     const end = new Date(endDate as string);
-    
+
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       dataPoints.push({
         date: new Date(d).toISOString().split('T')[0],
@@ -187,7 +185,7 @@ router.get('/charts/mood', async (req: Request, res: Response) => {
         count: Math.floor(Math.random() * 3) + 1,
       });
     }
-    
+
     res.json({
       dataPoints,
       average: 7.5,
@@ -203,7 +201,7 @@ router.get('/charts/mood', async (req: Request, res: Response) => {
 router.get('/charts/dosage', async (req: Request, res: Response) => {
   try {
     const { startDate: _startDate, endDate: _endDate, granularity: _granularity } = req.query;
-    
+
     res.json({
       dataPoints: [
         { date: '2024-01-15', method: 'vape', amount: 0.3, unit: 'g' },
@@ -249,9 +247,7 @@ router.get('/summary', async (req: Request, res: Response) => {
       totalProducts: 12,
       totalConsumption: { flower: '14g', edibles: '200mg' },
       averageMood: { before: 6.5, after: 8.2 },
-      topProducts: [
-        { productId: 'prod-1', name: 'Blue Dream', count: 15 },
-      ],
+      topProducts: [{ productId: 'prod-1', name: 'Blue Dream', count: 15 }],
       topEffects: ['relaxed', 'happy', 'creative'],
       mostActiveDay: 'Saturday',
       mostActiveTime: 'evening',
@@ -403,7 +399,12 @@ router.get('/by-strain/:strain', async (req: Request, res: Response) => {
 
 router.post('/export', async (req: Request, res: Response) => {
   try {
-    const { format, startDate: _startDate, endDate: _endDate, includeMedia: _includeMedia } = req.body;
+    const {
+      format,
+      startDate: _startDate,
+      endDate: _endDate,
+      includeMedia: _includeMedia,
+    } = req.body;
     res.json({
       downloadUrl: `https://nimbus.app/exports/journal-${Date.now()}.${format}`,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -417,7 +418,11 @@ router.post('/export', async (req: Request, res: Response) => {
 router.post('/entries/:entryId/share', async (req: Request, res: Response) => {
   try {
     const { entryId } = req.params;
-    const { includeProduct: _includeProduct, includeEffects: _includeEffects, expiresInDays } = req.body;
+    const {
+      includeProduct: _includeProduct,
+      includeEffects: _includeEffects,
+      expiresInDays,
+    } = req.body;
     res.json({
       shareUrl: `https://nimbus.app/shared/journal/${entryId}`,
       expiresAt: new Date(Date.now() + (expiresInDays || 7) * 24 * 60 * 60 * 1000).toISOString(),

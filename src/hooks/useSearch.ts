@@ -82,7 +82,11 @@ export interface SearchSuggestion {
 /**
  * Hook for advanced product search with filters
  */
-export function useProductSearch(query: string, filters: SearchFilters = {}, options?: { enabled?: boolean }) {
+export function useProductSearch(
+  query: string,
+  filters: SearchFilters = {},
+  options?: { enabled?: boolean }
+) {
   return useInfiniteQuery<SearchResponse, Error>({
     queryKey: ['search', 'products', query, filters],
     queryFn: async ({ pageParam }: { pageParam: number | undefined }) => {
@@ -90,7 +94,7 @@ export function useProductSearch(query: string, filters: SearchFilters = {}, opt
       if (query) params.append('q', query);
       params.append('page', String(pageParam || 1));
       params.append('limit', '24');
-      
+
       // Add filters
       if (filters.category) params.append('category', filters.category);
       if (filters.subcategory) params.append('subcategory', filters.subcategory);
@@ -108,20 +112,21 @@ export function useProductSearch(query: string, filters: SearchFilters = {}, opt
       if (filters.inStock) params.append('inStock', 'true');
       if (filters.onSale) params.append('onSale', 'true');
       if (filters.sortBy) params.append('sort', filters.sortBy);
-      
+
       const result = await clientGet<SearchResponse>(phase4Client, `/search/products?${params}`);
-      
+
       if (pageParam === 1 || !pageParam) {
-        logEvent('search_performed', { 
-          query, 
+        logEvent('search_performed', {
+          query,
           filterCount: Object.keys(filters).length,
           resultCount: result.total,
         });
       }
-      
+
       return result;
     },
-    getNextPageParam: (lastPage: SearchResponse) => lastPage.hasMore ? lastPage.page + 1 : undefined,
+    getNextPageParam: (lastPage: SearchResponse) =>
+      lastPage.hasMore ? lastPage.page + 1 : undefined,
     initialPageParam: 1,
     enabled: options?.enabled !== false && (!!query || Object.keys(filters).length > 0),
     staleTime: 2 * 60 * 1000,
@@ -166,18 +171,18 @@ export function useTrendingSearches() {
  */
 export function useRecentSearches() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  
+
   const addRecentSearch = useCallback((query: string) => {
     setRecentSearches(prev => {
       const filtered = prev.filter(s => s.toLowerCase() !== query.toLowerCase());
       return [query, ...filtered].slice(0, 10);
     });
   }, []);
-  
+
   const clearRecentSearches = useCallback(() => {
     setRecentSearches([]);
   }, []);
-  
+
   return { recentSearches, addRecentSearch, clearRecentSearches };
 }
 
@@ -188,29 +193,32 @@ export function useSearchState(initialFilters: SearchFilters = {}) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
-  
-  const debouncedSetQuery = useMemo(
-    () => debounce((q: string) => setDebouncedQuery(q), 300),
+
+  const debouncedSetQuery = useMemo(() => debounce((q: string) => setDebouncedQuery(q), 300), []);
+
+  const updateQuery = useCallback(
+    (q: string) => {
+      setQuery(q);
+      debouncedSetQuery(q);
+    },
+    [debouncedSetQuery]
+  );
+
+  const updateFilter = useCallback(
+    <K extends keyof SearchFilters>(key: K, value: SearchFilters[K]) => {
+      setFilters(prev => ({ ...prev, [key]: value }));
+    },
     []
   );
-  
-  const updateQuery = useCallback((q: string) => {
-    setQuery(q);
-    debouncedSetQuery(q);
-  }, [debouncedSetQuery]);
-  
-  const updateFilter = useCallback(<K extends keyof SearchFilters>(key: K, value: SearchFilters[K]) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  }, []);
-  
+
   const clearFilters = useCallback(() => {
     setFilters({});
   }, []);
-  
+
   const activeFilterCount = useMemo(() => {
     return Object.values(filters).filter(v => v !== undefined && v !== null && v !== '').length;
   }, [filters]);
-  
+
   return {
     query,
     debouncedQuery,

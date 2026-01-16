@@ -25,13 +25,16 @@ const demoRecalls = [
 ];
 
 // State restrictions data
-const stateRestrictions: Record<string, {
-  allowed: boolean;
-  restrictions?: string[];
-  legalAge: number;
-  medicalOnly?: boolean;
-  purchaseLimits?: { daily?: number; monthly?: number };
-}> = {
+const stateRestrictions: Record<
+  string,
+  {
+    allowed: boolean;
+    restrictions?: string[];
+    legalAge: number;
+    medicalOnly?: boolean;
+    purchaseLimits?: { daily?: number; monthly?: number };
+  }
+> = {
   CA: { allowed: true, legalAge: 21, purchaseLimits: { daily: 28.5 } },
   CO: { allowed: true, legalAge: 21, purchaseLimits: { daily: 28 } },
   OR: { allowed: true, legalAge: 21, purchaseLimits: { daily: 28 } },
@@ -55,18 +58,18 @@ const stateRestrictions: Record<string, {
  */
 router.get('/status', optionalAuth, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
-  
+
   let ageVerified = false;
   let ageVerifiedAt: string | undefined;
   let userState: string | undefined;
-  
+
   if (userId) {
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { ageVerified: true, dateOfBirth: true, state: true },
       });
-      
+
       if (user) {
         ageVerified = user.ageVerified;
         userState = user.state || undefined;
@@ -75,17 +78,19 @@ router.get('/status', optionalAuth, async (req: Request, res: Response) => {
       // Continue with defaults
     }
   }
-  
-  const stateInfo = userState ? (stateRestrictions[userState] || stateRestrictions.DEFAULT) : stateRestrictions.DEFAULT;
-  
+
+  const stateInfo = userState
+    ? stateRestrictions[userState] || stateRestrictions.DEFAULT
+    : stateRestrictions.DEFAULT;
+
   res.json({
     ageVerified,
     ageVerifiedAt,
     state: userState,
     stateAllowed: stateInfo.allowed,
     activeAlerts: [],
-    activeRecalls: demoRecalls.filter(r => 
-      !userState || !r.affectedStates || r.affectedStates.includes(userState)
+    activeRecalls: demoRecalls.filter(
+      r => !userState || !r.affectedStates || r.affectedStates.includes(userState)
     ),
   });
 });
@@ -98,11 +103,11 @@ router.get('/recalls', optionalAuth, async (req: Request, res: Response) => {
   // In production, fetch from database
   // Filter by user's state if available
   const userState = (req as any).user?.state;
-  
-  const relevantRecalls = demoRecalls.filter(r => 
-    !userState || !r.affectedStates || r.affectedStates.includes(userState)
+
+  const relevantRecalls = demoRecalls.filter(
+    r => !userState || !r.affectedStates || r.affectedStates.includes(userState)
   );
-  
+
   res.json(relevantRecalls);
 });
 
@@ -113,10 +118,10 @@ router.get('/recalls', optionalAuth, async (req: Request, res: Response) => {
 router.post('/recalls/:id/acknowledge', requireAuth, async (req: Request, res: Response) => {
   const { id } = req.params;
   const userId = (req as any).user?.id;
-  
+
   // In production, store acknowledgment in database
   console.log(`User ${userId} acknowledged recall ${id}`);
-  
+
   res.json({ success: true });
 });
 
@@ -127,11 +132,11 @@ router.post('/recalls/:id/acknowledge', requireAuth, async (req: Request, res: R
 router.post('/verify-age', requireAuth, async (req: Request, res: Response) => {
   const { birthDate } = req.body;
   const userId = (req as any).user?.id;
-  
+
   if (!birthDate) {
     return res.status(400).json({ error: 'Birth date is required' });
   }
-  
+
   const dob = new Date(birthDate);
   const today = new Date();
   let age = today.getFullYear() - dob.getFullYear();
@@ -139,14 +144,14 @@ router.post('/verify-age', requireAuth, async (req: Request, res: Response) => {
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
     age--;
   }
-  
+
   const verified = age >= 21;
-  
+
   if (verified && userId) {
     try {
       await prisma.user.update({
         where: { id: userId },
-        data: { 
+        data: {
           ageVerified: true,
           dateOfBirth: dob,
         },
@@ -155,10 +160,12 @@ router.post('/verify-age', requireAuth, async (req: Request, res: Response) => {
       // Non-fatal
     }
   }
-  
+
   res.json({
     verified,
-    expiresAt: verified ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+    expiresAt: verified
+      ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+      : undefined,
   });
 });
 
@@ -169,9 +176,9 @@ router.post('/verify-age', requireAuth, async (req: Request, res: Response) => {
 router.get('/states/:state', (req: Request, res: Response) => {
   const { state } = req.params;
   const stateUpper = state.toUpperCase();
-  
+
   const info = stateRestrictions[stateUpper] || stateRestrictions.DEFAULT;
-  
+
   res.json(info);
 });
 

@@ -33,14 +33,17 @@ export interface CreateReviewPayload {
 /**
  * Hook to fetch reviews for a product
  */
-export function useProductReviews(productId: string, options?: { limit?: number; offset?: number }) {
+export function useProductReviews(
+  productId: string,
+  options?: { limit?: number; offset?: number }
+) {
   return useQuery<ReviewsResponse, Error>({
     queryKey: ['reviews', productId, options?.limit, options?.offset],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (options?.limit) params.append('limit', String(options.limit));
       if (options?.offset) params.append('offset', String(options.offset));
-      
+
       const url = `/products/${productId}/reviews${params.toString() ? `?${params}` : ''}`;
       return clientGet<ReviewsResponse>(phase4Client, url);
     },
@@ -54,7 +57,7 @@ export function useProductReviews(productId: string, options?: { limit?: number;
  */
 export function useCreateReview(productId: string) {
   const queryClient = useQueryClient();
-  
+
   return useMutation<Review, Error, CreateReviewPayload>({
     mutationFn: async (payload: CreateReviewPayload) => {
       const result = await clientPost<CreateReviewPayload, Review>(
@@ -76,7 +79,7 @@ export function useCreateReview(productId: string) {
  */
 export function useMarkReviewHelpful() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { reviewId: string; productId: string }>({
     mutationFn: async ({ reviewId }: { reviewId: string; productId: string }) => {
       await clientPost<object, void>(phase4Client, `/reviews/${reviewId}/helpful`, {});

@@ -100,13 +100,25 @@ export function useTrendingProducts(limit: number = 10) {
  */
 export function useApplyPersonalizationScoring() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<
     RecommendationItem[],
     Error,
-    { contentType: 'article' | 'deal' | 'productCategory'; slugs: string[]; context?: PersonalizationContext }
+    {
+      contentType: 'article' | 'deal' | 'productCategory';
+      slugs: string[];
+      context?: PersonalizationContext;
+    }
   >({
-    mutationFn: async ({ contentType, slugs, context }: { contentType: 'article' | 'deal' | 'productCategory'; slugs: string[]; context?: PersonalizationContext }) => {
+    mutationFn: async ({
+      contentType,
+      slugs,
+      context,
+    }: {
+      contentType: 'article' | 'deal' | 'productCategory';
+      slugs: string[];
+      context?: PersonalizationContext;
+    }) => {
       const res = await clientPost<any, { items: RecommendationItem[] }>(
         phase4Client,
         '/personalization/apply',
@@ -145,10 +157,9 @@ export function useWaysToShop(userId?: string) {
       // Try to get personalized ways based on user preferences
       if (userId) {
         try {
-          const res = await phase4Client.get<{ ways: Array<{ id: string; label: string; icon?: string }> }>(
-            '/recommendations/ways-to-shop',
-            { params: { userId } }
-          );
+          const res = await phase4Client.get<{
+            ways: Array<{ id: string; label: string; icon?: string }>;
+          }>('/recommendations/ways-to-shop', { params: { userId } });
           if (res.data?.ways?.length) {
             return res.data.ways;
           }

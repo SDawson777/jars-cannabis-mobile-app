@@ -35,11 +35,16 @@ router.get('/status', async (req: Request, res: Response) => {
 
 router.post('/id/submit', async (req: Request, res: Response) => {
   try {
-    const { documentType, frontImageData: _frontImageData, backImageData: _backImageData, selfieImageData } = req.body;
-    
+    const {
+      documentType,
+      frontImageData: _frontImageData,
+      backImageData: _backImageData,
+      selfieImageData,
+    } = req.body;
+
     // In production, this would send to ID verification service (e.g., Jumio, Onfido)
     const verificationId = `verify-${Date.now()}`;
-    
+
     res.json({
       success: true,
       verified: true,
@@ -70,7 +75,7 @@ router.post('/id/submit', async (req: Request, res: Response) => {
 router.get('/id/:verificationId', async (req: Request, res: Response) => {
   try {
     const { verificationId } = req.params;
-    
+
     res.json({
       success: true,
       verified: true,
@@ -92,18 +97,18 @@ router.get('/id/:verificationId', async (req: Request, res: Response) => {
 router.post('/self-attest', async (req: Request, res: Response) => {
   try {
     const { dateOfBirth, agreedToTerms } = req.body;
-    
+
     if (!agreedToTerms) {
       return res.status(400).json({ error: 'Must agree to terms' });
     }
-    
+
     const birthDate = new Date(dateOfBirth);
     const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-    
+
     if (age < 21) {
       return res.json({ verified: false, expiresAt: new Date().toISOString() });
     }
-    
+
     res.json({
       verified: true,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
@@ -121,7 +126,7 @@ router.post('/self-attest', async (req: Request, res: Response) => {
 router.get('/location/check', async (req: Request, res: Response) => {
   try {
     const { lat: _lat, lng: _lng } = req.query;
-    
+
     // In production, this would use a geolocation service
     res.json({
       allowed: true,
@@ -149,7 +154,7 @@ router.get('/location/check', async (req: Request, res: Response) => {
 router.post('/location/verify', async (req: Request, res: Response) => {
   try {
     const { latitude: _latitude, longitude: _longitude } = req.body;
-    
+
     res.json({
       allowed: true,
       state: 'CA',
@@ -175,7 +180,7 @@ router.post('/location/verify', async (req: Request, res: Response) => {
 router.get('/regulations/:stateCode', async (req: Request, res: Response) => {
   try {
     const { stateCode } = req.params;
-    
+
     const regulations: Record<string, object> = {
       CA: {
         state: 'California',
@@ -213,12 +218,12 @@ router.get('/regulations/:stateCode', async (req: Request, res: Response) => {
         restrictions: [],
       },
     };
-    
+
     const stateReg = regulations[stateCode.toUpperCase()];
     if (!stateReg) {
       return res.status(404).json({ error: 'State not found or not legal' });
     }
-    
+
     res.json(stateReg);
   } catch (error) {
     console.error('Error fetching regulations:', error);
@@ -233,7 +238,7 @@ router.get('/regulations/:stateCode', async (req: Request, res: Response) => {
 router.post('/delivery-address', async (req: Request, res: Response) => {
   try {
     const { street: _street, city: _city, state: _state, zipCode: _zipCode } = req.body;
-    
+
     // In production, validate against allowed delivery zones
     res.json({
       allowed: true,

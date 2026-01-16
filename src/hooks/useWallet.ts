@@ -62,7 +62,15 @@ export interface DigitalReceipt {
 
 export interface WalletTransaction {
   id: string;
-  type: 'points_earn' | 'points_redeem' | 'gift_card_add' | 'gift_card_use' | 'credit_add' | 'credit_use' | 'token_earn' | 'token_use';
+  type:
+    | 'points_earn'
+    | 'points_redeem'
+    | 'gift_card_add'
+    | 'gift_card_use'
+    | 'credit_add'
+    | 'credit_use'
+    | 'token_earn'
+    | 'token_use';
   amount: number;
   balanceAfter: number;
   description: string;
@@ -112,7 +120,7 @@ export function useGiftCards() {
  */
 export function useAddGiftCard() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<GiftCard, Error, { code: string; pin?: string }>({
     mutationFn: async ({ code, pin }: { code: string; pin?: string }) => {
       const result = await clientPost<{ code: string; pin?: string }, GiftCard>(
@@ -133,7 +141,11 @@ export function useAddGiftCard() {
  * Hook to check gift card balance (without adding)
  */
 export function useCheckGiftCardBalance() {
-  return useMutation<{ balance: number; expiresAt?: string }, Error, { code: string; pin?: string }>({
+  return useMutation<
+    { balance: number; expiresAt?: string },
+    Error,
+    { code: string; pin?: string }
+  >({
     mutationFn: async ({ code, pin }: { code: string; pin?: string }) => {
       return clientPost(phase4Client, '/wallet/gift-cards/check-balance', { code, pin });
     },
@@ -145,13 +157,25 @@ export function useCheckGiftCardBalance() {
  */
 export function usePurchaseGiftCard() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<
     { giftCard: GiftCard; orderId: string },
     Error,
-    { amount: number; recipientEmail?: string; recipientName?: string; message?: string; sendDate?: string }
+    {
+      amount: number;
+      recipientEmail?: string;
+      recipientName?: string;
+      message?: string;
+      sendDate?: string;
+    }
   >({
-    mutationFn: async (payload: { amount: number; recipientEmail?: string; recipientName?: string; message?: string; sendDate?: string }) => {
+    mutationFn: async (payload: {
+      amount: number;
+      recipientEmail?: string;
+      recipientName?: string;
+      message?: string;
+      sendDate?: string;
+    }) => {
       const result = await clientPost<typeof payload, { giftCard: GiftCard; orderId: string }>(
         phase4Client,
         '/wallet/gift-cards/purchase',
@@ -171,13 +195,20 @@ export function usePurchaseGiftCard() {
  * Hook to fetch digital receipts
  */
 export function useDigitalReceipts() {
-  return useInfiniteQuery<{ receipts: DigitalReceipt[]; hasMore: boolean; nextCursor?: string }, Error>({
+  return useInfiniteQuery<
+    { receipts: DigitalReceipt[]; hasMore: boolean; nextCursor?: string },
+    Error
+  >({
     queryKey: ['wallet', 'receipts'],
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const params = pageParam ? `?cursor=${pageParam}` : '';
       return clientGet(phase4Client, `/wallet/receipts${params}`);
     },
-    getNextPageParam: (lastPage: { receipts: DigitalReceipt[]; hasMore: boolean; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: {
+      receipts: DigitalReceipt[];
+      hasMore: boolean;
+      nextCursor?: string;
+    }) => lastPage.nextCursor,
     initialPageParam: undefined,
     staleTime: 5 * 60 * 1000,
   });
@@ -202,7 +233,11 @@ export function useDigitalReceipt(receiptId: string) {
 export function useEmailReceipt() {
   return useMutation<void, Error, { receiptId: string; email: string }>({
     mutationFn: async ({ receiptId, email }: { receiptId: string; email: string }) => {
-      await clientPost<{ email: string }, void>(phase4Client, `/wallet/receipts/${receiptId}/email`, { email });
+      await clientPost<{ email: string }, void>(
+        phase4Client,
+        `/wallet/receipts/${receiptId}/email`,
+        { email }
+      );
       logEvent('receipt_emailed', { receiptId });
     },
   });
@@ -212,17 +247,24 @@ export function useEmailReceipt() {
  * Hook to fetch wallet transaction history
  */
 export function useWalletTransactions(type?: WalletTransaction['type']) {
-  return useInfiniteQuery<{ transactions: WalletTransaction[]; hasMore: boolean; nextCursor?: string }, Error>({
+  return useInfiniteQuery<
+    { transactions: WalletTransaction[]; hasMore: boolean; nextCursor?: string },
+    Error
+  >({
     queryKey: ['wallet', 'transactions', type],
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) => {
       const params = new URLSearchParams();
       if (type) params.append('type', type);
       if (pageParam) params.append('cursor', pageParam);
       params.append('limit', '20');
-      
+
       return clientGet(phase4Client, `/wallet/transactions?${params}`);
     },
-    getNextPageParam: (lastPage: { transactions: WalletTransaction[]; hasMore: boolean; nextCursor?: string }) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: {
+      transactions: WalletTransaction[];
+      hasMore: boolean;
+      nextCursor?: string;
+    }) => lastPage.nextCursor,
     initialPageParam: undefined,
     staleTime: 2 * 60 * 1000,
   });
@@ -235,7 +277,10 @@ export function useStoreCredits() {
   return useQuery<StoreCredit[], Error>({
     queryKey: ['wallet', 'store-credits'],
     queryFn: async () => {
-      const res = await clientGet<{ credits: StoreCredit[] }>(phase4Client, '/wallet/store-credits');
+      const res = await clientGet<{ credits: StoreCredit[] }>(
+        phase4Client,
+        '/wallet/store-credits'
+      );
       return res.credits || [];
     },
     staleTime: 5 * 60 * 1000,
@@ -249,15 +294,26 @@ export function useApplyWalletAtCheckout() {
   return useMutation<
     { appliedAmount: number; remainingTotal: number },
     Error,
-    { orderId: string; usePoints?: boolean; useGiftCards?: boolean; useStoreCredit?: boolean; maxAmount?: number }
+    {
+      orderId: string;
+      usePoints?: boolean;
+      useGiftCards?: boolean;
+      useStoreCredit?: boolean;
+      maxAmount?: number;
+    }
   >({
-    mutationFn: async (payload: { orderId: string; usePoints?: boolean; useGiftCards?: boolean; useStoreCredit?: boolean; maxAmount?: number }) => {
-      const result = await clientPost<typeof payload, { appliedAmount: number; remainingTotal: number }>(
-        phase4Client,
-        '/checkout/apply-wallet',
-        payload
-      );
-      logEvent('wallet_applied_checkout', { 
+    mutationFn: async (payload: {
+      orderId: string;
+      usePoints?: boolean;
+      useGiftCards?: boolean;
+      useStoreCredit?: boolean;
+      maxAmount?: number;
+    }) => {
+      const result = await clientPost<
+        typeof payload,
+        { appliedAmount: number; remainingTotal: number }
+      >(phase4Client, '/checkout/apply-wallet', payload);
+      logEvent('wallet_applied_checkout', {
         appliedAmount: result.appliedAmount,
         usePoints: payload.usePoints,
         useGiftCards: payload.useGiftCards,
@@ -271,13 +327,16 @@ export function useApplyWalletAtCheckout() {
  * Hook to get warranty info for purchased products
  */
 export function useWarrantyInfo(productId: string) {
-  return useQuery<{
-    hasWarranty: boolean;
-    warrantyEndDate?: string;
-    warrantyType?: string;
-    receiptId?: string;
-    purchaseDate?: string;
-  }, Error>({
+  return useQuery<
+    {
+      hasWarranty: boolean;
+      warrantyEndDate?: string;
+      warrantyType?: string;
+      receiptId?: string;
+      purchaseDate?: string;
+    },
+    Error
+  >({
     queryKey: ['wallet', 'warranty', productId],
     queryFn: async () => {
       return clientGet(phase4Client, `/wallet/warranty/${productId}`);

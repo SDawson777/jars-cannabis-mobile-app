@@ -16,7 +16,7 @@ export const arRouter = Router();
  */
 arRouter.get('/ar/models/:productId', optionalAuth, async (req: Request, res: Response) => {
   const { productId } = req.params;
-  
+
   try {
     res.json({
       id: `ar-${productId}`,
@@ -74,51 +74,98 @@ arRouter.get('/ar/models', optionalAuth, async (req: Request, res: Response) => 
  * GET /ar/products/:productId/assets
  * Get all AR assets for a product
  */
-arRouter.get('/ar/products/:productId/assets', optionalAuth, async (req: Request, res: Response) => {
-  const { productId } = req.params;
-  
-  try {
-    res.json({
-      assets: [
-        { id: 'asset-1', type: 'model', url: `https://assets.nimbus.app/ar/models/${productId}.glb`, format: 'glb', size: 2450000 },
-        { id: 'asset-2', type: 'texture', url: `https://assets.nimbus.app/ar/textures/${productId}/diffuse.png`, format: 'png', size: 512000 },
-        { id: 'asset-3', type: 'thumbnail', url: `https://assets.nimbus.app/ar/thumbnails/${productId}.png`, format: 'png', size: 125000 },
-      ],
-    });
-  } catch (error) {
-    console.error('AR assets error:', error);
-    res.status(500).json({ error: 'Failed to get AR assets' });
+arRouter.get(
+  '/ar/products/:productId/assets',
+  optionalAuth,
+  async (req: Request, res: Response) => {
+    const { productId } = req.params;
+
+    try {
+      res.json({
+        assets: [
+          {
+            id: 'asset-1',
+            type: 'model',
+            url: `https://assets.nimbus.app/ar/models/${productId}.glb`,
+            format: 'glb',
+            size: 2450000,
+          },
+          {
+            id: 'asset-2',
+            type: 'texture',
+            url: `https://assets.nimbus.app/ar/textures/${productId}/diffuse.png`,
+            format: 'png',
+            size: 512000,
+          },
+          {
+            id: 'asset-3',
+            type: 'thumbnail',
+            url: `https://assets.nimbus.app/ar/thumbnails/${productId}.png`,
+            format: 'png',
+            size: 125000,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error('AR assets error:', error);
+      res.status(500).json({ error: 'Failed to get AR assets' });
+    }
   }
-});
+);
 
 /**
  * GET /ar/products/:productId/visualization
  * Get product visualization data
  */
-arRouter.get('/ar/products/:productId/visualization', optionalAuth, async (req: Request, res: Response) => {
-  const { productId } = req.params;
-  
-  try {
-    res.json({
-      productId,
-      arEnabled: true,
-      hasModel: true,
-      modelUrl: `https://assets.nimbus.app/ar/models/${productId}.glb`,
-      thumbnailUrl: `https://assets.nimbus.app/ar/thumbnails/${productId}.png`,
-      has360View: true,
-      images360: Array.from({ length: 6 }, (_, i) => `https://assets.nimbus.app/360/${productId}/${i}.jpg`),
-      videos: [{ url: `https://assets.nimbus.app/videos/${productId}/demo.mp4`, type: 'demo', duration: 30 }],
-      annotations: [
-        { id: 'ann-1', position: { x: 0.5, y: 0.8, z: 0 }, label: 'Premium Flower', description: 'Hand-trimmed cannabis flower' },
-        { id: 'ann-2', position: { x: -0.5, y: 0.5, z: 0 }, label: 'Lab Tested', description: 'Third-party verified potency' },
-      ],
-      hotspots: [{ id: 'hs-1', position: { x: 0, y: 0.5, z: 0 }, label: 'View Trichomes', action: 'zoom' }],
-    });
-  } catch (error) {
-    console.error('Visualization error:', error);
-    res.status(500).json({ error: 'Failed to get visualization' });
+arRouter.get(
+  '/ar/products/:productId/visualization',
+  optionalAuth,
+  async (req: Request, res: Response) => {
+    const { productId } = req.params;
+
+    try {
+      res.json({
+        productId,
+        arEnabled: true,
+        hasModel: true,
+        modelUrl: `https://assets.nimbus.app/ar/models/${productId}.glb`,
+        thumbnailUrl: `https://assets.nimbus.app/ar/thumbnails/${productId}.png`,
+        has360View: true,
+        images360: Array.from(
+          { length: 6 },
+          (_, i) => `https://assets.nimbus.app/360/${productId}/${i}.jpg`
+        ),
+        videos: [
+          {
+            url: `https://assets.nimbus.app/videos/${productId}/demo.mp4`,
+            type: 'demo',
+            duration: 30,
+          },
+        ],
+        annotations: [
+          {
+            id: 'ann-1',
+            position: { x: 0.5, y: 0.8, z: 0 },
+            label: 'Premium Flower',
+            description: 'Hand-trimmed cannabis flower',
+          },
+          {
+            id: 'ann-2',
+            position: { x: -0.5, y: 0.5, z: 0 },
+            label: 'Lab Tested',
+            description: 'Third-party verified potency',
+          },
+        ],
+        hotspots: [
+          { id: 'hs-1', position: { x: 0, y: 0.5, z: 0 }, label: 'View Trichomes', action: 'zoom' },
+        ],
+      });
+    } catch (error) {
+      console.error('Visualization error:', error);
+      res.status(500).json({ error: 'Failed to get visualization' });
+    }
   }
-});
+);
 
 /**
  * GET /ar/products/:productId/360
@@ -126,11 +173,14 @@ arRouter.get('/ar/products/:productId/visualization', optionalAuth, async (req: 
  */
 arRouter.get('/ar/products/:productId/360', optionalAuth, async (req: Request, res: Response) => {
   const { productId } = req.params;
-  
+
   try {
     res.json({
       productId,
-      images: Array.from({ length: 36 }, (_, i) => `https://assets.nimbus.app/360/${productId}/${i}.jpg`),
+      images: Array.from(
+        { length: 36 },
+        (_, i) => `https://assets.nimbus.app/360/${productId}/${i}.jpg`
+      ),
       totalFrames: 36,
       autoRotateSpeed: 5,
     });
@@ -151,7 +201,7 @@ arRouter.get('/ar/products/:productId/360', optionalAuth, async (req: Request, r
 arRouter.post('/ar/sessions', requireAuth, async (req: Request, res: Response) => {
   const { productId, deviceInfo } = req.body;
   const userId = (req as any).user?.uid;
-  
+
   try {
     res.status(201).json({
       sessionId: `arsess-${Date.now()}`,
@@ -170,25 +220,29 @@ arRouter.post('/ar/sessions', requireAuth, async (req: Request, res: Response) =
  * POST /ar/sessions/:sessionId/interactions
  * Record an AR interaction
  */
-arRouter.post('/ar/sessions/:sessionId/interactions', requireAuth, async (req: Request, res: Response) => {
-  const { sessionId } = req.params;
-  const { type, details, position, duration } = req.body;
-  
-  try {
-    res.json({
-      id: `int-${Date.now()}`,
-      sessionId,
-      type,
-      details,
-      position,
-      duration,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error('Record interaction error:', error);
-    res.status(500).json({ error: 'Failed to record interaction' });
+arRouter.post(
+  '/ar/sessions/:sessionId/interactions',
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { sessionId } = req.params;
+    const { type, details, position, duration } = req.body;
+
+    try {
+      res.json({
+        id: `int-${Date.now()}`,
+        sessionId,
+        type,
+        details,
+        position,
+        duration,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Record interaction error:', error);
+      res.status(500).json({ error: 'Failed to record interaction' });
+    }
   }
-});
+);
 
 /**
  * POST /ar/sessions/:sessionId/end
@@ -196,7 +250,7 @@ arRouter.post('/ar/sessions/:sessionId/interactions', requireAuth, async (req: R
  */
 arRouter.post('/ar/sessions/:sessionId/end', requireAuth, async (req: Request, res: Response) => {
   const { sessionId } = req.params;
-  
+
   try {
     res.json({
       sessionId,
@@ -214,19 +268,23 @@ arRouter.post('/ar/sessions/:sessionId/end', requireAuth, async (req: Request, r
  * POST /ar/sessions/:sessionId/screenshot
  * Capture AR screenshot
  */
-arRouter.post('/ar/sessions/:sessionId/screenshot', requireAuth, async (req: Request, res: Response) => {
-  const { sessionId } = req.params;
-  
-  try {
-    res.json({
-      url: `https://assets.nimbus.app/ar/screenshots/${sessionId}/${Date.now()}.jpg`,
-      shareUrl: `https://nimbus.app/share/ar/${sessionId}`,
-    });
-  } catch (error) {
-    console.error('Screenshot error:', error);
-    res.status(500).json({ error: 'Failed to save screenshot' });
+arRouter.post(
+  '/ar/sessions/:sessionId/screenshot',
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { sessionId } = req.params;
+
+    try {
+      res.json({
+        url: `https://assets.nimbus.app/ar/screenshots/${sessionId}/${Date.now()}.jpg`,
+        shareUrl: `https://nimbus.app/share/ar/${sessionId}`,
+      });
+    } catch (error) {
+      console.error('Screenshot error:', error);
+      res.status(500).json({ error: 'Failed to save screenshot' });
+    }
   }
-});
+);
 
 // ============================================
 // AR Admin Endpoints
@@ -238,11 +296,11 @@ arRouter.post('/ar/sessions/:sessionId/screenshot', requireAuth, async (req: Req
  */
 arRouter.post('/ar/models', requireAuth, async (req: Request, res: Response) => {
   const { productId, modelUrl, thumbnailUrl, scale, animations } = req.body;
-  
+
   if (!productId || !modelUrl) {
     return res.status(400).json({ error: 'productId and modelUrl are required' });
   }
-  
+
   try {
     res.status(201).json({
       id: `ar-${Date.now()}`,
@@ -266,7 +324,7 @@ arRouter.post('/ar/models', requireAuth, async (req: Request, res: Response) => 
  */
 arRouter.delete('/ar/models/:modelId', requireAuth, async (req: Request, res: Response) => {
   const { modelId } = req.params;
-  
+
   try {
     res.json({ success: true, modelId });
   } catch (error) {

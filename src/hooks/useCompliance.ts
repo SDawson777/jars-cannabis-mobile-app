@@ -78,11 +78,11 @@ export function useRecallNotices() {
     queryFn: async () => {
       try {
         const recalls = await clientGet<RecallNotice[]>(phase4Client, '/compliance/recalls');
-        
+
         // Check which recalls have been acknowledged
         const acknowledgedJson = await AsyncStorage.getItem(ACKNOWLEDGED_RECALLS_KEY);
         const acknowledged = acknowledgedJson ? JSON.parse(acknowledgedJson) : [];
-        
+
         return recalls.map(recall => ({
           ...recall,
           acknowledged: acknowledged.includes(recall.id),
@@ -101,7 +101,7 @@ export function useRecallNotices() {
  */
 export function useAcknowledgeRecall() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (recallId: string) => {
       // Store acknowledgment locally
@@ -111,14 +111,18 @@ export function useAcknowledgeRecall() {
         acknowledged.push(recallId);
         await AsyncStorage.setItem(ACKNOWLEDGED_RECALLS_KEY, JSON.stringify(acknowledged));
       }
-      
+
       // Optionally notify backend
       try {
-        await clientPost<object, void>(phase4Client, `/compliance/recalls/${recallId}/acknowledge`, {});
+        await clientPost<object, void>(
+          phase4Client,
+          `/compliance/recalls/${recallId}/acknowledge`,
+          {}
+        );
       } catch {
         // Silently fail - local acknowledgment is sufficient
       }
-      
+
       logEvent('recall_acknowledged', { recallId });
     },
     onSuccess: () => {
@@ -132,9 +136,9 @@ export function useAcknowledgeRecall() {
  */
 export function useProductRecallStatus(productId: string) {
   const { data: recalls = [] } = useRecallNotices();
-  
+
   const recall = recalls.find((r: RecallNotice) => r.productId === productId);
-  
+
   return {
     isRecalled: !!recall,
     recall,
@@ -147,14 +151,13 @@ export function useProductRecallStatus(productId: string) {
  */
 export function useAgeVerification() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ verified: boolean; expiresAt?: string }, Error, { birthDate: string }>({
     mutationFn: async ({ birthDate }: { birthDate: string }) => {
-      const result = await clientPost<{ birthDate: string }, { verified: boolean; expiresAt?: string }>(
-        phase4Client,
-        '/compliance/verify-age',
-        { birthDate }
-      );
+      const result = await clientPost<
+        { birthDate: string },
+        { verified: boolean; expiresAt?: string }
+      >(phase4Client, '/compliance/verify-age', { birthDate });
       logEvent('age_verification_attempt', { verified: result.verified });
       return result;
     },
@@ -168,16 +171,19 @@ export function useAgeVerification() {
  * Hook to fetch state restrictions
  */
 export function useStateRestrictions(state?: string) {
-  return useQuery<{
-    allowed: boolean;
-    restrictions?: string[];
-    legalAge: number;
-    medicalOnly?: boolean;
-    purchaseLimits?: {
-      daily?: number;
-      monthly?: number;
-    };
-  }, Error>({
+  return useQuery<
+    {
+      allowed: boolean;
+      restrictions?: string[];
+      legalAge: number;
+      medicalOnly?: boolean;
+      purchaseLimits?: {
+        daily?: number;
+        monthly?: number;
+      };
+    },
+    Error
+  >({
     queryKey: ['compliance', 'state', state],
     queryFn: async () => {
       if (!state) {
@@ -256,21 +262,23 @@ export function useUserRecallAlerts() {
  * Hook to check if any cart items are affected by recalls
  */
 export function useCartRecallCheck(productIds: string[]) {
-  return useQuery<{
-    hasRecalledItems: boolean;
-    recalledProducts: { productId: string; recallId: string; severity: string }[];
-  }, Error>({
+  return useQuery<
+    {
+      hasRecalledItems: boolean;
+      recalledProducts: { productId: string; recallId: string; severity: string }[];
+    },
+    Error
+  >({
     queryKey: ['compliance', 'cart-recall-check', productIds],
     queryFn: async () => {
       try {
-        const res = await clientPost<{ productIds: string[] }, {
-          hasRecalledItems: boolean;
-          recalledProducts: { productId: string; recallId: string; severity: string }[];
-        }>(
-          phase4Client,
-          '/compliance/cart/recall-check',
-          { productIds }
-        );
+        const res = await clientPost<
+          { productIds: string[] },
+          {
+            hasRecalledItems: boolean;
+            recalledProducts: { productId: string; recallId: string; severity: string }[];
+          }
+        >(phase4Client, '/compliance/cart/recall-check', { productIds });
         return res;
       } catch {
         return { hasRecalledItems: false, recalledProducts: [] };
@@ -285,29 +293,36 @@ export function useCartRecallCheck(productIds: string[]) {
  * Hook to check purchase eligibility
  */
 export function usePurchaseEligibility(items: { productId: string; quantity: number }[]) {
-  return useQuery<{
-    eligible: boolean;
-    issues: {
-      type: 'recall' | 'limit_exceeded' | 'verification_required' | 'medical_card_required' | 'blocked';
-      productId?: string;
-      message: string;
-    }[];
-  }, Error>({
+  return useQuery<
+    {
+      eligible: boolean;
+      issues: {
+        type:
+          | 'recall'
+          | 'limit_exceeded'
+          | 'verification_required'
+          | 'medical_card_required'
+          | 'blocked';
+        productId?: string;
+        message: string;
+      }[];
+    },
+    Error
+  >({
     queryKey: ['compliance', 'purchase-eligibility', items],
     queryFn: async () => {
       try {
-        return await clientPost<{ items: typeof items }, {
-          eligible: boolean;
-          issues: {
-            type: string;
-            productId?: string;
-            message: string;
-          }[];
-        }>(
-          phase4Client,
-          '/compliance/purchase/eligibility',
-          { items }
-        );
+        return await clientPost<
+          { items: typeof items },
+          {
+            eligible: boolean;
+            issues: {
+              type: string;
+              productId?: string;
+              message: string;
+            }[];
+          }
+        >(phase4Client, '/compliance/purchase/eligibility', { items });
       } catch {
         return { eligible: true, issues: [] };
       }
@@ -350,13 +365,17 @@ export function useProductCompliance(productId: string) {
  */
 export function useVerifyMedicalCard() {
   const queryClient = useQueryClient();
-  
-  return useMutation<{ verified: boolean; expiryDate?: string }, Error, {
-    cardNumber: string;
-    state: string;
-    expiryDate: string;
-    imageData?: string;
-  }>({
+
+  return useMutation<
+    { verified: boolean; expiryDate?: string },
+    Error,
+    {
+      cardNumber: string;
+      state: string;
+      expiryDate: string;
+      imageData?: string;
+    }
+  >({
     mutationFn: async (cardData: {
       cardNumber: string;
       state: string;
@@ -381,19 +400,22 @@ export function useVerifyMedicalCard() {
  * Hook to fetch state regulations
  */
 export function useStateRegulations(state: string) {
-  return useQuery<{
-    state: string;
-    legalStatus: 'recreational' | 'medical_only' | 'decriminalized' | 'illegal';
-    purchaseLimits: { category: string; dailyLimit: string; possessionLimit: string }[];
-    requiresId: boolean;
-    requiresMedicalCard: boolean;
-    minimumAge: number;
-    taxRates: { type: string; rate: number }[];
-    operatingHours: { open: string; close: string };
-    deliveryAllowed: boolean;
-    consumptionRestrictions: string[];
-    lastUpdated: string;
-  }, Error>({
+  return useQuery<
+    {
+      state: string;
+      legalStatus: 'recreational' | 'medical_only' | 'decriminalized' | 'illegal';
+      purchaseLimits: { category: string; dailyLimit: string; possessionLimit: string }[];
+      requiresId: boolean;
+      requiresMedicalCard: boolean;
+      minimumAge: number;
+      taxRates: { type: string; rate: number }[];
+      operatingHours: { open: string; close: string };
+      deliveryAllowed: boolean;
+      consumptionRestrictions: string[];
+      lastUpdated: string;
+    },
+    Error
+  >({
     queryKey: ['compliance', 'regulations', state],
     queryFn: async () => {
       return await clientGet<{
