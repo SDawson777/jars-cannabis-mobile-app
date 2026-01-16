@@ -9,9 +9,18 @@ jest.mock('../hooks/useProductDetails', () => ({
 }));
 
 // mock navigation hook useRoute to provide slug param
-jest.mock('@react-navigation/native', () => ({
-  useRoute: () => ({ params: { slug: 'prod-1' } }),
-}));
+jest.mock('@react-navigation/native', () => {
+  const React = require('react');
+  return {
+    useRoute: () => ({ params: { slug: 'prod-1' } }),
+    useFocusEffect: (callback: () => void | (() => void)) => {
+      React.useEffect(() => {
+        const cleanup = callback();
+        return typeof cleanup === 'function' ? cleanup : undefined;
+      }, []);
+    },
+  };
+});
 
 // mock store context hook
 jest.mock('../context/StoreContext', () => ({

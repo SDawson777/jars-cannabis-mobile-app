@@ -51,10 +51,19 @@ function __resetMockRouteParams() {
   };
 }
 
+// useFocusEffect mock - runs callback immediately
+function useFocusEffect(callback) {
+  React.useEffect(() => {
+    const cleanup = callback();
+    return typeof cleanup === 'function' ? cleanup : undefined;
+  }, []);
+}
+
 module.exports = {
   NavigationContainer,
   useNavigation,
   useRoute,
+  useFocusEffect,
   __setMockRouteParams,
   __resetMockRouteParams,
 };

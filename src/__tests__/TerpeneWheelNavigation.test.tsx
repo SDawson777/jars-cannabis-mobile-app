@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 
@@ -7,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import TerpeneWheelScreen from '../screens/TerpeneWheelScreen';
 
 const Stack = createNativeStackNavigator();
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
 // Mock dependencies
 jest.mock('../context/ThemeContext', () => ({
@@ -45,12 +47,14 @@ jest.mock('../terpene_wheel/components/TerpeneInfoModal', () => ({
 
 function TestApp() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="TerpeneWheel" component={TerpeneWheelScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Screen name="TerpeneWheel" component={TerpeneWheelScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
 
