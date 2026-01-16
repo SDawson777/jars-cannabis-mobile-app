@@ -11,7 +11,7 @@ const router = Router();
 
 router.get('/articles', async (req: Request, res: Response) => {
   try {
-    const { category, tags, effects, difficulty, search, cursor } = req.query;
+    const { category: _category, tags: _tags, effects: _effects, difficulty: _difficulty, search: _search, cursor: _cursor } = req.query;
     
     res.json({
       articles: [
@@ -269,7 +269,7 @@ router.get('/wellness/:slug', async (req: Request, res: Response) => {
 
 router.post('/wellness/start', async (req: Request, res: Response) => {
   try {
-    const { routineId } = req.body;
+    const { routineId: _routineId } = req.body;
     res.json({ trackingId: `track-${Date.now()}` });
   } catch (error) {
     console.error('Error starting routine:', error);
@@ -314,7 +314,7 @@ router.get('/pairings', async (req: Request, res: Response) => {
 
 router.get('/pairings/product/:productId', async (req: Request, res: Response) => {
   try {
-    const { productId } = req.params;
+    const { productId: _productId } = req.params;
     res.json({
       id: 'pairing-prod-1',
       title: 'Pairings for Blue Dream',

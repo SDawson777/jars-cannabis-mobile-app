@@ -3,7 +3,6 @@
 
 import { Router, Request, Response } from 'express';
 import { requireAuth, optionalAuth } from '../middleware/auth';
-import { prisma } from '../prismaClient';
 
 export const deliveryRouter = Router();
 
@@ -288,8 +287,8 @@ deliveryRouter.get('/orders/:orderId/driver-location', requireAuth, async (req: 
  * Update delivery instructions
  */
 deliveryRouter.post('/orders/:orderId/delivery-instructions', requireAuth, async (req: Request, res: Response) => {
-  const { orderId } = req.params;
-  const { instructions } = req.body;
+  const { orderId: _orderId } = req.params;
+  const { instructions: _instructions } = req.body;
   
   try {
     // In production, update order in database
@@ -305,8 +304,8 @@ deliveryRouter.post('/orders/:orderId/delivery-instructions', requireAuth, async
  * Confirm order receipt
  */
 deliveryRouter.post('/orders/:orderId/confirm-delivery', requireAuth, async (req: Request, res: Response) => {
-  const { orderId } = req.params;
-  const { signature, rating } = req.body;
+  const { orderId: _orderId } = req.params;
+  const { signature: _signature, rating: _rating } = req.body;
   
   try {
     // In production, update order status and store rating

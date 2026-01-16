@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const Sentry = require('@sentry/node');
 
 const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;

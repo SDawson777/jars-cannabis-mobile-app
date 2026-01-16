@@ -35,7 +35,7 @@ router.get('/status', async (req: Request, res: Response) => {
 
 router.post('/id/submit', async (req: Request, res: Response) => {
   try {
-    const { documentType, frontImageData, backImageData, selfieImageData } = req.body;
+    const { documentType, frontImageData: _frontImageData, backImageData: _backImageData, selfieImageData } = req.body;
     
     // In production, this would send to ID verification service (e.g., Jumio, Onfido)
     const verificationId = `verify-${Date.now()}`;
@@ -120,7 +120,7 @@ router.post('/self-attest', async (req: Request, res: Response) => {
 
 router.get('/location/check', async (req: Request, res: Response) => {
   try {
-    const { lat, lng } = req.query;
+    const { lat: _lat, lng: _lng } = req.query;
     
     // In production, this would use a geolocation service
     res.json({
@@ -148,7 +148,7 @@ router.get('/location/check', async (req: Request, res: Response) => {
 
 router.post('/location/verify', async (req: Request, res: Response) => {
   try {
-    const { latitude, longitude } = req.body;
+    const { latitude: _latitude, longitude: _longitude } = req.body;
     
     res.json({
       allowed: true,
@@ -232,7 +232,7 @@ router.get('/regulations/:stateCode', async (req: Request, res: Response) => {
 
 router.post('/delivery-address', async (req: Request, res: Response) => {
   try {
-    const { street, city, state, zipCode } = req.body;
+    const { street: _street, city: _city, state: _state, zipCode: _zipCode } = req.body;
     
     // In production, validate against allowed delivery zones
     res.json({

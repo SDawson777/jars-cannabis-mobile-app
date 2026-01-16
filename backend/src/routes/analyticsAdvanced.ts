@@ -3,7 +3,6 @@
 
 import { Router, Request, Response } from 'express';
 import { requireAuth } from '../middleware/auth';
-import { prisma } from '../prismaClient';
 
 export const analyticsAdvancedRouter = Router();
 
@@ -73,7 +72,7 @@ analyticsAdvancedRouter.get('/analytics/dashboards/:dashboardId', requireAuth, a
  * Get key metrics summary
  */
 analyticsAdvancedRouter.get('/analytics/metrics/summary', requireAuth, async (req: Request, res: Response) => {
-  const { start, end } = req.query;
+  const { start: _start, end: _end } = req.query;
   
   try {
     res.json({
@@ -167,8 +166,8 @@ analyticsAdvancedRouter.post('/analytics/segments', requireAuth, async (req: Req
  * Get users in a segment
  */
 analyticsAdvancedRouter.get('/analytics/segments/:segmentId/users', requireAuth, async (req: Request, res: Response) => {
-  const { segmentId } = req.params;
-  const { limit = '100' } = req.query;
+  const { segmentId: _segmentId } = req.params;
+  const { limit: _limit = '100' } = req.query;
   
   try {
     res.json({
@@ -192,7 +191,7 @@ analyticsAdvancedRouter.get('/analytics/segments/:segmentId/users', requireAuth,
  * Get cohort retention analysis
  */
 analyticsAdvancedRouter.get('/analytics/cohorts', requireAuth, async (req: Request, res: Response) => {
-  const { cohortType, start, end, granularity } = req.query;
+  const { cohortType: _cohortType, start, end: _end, granularity: _granularity } = req.query;
   
   try {
     // Generate mock cohort data
@@ -277,7 +276,7 @@ analyticsAdvancedRouter.get('/analytics/funnels', requireAuth, async (req: Reque
  */
 analyticsAdvancedRouter.get('/analytics/funnels/:funnelId', requireAuth, async (req: Request, res: Response) => {
   const { funnelId } = req.params;
-  const { start, end } = req.query;
+  const { start: _start, end: _end } = req.query;
   
   try {
     res.json({
@@ -313,7 +312,7 @@ analyticsAdvancedRouter.post('/analytics/funnels', requireAuth, async (req: Requ
     res.status(201).json({
       id: `funnel-${Date.now()}`,
       name,
-      steps: steps.map((s: any, i: number) => ({ ...s, count: 0, dropoffRate: 0 })),
+      steps: steps.map((s: any, _i: number) => ({ ...s, count: 0, dropoffRate: 0 })),
       conversionRate: 0,
       averageTimeToConvert: 0,
     });
@@ -405,7 +404,7 @@ analyticsAdvancedRouter.get('/analytics/ab-tests/:testId', requireAuth, async (r
  * Create an A/B test
  */
 analyticsAdvancedRouter.post('/analytics/ab-tests', requireAuth, async (req: Request, res: Response) => {
-  const { name, variants, goalEvent, targetSegmentId } = req.body;
+  const { name, variants, goalEvent, targetSegmentId: _targetSegmentId } = req.body;
   
   if (!name || !variants || !goalEvent) {
     return res.status(400).json({ error: 'name, variants, and goalEvent are required' });
@@ -440,7 +439,7 @@ analyticsAdvancedRouter.post('/analytics/ab-tests', requireAuth, async (req: Req
  * Get campaign performance metrics
  */
 analyticsAdvancedRouter.get('/analytics/campaigns', requireAuth, async (req: Request, res: Response) => {
-  const { start, end, campaignIds } = req.query;
+  const { start: _start, end: _end, campaignIds: _campaignIds } = req.query;
   
   try {
     res.json({
@@ -513,7 +512,7 @@ analyticsAdvancedRouter.get('/analytics/deep-links', requireAuth, async (req: Re
  * Create a tracked deep link
  */
 analyticsAdvancedRouter.post('/analytics/deep-links', requireAuth, async (req: Request, res: Response) => {
-  const { destination, campaign, source, medium } = req.body;
+  const { destination, campaign: _campaign, source: _source, medium: _medium } = req.body;
   
   if (!destination) {
     return res.status(400).json({ error: 'destination is required' });

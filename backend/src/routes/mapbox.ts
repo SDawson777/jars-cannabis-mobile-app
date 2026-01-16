@@ -11,7 +11,7 @@ const router = Router();
 
 router.get('/stores/nearby', async (req: Request, res: Response) => {
   try {
-    const { lat, lng, radius = 25, services, limit = 20 } = req.query;
+    const { lat: _lat, lng: _lng, radius: _radius = 25, services: _services, limit: _limit = 20 } = req.query;
     
     // Mock nearby stores with distance/traffic info
     res.json({
@@ -86,7 +86,7 @@ router.get('/stores/nearby', async (req: Request, res: Response) => {
 
 router.get('/map/search', async (req: Request, res: Response) => {
   try {
-    const { q } = req.query;
+    const { q: _q } = req.query;
     
     res.json({
       results: [
@@ -112,7 +112,7 @@ router.get('/map/search', async (req: Request, res: Response) => {
 
 router.get('/map/directions', async (req: Request, res: Response) => {
   try {
-    const { originLat, originLng, destLat, destLng, mode = 'driving' } = req.query;
+    const { originLat, originLng, destLat, destLng, mode: _mode = 'driving' } = req.query;
     
     res.json({
       distance: 3700, // meters

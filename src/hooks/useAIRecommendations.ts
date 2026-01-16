@@ -1,6 +1,6 @@
 // src/hooks/useAIRecommendations.ts
 // AI-driven recommendations with ML models, journal data, purchase history, peer behavior
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { phase4Client } from '../api/phase4Client';
 import { clientGet, clientPost } from '../api/http';
 import { logEvent } from '../utils/analytics';
@@ -142,11 +142,10 @@ export function useFrequentlyBoughtTogether(productIds: string[]) {
   return useQuery<AIRecommendation[], Error>({
     queryKey: ['ai', 'frequently-bought', productIds],
     queryFn: async () => {
-      const res = await clientPost<{ productIds: string[] }, { recommendations: AIRecommendation[] }>(
-        phase4Client,
-        '/ai/recommendations/frequently-bought',
-        { productIds }
-      );
+      const res = await clientPost<
+        { productIds: string[] },
+        { recommendations: AIRecommendation[] }
+      >(phase4Client, '/ai/recommendations/frequently-bought', { productIds });
       return res.recommendations;
     },
     enabled: productIds.length > 0,
@@ -156,15 +155,17 @@ export function useFrequentlyBoughtTogether(productIds: string[]) {
 /**
  * Hook to fetch recommendations for specific effects
  */
-export function useEffectBasedRecommendations(effects: string[], intensity?: 'mild' | 'moderate' | 'strong') {
+export function useEffectBasedRecommendations(
+  effects: string[],
+  intensity?: 'mild' | 'moderate' | 'strong'
+) {
   return useQuery<AIRecommendation[], Error>({
     queryKey: ['ai', 'recommendations', 'effects', effects, intensity],
     queryFn: async () => {
-      const res = await clientPost<{ effects: string[]; intensity?: string }, { recommendations: AIRecommendation[] }>(
-        phase4Client,
-        '/ai/recommendations/by-effects',
-        { effects, intensity }
-      );
+      const res = await clientPost<
+        { effects: string[]; intensity?: string },
+        { recommendations: AIRecommendation[] }
+      >(phase4Client, '/ai/recommendations/by-effects', { effects, intensity });
       return res.recommendations;
     },
     enabled: effects.length > 0,
@@ -200,10 +201,7 @@ export function usePreferenceProfile() {
   return useQuery<UserPreferenceProfile, Error>({
     queryKey: ['ai', 'preference-profile'],
     queryFn: async () => {
-      return await clientGet<UserPreferenceProfile>(
-        phase4Client,
-        '/ai/profile'
-      );
+      return await clientGet<UserPreferenceProfile>(phase4Client, '/ai/profile');
     },
   });
 }
@@ -213,7 +211,7 @@ export function usePreferenceProfile() {
  */
 export function useUpdatePreferenceProfile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<UserPreferenceProfile, Error, Partial<UserPreferenceProfile>>({
     mutationFn: async (updates: Partial<UserPreferenceProfile>) => {
       const result = await clientPost<Partial<UserPreferenceProfile>, UserPreferenceProfile>(
@@ -236,7 +234,7 @@ export function useUpdatePreferenceProfile() {
  */
 export function useResetPreferenceProfile() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, void>({
     mutationFn: async () => {
       await clientPost<{}, void>(phase4Client, '/ai/profile/reset', {});
@@ -257,16 +255,19 @@ export function useResetPreferenceProfile() {
  * Hook to fetch insights from journal entries
  */
 export function useJournalInsights() {
-  return useQuery<{
-    insights: JournalInsight[];
-    summary: {
-      topEffects: { effect: string; frequency: number }[];
-      topProducts: { productId: string; productName: string; rating: number }[];
-      preferredStrainTypes: { type: string; percentage: number }[];
-      averageRating: number;
-      totalEntries: number;
-    };
-  }, Error>({
+  return useQuery<
+    {
+      insights: JournalInsight[];
+      summary: {
+        topEffects: { effect: string; frequency: number }[];
+        topProducts: { productId: string; productName: string; rating: number }[];
+        preferredStrainTypes: { type: string; percentage: number }[];
+        averageRating: number;
+        totalEntries: number;
+      };
+    },
+    Error
+  >({
     queryKey: ['ai', 'journal-insights'],
     queryFn: async () => {
       return await clientGet<{
@@ -347,17 +348,13 @@ export function useUsersAlsoBought(productId: string) {
  */
 export function useRecommendationFeedback() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, RecommendationFeedback>({
     mutationFn: async (feedback: RecommendationFeedback) => {
-      await clientPost<RecommendationFeedback, void>(
-        phase4Client,
-        '/ai/feedback',
-        feedback
-      );
-      logEvent('recommendation_feedback', { 
-        recommendationId: feedback.recommendationId, 
-        action: feedback.action 
+      await clientPost<RecommendationFeedback, void>(phase4Client, '/ai/feedback', feedback);
+      logEvent('recommendation_feedback', {
+        recommendationId: feedback.recommendationId,
+        action: feedback.action,
       });
     },
     onSuccess: () => {
@@ -372,7 +369,15 @@ export function useRecommendationFeedback() {
  */
 export function useRateRecommendation() {
   return useMutation<void, Error, { recommendationId: string; rating: number; helpful: boolean }>({
-    mutationFn: async ({ recommendationId, rating, helpful }: { recommendationId: string; rating: number; helpful: boolean }) => {
+    mutationFn: async ({
+      recommendationId,
+      rating,
+      helpful,
+    }: {
+      recommendationId: string;
+      rating: number;
+      helpful: boolean;
+    }) => {
       await clientPost<{ rating: number; helpful: boolean }, void>(
         phase4Client,
         `/ai/recommendations/${recommendationId}/rate`,
@@ -388,9 +393,15 @@ export function useRateRecommendation() {
  */
 export function useDismissRecommendation() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { recommendationId: string; reason?: string }>({
-    mutationFn: async ({ recommendationId, reason }: { recommendationId: string; reason?: string }) => {
+    mutationFn: async ({
+      recommendationId,
+      reason,
+    }: {
+      recommendationId: string;
+      reason?: string;
+    }) => {
       await clientPost<{ reason?: string }, void>(
         phase4Client,
         `/ai/recommendations/${recommendationId}/dismiss`,
@@ -426,7 +437,7 @@ export function useModelMetrics() {
  */
 export function useRetrainModel() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<{ jobId: string; estimatedCompletionTime: string }, Error, void>({
     mutationFn: async () => {
       const result = await clientPost<{}, { jobId: string; estimatedCompletionTime: string }>(
@@ -449,15 +460,16 @@ export function useRetrainModel() {
 /**
  * Hook to fetch trending products
  */
-export function useTrendingProducts(options?: { category?: string; timeframe?: 'day' | 'week' | 'month' }) {
+export function useTrendingProducts(options?: {
+  category?: string;
+  timeframe?: 'day' | 'week' | 'month';
+}) {
   return useQuery<AIRecommendation[], Error>({
     queryKey: ['ai', 'trending', options],
     queryFn: async () => {
-      const res = await clientGet<{ products: AIRecommendation[] }>(
-        phase4Client,
-        '/ai/trending',
-        { params: options }
-      );
+      const res = await clientGet<{ products: AIRecommendation[] }>(phase4Client, '/ai/trending', {
+        params: options,
+      });
       return res.products;
     },
     staleTime: 15 * 60 * 1000,
@@ -488,11 +500,10 @@ export function usePersonalizedRanking(productIds: string[]) {
   return useQuery<{ productId: string; personalizedScore: number }[], Error>({
     queryKey: ['ai', 'personalized-ranking', productIds],
     queryFn: async () => {
-      const res = await clientPost<{ productIds: string[] }, { rankings: { productId: string; personalizedScore: number }[] }>(
-        phase4Client,
-        '/ai/personalize-ranking',
-        { productIds }
-      );
+      const res = await clientPost<
+        { productIds: string[] },
+        { rankings: { productId: string; personalizedScore: number }[] }
+      >(phase4Client, '/ai/personalize-ranking', { productIds });
       return res.rankings;
     },
     enabled: productIds.length > 0,

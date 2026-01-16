@@ -255,7 +255,7 @@ router.post('/payments/intents/:intentId/cancel', async (req: Request, res: Resp
 
 router.post('/payments/refunds', async (req: Request, res: Response) => {
   try {
-    const { paymentIntentId, amount, reason } = req.body;
+    const { paymentIntentId, amount: _amount, reason: _reason } = req.body;
     
     res.status(201).json({
       success: true,

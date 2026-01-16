@@ -209,7 +209,7 @@ router.post('/settings', async (req: Request, res: Response) => {
 
 router.post('/detect', async (req: Request, res: Response) => {
   try {
-    const { acceptLanguage, timezone, region } = req.body;
+    const { acceptLanguage, timezone: _timezone, region: _region } = req.body;
     
     // Simple detection logic
     let detectedLocale = 'en-US';

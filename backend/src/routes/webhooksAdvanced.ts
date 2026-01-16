@@ -143,7 +143,7 @@ webhooksAdvancedRouter.delete('/webhooks/:webhookId', requireAuth, async (req: R
  * Test a webhook endpoint
  */
 webhooksAdvancedRouter.post('/webhooks/:webhookId/test', requireAuth, async (req: Request, res: Response) => {
-  const { webhookId } = req.params;
+  const { webhookId: _webhookId } = req.params;
   
   try {
     const latencyMs = Math.floor(Math.random() * 200) + 50;
@@ -330,10 +330,10 @@ webhooksAdvancedRouter.post('/integrations/connect', requireAuth, async (req: Re
  * Disconnect an integration
  */
 webhooksAdvancedRouter.post('/integrations/:integrationId/disconnect', requireAuth, async (req: Request, res: Response) => {
-  const { integrationId } = req.params;
+  const { integrationId: _integrationId } = req.params;
   
   try {
-    res.json({ success: true, integrationId });
+    res.json({ success: true, integrationId: _integrationId });
   } catch (error) {
     console.error('Disconnect integration error:', error);
     res.status(500).json({ error: 'Failed to disconnect integration' });
@@ -345,7 +345,7 @@ webhooksAdvancedRouter.post('/integrations/:integrationId/disconnect', requireAu
  * Trigger a sync for an integration
  */
 webhooksAdvancedRouter.post('/integrations/:integrationId/sync', requireAuth, async (req: Request, res: Response) => {
-  const { integrationId } = req.params;
+  const { integrationId: _integrationId } = req.params;
   
   try {
     res.json({
@@ -463,7 +463,7 @@ webhooksAdvancedRouter.get('/integrations/marketing/campaigns', requireAuth, asy
  * Create a marketing campaign
  */
 webhooksAdvancedRouter.post('/integrations/marketing/campaigns', requireAuth, async (req: Request, res: Response) => {
-  const { name, platform, audienceSegmentId, content, scheduledAt } = req.body;
+  const { name, platform, audienceSegmentId, content: _content, scheduledAt } = req.body;
   
   if (!name || !platform) {
     return res.status(400).json({ error: 'name and platform are required' });

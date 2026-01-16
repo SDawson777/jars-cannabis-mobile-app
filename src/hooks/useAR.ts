@@ -82,10 +82,7 @@ export function useARModel(productId: string) {
     queryKey: ['ar', 'models', productId],
     queryFn: async () => {
       try {
-        const res = await clientGet<{ model: ARModel }>(
-          phase4Client,
-          `/ar/models/${productId}`
-        );
+        const res = await clientGet<{ model: ARModel }>(phase4Client, `/ar/models/${productId}`);
         return res.model;
       } catch (error: any) {
         if (error?.response?.status === 404 || error?.response?.status === 501) {
@@ -106,11 +103,9 @@ export function useARModels(options?: { category?: string; limit?: number }) {
   return useQuery<ARModel[], Error>({
     queryKey: ['ar', 'models', options],
     queryFn: async () => {
-      const res = await clientGet<{ models: ARModel[] }>(
-        phase4Client,
-        '/ar/models',
-        { params: options }
-      );
+      const res = await clientGet<{ models: ARModel[] }>(phase4Client, '/ar/models', {
+        params: options,
+      });
       return res.models;
     },
     staleTime: 10 * 60 * 1000,
@@ -173,7 +168,8 @@ export function useARCapabilities() {
       // Check for WebXR support
       if (typeof navigator !== 'undefined' && 'xr' in navigator) {
         try {
-          capabilities.supportsWebXR = await (navigator as any).xr?.isSessionSupported?.('immersive-ar') || false;
+          capabilities.supportsWebXR =
+            (await (navigator as any).xr?.isSessionSupported?.('immersive-ar')) || false;
         } catch {
           capabilities.supportsWebXR = false;
         }
@@ -183,7 +179,7 @@ export function useARCapabilities() {
       // In production, use react-native Platform API
       capabilities.supportsARKit = false; // Platform.OS === 'ios'
       capabilities.supportsARCore = false; // Platform.OS === 'android'
-      
+
       capabilities.recommendedFormat = capabilities.supportsARKit ? 'usdz' : 'glb';
 
       return capabilities;
@@ -201,7 +197,6 @@ export function useARCapabilities() {
  */
 export function useARSession(productId: string) {
   const [session, setSession] = useState<ARSession | null>(null);
-  const queryClient = useQueryClient();
 
   const startSession = useCallback(() => {
     const newSession: ARSession = {
@@ -215,48 +210,49 @@ export function useARSession(productId: string) {
     return newSession;
   }, [productId]);
 
-  const recordInteraction = useCallback((interaction: Omit<ARInteraction, 'timestamp'>) => {
-    if (!session) return;
-    
-    const newInteraction: ARInteraction = {
-      ...interaction,
-      timestamp: new Date().toISOString(),
-    };
-    
-    setSession(prev => prev ? {
-      ...prev,
-      interactions: [...prev.interactions, newInteraction],
-    } : null);
+  const recordInteraction = useCallback(
+    (interaction: Omit<ARInteraction, 'timestamp'>) => {
+      if (!session) return;
 
-    logEvent('ar_interaction', { 
-      productId, 
-      sessionId: session.id,
-      interactionType: interaction.type 
-    });
-  }, [session, productId]);
+      const newInteraction: ARInteraction = {
+        ...interaction,
+        timestamp: new Date().toISOString(),
+      };
+
+      setSession(prev =>
+        prev
+          ? {
+              ...prev,
+              interactions: [...prev.interactions, newInteraction],
+            }
+          : null
+      );
+
+      logEvent('ar_interaction', {
+        productId,
+        sessionId: session.id,
+        interactionType: interaction.type,
+      });
+    },
+    [session, productId]
+  );
 
   const endSession = useCallback(async () => {
     if (!session) return;
 
-    const duration = Math.floor(
-      (Date.now() - new Date(session.startedAt).getTime()) / 1000
-    );
+    const duration = Math.floor((Date.now() - new Date(session.startedAt).getTime()) / 1000);
 
     const finalSession = { ...session, duration };
 
     // Report session to backend
     try {
-      await clientPost<ARSession, void>(
-        phase4Client,
-        '/ar/sessions',
-        finalSession
-      );
+      await clientPost<ARSession, void>(phase4Client, '/ar/sessions', finalSession);
     } catch (e) {
       console.warn('Failed to report AR session:', e);
     }
 
-    logEvent('ar_session_ended', { 
-      productId, 
+    logEvent('ar_session_ended', {
+      productId,
       sessionId: session.id,
       duration,
       interactionCount: session.interactions.length,
@@ -266,12 +262,15 @@ export function useARSession(productId: string) {
     return finalSession;
   }, [session, productId]);
 
-  const captureScreenshot = useCallback((imageData: string) => {
-    if (!session) return;
-    
-    setSession(prev => prev ? { ...prev, screenshot: imageData } : null);
-    recordInteraction({ type: 'screenshot' });
-  }, [session, recordInteraction]);
+  const captureScreenshot = useCallback(
+    (imageData: string) => {
+      if (!session) return;
+
+      setSession(prev => (prev ? { ...prev, screenshot: imageData } : null));
+      recordInteraction({ type: 'screenshot' });
+    },
+    [session, recordInteraction]
+  );
 
   return {
     session,
@@ -293,13 +292,22 @@ export function useARSession(productId: string) {
 export function useUploadARModel() {
   const queryClient = useQueryClient();
 
-  return useMutation<ARModel, Error, {
-    productId: string;
-    modelFile: Blob;
-    thumbnailFile?: Blob;
-    dimensions?: ARModel['dimensions'];
-  }>({
-    mutationFn: async ({ productId, modelFile, thumbnailFile, dimensions }: {
+  return useMutation<
+    ARModel,
+    Error,
+    {
+      productId: string;
+      modelFile: Blob;
+      thumbnailFile?: Blob;
+      dimensions?: ARModel['dimensions'];
+    }
+  >({
+    mutationFn: async ({
+      productId,
+      modelFile,
+      thumbnailFile,
+      dimensions,
+    }: {
       productId: string;
       modelFile: Blob;
       thumbnailFile?: Blob;
@@ -355,15 +363,18 @@ export function useDeleteARModel() {
  * Hook to fetch AR analytics
  */
 export function useARAnalytics(dateRange: { start: string; end: string }) {
-  return useQuery<{
-    totalSessions: number;
-    uniqueUsers: number;
-    averageSessionDuration: number;
-    topProducts: { productId: string; productName: string; sessions: number }[];
-    interactionBreakdown: { type: string; count: number }[];
-    conversionRate: number;
-    addToCartFromAR: number;
-  }, Error>({
+  return useQuery<
+    {
+      totalSessions: number;
+      uniqueUsers: number;
+      averageSessionDuration: number;
+      topProducts: { productId: string; productName: string; sessions: number }[];
+      interactionBreakdown: { type: string; count: number }[];
+      conversionRate: number;
+      addToCartFromAR: number;
+    },
+    Error
+  >({
     queryKey: ['ar', 'analytics', dateRange],
     queryFn: async () => {
       return await clientGet<{
@@ -388,13 +399,16 @@ export function useARAnalytics(dateRange: { start: string; end: string }) {
  * Hook to fetch 360 degree product images
  */
 export function useProduct360View(productId: string) {
-  return useQuery<{
-    productId: string;
-    images: string[];
-    frameCount: number;
-    initialFrame: number;
-    autoRotate: boolean;
-  }, Error>({
+  return useQuery<
+    {
+      productId: string;
+      images: string[];
+      frameCount: number;
+      initialFrame: number;
+      autoRotate: boolean;
+    },
+    Error
+  >({
     queryKey: ['ar', '360view', productId],
     queryFn: async () => {
       return await clientGet<{

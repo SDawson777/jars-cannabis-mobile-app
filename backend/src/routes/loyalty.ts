@@ -309,8 +309,8 @@ loyaltyRouter.post('/loyalty/rewards/redeem', requireAuth, async (req: Request, 
  * Get points transaction history
  */
 loyaltyRouter.get('/loyalty/transactions', requireAuth, async (req: Request, res: Response) => {
-  const uid = (req as any).user.userId as string;
-  const { cursor, limit = '20' } = req.query;
+  const _uid = (req as any).user.userId as string;
+  const { cursor: _cursor, limit: _limit = '20' } = req.query;
   
   try {
     // Mock transactions
@@ -571,7 +571,7 @@ loyaltyRouter.post('/loyalty/coupons/clip', requireAuth, async (req: Request, re
  */
 loyaltyRouter.post('/loyalty/calculate-points', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
-  const { subtotal, productIds } = req.body;
+  const { subtotal, productIds: _productIds } = req.body;
   
   if (typeof subtotal !== 'number' || subtotal < 0) {
     return res.status(400).json({ error: 'Valid subtotal is required' });

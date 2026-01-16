@@ -272,7 +272,7 @@ conciergeRouter.post('/concierge/chat/stream', async (req, res) => {
  * Search the knowledge base
  */
 conciergeRouter.get('/concierge/knowledge/search', async (req, res) => {
-  const { query, category, limit = '10' } = req.query;
+  const { query, category: _category, limit = '10' } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'query is required' });

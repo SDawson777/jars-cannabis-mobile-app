@@ -11,7 +11,7 @@ const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { type, folderId } = req.query;
+    const { type: _type, folderId: _folderId } = req.query;
     
     res.json({
       favorites: [
@@ -173,8 +173,8 @@ router.delete('/folders/:folderId', async (req: Request, res: Response) => {
 
 router.post('/folders/:folderId/move', async (req: Request, res: Response) => {
   try {
-    const { favoriteIds } = req.body;
-    res.json({ moved: favoriteIds.length });
+    const { favoriteIds: _favoriteIds } = req.body;
+    res.json({ moved: _favoriteIds.length });
   } catch (error) {
     console.error('Error moving favorites:', error);
     res.status(500).json({ error: 'Failed to move favorites' });
@@ -252,7 +252,7 @@ router.get('/last-order', async (req: Request, res: Response) => {
 
 router.post('/reorder/:orderId', async (req: Request, res: Response) => {
   try {
-    const { orderId } = req.params;
+    const { orderId: _orderId } = req.params;
     res.json({
       cartId: 'cart-123',
       addedItems: [
@@ -321,7 +321,7 @@ router.get('/back-in-stock', async (req: Request, res: Response) => {
 
 router.post('/share', async (req: Request, res: Response) => {
   try {
-    const { favoriteIds, expiresInDays } = req.body;
+    const { favoriteIds: _favoriteIds, expiresInDays } = req.body;
     res.json({
       shareId: `share-${Date.now()}`,
       shareUrl: `https://nimbus.app/shared/favorites/${Date.now()}`,

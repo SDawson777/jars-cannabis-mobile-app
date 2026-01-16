@@ -53,7 +53,7 @@ router.get('/smarthome/connections/:provider', async (req: Request, res: Respons
 
 router.post('/smarthome/link', async (req: Request, res: Response) => {
   try {
-    const { provider, permissions, redirectUri } = req.body;
+    const { provider, permissions: _permissions, redirectUri } = req.body;
     
     // In production, this would generate real OAuth URLs
     const authUrls: Record<string, string> = {
@@ -74,7 +74,7 @@ router.post('/smarthome/link', async (req: Request, res: Response) => {
 
 router.post('/smarthome/link/complete', async (req: Request, res: Response) => {
   try {
-    const { provider, code, state } = req.body;
+    const { provider, code: _code, state: _state } = req.body;
     
     res.json({
       provider,

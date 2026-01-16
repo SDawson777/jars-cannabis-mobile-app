@@ -3,7 +3,6 @@
 
 import { Router, Request, Response } from 'express';
 import { requireAuth } from '../middleware/auth';
-import { prisma } from '../prismaClient';
 
 export const aiRecommendationsRouter = Router();
 
@@ -16,8 +15,8 @@ export const aiRecommendationsRouter = Router();
  * Get personalized AI recommendations
  */
 aiRecommendationsRouter.get('/ai/recommendations', requireAuth, async (req: Request, res: Response) => {
-  const { context, limit = '10' } = req.query;
-  const userId = (req as any).user?.uid;
+  const { context: _context, limit: _limit = '10' } = req.query;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -78,8 +77,8 @@ aiRecommendationsRouter.get('/ai/recommendations', requireAuth, async (req: Requ
  * Get similar products
  */
 aiRecommendationsRouter.get('/ai/recommendations/similar/:productId', async (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const { limit = '5' } = req.query;
+  const { productId: _productId } = req.params;
+  const { limit: _limit = '5' } = req.query;
   
   try {
     res.json({
@@ -100,7 +99,7 @@ aiRecommendationsRouter.get('/ai/recommendations/similar/:productId', async (req
  * Get frequently bought together products
  */
 aiRecommendationsRouter.get('/ai/recommendations/frequently-bought-together/:productId', async (req: Request, res: Response) => {
-  const { productId } = req.params;
+  const { productId: _productId } = req.params;
   
   try {
     res.json({
@@ -248,7 +247,7 @@ aiRecommendationsRouter.post('/ai/profile', requireAuth, async (req: Request, re
  * Get insights from journal entries
  */
 aiRecommendationsRouter.get('/ai/insights/journal', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.uid;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -294,7 +293,7 @@ aiRecommendationsRouter.get('/ai/insights/journal', requireAuth, async (req: Req
  * Get recommendations based on journal patterns
  */
 aiRecommendationsRouter.get('/ai/insights/journal/recommendations', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.uid;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -328,7 +327,7 @@ aiRecommendationsRouter.get('/ai/insights/journal/recommendations', requireAuth,
  * Get recommendations based on similar users
  */
 aiRecommendationsRouter.get('/ai/recommendations/peers', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.uid;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -363,7 +362,7 @@ aiRecommendationsRouter.get('/ai/recommendations/peers', requireAuth, async (req
  * Get "users who bought X also bought Y"
  */
 aiRecommendationsRouter.get('/ai/recommendations/users-also-bought', async (req: Request, res: Response) => {
-  const { productId, orderId } = req.query;
+  const { productId: _productId, orderId: _orderId } = req.query;
   
   try {
     res.json({
@@ -388,7 +387,7 @@ aiRecommendationsRouter.get('/ai/recommendations/users-also-bought', async (req:
  * Get user's recommendation feedback history
  */
 aiRecommendationsRouter.get('/ai/feedback', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.uid;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -437,8 +436,8 @@ aiRecommendationsRouter.post('/ai/feedback/rate', requireAuth, async (req: Reque
  * Dismiss a recommendation
  */
 aiRecommendationsRouter.post('/ai/feedback/dismiss', requireAuth, async (req: Request, res: Response) => {
-  const { recommendationId, productId, reason } = req.body;
-  const userId = (req as any).user?.uid;
+  const { recommendationId, productId: _productId, reason: _reason } = req.body;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -510,7 +509,7 @@ aiRecommendationsRouter.post('/ai/retrain', requireAuth, async (req: Request, re
  * Get trending products
  */
 aiRecommendationsRouter.get('/ai/trending', async (req: Request, res: Response) => {
-  const { category, location, timeframe } = req.query;
+  const { category: _category, location, timeframe } = req.query;
   
   try {
     res.json({
@@ -535,7 +534,7 @@ aiRecommendationsRouter.get('/ai/trending', async (req: Request, res: Response) 
  * Get discovery recommendations (new & interesting products)
  */
 aiRecommendationsRouter.get('/ai/discovery', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.uid;
+  const _userId = (req as any).user?.uid;
   
   try {
     res.json({
@@ -567,8 +566,8 @@ aiRecommendationsRouter.get('/ai/discovery', requireAuth, async (req: Request, r
  * Get personalized product ranking for a list
  */
 aiRecommendationsRouter.post('/ai/personalized-ranking', requireAuth, async (req: Request, res: Response) => {
-  const { productIds, context } = req.body;
-  const userId = (req as any).user?.uid;
+  const { productIds, context: _context } = req.body;
+  const _userId = (req as any).user?.uid;
   
   if (!productIds || !Array.isArray(productIds)) {
     return res.status(400).json({ error: 'productIds array is required' });

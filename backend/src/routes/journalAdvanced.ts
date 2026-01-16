@@ -154,7 +154,7 @@ router.post('/tags', async (req: Request, res: Response) => {
 
 router.get('/tags/suggested', async (req: Request, res: Response) => {
   try {
-    const { entryContent } = req.query;
+    const { entryContent: _entryContent } = req.query;
     res.json({
       tags: [
         { id: 'tag-1', name: 'relaxation', relevance: 0.9 },
@@ -173,7 +173,7 @@ router.get('/tags/suggested', async (req: Request, res: Response) => {
 
 router.get('/charts/mood', async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate, granularity } = req.query;
+    const { startDate, endDate, granularity: _granularity } = req.query;
     
     // Generate mock mood data
     const dataPoints = [];
@@ -202,7 +202,7 @@ router.get('/charts/mood', async (req: Request, res: Response) => {
 
 router.get('/charts/dosage', async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate, granularity } = req.query;
+    const { startDate: _startDate, endDate: _endDate, granularity: _granularity } = req.query;
     
     res.json({
       dataPoints: [
@@ -243,7 +243,7 @@ router.get('/charts/effects', async (req: Request, res: Response) => {
 
 router.get('/summary', async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.query;
+    const { startDate: _startDate, endDate: _endDate } = req.query;
     res.json({
       totalEntries: 45,
       totalProducts: 12,
@@ -368,7 +368,7 @@ router.get('/recommendations', async (req: Request, res: Response) => {
 
 router.get('/search', async (req: Request, res: Response) => {
   try {
-    const { query, filters } = req.query;
+    const { query: _query, filters: _filters } = req.query;
     res.json({
       entries: [],
       total: 0,
@@ -403,7 +403,7 @@ router.get('/by-strain/:strain', async (req: Request, res: Response) => {
 
 router.post('/export', async (req: Request, res: Response) => {
   try {
-    const { format, startDate, endDate, includeMedia } = req.body;
+    const { format, startDate: _startDate, endDate: _endDate, includeMedia: _includeMedia } = req.body;
     res.json({
       downloadUrl: `https://nimbus.app/exports/journal-${Date.now()}.${format}`,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -417,7 +417,7 @@ router.post('/export', async (req: Request, res: Response) => {
 router.post('/entries/:entryId/share', async (req: Request, res: Response) => {
   try {
     const { entryId } = req.params;
-    const { includeProduct, includeEffects, expiresInDays } = req.body;
+    const { includeProduct: _includeProduct, includeEffects: _includeEffects, expiresInDays } = req.body;
     res.json({
       shareUrl: `https://nimbus.app/shared/journal/${entryId}`,
       expiresAt: new Date(Date.now() + (expiresInDays || 7) * 24 * 60 * 60 * 1000).toISOString(),

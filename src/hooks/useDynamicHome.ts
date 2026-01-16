@@ -6,7 +6,6 @@ import { phase4Client } from '../api/phase4Client';
 import { clientGet, clientPost, clientPatch, clientDelete } from '../api/http';
 import { logEvent } from '../utils/analytics';
 import { useState, useCallback, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ============================================
 // Types
@@ -26,7 +25,7 @@ export interface HomeSection {
   lastUpdated?: string;
 }
 
-export type HomeSectionType = 
+export type HomeSectionType =
   | 'hero_banner'
   | 'featured_products'
   | 'categories'
@@ -108,10 +107,7 @@ export function useHomeSections() {
   return useQuery<HomeSection[], Error>({
     queryKey: ['home', 'sections'],
     queryFn: async () => {
-      const res = await clientGet<{ sections: HomeSection[] }>(
-        phase4Client,
-        '/home/sections'
-      );
+      const res = await clientGet<{ sections: HomeSection[] }>(phase4Client, '/home/sections');
       return res.sections;
     },
     staleTime: 60 * 1000, // 1 minute
@@ -125,10 +121,7 @@ export function useSectionData<T = unknown>(sectionId: string, sectionType: Home
   return useQuery<T, Error>({
     queryKey: ['home', 'section', sectionId, 'data'],
     queryFn: async () => {
-      return await clientGet<T>(
-        phase4Client,
-        `/home/sections/${sectionId}/data`
-      );
+      return await clientGet<T>(phase4Client, `/home/sections/${sectionId}/data`);
     },
     enabled: !!sectionId,
     staleTime: getSectionStaleTime(sectionType),
@@ -140,11 +133,15 @@ export function useSectionData<T = unknown>(sectionId: string, sectionType: Home
  */
 export function useSaveHomeLayout() {
   const queryClient = useQueryClient();
-  
-  return useMutation<HomeLayout, Error, {
-    sections: Pick<HomeSection, 'id' | 'position' | 'visible' | 'isCollapsed' | 'config'>[];
-    name?: string;
-  }>({
+
+  return useMutation<
+    HomeLayout,
+    Error,
+    {
+      sections: Pick<HomeSection, 'id' | 'position' | 'visible' | 'isCollapsed' | 'config'>[];
+      name?: string;
+    }
+  >({
     mutationFn: async (layout: {
       sections: Pick<HomeSection, 'id' | 'position' | 'visible' | 'isCollapsed' | 'config'>[];
       name?: string;
@@ -169,7 +166,7 @@ export function useSaveHomeLayout() {
  */
 export function useResetHomeLayout() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<HomeLayout, Error, void>({
     mutationFn: async () => {
       const result = await clientPost<Record<string, never>, HomeLayout>(
@@ -196,14 +193,12 @@ export function useResetHomeLayout() {
  */
 export function useToggleSectionVisibility() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { sectionId: string; visible: boolean }>({
     mutationFn: async ({ sectionId, visible }: { sectionId: string; visible: boolean }) => {
-      await clientPatch<{ visible: boolean }, void>(
-        phase4Client,
-        `/home/sections/${sectionId}`,
-        { visible }
-      );
+      await clientPatch<{ visible: boolean }, void>(phase4Client, `/home/sections/${sectionId}`, {
+        visible,
+      });
       logEvent('section_visibility_toggled', { sectionId, visible });
     },
     onSuccess: () => {
@@ -218,7 +213,7 @@ export function useToggleSectionVisibility() {
  */
 export function useToggleSectionCollapsed() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, { sectionId: string; isCollapsed: boolean }>({
     mutationFn: async ({ sectionId, isCollapsed }: { sectionId: string; isCollapsed: boolean }) => {
       await clientPatch<{ isCollapsed: boolean }, void>(
@@ -238,22 +233,33 @@ export function useToggleSectionCollapsed() {
  */
 export function useUpdateSectionConfig() {
   const queryClient = useQueryClient();
-  
-  return useMutation<HomeSection, Error, { sectionId: string; config: Partial<HomeSectionConfig> }>({
-    mutationFn: async ({ sectionId, config }: { sectionId: string; config: Partial<HomeSectionConfig> }) => {
-      const result = await clientPatch<{ config: Partial<HomeSectionConfig> }, HomeSection>(
-        phase4Client,
-        `/home/sections/${sectionId}`,
-        { config }
-      );
-      logEvent('section_config_updated', { sectionId });
-      return result;
-    },
-    onSuccess: (_: HomeSection, { sectionId }: { sectionId: string; config: Partial<HomeSectionConfig> }) => {
-      queryClient.invalidateQueries({ queryKey: ['home', 'sections'] });
-      queryClient.invalidateQueries({ queryKey: ['home', 'section', sectionId] });
-    },
-  });
+
+  return useMutation<HomeSection, Error, { sectionId: string; config: Partial<HomeSectionConfig> }>(
+    {
+      mutationFn: async ({
+        sectionId,
+        config,
+      }: {
+        sectionId: string;
+        config: Partial<HomeSectionConfig>;
+      }) => {
+        const result = await clientPatch<{ config: Partial<HomeSectionConfig> }, HomeSection>(
+          phase4Client,
+          `/home/sections/${sectionId}`,
+          { config }
+        );
+        logEvent('section_config_updated', { sectionId });
+        return result;
+      },
+      onSuccess: (
+        _: HomeSection,
+        { sectionId }: { sectionId: string; config: Partial<HomeSectionConfig> }
+      ) => {
+        queryClient.invalidateQueries({ queryKey: ['home', 'sections'] });
+        queryClient.invalidateQueries({ queryKey: ['home', 'section', sectionId] });
+      },
+    }
+  );
 }
 
 /**
@@ -261,13 +267,17 @@ export function useUpdateSectionConfig() {
  */
 export function useAddSection() {
   const queryClient = useQueryClient();
-  
-  return useMutation<HomeSection, Error, {
-    type: HomeSectionType;
-    title: string;
-    config?: Partial<HomeSectionConfig>;
-    position?: number;
-  }>({
+
+  return useMutation<
+    HomeSection,
+    Error,
+    {
+      type: HomeSectionType;
+      title: string;
+      config?: Partial<HomeSectionConfig>;
+      position?: number;
+    }
+  >({
     mutationFn: async (section: {
       type: HomeSectionType;
       title: string;
@@ -294,7 +304,7 @@ export function useAddSection() {
  */
 export function useRemoveSection() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (sectionId: string) => {
       await clientDelete(phase4Client, `/home/sections/${sectionId}`);
@@ -320,10 +330,10 @@ export function useSectionDragDrop() {
     draggedSectionId: null,
     dragOverSectionId: null,
   });
-  
+
   const [sections, setSections] = useState<HomeSection[]>([]);
   const originalOrderRef = useRef<HomeSection[]>([]);
-  
+
   const startDrag = useCallback((sectionId: string, initialSections: HomeSection[]) => {
     originalOrderRef.current = [...initialSections];
     setSections(initialSections);
@@ -334,34 +344,37 @@ export function useSectionDragDrop() {
     });
     logEvent('section_drag_started', { sectionId });
   }, []);
-  
-  const dragOver = useCallback((targetSectionId: string) => {
-    if (dragState.draggedSectionId === targetSectionId) return;
-    
-    setDragState(prev => ({
-      ...prev,
-      dragOverSectionId: targetSectionId,
-    }));
-    
-    // Reorder sections during drag
-    setSections(prev => {
-      const draggedIndex = prev.findIndex(s => s.id === dragState.draggedSectionId);
-      const targetIndex = prev.findIndex(s => s.id === targetSectionId);
-      
-      if (draggedIndex === -1 || targetIndex === -1) return prev;
-      
-      const newSections = [...prev];
-      const [draggedSection] = newSections.splice(draggedIndex, 1);
-      newSections.splice(targetIndex, 0, draggedSection);
-      
-      // Update positions
-      return newSections.map((section, index) => ({
-        ...section,
-        position: index,
+
+  const dragOver = useCallback(
+    (targetSectionId: string) => {
+      if (dragState.draggedSectionId === targetSectionId) return;
+
+      setDragState(prev => ({
+        ...prev,
+        dragOverSectionId: targetSectionId,
       }));
-    });
-  }, [dragState.draggedSectionId]);
-  
+
+      // Reorder sections during drag
+      setSections(prev => {
+        const draggedIndex = prev.findIndex(s => s.id === dragState.draggedSectionId);
+        const targetIndex = prev.findIndex(s => s.id === targetSectionId);
+
+        if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+        const newSections = [...prev];
+        const [draggedSection] = newSections.splice(draggedIndex, 1);
+        newSections.splice(targetIndex, 0, draggedSection);
+
+        // Update positions
+        return newSections.map((section, index) => ({
+          ...section,
+          position: index,
+        }));
+      });
+    },
+    [dragState.draggedSectionId]
+  );
+
   const endDrag = useCallback(() => {
     setDragState({
       isDragging: false,
@@ -369,7 +382,7 @@ export function useSectionDragDrop() {
       dragOverSectionId: null,
     });
   }, []);
-  
+
   const cancelDrag = useCallback(() => {
     setSections(originalOrderRef.current);
     setDragState({
@@ -378,7 +391,7 @@ export function useSectionDragDrop() {
       dragOverSectionId: null,
     });
   }, []);
-  
+
   const getReorderedSections = useCallback(() => {
     return sections.map(s => ({
       id: s.id,
@@ -388,7 +401,7 @@ export function useSectionDragDrop() {
       config: s.config,
     }));
   }, [sections]);
-  
+
   return {
     dragState,
     sections,
@@ -432,10 +445,7 @@ export function useSavedLayouts() {
   return useQuery<HomeLayout[], Error>({
     queryKey: ['home', 'layouts', 'saved'],
     queryFn: async () => {
-      const res = await clientGet<{ layouts: HomeLayout[] }>(
-        phase4Client,
-        '/home/layouts'
-      );
+      const res = await clientGet<{ layouts: HomeLayout[] }>(phase4Client, '/home/layouts');
       return res.layouts;
     },
   });
@@ -446,7 +456,7 @@ export function useSavedLayouts() {
  */
 export function useSaveLayoutPreset() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<HomeLayout, Error, { name: string }>({
     mutationFn: async ({ name }: { name: string }) => {
       const result = await clientPost<{ name: string }, HomeLayout>(
@@ -468,7 +478,7 @@ export function useSaveLayoutPreset() {
  */
 export function useLoadLayoutPreset() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<HomeLayout, Error, string>({
     mutationFn: async (layoutId: string) => {
       const result = await clientPost<{ layoutId: string }, HomeLayout>(
@@ -490,24 +500,24 @@ export function useLoadLayoutPreset() {
 // Local Storage for Edit Mode
 // ============================================
 
-const EDIT_MODE_KEY = '@nimbus/home_edit_mode';
+const _EDIT_MODE_KEY = '@nimbus/home_edit_mode';
 
 /**
  * Hook to manage edit mode state
  */
 export function useHomeEditMode() {
   const [isEditMode, setIsEditMode] = useState(false);
-  
+
   const enterEditMode = useCallback(() => {
     setIsEditMode(true);
     logEvent('home_edit_mode_entered', {});
   }, []);
-  
+
   const exitEditMode = useCallback(() => {
     setIsEditMode(false);
     logEvent('home_edit_mode_exited', {});
   }, []);
-  
+
   return {
     isEditMode,
     enterEditMode,
@@ -524,7 +534,7 @@ export function useHomeEditMode() {
  */
 export function useRefreshSection() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<void, Error, string>({
     mutationFn: async (sectionId: string) => {
       await clientPost<Record<string, never>, void>(

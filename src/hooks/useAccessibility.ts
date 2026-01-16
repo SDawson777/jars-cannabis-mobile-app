@@ -7,7 +7,7 @@ import { clientGet, clientPost } from '../api/http';
 import { logEvent } from '../utils/analytics';
 import { useState, useCallback, useEffect, createContext, useContext, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appearance, ColorSchemeName, AccessibilityInfo, useColorScheme } from 'react-native';
+import { AccessibilityInfo, useColorScheme } from 'react-native';
 import React from 'react';
 
 // ============================================
@@ -198,38 +198,37 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
     autoReadAloud: false,
     captions: false,
   });
-  
+
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
-  
+
   // Load saved settings
   useEffect(() => {
-    AsyncStorage.getItem(SETTINGS_STORAGE_KEY).then((saved) => {
+    AsyncStorage.getItem(SETTINGS_STORAGE_KEY).then(saved => {
       if (saved) {
         setSettings(prev => ({ ...prev, ...JSON.parse(saved) }));
       }
     });
-    
+
     // Check screen reader status
     AccessibilityInfo.isScreenReaderEnabled().then(setIsScreenReaderEnabled);
-    
+
     // Listen for screen reader changes
     const subscription = AccessibilityInfo.addEventListener(
       'screenReaderChanged',
       setIsScreenReaderEnabled
     );
-    
+
     return () => {
       subscription.remove();
     };
   }, []);
-  
+
   // Determine active theme
-  const activeThemeMode = settings.themeMode === 'system' 
-    ? (systemColorScheme || 'light')
-    : settings.themeMode;
-  
+  const activeThemeMode =
+    settings.themeMode === 'system' ? systemColorScheme || 'light' : settings.themeMode;
+
   const baseTheme = activeThemeMode === 'dark' ? darkTheme : lightTheme;
-  
+
   // Apply high contrast if enabled
   const theme: Theme = settings.highContrast
     ? {
@@ -242,52 +241,67 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
         },
       }
     : baseTheme;
-  
+
   const saveSettings = useCallback(async (newSettings: AccessibilitySettings) => {
     setSettings(newSettings);
     await AsyncStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
   }, []);
-  
-  const setThemeMode = useCallback(async (mode: ThemeMode) => {
-    await saveSettings({ ...settings, themeMode: mode });
-    logEvent('theme_mode_changed', { mode });
-  }, [settings, saveSettings]);
-  
-  const setFontScale = useCallback(async (scale: FontScale) => {
-    await saveSettings({ ...settings, fontScale: scale });
-    logEvent('font_scale_changed', { scale });
-  }, [settings, saveSettings]);
-  
+
+  const setThemeMode = useCallback(
+    async (mode: ThemeMode) => {
+      await saveSettings({ ...settings, themeMode: mode });
+      logEvent('theme_mode_changed', { mode });
+    },
+    [settings, saveSettings]
+  );
+
+  const setFontScale = useCallback(
+    async (scale: FontScale) => {
+      await saveSettings({ ...settings, fontScale: scale });
+      logEvent('font_scale_changed', { scale });
+    },
+    [settings, saveSettings]
+  );
+
   const toggleHighContrast = useCallback(async () => {
     const newValue = !settings.highContrast;
     await saveSettings({ ...settings, highContrast: newValue });
     logEvent('high_contrast_toggled', { enabled: newValue });
   }, [settings, saveSettings]);
-  
+
   const toggleReduceMotion = useCallback(async () => {
     const newValue = !settings.reduceMotion;
     await saveSettings({ ...settings, reduceMotion: newValue });
     logEvent('reduce_motion_toggled', { enabled: newValue });
   }, [settings, saveSettings]);
-  
-  const updateSettings = useCallback(async (updates: Partial<AccessibilitySettings>) => {
-    await saveSettings({ ...settings, ...updates });
-    logEvent('accessibility_settings_updated', { fields: Object.keys(updates) });
-  }, [settings, saveSettings]);
-  
-  const getFontSize = useCallback((baseSize: number): number => {
-    return Math.round(baseSize * fontScales[settings.fontScale]);
-  }, [settings.fontScale]);
-  
-  const getSpacing = useCallback((key: keyof Theme['spacing']): number => {
-    const baseSpacing = theme.spacing[key];
-    // Increase spacing for large button mode
-    if (settings.buttonSize === 'large') {
-      return Math.round(baseSpacing * 1.25);
-    }
-    return baseSpacing;
-  }, [theme.spacing, settings.buttonSize]);
-  
+
+  const updateSettings = useCallback(
+    async (updates: Partial<AccessibilitySettings>) => {
+      await saveSettings({ ...settings, ...updates });
+      logEvent('accessibility_settings_updated', { fields: Object.keys(updates) });
+    },
+    [settings, saveSettings]
+  );
+
+  const getFontSize = useCallback(
+    (baseSize: number): number => {
+      return Math.round(baseSize * fontScales[settings.fontScale]);
+    },
+    [settings.fontScale]
+  );
+
+  const getSpacing = useCallback(
+    (key: keyof Theme['spacing']): number => {
+      const baseSpacing = theme.spacing[key];
+      // Increase spacing for large button mode
+      if (settings.buttonSize === 'large') {
+        return Math.round(baseSpacing * 1.25);
+      }
+      return baseSpacing;
+    },
+    [theme.spacing, settings.buttonSize]
+  );
+
   const value: AccessibilityContextValue = {
     theme,
     settings,
@@ -300,12 +314,8 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
     getSpacing,
     isScreenReaderEnabled,
   };
-  
-  return React.createElement(
-    AccessibilityContext.Provider,
-    { value },
-    children
-  );
+
+  return React.createElement(AccessibilityContext.Provider, { value }, children);
 }
 
 // ============================================
@@ -364,13 +374,13 @@ export function useAnnounce() {
   const announce = useCallback((message: string) => {
     AccessibilityInfo.announceForAccessibility(message);
   }, []);
-  
+
   const announcePolite = useCallback((message: string) => {
     // For React Native, announceForAccessibility is used
     // On web, this would use aria-live="polite"
     AccessibilityInfo.announceForAccessibility(message);
   }, []);
-  
+
   return { announce, announcePolite };
 }
 
@@ -385,10 +395,7 @@ export function useSyncedAccessibilitySettings() {
   return useQuery<AccessibilitySettings, Error>({
     queryKey: ['accessibility', 'settings'],
     queryFn: async () => {
-      return await clientGet<AccessibilitySettings>(
-        phase4Client,
-        '/user/accessibility'
-      );
+      return await clientGet<AccessibilitySettings>(phase4Client, '/user/accessibility');
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -399,7 +406,7 @@ export function useSyncedAccessibilitySettings() {
  */
 export function useSyncAccessibilitySettings() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<AccessibilitySettings, Error, Partial<AccessibilitySettings>>({
     mutationFn: async (settings: Partial<AccessibilitySettings>) => {
       return await clientPost<Partial<AccessibilitySettings>, AccessibilitySettings>(
@@ -423,41 +430,46 @@ export function useSyncAccessibilitySettings() {
  */
 export function useColorBlindAdjustments() {
   const { settings } = useAccessibility();
-  
-  const adjustColor = useCallback((color: string): string => {
-    if (settings.colorBlindMode === 'none') return color;
-    
-    // Convert hex to RGB
-    const hex = color.replace('#', '');
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    
-    let adjustedR = r, adjustedG = g, adjustedB = b;
-    
-    switch (settings.colorBlindMode) {
-      case 'protanopia':
-        // Red-blind: shift reds toward yellows
-        adjustedR = Math.round(0.567 * r + 0.433 * g);
-        adjustedG = Math.round(0.558 * g + 0.442 * r);
-        break;
-      case 'deuteranopia':
-        // Green-blind: shift greens toward yellows
-        adjustedG = Math.round(0.7 * g + 0.3 * r);
-        adjustedR = Math.round(0.625 * r + 0.375 * g);
-        break;
-      case 'tritanopia':
-        // Blue-blind: shift blues toward cyans
-        adjustedB = Math.round(0.95 * b + 0.05 * g);
-        adjustedG = Math.round(0.9 * g + 0.1 * b);
-        break;
-    }
-    
-    // Convert back to hex
-    const toHex = (n: number) => Math.min(255, Math.max(0, n)).toString(16).padStart(2, '0');
-    return `#${toHex(adjustedR)}${toHex(adjustedG)}${toHex(adjustedB)}`;
-  }, [settings.colorBlindMode]);
-  
+
+  const adjustColor = useCallback(
+    (color: string): string => {
+      if (settings.colorBlindMode === 'none') return color;
+
+      // Convert hex to RGB
+      const hex = color.replace('#', '');
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+
+      let adjustedR = r,
+        adjustedG = g,
+        adjustedB = b;
+
+      switch (settings.colorBlindMode) {
+        case 'protanopia':
+          // Red-blind: shift reds toward yellows
+          adjustedR = Math.round(0.567 * r + 0.433 * g);
+          adjustedG = Math.round(0.558 * g + 0.442 * r);
+          break;
+        case 'deuteranopia':
+          // Green-blind: shift greens toward yellows
+          adjustedG = Math.round(0.7 * g + 0.3 * r);
+          adjustedR = Math.round(0.625 * r + 0.375 * g);
+          break;
+        case 'tritanopia':
+          // Blue-blind: shift blues toward cyans
+          adjustedB = Math.round(0.95 * b + 0.05 * g);
+          adjustedG = Math.round(0.9 * g + 0.1 * b);
+          break;
+      }
+
+      // Convert back to hex
+      const toHex = (n: number) => Math.min(255, Math.max(0, n)).toString(16).padStart(2, '0');
+      return `#${toHex(adjustedR)}${toHex(adjustedG)}${toHex(adjustedB)}`;
+    },
+    [settings.colorBlindMode]
+  );
+
   return { adjustColor };
 }
 
@@ -470,16 +482,19 @@ export function useColorBlindAdjustments() {
  */
 export function useAnimationDuration() {
   const { settings } = useAccessibility();
-  
-  const getDuration = useCallback((baseDuration: number): number => {
-    if (settings.reduceMotion) {
-      return 0; // No animation
-    }
-    return baseDuration;
-  }, [settings.reduceMotion]);
-  
+
+  const getDuration = useCallback(
+    (baseDuration: number): number => {
+      if (settings.reduceMotion) {
+        return 0; // No animation
+      }
+      return baseDuration;
+    },
+    [settings.reduceMotion]
+  );
+
   const shouldAnimate = !settings.reduceMotion;
-  
+
   return { getDuration, shouldAnimate };
 }
 
@@ -492,20 +507,23 @@ export function useAnimationDuration() {
  */
 export function useHapticFeedback() {
   const { settings } = useAccessibility();
-  
-  const trigger = useCallback((type: 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'warning' | 'error') => {
-    if (!settings.hapticFeedback) return;
-    
-    // In React Native, use expo-haptics or react-native-haptic-feedback
-    // This is a placeholder implementation
-    try {
-      // Would call native haptic API here
-      console.log(`Haptic: ${type}`);
-    } catch {
-      // Haptics not available
-    }
-  }, [settings.hapticFeedback]);
-  
+
+  const trigger = useCallback(
+    (type: 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'warning' | 'error') => {
+      if (!settings.hapticFeedback) return;
+
+      // In React Native, use expo-haptics or react-native-haptic-feedback
+      // This is a placeholder implementation
+      try {
+        // Would call native haptic API here
+        console.log(`Haptic: ${type}`);
+      } catch {
+        // Haptics not available
+      }
+    },
+    [settings.hapticFeedback]
+  );
+
   return { trigger };
 }
 
@@ -518,26 +536,29 @@ export function useHapticFeedback() {
  */
 export function useAccessibleTextStyle() {
   const { theme, settings, getFontSize } = useAccessibility();
-  
-  const getTextStyle = useCallback((variant: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'button') => {
-    const baseStyles = {
-      h1: { fontSize: 32, lineHeight: 40, fontWeight: '700' as const },
-      h2: { fontSize: 24, lineHeight: 32, fontWeight: '600' as const },
-      h3: { fontSize: 20, lineHeight: 28, fontWeight: '600' as const },
-      body: { fontSize: 16, lineHeight: 24, fontWeight: '400' as const },
-      caption: { fontSize: 12, lineHeight: 16, fontWeight: '400' as const },
-      button: { fontSize: 16, lineHeight: 24, fontWeight: '600' as const },
-    };
-    
-    const base = baseStyles[variant];
-    
-    return {
-      fontSize: getFontSize(base.fontSize),
-      lineHeight: getFontSize(base.lineHeight),
-      fontWeight: settings.boldText ? '700' as const : base.fontWeight,
-      color: theme.colors.text,
-    };
-  }, [getFontSize, settings.boldText, theme.colors.text]);
-  
+
+  const getTextStyle = useCallback(
+    (variant: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'button') => {
+      const baseStyles = {
+        h1: { fontSize: 32, lineHeight: 40, fontWeight: '700' as const },
+        h2: { fontSize: 24, lineHeight: 32, fontWeight: '600' as const },
+        h3: { fontSize: 20, lineHeight: 28, fontWeight: '600' as const },
+        body: { fontSize: 16, lineHeight: 24, fontWeight: '400' as const },
+        caption: { fontSize: 12, lineHeight: 16, fontWeight: '400' as const },
+        button: { fontSize: 16, lineHeight: 24, fontWeight: '600' as const },
+      };
+
+      const base = baseStyles[variant];
+
+      return {
+        fontSize: getFontSize(base.fontSize),
+        lineHeight: getFontSize(base.lineHeight),
+        fontWeight: settings.boldText ? ('700' as const) : base.fontWeight,
+        color: theme.colors.text,
+      };
+    },
+    [getFontSize, settings.boldText, theme.colors.text]
+  );
+
   return { getTextStyle };
 }

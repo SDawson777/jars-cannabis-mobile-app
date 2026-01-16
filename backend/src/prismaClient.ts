@@ -31,7 +31,6 @@ let prismaFromMock: any | undefined;
 if (isTestEnvironment()) {
   try {
     // Only available in the test workspace; never used in production builds.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     prismaFromMock = require('../tests/helpers/prismaMock.ts')?.prisma;
   } catch {
     prismaFromMock = undefined;

@@ -75,7 +75,7 @@ walletRouter.get('/wallet/gift-cards', requireAuth, async (req: Request, res: Re
  * Add a gift card to wallet
  */
 walletRouter.post('/wallet/gift-cards/add', requireAuth, async (req: Request, res: Response) => {
-  const { code, pin } = req.body;
+  const { code, pin: _pin } = req.body;
   
   if (!code) {
     return res.status(400).json({ error: 'Gift card code is required' });
@@ -103,7 +103,7 @@ walletRouter.post('/wallet/gift-cards/add', requireAuth, async (req: Request, re
  * Check gift card balance without adding
  */
 walletRouter.post('/wallet/gift-cards/check-balance', requireAuth, async (req: Request, res: Response) => {
-  const { code, pin } = req.body;
+  const { code, pin: _pin } = req.body;
   
   if (!code) {
     return res.status(400).json({ error: 'Gift card code is required' });
@@ -126,7 +126,7 @@ walletRouter.post('/wallet/gift-cards/check-balance', requireAuth, async (req: R
  * Purchase a gift card
  */
 walletRouter.post('/wallet/gift-cards/purchase', requireAuth, async (req: Request, res: Response) => {
-  const { amount, recipientEmail, recipientName, message, sendDate } = req.body;
+  const { amount, recipientEmail, recipientName: _recipientName, message: _message, sendDate: _sendDate } = req.body;
   
   if (!amount || amount < 10 || amount > 500) {
     return res.status(400).json({ error: 'Amount must be between $10 and $500' });
@@ -159,7 +159,7 @@ walletRouter.post('/wallet/gift-cards/purchase', requireAuth, async (req: Reques
  */
 walletRouter.get('/wallet/receipts', requireAuth, async (req: Request, res: Response) => {
   const userId = (req as any).user?.userId;
-  const { cursor } = req.query;
+  const { cursor: _cursor } = req.query;
   
   try {
     // Get user's orders
@@ -274,7 +274,7 @@ walletRouter.post('/wallet/receipts/:receiptId/email', requireAuth, async (req: 
  * Get wallet transaction history
  */
 walletRouter.get('/wallet/transactions', requireAuth, async (req: Request, res: Response) => {
-  const { type, cursor } = req.query;
+  const { type, cursor: _cursor } = req.query;
   
   try {
     // Mock transactions
@@ -351,7 +351,7 @@ walletRouter.get('/wallet/store-credits', requireAuth, async (req: Request, res:
  * Get user's digital coupons
  */
 walletRouter.get('/wallet/coupons', requireAuth, async (req: Request, res: Response) => {
-  const { includeUsed } = req.query;
+  const { includeUsed: _includeUsed } = req.query;
   
   try {
     const coupons = [
@@ -422,7 +422,7 @@ walletRouter.post('/wallet/coupons/clip', requireAuth, async (req: Request, res:
  * Apply wallet balance at checkout
  */
 walletRouter.post('/checkout/apply-wallet', requireAuth, async (req: Request, res: Response) => {
-  const { orderId, usePoints, useGiftCards, useStoreCredit, maxAmount } = req.body;
+  const { orderId: _orderId, usePoints, useGiftCards, useStoreCredit, maxAmount } = req.body;
   
   try {
     let appliedAmount = 0;
@@ -450,7 +450,7 @@ walletRouter.post('/checkout/apply-wallet', requireAuth, async (req: Request, re
  * Get warranty info for a purchased product
  */
 walletRouter.get('/wallet/warranty/:productId', requireAuth, async (req: Request, res: Response) => {
-  const { productId } = req.params;
+  const { productId: _productId } = req.params;
   
   try {
     // In production, query purchase history for warranty info

@@ -51,7 +51,7 @@ inventoryRouter.get('/inventory/:productId', optionalAuth, async (req: Request, 
  * Get product availability across stores
  */
 inventoryRouter.get('/inventory/:productId/stores', optionalAuth, async (req: Request, res: Response) => {
-  const { productId } = req.params;
+  const { productId: _productId } = req.params;
   const { lat, lng } = req.query;
   
   try {
@@ -109,7 +109,7 @@ inventoryRouter.get('/inventory/:productId/stores', optionalAuth, async (req: Re
  * Get user's back-in-stock subscriptions
  */
 inventoryRouter.get('/inventory/back-in-stock', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.userId;
+  const _userId = (req as any).user?.userId;
   
   try {
     // In production, query from database
@@ -137,7 +137,7 @@ inventoryRouter.get('/inventory/back-in-stock', requireAuth, async (req: Request
  * Subscribe to back-in-stock notification
  */
 inventoryRouter.post('/inventory/back-in-stock/subscribe', requireAuth, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.userId;
+  const _userId = (req as any).user?.userId;
   const { productId, storeId } = req.body;
   
   if (!productId) {
@@ -166,7 +166,7 @@ inventoryRouter.post('/inventory/back-in-stock/subscribe', requireAuth, async (r
  * Unsubscribe from back-in-stock notification
  */
 inventoryRouter.post('/inventory/back-in-stock/:id/unsubscribe', requireAuth, async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id: _id } = req.params;
   
   try {
     // In production, delete from database

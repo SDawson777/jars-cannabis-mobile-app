@@ -2,8 +2,7 @@
 // Push notification preferences, campaigns, and history
 
 import { Router, Request, Response } from 'express';
-import { requireAuth, optionalAuth } from '../middleware/auth';
-import { prisma } from '../prismaClient';
+import { requireAuth } from '../middleware/auth';
 
 const notificationsRouter = Router();
 
@@ -12,7 +11,7 @@ const notificationsRouter = Router();
  * Get user's notification preferences
  */
 notificationsRouter.get('/notifications/preferences', requireAuth, async (req: Request, res: Response) => {
-  const uid = (req as any).user.userId as string;
+  const _uid = (req as any).user.userId as string;
   
   try {
     // In production, fetch from database
@@ -97,7 +96,7 @@ notificationsRouter.put('/notifications/preferences', requireAuth, async (req: R
  * Get notification channels with status
  */
 notificationsRouter.get('/notifications/channels', requireAuth, async (req: Request, res: Response) => {
-  const uid = (req as any).user.userId as string;
+  const _uid = (req as any).user.userId as string;
   
   try {
     res.json({
@@ -287,7 +286,7 @@ notificationsRouter.post('/notifications/topics/:topicId/unsubscribe', requireAu
  * Get notification history
  */
 notificationsRouter.get('/notifications/history', requireAuth, async (req: Request, res: Response) => {
-  const { cursor, limit = '20', type } = req.query;
+  const { cursor: _cursor, limit: _limit = '20', type } = req.query;
   
   try {
     const notifications = [
@@ -414,7 +413,7 @@ notificationsRouter.post('/notifications/register-device', requireAuth, async (r
  * Unregister device from push notifications
  */
 notificationsRouter.delete('/notifications/unregister-device', requireAuth, async (req: Request, res: Response) => {
-  const { deviceId } = req.body;
+  const { deviceId: _deviceId } = req.body;
   
   try {
     res.json({ success: true });

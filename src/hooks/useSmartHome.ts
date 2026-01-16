@@ -1,7 +1,6 @@
 // src/hooks/useSmartHome.ts
 // Smart home and voice assistant integrations (Alexa, Google Home)
 
-import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { phase4Client } from '../api/phase4Client';
 import { clientGet, clientPost, clientDelete } from '../api/http';
@@ -26,7 +25,7 @@ export interface SmartHomeConnection {
   error?: string;
 }
 
-export type SmartHomePermission = 
+export type SmartHomePermission =
   | 'order_reminders'
   | 'consumption_timers'
   | 'strain_suggestions'
@@ -170,12 +169,20 @@ export function useSmartHomeConnection(provider: SmartHomeProvider) {
 export function useLinkSmartHome() {
   const queryClient = useQueryClient();
 
-  return useMutation<{ authUrl: string; state: string }, Error, {
-    provider: SmartHomeProvider;
-    permissions: SmartHomePermission[];
-    redirectUri?: string;
-  }>({
-    mutationFn: async (params: { provider: SmartHomeProvider; permissions: SmartHomePermission[]; redirectUri?: string }) => {
+  return useMutation<
+    { authUrl: string; state: string },
+    Error,
+    {
+      provider: SmartHomeProvider;
+      permissions: SmartHomePermission[];
+      redirectUri?: string;
+    }
+  >({
+    mutationFn: async (params: {
+      provider: SmartHomeProvider;
+      permissions: SmartHomePermission[];
+      redirectUri?: string;
+    }) => {
       const result = await clientPost<typeof params, { authUrl: string; state: string }>(
         phase4Client,
         '/smarthome/link',
@@ -184,7 +191,14 @@ export function useLinkSmartHome() {
       logEvent('smarthome_link_initiated', { provider: params.provider });
       return result;
     },
-    onSuccess: (_: { authUrl: string; state: string }, variables: { provider: SmartHomeProvider; permissions: SmartHomePermission[]; redirectUri?: string }) => {
+    onSuccess: (
+      _: { authUrl: string; state: string },
+      variables: {
+        provider: SmartHomeProvider;
+        permissions: SmartHomePermission[];
+        redirectUri?: string;
+      }
+    ) => {
       queryClient.invalidateQueries({
         queryKey: ['smarthome', 'connections', variables.provider],
       });
@@ -198,11 +212,15 @@ export function useLinkSmartHome() {
 export function useCompleteLinking() {
   const queryClient = useQueryClient();
 
-  return useMutation<SmartHomeConnection, Error, {
-    provider: SmartHomeProvider;
-    code: string;
-    state: string;
-  }>({
+  return useMutation<
+    SmartHomeConnection,
+    Error,
+    {
+      provider: SmartHomeProvider;
+      code: string;
+      state: string;
+    }
+  >({
     mutationFn: async (params: { provider: SmartHomeProvider; code: string; state: string }) => {
       const result = await clientPost<typeof params, SmartHomeConnection>(
         phase4Client,
@@ -246,10 +264,7 @@ export function useSmartHomeSkills() {
   return useQuery<SmartHomeSkill[], Error>({
     queryKey: ['smarthome', 'skills'],
     queryFn: async () => {
-      const res = await clientGet<{ skills: SmartHomeSkill[] }>(
-        phase4Client,
-        '/smarthome/skills'
-      );
+      const res = await clientGet<{ skills: SmartHomeSkill[] }>(phase4Client, '/smarthome/skills');
       return res.skills;
     },
   });
@@ -261,11 +276,15 @@ export function useSmartHomeSkills() {
 export function useToggleCapability() {
   const queryClient = useQueryClient();
 
-  return useMutation<SmartHomeCapability, Error, {
-    skillId: string;
-    capabilityId: string;
-    enabled: boolean;
-  }>({
+  return useMutation<
+    SmartHomeCapability,
+    Error,
+    {
+      skillId: string;
+      capabilityId: string;
+      enabled: boolean;
+    }
+  >({
     mutationFn: async (params: { skillId: string; capabilityId: string; enabled: boolean }) => {
       return await clientPost<{ enabled: boolean }, SmartHomeCapability>(
         phase4Client,
@@ -290,11 +309,9 @@ export function useSmartDevices(provider?: SmartHomeProvider) {
   return useQuery<SmartDevice[], Error>({
     queryKey: ['smarthome', 'devices', provider],
     queryFn: async () => {
-      const res = await clientGet<{ devices: SmartDevice[] }>(
-        phase4Client,
-        '/smarthome/devices',
-        { params: provider ? { provider } : undefined }
-      );
+      const res = await clientGet<{ devices: SmartDevice[] }>(phase4Client, '/smarthome/devices', {
+        params: provider ? { provider } : undefined,
+      });
       return res.devices;
     },
   });
@@ -351,7 +368,11 @@ export function useSmartHomeRoutines() {
 export function useCreateRoutine() {
   const queryClient = useQueryClient();
 
-  return useMutation<SmartHomeRoutine, Error, Omit<SmartHomeRoutine, 'id' | 'createdAt' | 'lastTriggered'>>({
+  return useMutation<
+    SmartHomeRoutine,
+    Error,
+    Omit<SmartHomeRoutine, 'id' | 'createdAt' | 'lastTriggered'>
+  >({
     mutationFn: async (routine: Omit<SmartHomeRoutine, 'id' | 'createdAt' | 'lastTriggered'>) => {
       const result = await clientPost<typeof routine, SmartHomeRoutine>(
         phase4Client,
@@ -433,15 +454,26 @@ export function useOrderReminders() {
 export function useCreateOrderReminder() {
   const queryClient = useQueryClient();
 
-  return useMutation<OrderReminder, Error, {
-    orderId: string;
-    type: OrderReminder['type'];
-    message: string;
-    scheduledFor: string;
-    deliverTo: SmartHomeProvider[];
-    deviceIds?: string[];
-  }>({
-    mutationFn: async (params: { orderId: string; type: OrderReminder['type']; message: string; scheduledFor: string; deliverTo: SmartHomeProvider[]; deviceIds?: string[] }) => {
+  return useMutation<
+    OrderReminder,
+    Error,
+    {
+      orderId: string;
+      type: OrderReminder['type'];
+      message: string;
+      scheduledFor: string;
+      deliverTo: SmartHomeProvider[];
+      deviceIds?: string[];
+    }
+  >({
+    mutationFn: async (params: {
+      orderId: string;
+      type: OrderReminder['type'];
+      message: string;
+      scheduledFor: string;
+      deliverTo: SmartHomeProvider[];
+      deviceIds?: string[];
+    }) => {
       const result = await clientPost<typeof params, OrderReminder>(
         phase4Client,
         '/smarthome/reminders/orders',
@@ -485,7 +517,11 @@ export function useConsumptionTimers() {
 export function useCreateConsumptionTimer() {
   const queryClient = useQueryClient();
 
-  return useMutation<ConsumptionTimer, Error, Omit<ConsumptionTimer, 'id' | 'isActive' | 'lastTriggered'>>({
+  return useMutation<
+    ConsumptionTimer,
+    Error,
+    Omit<ConsumptionTimer, 'id' | 'isActive' | 'lastTriggered'>
+  >({
     mutationFn: async (timer: Omit<ConsumptionTimer, 'id' | 'isActive' | 'lastTriggered'>) => {
       const result = await clientPost<typeof timer, ConsumptionTimer>(
         phase4Client,
@@ -532,13 +568,22 @@ export function useToggleConsumptionTimer() {
  * Hook to send a strain suggestion via smart assistant
  */
 export function useSendStrainSuggestion() {
-  return useMutation<void, Error, {
-    strainId?: string;
-    productId?: string;
-    message: string;
-    deviceIds: string[];
-  }>({
-    mutationFn: async (params: { strainId?: string; productId?: string; message: string; deviceIds: string[] }) => {
+  return useMutation<
+    void,
+    Error,
+    {
+      strainId?: string;
+      productId?: string;
+      message: string;
+      deviceIds: string[];
+    }
+  >({
+    mutationFn: async (params: {
+      strainId?: string;
+      productId?: string;
+      message: string;
+      deviceIds: string[];
+    }) => {
       await clientPost<typeof params, void>(
         phase4Client,
         '/smarthome/actions/strain-suggestion',
@@ -556,10 +601,14 @@ export function useSendStrainSuggestion() {
  * Hook to announce order status via smart assistant
  */
 export function useAnnounceOrderStatus() {
-  return useMutation<void, Error, {
-    orderId: string;
-    deviceIds?: string[];
-  }>({
+  return useMutation<
+    void,
+    Error,
+    {
+      orderId: string;
+      deviceIds?: string[];
+    }
+  >({
     mutationFn: async (params: { orderId: string; deviceIds?: string[] }) => {
       await clientPost<typeof params, void>(
         phase4Client,

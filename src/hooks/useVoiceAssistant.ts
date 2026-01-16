@@ -78,7 +78,7 @@ interface SpeechSynthesisUtterance {
   onerror: (() => void) | null;
 }
 
-interface SpeechSynthesisUtteranceConstructor {
+interface _SpeechSynthesisUtteranceConstructor {
   new (text: string): SpeechSynthesisUtterance;
 }
 
@@ -101,7 +101,7 @@ export interface VoiceCommand {
   createdAt: string;
 }
 
-export type VoiceIntent = 
+export type VoiceIntent =
   | 'search_products'
   | 'add_to_cart'
   | 'remove_from_cart'
@@ -184,15 +184,19 @@ export interface GoogleAssistantAction {
  */
 export function useProcessVoiceCommand() {
   const queryClient = useQueryClient();
-  
-  return useMutation<VoiceCommand, Error, {
-    transcript: string;
-    context?: {
-      currentScreen?: string;
-      cartId?: string;
-      storeId?: string;
-    };
-  }>({
+
+  return useMutation<
+    VoiceCommand,
+    Error,
+    {
+      transcript: string;
+      context?: {
+        currentScreen?: string;
+        cartId?: string;
+        storeId?: string;
+      };
+    }
+  >({
     mutationFn: async (input: {
       transcript: string;
       context?: {
@@ -228,10 +232,7 @@ export function useVoiceCommandHistory() {
   return useQuery<VoiceCommand[], Error>({
     queryKey: ['voice', 'history'],
     queryFn: async () => {
-      const res = await clientGet<{ commands: VoiceCommand[] }>(
-        phase4Client,
-        '/voice/history'
-      );
+      const res = await clientGet<{ commands: VoiceCommand[] }>(phase4Client, '/voice/history');
       return res.commands;
     },
   });
@@ -246,7 +247,18 @@ interface VoiceRecognitionInstance {
   continuous: boolean;
   interimResults: boolean;
   lang: string;
-  onresult: ((event: { resultIndex: number; results: { [index: number]: { [index: number]: { transcript: string; confidence: number }; isFinal: boolean }; length: number } }) => void) | null;
+  onresult:
+    | ((event: {
+        resultIndex: number;
+        results: {
+          [index: number]: {
+            [index: number]: { transcript: string; confidence: number };
+            isFinal: boolean;
+          };
+          length: number;
+        };
+      }) => void)
+    | null;
   onerror: ((event: { error: string }) => void) | null;
   onend: (() => void) | null;
   start: () => void;
@@ -266,26 +278,31 @@ export function useVoiceRecognition() {
     error: null,
     confidence: 0,
   });
-  
+
   const recognitionRef = useRef<VoiceRecognitionInstance | null>(null);
-  
+
   useEffect(() => {
     // Initialize Web Speech API (for web) or native module (for React Native)
     // In React Native, you would use @react-native-voice/voice instead
-    const globalWindow = typeof globalThis !== 'undefined' ? globalThis as unknown as Record<string, unknown> : null;
-    if (globalWindow && ('SpeechRecognition' in globalWindow || 'webkitSpeechRecognition' in globalWindow)) {
-      const SpeechRecognitionClass = (globalWindow.SpeechRecognition || globalWindow.webkitSpeechRecognition) as { new(): VoiceRecognitionInstance } | undefined;
+    const globalWindow =
+      typeof globalThis !== 'undefined' ? (globalThis as unknown as Record<string, unknown>) : null;
+    if (
+      globalWindow &&
+      ('SpeechRecognition' in globalWindow || 'webkitSpeechRecognition' in globalWindow)
+    ) {
+      const SpeechRecognitionClass = (globalWindow.SpeechRecognition ||
+        globalWindow.webkitSpeechRecognition) as { new (): VoiceRecognitionInstance } | undefined;
       if (SpeechRecognitionClass) {
         recognitionRef.current = new SpeechRecognitionClass();
         const recognition = recognitionRef.current;
         recognition.continuous = false;
         recognition.interimResults = true;
         recognition.lang = 'en-US';
-        
-        recognition.onresult = (event) => {
+
+        recognition.onresult = event => {
           let interimTranscript = '';
           let finalTranscript = '';
-          
+
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
@@ -294,7 +311,7 @@ export function useVoiceRecognition() {
               interimTranscript += transcript;
             }
           }
-          
+
           setState(prev => ({
             ...prev,
             transcript: finalTranscript || prev.transcript,
@@ -302,28 +319,28 @@ export function useVoiceRecognition() {
             confidence: event.results[0]?.[0]?.confidence || 0,
           }));
         };
-        
-        recognition.onerror = (event) => {
+
+        recognition.onerror = event => {
           setState(prev => ({
             ...prev,
             error: event.error,
             isListening: false,
           }));
         };
-        
+
         recognition.onend = () => {
           setState(prev => ({ ...prev, isListening: false }));
         };
       }
     }
-    
+
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
     };
   }, []);
-  
+
   const startListening = useCallback(() => {
     if (recognitionRef.current) {
       setState(prev => ({
@@ -342,7 +359,7 @@ export function useVoiceRecognition() {
       }));
     }
   }, []);
-  
+
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
@@ -350,7 +367,7 @@ export function useVoiceRecognition() {
     }
     setState(prev => ({ ...prev, isListening: false }));
   }, []);
-  
+
   const resetTranscript = useCallback(() => {
     setState(prev => ({
       ...prev,
@@ -359,7 +376,7 @@ export function useVoiceRecognition() {
       confidence: 0,
     }));
   }, []);
-  
+
   return {
     ...state,
     startListening,
@@ -398,74 +415,86 @@ export function useTextToSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const synthRef = useRef<SpeechSynthesisInstance | null>(null);
   const utteranceRef = useRef<SpeechUtteranceInstance | null>(null);
-  
+
   useEffect(() => {
-    const globalWindow = typeof globalThis !== 'undefined' ? globalThis as unknown as Record<string, unknown> : null;
+    const globalWindow =
+      typeof globalThis !== 'undefined' ? (globalThis as unknown as Record<string, unknown>) : null;
     if (globalWindow && 'speechSynthesis' in globalWindow) {
       synthRef.current = globalWindow.speechSynthesis as SpeechSynthesisInstance;
     }
-    
+
     return () => {
       if (synthRef.current) {
         synthRef.current.cancel();
       }
     };
   }, []);
-  
-  const speak = useCallback((text: string, options?: {
-    lang?: string;
-    rate?: number;
-    pitch?: number;
-    voice?: string;
-  }) => {
-    if (!synthRef.current) return;
-    
-    const synth = synthRef.current;
-    // Cancel any ongoing speech
-    synth.cancel();
-    
-    // In a browser environment, create SpeechSynthesisUtterance
-    // In React Native, you would use expo-speech.speak() instead
-    const globalWindow = typeof globalThis !== 'undefined' ? globalThis as unknown as Record<string, unknown> : null;
-    const SpeechUtteranceClass = globalWindow?.SpeechSynthesisUtterance as { new(text: string): SpeechUtteranceInstance } | undefined;
-    
-    if (SpeechUtteranceClass) {
-      const utterance = new SpeechUtteranceClass(text);
-      utterance.lang = options?.lang || 'en-US';
-      utterance.rate = options?.rate || 1;
-      utterance.pitch = options?.pitch || 1;
-      
-      if (options?.voice) {
-        const voices = synth.getVoices();
-        const selectedVoice = voices.find((v: { name: string }) => v.name === options.voice);
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
+
+  const speak = useCallback(
+    (
+      text: string,
+      options?: {
+        lang?: string;
+        rate?: number;
+        pitch?: number;
+        voice?: string;
       }
-      
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      
-      utteranceRef.current = utterance;
-      synth.speak(utterance);
-    }
-  }, []);
-  
+    ) => {
+      if (!synthRef.current) return;
+
+      const synth = synthRef.current;
+      // Cancel any ongoing speech
+      synth.cancel();
+
+      // In a browser environment, create SpeechSynthesisUtterance
+      // In React Native, you would use expo-speech.speak() instead
+      const globalWindow =
+        typeof globalThis !== 'undefined'
+          ? (globalThis as unknown as Record<string, unknown>)
+          : null;
+      const SpeechUtteranceClass = globalWindow?.SpeechSynthesisUtterance as
+        | { new (text: string): SpeechUtteranceInstance }
+        | undefined;
+
+      if (SpeechUtteranceClass) {
+        const utterance = new SpeechUtteranceClass(text);
+        utterance.lang = options?.lang || 'en-US';
+        utterance.rate = options?.rate || 1;
+        utterance.pitch = options?.pitch || 1;
+
+        if (options?.voice) {
+          const voices = synth.getVoices();
+          const selectedVoice = voices.find((v: { name: string }) => v.name === options.voice);
+          if (selectedVoice) {
+            utterance.voice = selectedVoice;
+          }
+        }
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+
+        utteranceRef.current = utterance;
+        synth.speak(utterance);
+      }
+    },
+    []
+  );
+
   const stop = useCallback(() => {
     if (synthRef.current) {
       synthRef.current.cancel();
       setIsSpeaking(false);
     }
   }, []);
-  
+
   const getVoices = useCallback(() => {
     if (synthRef.current) {
       return synthRef.current.getVoices();
     }
     return [];
   }, []);
-  
+
   return {
     speak,
     stop,
@@ -496,7 +525,7 @@ export function useVoiceSettings() {
  */
 export function useUpdateVoiceSettings() {
   const queryClient = useQueryClient();
-  
+
   return useMutation<VoiceSettings, Error, Partial<VoiceSettings>>({
     mutationFn: async (settings: Partial<VoiceSettings>) => {
       const result = await clientPost<Partial<VoiceSettings>, VoiceSettings>(
@@ -538,17 +567,17 @@ export function useSiriShortcuts() {
  */
 export function useCreateSiriShortcut() {
   const queryClient = useQueryClient();
-  
-  return useMutation<SiriShortcut, Error, {
-    title: string;
-    phrase: string;
-    activityType: string;
-  }>({
-    mutationFn: async (shortcut: {
+
+  return useMutation<
+    SiriShortcut,
+    Error,
+    {
       title: string;
       phrase: string;
       activityType: string;
-    }) => {
+    }
+  >({
+    mutationFn: async (shortcut: { title: string; phrase: string; activityType: string }) => {
       const result = await clientPost<typeof shortcut, SiriShortcut>(
         phase4Client,
         '/voice/siri/shortcuts',
@@ -606,12 +635,16 @@ export function useGoogleAssistantActions() {
  */
 export function useRegisterGoogleAction() {
   const queryClient = useQueryClient();
-  
-  return useMutation<GoogleAssistantAction, Error, {
-    name: string;
-    actionId: string;
-    parameters: Record<string, unknown>;
-  }>({
+
+  return useMutation<
+    GoogleAssistantAction,
+    Error,
+    {
+      name: string;
+      actionId: string;
+      parameters: Record<string, unknown>;
+    }
+  >({
     mutationFn: async (action: {
       name: string;
       actionId: string;
@@ -642,20 +675,20 @@ export function useVoiceSearch() {
   const voiceRecognition = useVoiceRecognition();
   const processCommand = useProcessVoiceCommand();
   const [searchResults, setSearchResults] = useState<unknown[]>([]);
-  
+
   const search = useCallback(async () => {
     if (voiceRecognition.transcript) {
       const result = await processCommand.mutateAsync({
         transcript: voiceRecognition.transcript,
         context: { currentScreen: 'search' },
       });
-      
+
       if (result.response.displayData?.type === 'products') {
         setSearchResults(result.response.displayData.data as unknown[]);
       }
     }
   }, [voiceRecognition.transcript, processCommand]);
-  
+
   return {
     ...voiceRecognition,
     search,
@@ -674,23 +707,29 @@ export function useVoiceSearch() {
 export function useVoiceOrdering() {
   const processCommand = useProcessVoiceCommand();
   const [lastAction, setLastAction] = useState<VoiceAction | null>(null);
-  
-  const executeCommand = useCallback(async (transcript: string, context?: {
-    cartId?: string;
-    storeId?: string;
-  }) => {
-    const result = await processCommand.mutateAsync({
-      transcript,
-      context,
-    });
-    
-    if (result.response.actions && result.response.actions.length > 0) {
-      setLastAction(result.response.actions[0]);
-    }
-    
-    return result;
-  }, [processCommand]);
-  
+
+  const executeCommand = useCallback(
+    async (
+      transcript: string,
+      context?: {
+        cartId?: string;
+        storeId?: string;
+      }
+    ) => {
+      const result = await processCommand.mutateAsync({
+        transcript,
+        context,
+      });
+
+      if (result.response.actions && result.response.actions.length > 0) {
+        setLastAction(result.response.actions[0]);
+      }
+
+      return result;
+    },
+    [processCommand]
+  );
+
   return {
     executeCommand,
     lastAction,

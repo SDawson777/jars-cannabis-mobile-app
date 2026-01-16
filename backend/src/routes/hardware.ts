@@ -36,7 +36,7 @@ router.get('/hardware/devices', async (req: Request, res: Response) => {
 
 router.get('/hardware/discover', async (req: Request, res: Response) => {
   try {
-    const { types } = req.query;
+    const { types: _types } = req.query;
     
     res.json({
       devices: [
@@ -150,7 +150,7 @@ router.get('/hardware/scales/:deviceId/readings', async (req: Request, res: Resp
 
 router.post('/hardware/scales/:deviceId/sync-to-journal', async (req: Request, res: Response) => {
   try {
-    const { deviceId } = req.params;
+    const { deviceId: _deviceId } = req.params;
     
     res.json({
       success: true,
@@ -262,7 +262,7 @@ router.post('/hardware/trackers/:deviceId/sessions/:sessionId/end', async (req: 
 
 router.post('/hardware/sync', async (req: Request, res: Response) => {
   try {
-    const { deviceId } = req.body;
+    const { deviceId: _deviceId } = req.body;
     
     res.json({
       success: true,

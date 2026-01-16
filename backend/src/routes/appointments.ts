@@ -83,7 +83,7 @@ router.get('/:appointmentId', async (req: Request, res: Response) => {
 
 router.get('/slots', async (req: Request, res: Response) => {
   try {
-    const { storeId, date, appointmentType, budtenderId } = req.query;
+    const { storeId: _storeId, date, appointmentType: _appointmentType, budtenderId } = req.query;
     
     // Generate available time slots
     const slots = [];
@@ -133,7 +133,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.patch('/:appointmentId/reschedule', async (req: Request, res: Response) => {
   try {
     const { appointmentId } = req.params;
-    const { newStartTime, reason } = req.body;
+    const { newStartTime, reason: _reason } = req.body;
     res.json({
       id: appointmentId,
       startTime: newStartTime,
@@ -184,7 +184,7 @@ router.post('/:appointmentId/reminders', async (req: Request, res: Response) => 
 
 router.get('/budtenders/:budtenderId/availability', async (req: Request, res: Response) => {
   try {
-    const { date } = req.query;
+    const { date: _date } = req.query;
     res.json({ slots: [] });
   } catch (error) {
     console.error('Error fetching budtender availability:', error);

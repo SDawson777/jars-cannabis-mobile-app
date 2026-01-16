@@ -11,7 +11,7 @@ const router = Router();
 
 router.post('/process', async (req: Request, res: Response) => {
   try {
-    const { transcript, context } = req.body;
+    const { transcript, context: _context } = req.body;
     
     // Simple intent detection (in production, use NLP service)
     let intent = 'unknown';
