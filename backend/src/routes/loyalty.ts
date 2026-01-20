@@ -147,9 +147,16 @@ loyaltyRouter.get('/loyalty/tiers', optionalAuth, async (req: Request, res: Resp
   res.json({ tiers });
 });
 
+// Tier hierarchy for checking minimum tier requirements
+const tierOrder = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+function meetsMinTier(userTier: string, minTier: string | null): boolean {
+  if (!minTier) return true;
+  return tierOrder.indexOf(userTier) >= tierOrder.indexOf(minTier);
+}
+
 /**
  * GET /loyalty/rewards
- * Get available rewards for redemption
+ * Get available rewards for redemption from database
  */
 loyaltyRouter.get('/loyalty/rewards', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
@@ -163,79 +170,29 @@ loyaltyRouter.get('/loyalty/rewards', requireAuth, async (req: Request, res: Res
     const userPoints = status?.points || 0;
     const userTier = status?.tier || 'Bronze';
 
-    // Mock rewards catalog
-    let rewards = [
-      {
-        id: 'reward-1',
-        name: '$5 Off',
-        description: 'Get $5 off your next order',
-        pointsCost: 500,
-        category: 'discount',
-        imageUrl: '/rewards/5-off.png',
-        isAvailable: userPoints >= 500,
-        minTier: null,
-        expiresAfterRedemption: 30, // days
-      },
-      {
-        id: 'reward-2',
-        name: '$10 Off',
-        description: 'Get $10 off your next order',
-        pointsCost: 1000,
-        category: 'discount',
-        imageUrl: '/rewards/10-off.png',
-        isAvailable: userPoints >= 1000,
-        minTier: null,
-        expiresAfterRedemption: 30,
-      },
-      {
-        id: 'reward-3',
-        name: 'Free Pre-Roll',
-        description: 'Redeem for a free house pre-roll',
-        pointsCost: 750,
-        category: 'product',
-        imageUrl: '/rewards/preroll.png',
-        isAvailable: userPoints >= 750,
-        minTier: 'Silver',
-        expiresAfterRedemption: 14,
-      },
-      {
-        id: 'reward-4',
-        name: 'Free Delivery',
-        description: 'Get free delivery on your next order',
-        pointsCost: 300,
-        category: 'service',
-        imageUrl: '/rewards/delivery.png',
-        isAvailable: userPoints >= 300,
-        minTier: null,
-        expiresAfterRedemption: 7,
-      },
-      {
-        id: 'reward-5',
-        name: '25% Off Order',
-        description: 'Get 25% off your entire order (max $50)',
-        pointsCost: 2500,
-        category: 'discount',
-        imageUrl: '/rewards/25-off.png',
-        isAvailable: userPoints >= 2500,
-        minTier: 'Gold',
-        expiresAfterRedemption: 14,
-      },
-      {
-        id: 'reward-6',
-        name: 'Premium Merch',
-        description: 'Redeem for exclusive Nimbus merchandise',
-        pointsCost: 5000,
-        category: 'merchandise',
-        imageUrl: '/rewards/merch.png',
-        isAvailable: userPoints >= 5000,
-        minTier: 'Platinum',
-        expiresAfterRedemption: 60,
-      },
-    ];
-
+    // Query rewards from database
+    const whereClause: any = { isActive: true };
     if (category) {
-      rewards = rewards.filter(r => r.category === category);
+      whereClause.category = String(category);
     }
+
+    const dbRewards = await prisma.reward.findMany({
+      where: whereClause,
+      orderBy: { pointsCost: 'asc' },
+    });
+
+    // Map rewards with availability based on user's points and tier
+    const rewards = dbRewards.map(reward => ({
+      id: reward.id,
+      name: reward.name,
+      description: reward.description,
+      pointsCost: reward.pointsCost,
+      category: reward.category,
+      imageUrl: reward.imageUrl || `/rewards/${reward.category}.png`,
+      isAvailable: userPoints >= reward.pointsCost && meetsMinTier(userTier, reward.minTier),
+      minTier: reward.minTier,
+      expiresAfterRedemption: reward.expiresAfterRedemption,
+    }));
 
     res.json({
       rewards,
@@ -269,31 +226,68 @@ loyaltyRouter.post('/loyalty/rewards/redeem', requireAuth, async (req: Request, 
       return res.status(404).json({ error: 'Loyalty account not found' });
     }
 
-    // In production, verify reward exists and check points/tier requirements
-    const pointsCost = 500; // Example
+    // Verify reward exists and check points/tier requirements
+    const reward = await prisma.reward.findUnique({
+      where: { id: rewardId },
+    });
 
-    if (status.points < pointsCost) {
+    if (!reward) {
+      return res.status(404).json({ error: 'Reward not found' });
+    }
+
+    if (!reward.isActive) {
+      return res.status(400).json({ error: 'Reward is no longer available' });
+    }
+
+    if (status.points < reward.pointsCost) {
       return res.status(400).json({ error: 'Insufficient points' });
     }
 
-    // Deduct points
-    await prisma.loyaltyStatus.update({
-      where: { userId: uid },
-      data: { points: status.points - pointsCost },
-    });
+    if (reward.minTier && !meetsMinTier(status.tier, reward.minTier)) {
+      return res
+        .status(400)
+        .json({ error: `This reward requires ${reward.minTier} tier or higher` });
+    }
 
-    const redemption = {
-      id: `redemption-${Date.now()}`,
-      rewardId,
-      redeemedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      code: `REWARD-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-      status: 'active',
-    };
+    // Generate unique redemption code
+    const code = `REWARD-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const expiresAt = new Date(Date.now() + reward.expiresAfterRedemption * 24 * 60 * 60 * 1000);
+
+    // Create redemption record and deduct points in a transaction
+    const [redemption] = await prisma.$transaction([
+      prisma.rewardRedemption.create({
+        data: {
+          rewardId: reward.id,
+          userId: uid,
+          code,
+          expiresAt,
+          status: 'active',
+        },
+      }),
+      prisma.loyaltyStatus.update({
+        where: { userId: uid },
+        data: { points: status.points - reward.pointsCost },
+      }),
+      prisma.loyaltyTransaction.create({
+        data: {
+          userId: uid,
+          type: 'redeem',
+          amount: -reward.pointsCost,
+          description: `Redeemed: ${reward.name}`,
+        },
+      }),
+    ]);
 
     res.json({
-      redemption,
-      pointsRemaining: status.points - pointsCost,
+      redemption: {
+        id: redemption.id,
+        rewardId: redemption.rewardId,
+        redeemedAt: redemption.redeemedAt.toISOString(),
+        expiresAt: redemption.expiresAt.toISOString(),
+        code: redemption.code,
+        status: redemption.status,
+      },
+      pointsRemaining: status.points - reward.pointsCost,
     });
   } catch (error) {
     console.error('Redeem reward error:', error);
@@ -303,58 +297,36 @@ loyaltyRouter.post('/loyalty/rewards/redeem', requireAuth, async (req: Request, 
 
 /**
  * GET /loyalty/transactions
- * Get points transaction history
+ * Get points transaction history from database
  */
 loyaltyRouter.get('/loyalty/transactions', requireAuth, async (req: Request, res: Response) => {
-  const _uid = (req as any).user.userId as string;
-  const { cursor: _cursor, limit: _limit = '20' } = req.query;
+  const uid = (req as any).user.userId as string;
+  const { cursor, limit = '20' } = req.query;
 
   try {
-    // Mock transactions
-    const transactions = [
-      {
-        id: 'tx-1',
-        type: 'earn',
-        amount: 48,
-        description: 'Purchase at Nimbus SF',
-        orderId: 'order-123',
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 'tx-2',
-        type: 'bonus',
-        amount: 100,
-        description: 'Double points Tuesday',
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 'tx-3',
-        type: 'redeem',
-        amount: -500,
-        description: 'Redeemed: $5 Off',
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 'tx-4',
-        type: 'earn',
-        amount: 125,
-        description: 'Purchase at Nimbus Oakland',
-        orderId: 'order-122',
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 'tx-5',
-        type: 'referral',
-        amount: 500,
-        description: 'Referral bonus: John D.',
-        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
+    const take = Math.min(parseInt(limit as string) || 20, 100);
+
+    const transactions = await prisma.loyaltyTransaction.findMany({
+      where: { userId: uid },
+      orderBy: { createdAt: 'desc' },
+      take: take + 1, // Fetch one extra to check if there are more
+      ...(cursor ? { cursor: { id: String(cursor) }, skip: 1 } : {}),
+    });
+
+    const hasMore = transactions.length > take;
+    const items = hasMore ? transactions.slice(0, take) : transactions;
 
     res.json({
-      transactions,
-      hasMore: false,
-      nextCursor: undefined,
+      transactions: items.map(tx => ({
+        id: tx.id,
+        type: tx.type,
+        amount: tx.amount,
+        description: tx.description,
+        orderId: tx.orderId,
+        createdAt: tx.createdAt.toISOString(),
+      })),
+      hasMore,
+      nextCursor: hasMore ? items[items.length - 1].id : undefined,
     });
   } catch (error) {
     console.error('Transactions error:', error);
@@ -373,42 +345,37 @@ loyaltyRouter.get('/loyalty/badges', requireAuth, async (req, res) => {
 
 /**
  * GET /loyalty/referral
- * Get referral program info
+ * Get referral program info from database
  */
 loyaltyRouter.get('/loyalty/referral', requireAuth, async (req: Request, res: Response) => {
   const uid = (req as any).user.userId as string;
 
   try {
+    // Get referral stats from database
+    const referrals = await prisma.referral.findMany({
+      where: { referrerUserId: uid },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const completedReferrals = referrals.filter(r => r.status === 'completed');
+    const pendingReferrals = referrals.filter(r => r.status === 'pending');
+
     res.json({
       referralCode: `NIMBUS${uid.slice(-6).toUpperCase()}`,
       referralLink: `https://nimbus.app/join?ref=NIMBUS${uid.slice(-6).toUpperCase()}`,
       referrerReward: 500,
       refereeReward: 500,
-      totalReferrals: 3,
-      pendingReferrals: 1,
-      referrals: [
-        {
-          id: 'ref-1',
-          refereeName: 'John D.',
-          status: 'completed',
-          pointsEarned: 500,
-          completedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: 'ref-2',
-          refereeName: 'Sarah M.',
-          status: 'completed',
-          pointsEarned: 500,
-          completedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: 'ref-3',
-          refereeName: 'Mike T.',
-          status: 'pending',
-          pointsEarned: 0,
-          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-      ],
+      totalReferrals: completedReferrals.length,
+      pendingReferrals: pendingReferrals.length,
+      referrals: referrals.map(r => ({
+        id: r.id,
+        refereeName: r.refereeEmail ? r.refereeEmail.split('@')[0] : 'Anonymous',
+        status: r.status,
+        pointsEarned: r.pointsEarned,
+        ...(r.status === 'completed'
+          ? { completedAt: r.completedAt?.toISOString() }
+          : { createdAt: r.createdAt.toISOString() }),
+      })),
     });
   } catch (error) {
     console.error('Referral info error:', error);
@@ -418,9 +385,10 @@ loyaltyRouter.get('/loyalty/referral', requireAuth, async (req: Request, res: Re
 
 /**
  * POST /loyalty/referral/send
- * Send a referral invite
+ * Send a referral invite and track in database
  */
 loyaltyRouter.post('/loyalty/referral/send', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
   const { email, phone, method } = req.body;
 
   if (!email && !phone) {
@@ -428,7 +396,17 @@ loyaltyRouter.post('/loyalty/referral/send', requireAuth, async (req: Request, r
   }
 
   try {
-    // In production, send referral invite
+    // Create referral record in database
+    await prisma.referral.create({
+      data: {
+        referrerUserId: uid,
+        refereeEmail: email || undefined,
+        refereePhone: phone || undefined,
+        status: 'pending',
+      },
+    });
+
+    // In production, would also send email/SMS here
     res.json({
       success: true,
       message: `Referral invite sent via ${method || 'email'}`,
@@ -452,12 +430,62 @@ loyaltyRouter.post('/loyalty/referral/apply', requireAuth, async (req: Request, 
   }
 
   try {
-    // In production, validate code and apply bonus
-    await prisma.loyaltyStatus.upsert({
-      where: { userId: uid },
-      update: { points: { increment: 500 } },
-      create: { userId: uid, points: 500, tier: 'Bronze' },
+    // Extract referrer ID from code (format: NIMBUS + last 6 chars of user ID)
+    const referrerId = referralCode.replace('NIMBUS', '').toLowerCase();
+
+    // Find pending referral for this referee
+    const referral = await prisma.referral.findFirst({
+      where: {
+        referrerUserId: { endsWith: referrerId },
+        status: 'pending',
+      },
     });
+
+    // Update referral to completed and award points
+    await prisma.$transaction([
+      // Award points to referee
+      prisma.loyaltyStatus.upsert({
+        where: { userId: uid },
+        update: { points: { increment: 500 } },
+        create: { userId: uid, points: 500, tier: 'Bronze' },
+      }),
+      // Record transaction for referee
+      prisma.loyaltyTransaction.create({
+        data: {
+          userId: uid,
+          type: 'referral',
+          amount: 500,
+          description: 'Referral welcome bonus',
+        },
+      }),
+      // If referral record exists, update and award referrer
+      ...(referral
+        ? [
+            prisma.referral.update({
+              where: { id: referral.id },
+              data: {
+                refereeUserId: uid,
+                status: 'completed',
+                pointsEarned: 500,
+                completedAt: new Date(),
+              },
+            }),
+            prisma.loyaltyStatus.upsert({
+              where: { userId: referral.referrerUserId },
+              update: { points: { increment: 500 } },
+              create: { userId: referral.referrerUserId, points: 500, tier: 'Bronze' },
+            }),
+            prisma.loyaltyTransaction.create({
+              data: {
+                userId: referral.referrerUserId,
+                type: 'referral',
+                amount: 500,
+                description: 'Referral bonus',
+              },
+            }),
+          ]
+        : []),
+    ]);
 
     res.json({
       success: true,
@@ -472,62 +500,71 @@ loyaltyRouter.post('/loyalty/referral/apply', requireAuth, async (req: Request, 
 
 /**
  * GET /loyalty/coupons
- * Get user's digital coupons
+ * Get user's digital coupons from database
  */
 loyaltyRouter.get('/loyalty/coupons', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
   const { includeUsed } = req.query;
 
   try {
+    // Get user's coupons with their clip/use status
+    const userCoupons = await prisma.userCoupon.findMany({
+      where: {
+        userId: uid,
+        ...(includeUsed !== 'true' ? { isUsed: false } : {}),
+      },
+      include: {
+        coupon: true,
+      },
+    });
+
+    // Also get active coupons not yet assigned to user
+    const userCouponIds = userCoupons.map(uc => uc.couponId);
+    const availableCoupons = await prisma.coupon.findMany({
+      where: {
+        isActive: true,
+        id: { notIn: userCouponIds },
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+    });
+
     const coupons = [
-      {
-        id: 'coupon-1',
-        code: 'WELCOME10',
-        title: '10% Off Your Order',
-        description: 'Welcome discount for new members',
-        discountType: 'percent',
-        discountValue: 10,
-        minPurchase: 25,
-        maxDiscount: 50,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        isClipped: true,
-        isUsed: false,
-        applicableCategories: ['all'],
-        source: 'welcome',
-      },
-      {
-        id: 'coupon-2',
-        code: 'GOLD15',
-        title: '15% Off for Gold Members',
-        description: 'Exclusive Gold tier discount',
-        discountType: 'percent',
-        discountValue: 15,
-        minPurchase: 50,
-        maxDiscount: 100,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        isClipped: true,
-        isUsed: false,
-        applicableCategories: ['flower', 'concentrates'],
-        source: 'tier_benefit',
-      },
-      {
-        id: 'coupon-3',
-        code: 'EDIBLE5',
-        title: '$5 Off Edibles',
-        description: 'Valid on any edible product',
-        discountType: 'fixed',
-        discountValue: 5,
-        minPurchase: 20,
-        expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      // User's assigned coupons
+      ...userCoupons.map(uc => ({
+        id: uc.coupon.id,
+        code: uc.coupon.code,
+        title: uc.coupon.title,
+        description: uc.coupon.description,
+        discountType: uc.coupon.discountType,
+        discountValue: uc.coupon.discountValue,
+        minPurchase: uc.coupon.minPurchase,
+        maxDiscount: uc.coupon.maxDiscount,
+        expiresAt: uc.coupon.expiresAt?.toISOString(),
+        isClipped: uc.isClipped,
+        isUsed: uc.isUsed,
+        applicableCategories:
+          uc.coupon.applicableCategories.length > 0 ? uc.coupon.applicableCategories : ['all'],
+        source: uc.coupon.source,
+      })),
+      // Available coupons not yet clipped
+      ...availableCoupons.map(c => ({
+        id: c.id,
+        code: c.code,
+        title: c.title,
+        description: c.description,
+        discountType: c.discountType,
+        discountValue: c.discountValue,
+        minPurchase: c.minPurchase,
+        maxDiscount: c.maxDiscount,
+        expiresAt: c.expiresAt?.toISOString(),
         isClipped: false,
         isUsed: false,
-        applicableCategories: ['edibles'],
-        source: 'promo',
-      },
+        applicableCategories: c.applicableCategories.length > 0 ? c.applicableCategories : ['all'],
+        source: c.source,
+      })),
     ];
 
-    const filtered = includeUsed === 'true' ? coupons : coupons.filter(c => !c.isUsed);
-
-    res.json({ coupons: filtered });
+    res.json({ coupons });
   } catch (error) {
     console.error('Coupons error:', error);
     res.status(500).json({ error: 'Failed to get coupons' });
@@ -536,9 +573,10 @@ loyaltyRouter.get('/loyalty/coupons', requireAuth, async (req: Request, res: Res
 
 /**
  * POST /loyalty/coupons/clip
- * Clip (activate) a coupon
+ * Clip (activate) a coupon in database
  */
 loyaltyRouter.post('/loyalty/coupons/clip', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
   const { couponId } = req.body;
 
   if (!couponId) {
@@ -546,12 +584,37 @@ loyaltyRouter.post('/loyalty/coupons/clip', requireAuth, async (req: Request, re
   }
 
   try {
-    // In production, update coupon status in database
+    // Verify coupon exists
+    const coupon = await prisma.coupon.findUnique({
+      where: { id: couponId },
+    });
+
+    if (!coupon) {
+      return res.status(404).json({ error: 'Coupon not found' });
+    }
+
+    // Create or update UserCoupon record
+    const userCoupon = await prisma.userCoupon.upsert({
+      where: {
+        userId_couponId: { userId: uid, couponId },
+      },
+      update: {
+        isClipped: true,
+        clippedAt: new Date(),
+      },
+      create: {
+        userId: uid,
+        couponId,
+        isClipped: true,
+        clippedAt: new Date(),
+      },
+    });
+
     res.json({
       success: true,
       coupon: {
         id: couponId,
-        isClipped: true,
+        isClipped: userCoupon.isClipped,
       },
     });
   } catch (error) {

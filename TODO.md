@@ -87,6 +87,25 @@ This TODO list tracks all actionable steps required to bring the app to producti
 - [ ] Deploy backend to production environment
 - [ ] Build and deploy mobile app via EAS Build
 
+### ✅ Recently Completed Tasks:
+
+1. **Feature Flags Remote Config**: Implemented remote config integration in `src/utils/featureFlags.ts` with caching and async initialization
+2. **Cart Promo Code Logic**: Implemented full promo code handling in `/cart/update` and expanded `/cart/apply-coupon` with SAVE10, SAVE20, WELCOME15, NIMBUS25 codes
+3. **AI Budtender LLM Integration**: Replaced mock implementation with real OpenAI integration in `backend/src/routes/ai.ts` with graceful fallback
+4. **Type Declarations**: Replaced ambient `any` declarations in `src/@types/overrides.d.ts` with proper typed interfaces
+5. **Jest Coverage Thresholds**: Raised thresholds from 22%/15%/22%/22% to 30%/25%/35%/35%
+6. **Home Screen CMS Integration**: Updated `backend/src/routes/home.ts` to fetch categories and featured products from database instead of static data
+7. **Config Endpoint**: Added `backend/src/routes/config.ts` for feature flags and app configuration
+8. **Stub/Mock Data Removal**: Replaced all hardcoded mock arrays with database queries:
+   - `backend/src/routes/loyalty.ts`: Rewards, transactions, coupons, referrals now query Prisma models
+   - `backend/src/routes/favorites.ts`: Complete rewrite to use Favorite/FavoriteFolder tables
+   - `backend/src/routes/mapbox.ts`: Stores/nearby and geofences now query Store table with Haversine distance
+9. **Service Availability Graceful Fallbacks**:
+   - Added `/config/services` endpoint for Stripe/AI/Firebase/Database availability
+   - Created `useServiceAvailability` hook for mobile app
+   - CheckoutScreen disables online payment when Stripe unavailable with warning banner
+10. **Prisma Schema Updates**: Added Reward, RewardRedemption, LoyaltyTransaction, Coupon, UserCoupon, Favorite, FavoriteFolder, Referral models; added createdAt to LoyaltyStatus, state to User, subcategory/imageUrl to Product
+
 ### 🚀 Ready for Production Deployment!
 
 ---

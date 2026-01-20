@@ -29,6 +29,7 @@ import { parseAddress, isValidParsedAddress } from '../utils/address';
 import { toast } from '../utils/toast';
 import { useTranslation } from '../i18n/useTranslation';
 import { trackScreenView, trackCommerceEvent, logEvent } from '../utils/analytics';
+import { useServiceAvailability } from '../hooks/useServiceAvailability';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -47,6 +48,9 @@ const steps = [
 export default function CheckoutScreen() {
   const navigation = useNavigation<CheckoutNavProp>();
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
+
+  // Check if payment services are available
+  const { paymentsEnabled, stripeMessage } = useServiceAvailability();
 
   const [step, setStep] = useState(0);
   const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
@@ -421,28 +425,61 @@ export default function CheckoutScreen() {
         {step === 2 && (
           <View style={styles.step}>
             <Text style={[styles.prompt, { color: brandPrimary }]}>{t('checkout.howPay')}</Text>
+
+            {/* Show warning if online payments are unavailable */}
+            {!paymentsEnabled && (
+              <View
+                style={[
+                  styles.warningBanner,
+                  { backgroundColor: '#FEF3C7', borderColor: '#F59E0B' },
+                ]}
+              >
+                <Text style={[styles.warningText, { color: '#92400E' }]}>
+                  {stripeMessage ||
+                    'Online payment is currently unavailable. Please select "Pay at Pickup".'}
+                </Text>
+              </View>
+            )}
+
             <View style={styles.optionColumn}>
-              {(['online', 'atPickup'] as const).map(opt => (
-                <Pressable
-                  key={opt}
-                  testID={opt === 'online' ? 'payment-method-selector' : `payment-method-${opt}`}
-                  style={[
-                    styles.optionCard,
-                    payment === opt && {
-                      borderColor: brandPrimary,
-                      borderWidth: 2,
-                    },
-                  ]}
-                  onPress={() => {
-                    hapticLight();
-                    setPayment(opt);
-                  }}
-                >
-                  <Text style={[styles.optionText, { color: brandPrimary }]}>
-                    {opt === 'online' ? t('checkout.payOnline') : t('checkout.payAtPickup')}
-                  </Text>
-                </Pressable>
-              ))}
+              {(['online', 'atPickup'] as const).map(opt => {
+                // Disable online payment option if Stripe is not configured
+                const isDisabled = opt === 'online' && !paymentsEnabled;
+
+                return (
+                  <Pressable
+                    key={opt}
+                    testID={opt === 'online' ? 'payment-method-selector' : `payment-method-${opt}`}
+                    style={[
+                      styles.optionCard,
+                      payment === opt && {
+                        borderColor: brandPrimary,
+                        borderWidth: 2,
+                      },
+                      isDisabled && {
+                        opacity: 0.5,
+                        backgroundColor: '#F3F4F6',
+                      },
+                    ]}
+                    onPress={() => {
+                      if (isDisabled) {
+                        toast('Online payment is currently unavailable');
+                        return;
+                      }
+                      hapticLight();
+                      setPayment(opt);
+                    }}
+                    disabled={isDisabled}
+                  >
+                    <Text
+                      style={[styles.optionText, { color: isDisabled ? '#9CA3AF' : brandPrimary }]}
+                    >
+                      {opt === 'online' ? t('checkout.payOnline') : t('checkout.payAtPickup')}
+                      {isDisabled ? ' (Unavailable)' : ''}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
           </View>
         )}
@@ -626,4 +663,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   errorText: { color: '#991B1B', fontSize: 14 },
+  warningBanner: {
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  warningText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
 });

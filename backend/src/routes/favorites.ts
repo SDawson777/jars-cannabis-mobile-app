@@ -1,7 +1,9 @@
 // backend/src/routes/favorites.ts
-// Favorites and quick reorder routes
+// Favorites and quick reorder routes - Database-backed implementation
 
 import { Router, Request, Response } from 'express';
+import { prisma } from '../prismaClient';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -9,23 +11,41 @@ const router = Router();
 // Favorites Routes
 // ============================================
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { folderId, cursor, limit = '20' } = req.query;
+
   try {
-    const { type: _type, folderId: _folderId } = req.query;
+    const take = Math.min(parseInt(limit as string) || 20, 100);
+
+    const favorites = await prisma.favorite.findMany({
+      where: {
+        userId: uid,
+        ...(folderId ? { folderId: String(folderId) } : {}),
+      },
+      include: {
+        folder: true,
+      },
+      orderBy: { addedAt: 'desc' },
+      take: take + 1,
+      ...(cursor ? { cursor: { id: String(cursor) }, skip: 1 } : {}),
+    });
+
+    const hasMore = favorites.length > take;
+    const items = hasMore ? favorites.slice(0, take) : favorites;
 
     res.json({
-      favorites: [
-        {
-          id: 'fav-1',
-          itemId: 'prod-1',
-          itemType: 'product',
-          userId: 'user-123',
-          folderId: null,
-          notes: 'Great for relaxation',
-          addedAt: new Date().toISOString(),
-        },
-      ],
-      nextCursor: undefined,
+      favorites: items.map(f => ({
+        id: f.id,
+        itemId: f.productId,
+        itemType: 'product',
+        userId: f.userId,
+        folderId: f.folderId,
+        folderName: f.folder?.name || null,
+        notes: f.notes,
+        addedAt: f.addedAt.toISOString(),
+      })),
+      nextCursor: hasMore ? items[items.length - 1].id : undefined,
     });
   } catch (error) {
     console.error('Error fetching favorites:', error);
@@ -33,28 +53,55 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/products', async (req: Request, res: Response) => {
+router.get('/products', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+
   try {
-    res.json({
-      products: [
-        {
-          id: 'fav-1',
-          itemId: 'prod-1',
-          itemType: 'product',
-          product: {
-            id: 'prod-1',
-            name: 'Blue Dream',
-            brand: 'Nimbus Farms',
-            category: 'Flower',
-            price: 45,
-            image: 'https://example.com/blue-dream.jpg',
-            thcContent: '22%',
-            cbdContent: '0.1%',
-            inStock: true,
-          },
-          addedAt: new Date().toISOString(),
+    const favorites = await prisma.favorite.findMany({
+      where: { userId: uid },
+      orderBy: { addedAt: 'desc' },
+    });
+
+    // Fetch associated products
+    const productIds = favorites.map(f => f.productId);
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds } },
+      include: {
+        stores: {
+          where: { active: true },
+          take: 1,
+          select: { price: true, stock: true },
         },
-      ],
+      },
+    });
+
+    const productMap = new Map(products.map(p => [p.id, p]));
+
+    res.json({
+      products: favorites
+        .map(f => {
+          const product = productMap.get(f.productId);
+          return {
+            id: f.id,
+            itemId: f.productId,
+            itemType: 'product',
+            product: product
+              ? {
+                  id: product.id,
+                  name: product.name,
+                  brand: product.brand || 'Unknown',
+                  category: product.category,
+                  price: product.stores[0]?.price || product.defaultPrice || 0,
+                  image: 'https://placehold.co/200', // Image URL would come from CMS
+                  thcContent: product.thcPercent ? `${product.thcPercent}%` : null,
+                  cbdContent: product.cbdPercent ? `${product.cbdPercent}%` : null,
+                  inStock: (product.stores[0]?.stock ?? 0) > 0,
+                }
+              : null,
+            addedAt: f.addedAt.toISOString(),
+          };
+        })
+        .filter(f => f.product !== null),
     });
   } catch (error) {
     console.error('Error fetching favorite products:', error);
@@ -62,28 +109,57 @@ router.get('/products', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/check/:productId', async (req: Request, res: Response) => {
+router.get('/check/:productId', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { productId } = req.params;
+
   try {
-    const { productId } = req.params;
-    // Mock - in production, check user's favorites
-    res.json({ isFavorite: productId === 'prod-1' });
+    const favorite = await prisma.favorite.findUnique({
+      where: {
+        userId_productId: { userId: uid, productId },
+      },
+    });
+
+    res.json({ isFavorite: !!favorite });
   } catch (error) {
     console.error('Error checking favorite:', error);
     res.status(500).json({ error: 'Failed to check favorite' });
   }
 });
 
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { itemId, folderId, notes } = req.body;
+
+  if (!itemId) {
+    return res.status(400).json({ error: 'itemId is required' });
+  }
+
   try {
-    const { itemId, itemType, folderId, notes } = req.body;
+    const favorite = await prisma.favorite.upsert({
+      where: {
+        userId_productId: { userId: uid, productId: itemId },
+      },
+      update: {
+        folderId: folderId || null,
+        notes: notes || null,
+      },
+      create: {
+        userId: uid,
+        productId: itemId,
+        folderId: folderId || null,
+        notes: notes || null,
+      },
+    });
+
     res.status(201).json({
-      id: `fav-${Date.now()}`,
-      itemId,
-      itemType,
-      userId: 'user-123',
-      folderId: folderId || null,
-      notes: notes || null,
-      addedAt: new Date().toISOString(),
+      id: favorite.id,
+      itemId: favorite.productId,
+      itemType: 'product',
+      userId: favorite.userId,
+      folderId: favorite.folderId,
+      notes: favorite.notes,
+      addedAt: favorite.addedAt.toISOString(),
     });
   } catch (error) {
     console.error('Error adding favorite:', error);
@@ -91,8 +167,18 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-router.delete('/:itemId', async (req: Request, res: Response) => {
+router.delete('/:itemId', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { itemId } = req.params;
+
   try {
+    await prisma.favorite.deleteMany({
+      where: {
+        userId: uid,
+        productId: itemId,
+      },
+    });
+
     res.status(204).send();
   } catch (error) {
     console.error('Error removing favorite:', error);
@@ -100,13 +186,35 @@ router.delete('/:itemId', async (req: Request, res: Response) => {
   }
 });
 
-router.patch('/:favoriteId', async (req: Request, res: Response) => {
+router.patch('/:favoriteId', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { favoriteId } = req.params;
+  const { folderId, notes } = req.body;
+
   try {
-    const { favoriteId } = req.params;
-    const updates = req.body;
+    const favorite = await prisma.favorite.updateMany({
+      where: {
+        id: favoriteId,
+        userId: uid,
+      },
+      data: {
+        ...(folderId !== undefined ? { folderId } : {}),
+        ...(notes !== undefined ? { notes } : {}),
+      },
+    });
+
+    if (favorite.count === 0) {
+      return res.status(404).json({ error: 'Favorite not found' });
+    }
+
+    const updated = await prisma.favorite.findUnique({
+      where: { id: favoriteId },
+    });
+
     res.json({
-      id: favoriteId,
-      ...updates,
+      id: updated?.id,
+      folderId: updated?.folderId,
+      notes: updated?.notes,
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
@@ -119,27 +227,29 @@ router.patch('/:favoriteId', async (req: Request, res: Response) => {
 // Folders Routes
 // ============================================
 
-router.get('/folders', async (req: Request, res: Response) => {
+router.get('/folders', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+
   try {
+    const folders = await prisma.favoriteFolder.findMany({
+      where: { userId: uid },
+      include: {
+        _count: {
+          select: { favorites: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
     res.json({
-      folders: [
-        {
-          id: 'folder-1',
-          name: 'Relaxation',
-          color: '#7C3AED',
-          icon: 'moon',
-          itemCount: 5,
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: 'folder-2',
-          name: 'Energy',
-          color: '#F59E0B',
-          icon: 'lightning',
-          itemCount: 3,
-          createdAt: new Date().toISOString(),
-        },
-      ],
+      folders: folders.map(f => ({
+        id: f.id,
+        name: f.name,
+        color: f.color,
+        icon: f.icon,
+        itemCount: f._count.favorites,
+        createdAt: f.createdAt.toISOString(),
+      })),
     });
   } catch (error) {
     console.error('Error fetching folders:', error);
@@ -147,23 +257,57 @@ router.get('/folders', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/folders', async (req: Request, res: Response) => {
+router.post('/folders', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { name, color, icon } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'name is required' });
+  }
+
   try {
-    const folder = req.body;
-    res.status(201).json({
-      id: `folder-${Date.now()}`,
-      ...folder,
-      itemCount: 0,
-      createdAt: new Date().toISOString(),
+    const folder = await prisma.favoriteFolder.create({
+      data: {
+        userId: uid,
+        name,
+        color: color || '#7C3AED',
+        icon: icon || 'star',
+      },
     });
-  } catch (error) {
+
+    res.status(201).json({
+      id: folder.id,
+      name: folder.name,
+      color: folder.color,
+      icon: folder.icon,
+      itemCount: 0,
+      createdAt: folder.createdAt.toISOString(),
+    });
+  } catch (error: any) {
+    if (error?.code === 'P2002') {
+      return res.status(409).json({ error: 'A folder with this name already exists' });
+    }
     console.error('Error creating folder:', error);
     res.status(500).json({ error: 'Failed to create folder' });
   }
 });
 
-router.delete('/folders/:folderId', async (req: Request, res: Response) => {
+router.delete('/folders/:folderId', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { folderId } = req.params;
+
   try {
+    // First unassign all favorites from this folder
+    await prisma.favorite.updateMany({
+      where: { folderId, userId: uid },
+      data: { folderId: null },
+    });
+
+    // Then delete the folder
+    await prisma.favoriteFolder.deleteMany({
+      where: { id: folderId, userId: uid },
+    });
+
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting folder:', error);
@@ -171,10 +315,27 @@ router.delete('/folders/:folderId', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/folders/:folderId/move', async (req: Request, res: Response) => {
+router.post('/folders/:folderId/move', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { folderId } = req.params;
+  const { favoriteIds } = req.body;
+
+  if (!Array.isArray(favoriteIds)) {
+    return res.status(400).json({ error: 'favoriteIds must be an array' });
+  }
+
   try {
-    const { favoriteIds: _favoriteIds } = req.body;
-    res.json({ moved: _favoriteIds.length });
+    const result = await prisma.favorite.updateMany({
+      where: {
+        id: { in: favoriteIds },
+        userId: uid,
+      },
+      data: {
+        folderId: folderId === 'none' ? null : folderId,
+      },
+    });
+
+    res.json({ moved: result.count });
   } catch (error) {
     console.error('Error moving favorites:', error);
     res.status(500).json({ error: 'Failed to move favorites' });
@@ -182,23 +343,67 @@ router.post('/folders/:folderId/move', async (req: Request, res: Response) => {
 });
 
 // ============================================
-// Quick Reorder Routes
+// Quick Reorder Routes - Query from Order history
 // ============================================
 
-router.get('/frequently-ordered', async (req: Request, res: Response) => {
+router.get('/frequently-ordered', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+
   try {
-    res.json({
-      products: [
-        {
-          id: 'prod-1',
-          name: 'Blue Dream',
-          brand: 'Nimbus Farms',
-          price: 45,
-          image: 'https://example.com/blue-dream.jpg',
-          orderCount: 5,
-          lastOrdered: new Date().toISOString(),
+    // Get products from user's order history, grouped by frequency
+    const orderItems = await prisma.orderItem.findMany({
+      where: {
+        order: { userId: uid },
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            brand: true,
+            defaultPrice: true,
+          },
         },
-      ],
+        order: {
+          select: { createdAt: true },
+        },
+      },
+      orderBy: { order: { createdAt: 'desc' } },
+    });
+
+    // Aggregate by product
+    const productCounts = new Map<string, { product: any; count: number; lastOrdered: Date }>();
+    for (const item of orderItems) {
+      const existing = productCounts.get(item.productId);
+      if (existing) {
+        existing.count += item.quantity;
+        if (item.order.createdAt > existing.lastOrdered) {
+          existing.lastOrdered = item.order.createdAt;
+        }
+      } else {
+        productCounts.set(item.productId, {
+          product: item.product,
+          count: item.quantity,
+          lastOrdered: item.order.createdAt,
+        });
+      }
+    }
+
+    // Sort by count and take top 10
+    const sorted = Array.from(productCounts.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    res.json({
+      products: sorted.map(({ product, count, lastOrdered }) => ({
+        id: product.id,
+        name: product.name,
+        brand: product.brand || 'Unknown',
+        price: product.defaultPrice || 0,
+        image: 'https://placehold.co/200',
+        orderCount: count,
+        lastOrdered: lastOrdered.toISOString(),
+      })),
     });
   } catch (error) {
     console.error('Error fetching frequently ordered:', error);
@@ -206,22 +411,48 @@ router.get('/frequently-ordered', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/past-orders', async (req: Request, res: Response) => {
+router.get('/past-orders', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { cursor, limit = '10' } = req.query;
+
   try {
-    res.json({
-      orders: [
-        {
-          id: 'order-1',
-          orderNumber: 'NMB-2024-001',
-          status: 'delivered',
-          total: 125.5,
-          itemCount: 3,
-          items: [{ productId: 'prod-1', name: 'Blue Dream', quantity: 1, price: 45 }],
-          createdAt: new Date().toISOString(),
-          deliveredAt: new Date().toISOString(),
+    const take = Math.min(parseInt(limit as string) || 10, 50);
+
+    const orders = await prisma.order.findMany({
+      where: { userId: uid },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true },
+            },
+          },
         },
-      ],
-      nextCursor: undefined,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: take + 1,
+      ...(cursor ? { cursor: { id: String(cursor) }, skip: 1 } : {}),
+    });
+
+    const hasMore = orders.length > take;
+    const items = hasMore ? orders.slice(0, take) : orders;
+
+    res.json({
+      orders: items.map(order => ({
+        id: order.id,
+        orderNumber: `NMB-${order.createdAt.getFullYear()}-${order.id.slice(-6).toUpperCase()}`,
+        status: order.status.toLowerCase(),
+        total: order.total || 0,
+        itemCount: order.items.reduce((sum, i) => sum + i.quantity, 0),
+        items: order.items.map(i => ({
+          productId: i.productId,
+          name: i.product.name,
+          quantity: i.quantity,
+          price: i.unitPrice || 0,
+        })),
+        createdAt: order.createdAt.toISOString(),
+      })),
+      nextCursor: hasMore ? items[items.length - 1].id : undefined,
     });
   } catch (error) {
     console.error('Error fetching past orders:', error);
@@ -229,16 +460,41 @@ router.get('/past-orders', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/last-order', async (req: Request, res: Response) => {
+router.get('/last-order', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+
   try {
+    const order = await prisma.order.findFirst({
+      where: { userId: uid },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: 'No orders found' });
+    }
+
     res.json({
-      id: 'order-1',
-      orderNumber: 'NMB-2024-001',
-      status: 'delivered',
-      total: 125.5,
-      itemCount: 3,
-      items: [{ productId: 'prod-1', name: 'Blue Dream', quantity: 1, price: 45 }],
-      createdAt: new Date().toISOString(),
+      id: order.id,
+      orderNumber: `NMB-${order.createdAt.getFullYear()}-${order.id.slice(-6).toUpperCase()}`,
+      status: order.status.toLowerCase(),
+      total: order.total || 0,
+      itemCount: order.items.reduce((sum, i) => sum + i.quantity, 0),
+      items: order.items.map(i => ({
+        productId: i.productId,
+        name: i.product.name,
+        quantity: i.quantity,
+        price: i.unitPrice || 0,
+      })),
+      createdAt: order.createdAt.toISOString(),
     });
   } catch (error) {
     console.error('Error fetching last order:', error);
@@ -246,13 +502,95 @@ router.get('/last-order', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/reorder/:orderId', async (req: Request, res: Response) => {
+router.post('/reorder/:orderId', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { orderId } = req.params;
+
   try {
-    const { orderId: _orderId } = req.params;
+    // Get the original order
+    const order = await prisma.order.findFirst({
+      where: { id: orderId, userId: uid },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: { id: true, name: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Get or create cart
+    let cart = await prisma.cart.findFirst({
+      where: { userId: uid },
+    });
+
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: {
+          userId: uid,
+          storeId: order.storeId,
+        },
+      });
+    }
+
+    // Add items to cart
+    const addedItems = [];
+    const unavailableItems = [];
+
+    for (const item of order.items) {
+      // Check if product is available
+      const storeProduct = await prisma.storeProduct.findFirst({
+        where: {
+          productId: item.productId,
+          active: true,
+          stock: { gt: 0 },
+        },
+      });
+
+      if (storeProduct) {
+        await prisma.cartItem.upsert({
+          where: {
+            cartId_productId_variantId: {
+              cartId: cart.id,
+              productId: item.productId,
+              variantId: item.variantId || '',
+            },
+          },
+          update: {
+            quantity: { increment: item.quantity },
+          },
+          create: {
+            cartId: cart.id,
+            productId: item.productId,
+            variantId: item.variantId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          },
+        });
+        addedItems.push({
+          productId: item.productId,
+          name: item.product.name,
+          quantity: item.quantity,
+        });
+      } else {
+        unavailableItems.push({
+          productId: item.productId,
+          name: item.product.name,
+          reason: 'Out of stock',
+        });
+      }
+    }
+
     res.json({
-      cartId: 'cart-123',
-      addedItems: [{ productId: 'prod-1', name: 'Blue Dream', quantity: 1 }],
-      unavailableItems: [],
+      cartId: cart.id,
+      addedItems,
+      unavailableItems,
     });
   } catch (error) {
     console.error('Error reordering:', error);
@@ -260,11 +598,54 @@ router.post('/reorder/:orderId', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/quick-add', async (req: Request, res: Response) => {
+router.post('/quick-add', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { productId, quantity = 1 } = req.body;
+
+  if (!productId) {
+    return res.status(400).json({ error: 'productId is required' });
+  }
+
   try {
-    const { productId, quantity } = req.body;
+    // Get or create cart
+    let cart = await prisma.cart.findFirst({
+      where: { userId: uid },
+    });
+
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: { userId: uid },
+      });
+    }
+
+    // Get product price
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { defaultPrice: true },
+    });
+
+    // Add to cart
+    await prisma.cartItem.upsert({
+      where: {
+        cartId_productId_variantId: {
+          cartId: cart.id,
+          productId,
+          variantId: '',
+        },
+      },
+      update: {
+        quantity: { increment: quantity },
+      },
+      create: {
+        cartId: cart.id,
+        productId,
+        quantity,
+        unitPrice: product?.defaultPrice,
+      },
+    });
+
     res.json({
-      cartId: 'cart-123',
+      cartId: cart.id,
       item: { productId, quantity },
     });
   } catch (error) {
@@ -273,13 +654,71 @@ router.post('/quick-add', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/bulk-add', async (req: Request, res: Response) => {
+router.post('/bulk-add', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { items } = req.body;
+
+  if (!Array.isArray(items)) {
+    return res.status(400).json({ error: 'items must be an array' });
+  }
+
   try {
-    const { items } = req.body;
+    // Get or create cart
+    let cart = await prisma.cart.findFirst({
+      where: { userId: uid },
+    });
+
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: { userId: uid },
+      });
+    }
+
+    const addedItems = [];
+    const unavailableItems = [];
+
+    for (const item of items) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { id: true, name: true, defaultPrice: true },
+      });
+
+      if (product) {
+        await prisma.cartItem.upsert({
+          where: {
+            cartId_productId_variantId: {
+              cartId: cart.id,
+              productId: item.productId,
+              variantId: '',
+            },
+          },
+          update: {
+            quantity: { increment: item.quantity || 1 },
+          },
+          create: {
+            cartId: cart.id,
+            productId: item.productId,
+            quantity: item.quantity || 1,
+            unitPrice: product.defaultPrice,
+          },
+        });
+        addedItems.push({
+          productId: item.productId,
+          name: product.name,
+          quantity: item.quantity || 1,
+        });
+      } else {
+        unavailableItems.push({
+          productId: item.productId,
+          reason: 'Product not found',
+        });
+      }
+    }
+
     res.json({
-      cartId: 'cart-123',
-      addedItems: items,
-      unavailableItems: [],
+      cartId: cart.id,
+      addedItems,
+      unavailableItems,
     });
   } catch (error) {
     console.error('Error bulk adding:', error);
@@ -288,11 +727,21 @@ router.post('/bulk-add', async (req: Request, res: Response) => {
 });
 
 // ============================================
-// Special Collections
+// Special Collections - Query from Favorites + Products
 // ============================================
 
-router.get('/on-sale', async (req: Request, res: Response) => {
+router.get('/on-sale', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+
   try {
+    // Get user's favorite product IDs (used for filtering in production)
+    const _favorites = await prisma.favorite.findMany({
+      where: { userId: uid },
+      select: { productId: true },
+    });
+
+    // In a real implementation, we'd check for products with active sales/discounts
+    // For now, return empty as this requires a Deal/Promotion table
     res.json({ products: [] });
   } catch (error) {
     console.error('Error fetching favorites on sale:', error);
@@ -300,9 +749,46 @@ router.get('/on-sale', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/back-in-stock', async (req: Request, res: Response) => {
+router.get('/back-in-stock', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+
   try {
-    res.json({ products: [] });
+    // Get user's favorites with stock info
+    const favorites = await prisma.favorite.findMany({
+      where: { userId: uid },
+      select: { productId: true },
+    });
+
+    const productIds = favorites.map(f => f.productId);
+
+    // Find products that have stock > 0 (would need historical tracking for "back in stock")
+    // For now, return products that are in stock
+    const products = await prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        stores: {
+          some: { stock: { gt: 0 }, active: true },
+        },
+      },
+      include: {
+        stores: {
+          where: { active: true },
+          take: 1,
+          select: { price: true, stock: true },
+        },
+      },
+    });
+
+    res.json({
+      products: products.map(p => ({
+        id: p.id,
+        name: p.name,
+        brand: p.brand || 'Unknown',
+        price: p.stores[0]?.price || p.defaultPrice || 0,
+        image: 'https://placehold.co/200',
+        inStock: true,
+      })),
+    });
   } catch (error) {
     console.error('Error fetching back in stock:', error);
     res.status(500).json({ error: 'Failed to fetch products' });
@@ -310,16 +796,21 @@ router.get('/back-in-stock', async (req: Request, res: Response) => {
 });
 
 // ============================================
-// Sharing
+// Sharing - Generates shareable link
 // ============================================
 
-router.post('/share', async (req: Request, res: Response) => {
+router.post('/share', requireAuth, async (req: Request, res: Response) => {
+  const uid = (req as any).user.userId as string;
+  const { favoriteIds: _favoriteIds, expiresInDays = 7 } = req.body;
+
   try {
-    const { favoriteIds: _favoriteIds, expiresInDays } = req.body;
+    // In production, would create a ShareLink record in database
+    const shareId = `share-${uid.slice(-6)}-${Date.now().toString(36)}`;
+
     res.json({
-      shareId: `share-${Date.now()}`,
-      shareUrl: `https://nimbus.app/shared/favorites/${Date.now()}`,
-      expiresAt: new Date(Date.now() + (expiresInDays || 7) * 24 * 60 * 60 * 1000).toISOString(),
+      shareId,
+      shareUrl: `https://nimbus.app/shared/favorites/${shareId}`,
+      expiresAt: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString(),
     });
   } catch (error) {
     console.error('Error sharing favorites:', error);

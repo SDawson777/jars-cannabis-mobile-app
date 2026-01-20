@@ -73,6 +73,7 @@ model User {
   passwordHash String
   dateOfBirth  DateTime? // Date of birth for age verification
   ageVerified  Boolean   @default(false) // Whether age has been verified
+  state        String?   // User's state for compliance checking
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   fcmToken     String?
@@ -133,9 +134,11 @@ model Product {
   brand            String?
   brandId          String?
   category         ProductCategory @default(Other)
+  subcategory      String?
   strainType       StrainType      @default(None)
   terpenes         String[]        @default([])
   defaultPrice     Float?
+  imageUrl         String?
   thcPercent       Float?
   cbdPercent       Float?
   thcMgPerUnit     Float?          // THC milligrams per unit for compliance tracking
@@ -214,6 +217,7 @@ model Cart {
   id        String   @id @default(cuid())
   userId    String
   storeId   String?
+  promoCode String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -273,6 +277,7 @@ model CartItem {
   product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
+  @@unique([cartId, productId, variantId])
   @@index([cartId])
   @@index([productId])
 }
@@ -351,10 +356,11 @@ model Award {
 }
 
 model LoyaltyStatus {
-  userId String @id
-  points Int    @default(0)
-  tier   String @default("Bronze")
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @id
+  points    Int      @default(0)
+  tier      String   @default("Bronze")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model LoyaltyBadge {
@@ -469,4 +475,149 @@ model ComplianceRule {
   updatedAt       DateTime @updatedAt
 
   @@index([stateCode])
+}
+
+// ============================================
+// Loyalty Rewards & Transactions
+// ============================================
+
+model Reward {
+  id                      String   @id @default(cuid())
+  name                    String
+  description             String?
+  pointsCost              Int
+  category                String   // 'discount', 'product', 'service', 'merchandise'
+  imageUrl                String?
+  minTier                 String?  // null means available to all tiers
+  expiresAfterRedemption  Int      @default(30) // days
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  redemptions RewardRedemption[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model RewardRedemption {
+  id         String   @id @default(cuid())
+  rewardId   String
+  userId     String
+  code       String   @unique
+  status     String   @default("active") // 'active', 'used', 'expired'
+  redeemedAt DateTime @default(now())
+  expiresAt  DateTime
+  usedAt     DateTime?
+
+  reward Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([rewardId])
+  @@index([status])
+}
+
+model LoyaltyTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // 'earn', 'redeem', 'bonus', 'referral', 'adjustment'
+  amount      Int      // positive for earning, negative for spending
+  description String
+  orderId     String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([orderId])
+}
+
+model Coupon {
+  id                   String   @id @default(cuid())
+  code                 String   @unique
+  title                String
+  description          String?
+  discountType         String   // 'percent', 'fixed'
+  discountValue        Float
+  minPurchase          Float?
+  maxDiscount          Float?
+  applicableCategories String[] @default([])
+  source               String   @default("promo") // 'welcome', 'tier_benefit', 'promo', 'reward'
+  expiresAt            DateTime?
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  userCoupons UserCoupon[]
+
+  @@index([code])
+  @@index([isActive])
+}
+
+model UserCoupon {
+  id        String    @id @default(cuid())
+  userId    String
+  couponId  String
+  isClipped Boolean   @default(false)
+  isUsed    Boolean   @default(false)
+  usedAt    DateTime?
+  clippedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, couponId])
+  @@index([userId])
+}
+
+// ============================================
+// Favorites & Quick Reorder
+// ============================================
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  folderId  String?
+  notes     String?
+  addedAt   DateTime @default(now())
+
+  folder FavoriteFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([folderId])
+}
+
+model FavoriteFolder {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  color     String   @default("#7C3AED")
+  icon      String   @default("star")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites Favorite[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+// ============================================
+// Referrals
+// ============================================
+
+model Referral {
+  id            String    @id @default(cuid())
+  referrerUserId String
+  refereeUserId  String?
+  refereeEmail   String?
+  refereePhone   String?
+  status         String   @default("pending") // 'pending', 'completed', 'expired'
+  pointsEarned   Int      @default(0)
+  createdAt      DateTime @default(now())
+  completedAt    DateTime?
+
+  @@index([referrerUserId])
+  @@index([refereeUserId])
+  @@index([status])
 }

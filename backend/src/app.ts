@@ -65,6 +65,7 @@ import mapboxRouter from './routes/mapbox';
 import paymentsRouter from './routes/payments';
 import hardwareRouter from './routes/hardware';
 import smarthomeRouter from './routes/smarthome';
+import { configRouter } from './routes/config';
 import { logger } from './utils/logger';
 // rateLimit imported where applied per-route; not needed globally
 import { prisma } from './prismaClient';
@@ -284,6 +285,7 @@ const routers = [
   paymentsRouter,
   hardwareRouter,
   smarthomeRouter,
+  configRouter,
 ];
 
 for (const r of routers) {

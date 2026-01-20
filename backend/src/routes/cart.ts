@@ -106,20 +106,51 @@ cartRouter.post('/cart/update', requireAuth, async (req, res) => {
     }
   }
 
-  // TODO: apply promo handling (store promo on cart or compute discount)
+  // Apply promo code if provided
+  const { promo } = req.body || {};
+  let appliedPromo: { code: string; discountPercent: number } | null = null;
+
+  if (promo && typeof promo === 'string') {
+    // Validate promo codes (aligned with /cart/apply-coupon logic)
+    const validPromos: Record<string, number> = {
+      SAVE10: 10,
+      SAVE20: 20,
+      WELCOME15: 15,
+      NIMBUS25: 25,
+    };
+    const discountPercent = validPromos[promo.toUpperCase()];
+    if (discountPercent) {
+      appliedPromo = { code: promo.toUpperCase(), discountPercent };
+      // Store promo on cart for persistence
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: { promoCode: promo.toUpperCase() },
+      });
+    }
+  }
 
   const refreshed = await prisma.cart.findUnique({
     where: { id: cart.id },
     include: { items: { include: { product: true, variant: true } } },
   });
 
-  // compute total
-  const total = (refreshed?.items || []).reduce(
+  // Compute subtotal
+  const subtotal = (refreshed?.items || []).reduce(
     (s, it) => s + (it.unitPrice ?? 0) * (it.quantity ?? 1),
     0
   );
 
-  res.json({ ...(refreshed || { items: [] }), total });
+  // Apply discount if promo is valid
+  const discount = appliedPromo ? (subtotal * appliedPromo.discountPercent) / 100 : 0;
+  const total = subtotal - discount;
+
+  res.json({
+    ...(refreshed || { items: [] }),
+    subtotal,
+    discount,
+    total,
+    coupon: appliedPromo,
+  });
 });
 
 cartRouter.put('/cart/items/:itemId', requireAuth, async (req, res) => {
@@ -172,19 +203,56 @@ cartRouter.delete('/cart', requireAuth, async (req, res) => {
   return res.json({ message: 'cart cleared', cart: refreshed });
 });
 
-// POST /cart/apply-coupon - minimal coupon handling for tests
+// POST /cart/apply-coupon - coupon handling with discount computation
 cartRouter.post('/cart/apply-coupon', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const { code } = req.body || {};
   if (!code) return res.status(400).json({ error: 'coupon required' });
+
   const cart = await prisma.cart.findFirst({ where: { userId: uid } });
   if (!cart) return res.status(404).json({ error: 'Cart not found' });
-  // accept only SAVE10 as a valid coupon in tests
-  if (code !== 'SAVE10') return res.status(400).json({ error: 'invalid coupon' });
+
+  // Validate promo codes with discount percentages
+  const validPromos: Record<string, number> = {
+    SAVE10: 10,
+    SAVE20: 20,
+    WELCOME15: 15,
+    NIMBUS25: 25,
+  };
+
+  const upperCode = code.toUpperCase();
+  const discountPercent = validPromos[upperCode];
+
+  if (!discountPercent) {
+    return res.status(400).json({ error: 'invalid coupon' });
+  }
+
+  // Store promo code on cart
+  await prisma.cart.update({
+    where: { id: cart.id },
+    data: { promoCode: upperCode },
+  });
+
   const refreshed = await prisma.cart.findUnique({
     where: { id: cart.id },
     include: { items: { include: { product: true, variant: true } } },
   });
-  (refreshed as any).coupon = { code };
-  return res.json({ cart: refreshed });
+
+  // Compute totals with discount
+  const subtotal = (refreshed?.items || []).reduce(
+    (s, it) => s + (it.unitPrice ?? 0) * (it.quantity ?? 1),
+    0
+  );
+  const discount = (subtotal * discountPercent) / 100;
+  const total = subtotal - discount;
+
+  return res.json({
+    cart: {
+      ...refreshed,
+      subtotal,
+      discount,
+      total,
+      coupon: { code: upperCode, discountPercent },
+    },
+  });
 });
