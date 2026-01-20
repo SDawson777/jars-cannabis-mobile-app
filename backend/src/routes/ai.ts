@@ -229,20 +229,41 @@ router.post('/ai/budtender', async (req, res) => {
     let suggestedProducts: string[] = [];
 
     // Determine product search criteria based on message
-    if (lowerMessage.includes('sleep') || lowerMessage.includes('insomnia') || lowerMessage.includes('relax')) {
-      const products = await getSuggestedProducts({ strainType: 'Indica', category: ['Flower', 'Edibles'] });
+    if (
+      lowerMessage.includes('sleep') ||
+      lowerMessage.includes('insomnia') ||
+      lowerMessage.includes('relax')
+    ) {
+      const products = await getSuggestedProducts({
+        strainType: 'Indica',
+        category: ['Flower', 'Edibles'],
+      });
       suggestedProducts = products.map(p => `${p.brand} ${p.name}`);
       productContext = `Relevant Indica products for relaxation: ${suggestedProducts.join(', ')}`;
-    } else if (lowerMessage.includes('energy') || lowerMessage.includes('focus') || lowerMessage.includes('creative')) {
-      const products = await getSuggestedProducts({ strainType: 'Sativa', category: ['Flower', 'Vape'] });
+    } else if (
+      lowerMessage.includes('energy') ||
+      lowerMessage.includes('focus') ||
+      lowerMessage.includes('creative')
+    ) {
+      const products = await getSuggestedProducts({
+        strainType: 'Sativa',
+        category: ['Flower', 'Vape'],
+      });
       suggestedProducts = products.map(p => `${p.brand} ${p.name}`);
       productContext = `Relevant Sativa products for energy: ${suggestedProducts.join(', ')}`;
-    } else if (lowerMessage.includes('beginner') || lowerMessage.includes('new') || lowerMessage.includes('first time')) {
+    } else if (
+      lowerMessage.includes('beginner') ||
+      lowerMessage.includes('new') ||
+      lowerMessage.includes('first time')
+    ) {
       const products = await getSuggestedProducts({ thcMax: 15, category: ['Flower', 'Edibles'] });
       suggestedProducts = products.map(p => `${p.brand} ${p.name} (${p.thcPercent}% THC)`);
       productContext = `Beginner-friendly low-THC products: ${suggestedProducts.join(', ')}`;
     } else if (lowerMessage.includes('pain') || lowerMessage.includes('inflammation')) {
-      const products = await getSuggestedProducts({ cbdMin: 5, category: ['Flower', 'Topicals', 'Tincture'] });
+      const products = await getSuggestedProducts({
+        cbdMin: 5,
+        category: ['Flower', 'Topicals', 'Tincture'],
+      });
       suggestedProducts = products.map(p => `${p.brand} ${p.name}`);
       productContext = `CBD-rich products for pain relief: ${suggestedProducts.join(', ')}`;
     }
@@ -266,7 +287,7 @@ ${productContext ? `Available products to suggest: ${productContext}` : ''}`;
 
       const messages = [
         { role: 'system' as const, content: systemPrompt },
-        ...history.map((h) => ({ role: h.role as 'user' | 'assistant', content: h.content })),
+        ...history.map(h => ({ role: h.role as 'user' | 'assistant', content: h.content })),
         { role: 'user' as const, content: message },
       ];
 
@@ -277,7 +298,8 @@ ${productContext ? `Available products to suggest: ${productContext}` : ''}`;
         max_tokens: 300,
       });
 
-      const response = completion.choices?.[0]?.message?.content || 
+      const response =
+        completion.choices?.[0]?.message?.content ||
         "I apologize, but I couldn't generate a response. Please try rephrasing your question.";
 
       res.json({
@@ -315,23 +337,42 @@ async function handleBudtenderFallback(message: string, res: any) {
   let suggestedProducts: string[] = [];
 
   if (lowerMessage.includes('sleep') || lowerMessage.includes('insomnia')) {
-    response = "For sleep and relaxation, I'd recommend looking at Indica strains with higher CBD content. These tend to have sedating effects that can help with rest.";
-    const products = await getSuggestedProducts({ strainType: 'Indica', category: ['Flower', 'Edibles'] });
+    response =
+      "For sleep and relaxation, I'd recommend looking at Indica strains with higher CBD content. These tend to have sedating effects that can help with rest.";
+    const products = await getSuggestedProducts({
+      strainType: 'Indica',
+      category: ['Flower', 'Edibles'],
+    });
     suggestedProducts = products.map(p => `${p.brand} ${p.name}`);
-  } else if (lowerMessage.includes('energy') || lowerMessage.includes('focus') || lowerMessage.includes('creative')) {
-    response = 'For energy and focus, Sativa strains are typically your best bet. They tend to provide uplifting, cerebral effects that can enhance creativity and productivity.';
-    const products = await getSuggestedProducts({ strainType: 'Sativa', category: ['Flower', 'Vape'] });
+  } else if (
+    lowerMessage.includes('energy') ||
+    lowerMessage.includes('focus') ||
+    lowerMessage.includes('creative')
+  ) {
+    response =
+      'For energy and focus, Sativa strains are typically your best bet. They tend to provide uplifting, cerebral effects that can enhance creativity and productivity.';
+    const products = await getSuggestedProducts({
+      strainType: 'Sativa',
+      category: ['Flower', 'Vape'],
+    });
     suggestedProducts = products.map(p => `${p.brand} ${p.name}`);
-  } else if (lowerMessage.includes('beginner') || lowerMessage.includes('new') || lowerMessage.includes('first time')) {
-    response = 'Welcome to cannabis! For beginners, I recommend starting with products that have lower THC content (under 15%) and higher CBD ratios. Start with a small dose and wait to see how you feel.';
+  } else if (
+    lowerMessage.includes('beginner') ||
+    lowerMessage.includes('new') ||
+    lowerMessage.includes('first time')
+  ) {
+    response =
+      'Welcome to cannabis! For beginners, I recommend starting with products that have lower THC content (under 15%) and higher CBD ratios. Start with a small dose and wait to see how you feel.';
     const products = await getSuggestedProducts({ thcMax: 15, category: ['Flower', 'Edibles'] });
     suggestedProducts = products.map(p => `${p.brand} ${p.name} (${p.thcPercent}% THC)`);
   } else if (lowerMessage.includes('pain') || lowerMessage.includes('inflammation')) {
-    response = "For pain relief, look at strains with good CBD content, as CBD has anti-inflammatory properties. Both Indica and balanced Hybrid strains can be effective.";
+    response =
+      'For pain relief, look at strains with good CBD content, as CBD has anti-inflammatory properties. Both Indica and balanced Hybrid strains can be effective.';
     const products = await getSuggestedProducts({ cbdMin: 5 });
     suggestedProducts = products.map(p => `${p.brand} ${p.name}`);
   } else {
-    response = "I'm here to help you find the right cannabis products! Feel free to ask about specific effects, your experience level, or any concerns you might have.";
+    response =
+      "I'm here to help you find the right cannabis products! Feel free to ask about specific effects, your experience level, or any concerns you might have.";
   }
 
   if (suggestedProducts.length > 0) {

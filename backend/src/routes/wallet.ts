@@ -371,34 +371,64 @@ walletRouter.get('/wallet/store-credits', requireAuth, async (req: Request, res:
  * Get user's digital coupons
  */
 walletRouter.get('/wallet/coupons', requireAuth, async (req: Request, res: Response) => {
-  const { includeUsed: _includeUsed } = req.query;
+  const userId = (req as any).user?.userId;
+  const includeUsed = req.query.includeUsed === 'true';
 
   try {
+    // Get user's assigned coupons from UserCoupon table
+    const userCoupons = await prisma.userCoupon.findMany({
+      where: {
+        userId,
+        ...(includeUsed ? {} : { isUsed: false }),
+      },
+      include: {
+        coupon: true,
+      },
+    });
+
+    // Also get active coupons not yet assigned to user
+    const userCouponIds = userCoupons.map(uc => uc.couponId);
+    const availableCoupons = await prisma.coupon.findMany({
+      where: {
+        isActive: true,
+        id: { notIn: userCouponIds },
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+    });
+
     const coupons = [
-      {
-        id: 'coupon-1',
-        code: 'WELCOME10',
-        title: '10% Off Your Order',
-        description: 'Welcome discount for new members',
-        discountType: 'percent',
-        discountValue: 10,
-        minPurchase: 25,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        isActive: true,
-        source: 'welcome',
-      },
-      {
-        id: 'coupon-2',
-        code: 'LOYALTY5',
-        title: '$5 Off',
-        description: 'Loyalty reward coupon',
-        discountType: 'fixed',
-        discountValue: 5,
-        minPurchase: 40,
-        expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        isActive: true,
-        source: 'loyalty',
-      },
+      // User's assigned coupons
+      ...userCoupons.map(uc => ({
+        id: uc.coupon.id,
+        code: uc.coupon.code,
+        title: uc.coupon.title,
+        description: uc.coupon.description,
+        discountType: uc.coupon.discountType,
+        discountValue: uc.coupon.discountValue,
+        minPurchase: uc.coupon.minPurchase,
+        maxDiscount: uc.coupon.maxDiscount,
+        expiresAt: uc.coupon.expiresAt?.toISOString(),
+        isActive: uc.coupon.isActive,
+        isClipped: uc.isClipped,
+        isUsed: uc.isUsed,
+        source: uc.coupon.source,
+      })),
+      // Available coupons not yet clipped
+      ...availableCoupons.map(c => ({
+        id: c.id,
+        code: c.code,
+        title: c.title,
+        description: c.description,
+        discountType: c.discountType,
+        discountValue: c.discountValue,
+        minPurchase: c.minPurchase,
+        maxDiscount: c.maxDiscount,
+        expiresAt: c.expiresAt?.toISOString(),
+        isActive: c.isActive,
+        isClipped: false,
+        isUsed: false,
+        source: c.source,
+      })),
     ];
 
     res.json({ coupons });
@@ -413,6 +443,7 @@ walletRouter.get('/wallet/coupons', requireAuth, async (req: Request, res: Respo
  * Clip/activate a coupon
  */
 walletRouter.post('/wallet/coupons/clip', requireAuth, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.userId;
   const { couponId } = req.body;
 
   if (!couponId) {
@@ -420,16 +451,52 @@ walletRouter.post('/wallet/coupons/clip', requireAuth, async (req: Request, res:
   }
 
   try {
+    // Find the coupon
+    const coupon = await prisma.coupon.findUnique({
+      where: { id: couponId },
+    });
+
+    if (!coupon) {
+      return res.status(404).json({ error: 'Coupon not found' });
+    }
+
+    if (!coupon.isActive) {
+      return res.status(400).json({ error: 'Coupon is no longer active' });
+    }
+
+    if (coupon.expiresAt && coupon.expiresAt < new Date()) {
+      return res.status(400).json({ error: 'Coupon has expired' });
+    }
+
+    // Create or update UserCoupon to mark as clipped
+    const userCoupon = await prisma.userCoupon.upsert({
+      where: {
+        userId_couponId: { userId, couponId },
+      },
+      update: {
+        isClipped: true,
+      },
+      create: {
+        userId,
+        couponId,
+        isClipped: true,
+        isUsed: false,
+      },
+    });
+
     res.json({
-      id: couponId,
-      code: 'CLIPPED10',
-      title: '10% Off',
-      description: 'Clipped coupon',
-      discountType: 'percent',
-      discountValue: 10,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      isActive: true,
-      source: 'promo',
+      id: coupon.id,
+      code: coupon.code,
+      title: coupon.title,
+      description: coupon.description,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      minPurchase: coupon.minPurchase,
+      maxDiscount: coupon.maxDiscount,
+      expiresAt: coupon.expiresAt?.toISOString(),
+      isActive: coupon.isActive,
+      isClipped: userCoupon.isClipped,
+      source: coupon.source,
     });
   } catch (error) {
     console.error('Clip coupon error:', error);

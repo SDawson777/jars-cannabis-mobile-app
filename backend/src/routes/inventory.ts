@@ -58,46 +58,71 @@ inventoryRouter.get(
     const { lat, lng } = req.query;
 
     try {
-      // Mock store availability data
-      const stores = [
-        {
-          storeId: 'store-1',
-          storeName: 'Nimbus Downtown',
-          address: '123 Main St, San Francisco, CA',
-          distance: lat && lng ? 1.2 : undefined,
-          available: true,
-          quantity: 15,
-          lowStock: false,
-          pickupAvailable: true,
-          deliveryAvailable: true,
+      // Get all active stores from database
+      // TODO: When StoreInventory table is available, filter by _productId
+      const dbStores = await prisma.store.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          latitude: true,
+          longitude: true,
+          pickupEnabled: true,
+          deliveryEnabled: true,
         },
-        {
-          storeId: 'store-2',
-          storeName: 'Nimbus Mission',
-          address: '456 Valencia St, San Francisco, CA',
-          distance: lat && lng ? 2.5 : undefined,
-          available: true,
-          quantity: 8,
-          lowStock: true,
-          pickupAvailable: true,
-          deliveryAvailable: true,
-        },
-        {
-          storeId: 'store-3',
-          storeName: 'Nimbus Oakland',
-          address: '789 Broadway, Oakland, CA',
-          distance: lat && lng ? 5.8 : undefined,
-          available: false,
-          quantity: 0,
-          lowStock: false,
-          pickupAvailable: true,
-          deliveryAvailable: false,
-        },
-      ];
+      });
+
+      // Calculate distance if coordinates provided
+      const userLat = lat ? parseFloat(lat as string) : null;
+      const userLng = lng ? parseFloat(lng as string) : null;
+
+      const calculateDistance = (
+        lat1: number,
+        lon1: number,
+        lat2: number,
+        lon2: number
+      ): number => {
+        const R = 3959; // miles
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      };
+
+      // Build store availability response
+      // In production, query actual inventory per store
+      const stores = dbStores.map(store => {
+        // Simulated inventory - in production, query StoreInventory table
+        const quantity = Math.floor(Math.random() * 20);
+        const lowStockThreshold = 5;
+
+        return {
+          storeId: store.id,
+          storeName: store.name,
+          address: store.address,
+          distance:
+            userLat && userLng && store.latitude && store.longitude
+              ? Math.round(
+                  calculateDistance(userLat, userLng, store.latitude, store.longitude) * 10
+                ) / 10
+              : undefined,
+          available: quantity > 0,
+          quantity,
+          lowStock: quantity > 0 && quantity <= lowStockThreshold,
+          pickupAvailable: store.pickupEnabled ?? true,
+          deliveryAvailable: store.deliveryEnabled ?? true,
+        };
+      });
 
       // Sort by distance if coordinates provided
-      if (lat && lng) {
-        stores.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      if (userLat && userLng) {
+        stores.sort((a, b) => (a.distance || 999) - (b.distance || 999));
       }
 
       res.json({ stores });

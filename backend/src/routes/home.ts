@@ -39,9 +39,9 @@ homeRouter.get('/home/categories', async (_req, res) => {
     });
 
     const categories = products
-      .map((p) => p.category)
-      .filter((c) => c !== null && c !== undefined)
-      .map((category) => ({
+      .map(p => p.category)
+      .filter(c => c !== null && c !== undefined)
+      .map(category => ({
         id: String(category).toLowerCase().replace(/\s+/g, '-'),
         label: String(category),
         emoji: categoryEmojis[String(category)] || '📦',
@@ -95,7 +95,7 @@ homeRouter.get('/home/featured', async (_req, res) => {
     });
 
     if (featuredProducts.length > 0) {
-      const formatted = featuredProducts.map((p) => ({
+      const formatted = featuredProducts.map(p => ({
         id: p.id,
         name: p.name,
         price: p.defaultPrice || 0,
@@ -118,7 +118,7 @@ homeRouter.get('/home/featured', async (_req, res) => {
         },
       });
 
-      const formatted = recentProducts.map((p) => ({
+      const formatted = recentProducts.map(p => ({
         id: p.id,
         name: p.name,
         price: p.defaultPrice || 0,
