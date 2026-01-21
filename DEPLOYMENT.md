@@ -276,11 +276,8 @@ docker-compose up -d backend
 
 ### Database Migrations
 
-```bash
-# Migrations run automatically on backend startup
-# To run manually:
-docker-compose exec backend npx prisma migrate deploy
-```
+> **Note**: Database migrations are managed in the [nimbus-cms](https://github.com/SDawson777/nimbus-cms) repository.
+> This mobile repo does not own or run database migrations. See [SCHEMA_OWNERSHIP.md](./SCHEMA_OWNERSHIP.md) for details.
 
 ### Backup Database
 

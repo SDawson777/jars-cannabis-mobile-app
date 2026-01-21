@@ -46,13 +46,8 @@ pg_restore \
 
 ## Verify
 
-Run Prisma migrations to ensure the schema is up to date:
-
-```bash
-cd backend
-npx prisma migrate resolve --applied --schema=prisma/schema.prisma || true
-npx prisma migrate deploy --schema=prisma/schema.prisma || true
-```
+> **Note**: Database migrations are managed in the [nimbus-cms](https://github.com/SDawson777/nimbus-cms) repository.
+> Run migrations from that repo, not from this mobile repo.
 
 ## Retention & Security
 

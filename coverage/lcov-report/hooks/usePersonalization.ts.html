@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -87,44 +87,44 @@
 <a name='L22'></a><a href='#L22'>22</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 &nbsp;
-const KEY = <span class="cstat-no" title="statement not covered" >'personalization_enabled';</span>
+const KEY = 'personalization_enabled';
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >usePersonalization(</span>): [boolean, (__val: boolean) =&gt; Promise&lt;void&gt;] {
-  const [enabled, setEnabled] = <span class="cstat-no" title="statement not covered" >useState(true);</span>
+export function usePersonalization(): [boolean, (__val: boolean) =&gt; Promise&lt;void&gt;] {
+  const [enabled, setEnabled] = useState(true);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    AsyncStorage.getItem(KEY).then(<span class="fstat-no" title="function not covered" >va</span>l =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (val !== null) <span class="cstat-no" title="statement not covered" >setEnabled(val === 'true');</span></span>
+  useEffect(() =&gt; {
+    AsyncStorage.getItem(KEY).then(val =&gt; {
+      if (val !== null) setEnabled(val === 'true');
     });
   }, []);
 &nbsp;
-  const update = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (__val: boolean) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    setEnabled(__val);</span>
-<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem(KEY, __val ? 'true' : 'false');</span>
+  const update = async (__val: boolean) =&gt; {
+    setEnabled(__val);
+    await AsyncStorage.setItem(KEY, __val ? 'true' : 'false');
   };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return [enabled, update];</span>
+  return [enabled, update];
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -133,7 +133,7 @@ export function <span class="fstat-no" title="function not covered" >usePersonal
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-21T00:32:28.479Z
+                at 2026-01-21T05:03:47.311Z
             </div>
         <script src="../prettify.js"></script>
         <script>

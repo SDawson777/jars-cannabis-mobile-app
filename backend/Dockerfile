@@ -14,9 +14,8 @@ RUN apk add --no-cache \
     curl
 
 FROM base AS deps
-# Copy package files and Prisma schema for postinstall script
+# Copy package files for dependency installation
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-COPY prisma ./prisma
 
 # Install dependencies based on the preferred package manager
 RUN \
@@ -31,8 +30,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Note: @prisma/client is pre-installed as a dependency
+# Schema is managed in the nimbus-cms repository
 
 # Build the application
 RUN npm run build
@@ -49,7 +48,6 @@ RUN adduser --system --uid 1001 backend
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/prisma ./prisma
 
 # Copy startup script
 COPY docker/start.sh ./start.sh

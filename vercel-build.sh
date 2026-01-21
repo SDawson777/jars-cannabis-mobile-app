@@ -13,13 +13,8 @@ else
   npm install --ignore-scripts --legacy-peer-deps
 fi
 
-# Prisma client (only if your monorepo has backend/prisma/schema.prisma)
-if [ -f "backend/prisma/schema.prisma" ]; then
-  echo "🧬 Generating Prisma client…"
-  npx prisma generate --schema=backend/prisma/schema.prisma \
-  || npx prisma generate --schema=backend/prisma/schema.prisma --skip-download \
-  || echo "⚠️ Prisma generate skipped (no engine download available)"
-fi
+# Note: Prisma schema is managed in nimbus-cms repo, not here
+# The backend uses @prisma/client which connects to the shared database
 
 echo "🧹 Lint/format…"
 npm run lint --if-present

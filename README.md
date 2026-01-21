@@ -38,7 +38,8 @@ A premium white-label React Native mobile platform for cannabis retailers, desig
    - Ensure invites have been accepted for GitHub, Expo, Firebase, Stripe, Sentry, hosting (Railway/Render), and analytics dashboards.
    - Store production secrets exclusively in the platform secret managers; reference the canonical list in `.env.example` and `backend/.env.example`.
 2. **Local environment setup (≈10 minutes)**
-   - Install Node 20 LTS (`nvm use 20.18`) and run `./setup.sh` to install root + backend dependencies, generate Prisma client, and verify toolchains.
+   - Install Node 20 LTS (`nvm use 20.18`) and run `./setup.sh` to install root + backend dependencies and verify toolchains.
+   - **Note**: Database schema and migrations are managed in the [nimbus-cms](https://github.com/SDawson777/nimbus-cms) repository. This mobile repo only consumes APIs.
    - Copy env templates: `cp .env.example .env` and `cp backend/.env.example backend/.env`, then fill in API URLs, Firebase keys, and Stripe sandbox credentials.
    - All `.env` and `.env.*` files are gitignored—keep secrets in local files or platform secret managers instead of committing them.
    - Optional but recommended: start Redis locally (Docker compose) to exercise rate limiting, caching, and push backoff logic.

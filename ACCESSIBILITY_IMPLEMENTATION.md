@@ -29,7 +29,7 @@
 
 ### 2. Backend Schema Updates
 
-- **Prisma Schema** (`backend/prisma/schema.prisma`)
+- **Prisma Schema** (managed in [nimbus-cms](https://github.com/SDawson777/nimbus-cms) repository)
   - Updated AccessibilitySetting model with new fields:
     - `textSize`: AccessibilityTextSize enum (system|sm|md|lg|xl)
     - `highContrast`: Boolean

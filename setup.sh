@@ -65,13 +65,8 @@ else
     echo "ℹ️  Use 'npx firebase-tools@latest' for Firebase commands"
 fi
 
-# Test Prisma CLI via npx
-echo "🗄️  Testing Prisma CLI..."
-if npx prisma --version >/dev/null 2>&1; then
-    echo "✅ Prisma CLI available via npx (version: $(npx prisma --version | head -1))"
-else
-    echo "⚠️  Prisma CLI not available"
-fi
+# Note: Prisma schema is managed in nimbus-cms repo, not here
+echo "ℹ️  Note: Database schema is managed in the nimbus-cms repository"
 
 # Verify TypeScript
 echo "📝 Testing TypeScript..."
@@ -115,6 +110,6 @@ echo ""
 echo "🔧 Tool commands (using npx):"
 echo "  npx expo --help     - Expo CLI help"
 echo "  npx firebase --help - Firebase tools help"
-echo "  npx prisma --help   - Prisma CLI help"
 echo ""
 echo "📚 For more information, see README.md"
+echo "ℹ️  Database schema is managed in nimbus-cms repo (see SCHEMA_OWNERSHIP.md)"

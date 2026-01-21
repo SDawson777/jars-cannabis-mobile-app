@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>15/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">78.57% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>11/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>15/20</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -145,33 +145,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -179,12 +172,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -210,24 +210,24 @@ interface FullLegalContent {
   lastUpdated?: Record&lt;string, string | null&gt;;
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >fetchLegalContent(</span>stateCode?: string): Promise&lt;FullLegalContent&gt; {
-  const cacheKey = <span class="cstat-no" title="statement not covered" >`cms:legal${stateCode ? `:${stateCode}` : ''}`;</span>
-  const state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
+async function fetchLegalContent(stateCode?: string): Promise&lt;FullLegalContent&gt; {
+  const cacheKey = `cms:legal${stateCode ? `:${stateCode}` : ''}`;
+  const state = await NetInfo.fetch();
 &nbsp;
-  const path = <span class="cstat-no" title="statement not covered" >stateCode ? `/content/legal?state=${stateCode}` : '/content/legal';</span>
+  const path = stateCode ? `/content/legal?state=${stateCode}` : '/content/legal';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!state.isConnected) {</span>
-    const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >    if (cached) {</span>
-<span class="cstat-no" title="statement not covered" >      return JSON.parse(cached) as FullLegalContent;</span>
+  if (!state.isConnected) {
+    const cached = await AsyncStorage.getItem(cacheKey);
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) {
+      return JSON.parse(cached) as FullLegalContent;
     }
 <span class="cstat-no" title="statement not covered" >    throw new Error('Offline and no cached legal content');</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const res = <span class="cstat-no" title="statement not covered" >await cmsClient.get&lt;FullLegalContent&gt;(path);</span>
-<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));</span>
-<span class="cstat-no" title="statement not covered" >    return res.data;</span>
+  try {
+    const res = await cmsClient.get&lt;FullLegalContent&gt;(path);
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));
+    return res.data;
   } catch (err) {
     const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
 <span class="cstat-no" title="statement not covered" >    if (cached) {</span>
@@ -237,20 +237,20 @@ async function <span class="fstat-no" title="function not covered" >fetchLegalCo
   }
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useLegal(</span>stateCode?: string) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;FullLegalContent, Error&gt;({</span>
+export function useLegal(stateCode?: string) {
+  return useQuery&lt;FullLegalContent, Error&gt;({
     queryKey: ['legal', stateCode],
-    queryFn: <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >fetchLegalContent(stateCode),</span>
+    queryFn: () =&gt; fetchLegalContent(stateCode),
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
   });
 }
 &nbsp;
 /** Hook for a specific legal document type */
-export function <span class="fstat-no" title="function not covered" >useLegalByType(</span>type: 'terms' | 'privacy' | 'accessibility', stateCode?: string) {
-  const query = <span class="cstat-no" title="statement not covered" >useLegal(stateCode);</span>
+export function useLegalByType(type: 'terms' | 'privacy' | 'accessibility', stateCode?: string) {
+  const query = useLegal(stateCode);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return {</span>
+  return {
     ...query,
     data: query.data
       ? ({
@@ -268,7 +268,7 @@ export function <span class="fstat-no" title="function not covered" >useLegalByT
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-21T00:32:28.479Z
+                at 2026-01-21T05:03:47.311Z
             </div>
         <script src="../prettify.js"></script>
         <script>

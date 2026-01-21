@@ -9,13 +9,13 @@ rm -f package-lock.json backend/package-lock.json
 echo "📦 Installing root dependencies (Expo + React Native)..."
 npm install --legacy-peer-deps
 
-echo "📦 Installing backend dependencies (Prisma, Express)..."
+echo "📦 Installing backend dependencies (Express, API server)..."
 cd backend
 npm install --legacy-peer-deps
 cd ..
 
-echo "🛠 Re-generating Prisma client..."
-npx prisma generate --schema=backend/prisma/schema.prisma
+# Note: Prisma schema is managed in nimbus-cms repo, not here
+# Backend uses @prisma/client which is installed as a dependency
 
 echo "🧪 (Re)Installing dev tools (ESLint, Husky, etc.)..."
 npm install --save-dev \

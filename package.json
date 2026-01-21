@@ -44,12 +44,9 @@
     "test": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --passWithNoTests",
     "test:watch": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --watch",
     "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --coverage --ci --watchAll=false",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
     "integrate-terpene-assets": "mkdir -p assets/terpene-wheel && cp Terpene_Wheel_Code_Kit.zip assets/terpene-wheel && unzip -o assets/terpene-wheel/Terpene_Wheel_Code_Kit.zip -d assets/terpene-wheel",
     "scaffold:award-redemption": "ts-node scripts/setupAwardRedemption.ts",
     "test:award-redemption": "jest tests/awards.redeem.test.ts --runInBand",
-    "prisma-gen": "npx prisma generate --schema=backend/prisma/schema.prisma || npx prisma generate --schema=backend/prisma/schema.prisma --skip-download",
     "smoke": "newman run qa/collection.json -e qa/env.staging.json --reporters cli,junit --reporter-junit-export ./reports/newman-smoke.xml",
     "format:check": "prettier . --check",
     "align-deps": "bash scripts/align-deps.sh",
@@ -77,7 +74,6 @@
     "@firebase/app": "^0.14.4",
     "@gorhom/bottom-sheet": "5.2.6",
     "@hookform/resolvers": "^5.2.2",
-    "@prisma/client": "^6.16.2",
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-community/datetimepicker": "7.7.0",
     "@react-native-community/netinfo": "11.1.0",
@@ -126,7 +122,6 @@
     "lottie-react-native": "6.5.1",
     "lucide-react-native": "^0.544.0",
     "nativewind": "^4.2.1",
-    "prisma": "^6.16.2",
     "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-hook-form": "^7.63.0",
@@ -240,7 +235,6 @@
       "reactNativeDirectoryCheck": {
         "exclude": [
           "@expo/config-plugins",
-          "@prisma/client",
           "@sentry/node",
           "async-mutex",
           "bull",
@@ -250,7 +244,6 @@
           "firebase-functions",
           "ioredis",
           "jsonwebtoken",
-          "prisma",
           "rtl-detect"
         ]
       }

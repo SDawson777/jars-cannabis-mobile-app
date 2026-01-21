@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Express + Firestore backend for JARS Phase 4",
+  "description": "Express API backend for Nimbus Cannabis Mobile - consumes Prisma client generated from nimbus-cms schema",
   "main": "dist/index.js",
   "engines": {
     "node": ">=20.11.1 <21",
@@ -10,17 +10,12 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec \"ts-node --project tsconfig.json src/index.ts\"",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
-    "prestart": "npm run build && prisma migrate deploy",
+    "prestart": "npm run build",
     "start": "node dist/index.js",
     "start:compiled": "node dist/index.js",
     "start:local": "NODE_ENV=test node dist/index.js",
     "mock": "prism mock openapi.yml --port 4000",
-    "migrate": "prisma migrate deploy",
-    "generate": "prisma generate",
-    "postinstall": "prisma generate",
-    "seed": "ts-node --transpile-only prisma/seed.ts",
-    "seed:demo": "DEMO_MODE=true ts-node --transpile-only prisma/seed-demo.ts",
-    "seed:demo:verbose": "DEMO_MODE=true DEBUG=true ts-node --transpile-only prisma/seed-demo.ts",
+    "postinstall": "echo 'Note: Prisma client is generated from nimbus-cms schema'",
     "test:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --runInBand --coverage --ci --watchAll=false",
     "test:integration": "NODE_OPTIONS=--max_old_space_size=4096 jest --config jest.config.cjs --runInBand tests/integration",
     "lint": "eslint src --ext .ts,.js --ignore-pattern '**/__tests__/**' --ignore-pattern '**/*.test.ts'",

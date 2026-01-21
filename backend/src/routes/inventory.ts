@@ -65,11 +65,13 @@ inventoryRouter.get(
         select: {
           id: true,
           name: true,
-          address: true,
+          address1: true,
+          address2: true,
+          city: true,
+          state: true,
+          postalCode: true,
           latitude: true,
           longitude: true,
-          pickupEnabled: true,
-          deliveryEnabled: true,
         },
       });
 
@@ -80,9 +82,10 @@ inventoryRouter.get(
       const calculateDistance = (
         lat1: number,
         lon1: number,
-        lat2: number,
-        lon2: number
+        lat2: number | null,
+        lon2: number | null
       ): number => {
+        if (lat2 === null || lon2 === null) return 999;
         const R = 3959; // miles
         const dLat = ((lat2 - lat1) * Math.PI) / 180;
         const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -102,21 +105,33 @@ inventoryRouter.get(
         const quantity = Math.floor(Math.random() * 20);
         const lowStockThreshold = 5;
 
+        // Build address string from components
+        const addressParts = [
+          store.address1,
+          store.address2,
+          store.city,
+          store.state,
+          store.postalCode,
+        ].filter(Boolean);
+        const fullAddress = addressParts.join(', ');
+
+        // Convert Decimal to number for distance calculation
+        const lat = store.latitude ? Number(store.latitude) : null;
+        const lng = store.longitude ? Number(store.longitude) : null;
+
         return {
           storeId: store.id,
           storeName: store.name,
-          address: store.address,
+          address: fullAddress,
           distance:
-            userLat && userLng && store.latitude && store.longitude
-              ? Math.round(
-                  calculateDistance(userLat, userLng, store.latitude, store.longitude) * 10
-                ) / 10
+            userLat && userLng && lat && lng
+              ? Math.round(calculateDistance(userLat, userLng, lat, lng) * 10) / 10
               : undefined,
           available: quantity > 0,
           quantity,
           lowStock: quantity > 0 && quantity <= lowStockThreshold,
-          pickupAvailable: store.pickupEnabled ?? true,
-          deliveryAvailable: store.deliveryEnabled ?? true,
+          pickupAvailable: true, // TODO: Add pickupEnabled field to Store schema if needed
+          deliveryAvailable: true, // TODO: Add deliveryEnabled field to Store schema if needed
         };
       });
 

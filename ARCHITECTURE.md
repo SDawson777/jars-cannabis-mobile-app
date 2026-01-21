@@ -2,9 +2,9 @@
 
 ## High-Level Systems
 
-- **Mobile App (Expo/React Native)**: Frontend client that communicates with the backend via REST under `/api/v1`. Uses Expo SDK 50, Tailwind, and native modules for push notifications.
-- **Backend (Node 20, Express, Prisma)**: Located in `backend/`. Provides REST APIs, authentication, caching, and integrations with external services (Stripe, Firebase, OpenAI, weather APIs).
-- **Database (PostgreSQL via Prisma)**: Stores users, orders, products, loyalty data, etc. Prisma client is generated from `backend/prisma/schema.prisma`.
+- **Mobile App (Expo/React Native)**: Frontend client that communicates with the backend via REST under `/api/v1`. Uses Expo SDK 50, Tailwind, and native modules for push notifications. **This repo does not own the database schema.**
+- **Backend (Node 20, Express, Prisma)**: Located in `backend/`. Provides REST APIs, authentication, caching, and integrations with external services (Stripe, Firebase, OpenAI, weather APIs). Consumes Prisma client generated from the **nimbus-cms** repository.
+- **Database (PostgreSQL via Prisma)**: Stores users, orders, products, loyalty data, etc. **Schema and migrations are managed in the [nimbus-cms](https://github.com/SDawson777/nimbus-cms) repository.** This mobile repo only consumes APIs.
 - **Cache Layer (Redis via cacheService)**: Optional but highly recommended. Used for rate limits, product listings, recommendations, weather data, push backoff windows.
 - **Firebase Admin**: Used for push notifications and ID token verification.
 - **Stripe**: Handles payment sheet setup.

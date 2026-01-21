@@ -69,12 +69,8 @@ else
     exit 1
 fi
 
-if [ -f "backend/prisma/schema.prisma" ]; then
-    echo "✅ Prisma schema exists"
-else
-    echo "❌ Prisma schema missing"
-    exit 1
-fi
+# Note: Prisma schema is managed in nimbus-cms repo, not here
+echo "ℹ️  Database schema is managed in nimbus-cms repository"
 
 echo ""
 echo "🎉 Validation Complete!"

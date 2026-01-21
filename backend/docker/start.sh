@@ -17,15 +17,9 @@ while ! nc -z ${REDIS_HOST:-redis} ${REDIS_PORT:-6379}; do
 done
 echo "✅ Redis is ready!"
 
-# Run database migrations
-echo "🔄 Running database migrations..."
-npx prisma migrate deploy
-
-# Seed the database if SEED_DATABASE is set
-if [ "$SEED_DATABASE" = "true" ]; then
-  echo "🌱 Seeding database..."
-  npx prisma db seed
-fi
+# Note: Database migrations are managed by the nimbus-cms repository
+# This backend consumes APIs and doesn't run migrations
+echo "ℹ️  Database migrations are managed by nimbus-cms repo"
 
 echo "🎯 Starting backend server..."
 # Start the server

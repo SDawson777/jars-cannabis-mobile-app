@@ -17,19 +17,10 @@
 
 ### ✅ Database Setup
 
-- [ ] **Create production PostgreSQL database**
-- [ ] **Run database migrations:**
-  ```bash
-  npx prisma migrate deploy
-  ```
-- [ ] **Generate Prisma client:**
-  ```bash
-  npx prisma generate
-  ```
-- [ ] **Seed with initial data (optional):**
-  ```bash
-  npm run seed
-  ```
+- [ ] **Ensure production PostgreSQL database is configured**
+- [ ] **Note: Database migrations are managed in the [nimbus-cms](https://github.com/SDawson777/nimbus-cms) repository**
+- [ ] **Verify the nimbus-cms repo has deployed latest migrations**
+- [ ] **Seed with initial data (optional, via nimbus-cms)**
 
 ### ✅ Security Configuration
 
