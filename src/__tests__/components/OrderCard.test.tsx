@@ -9,6 +9,10 @@ const mockOrder = {
   store: 'Downtown Location',
   total: 89.99,
   status: 'delivered',
+  items: [{ id: 'item-1', name: 'Blue Dream', quantity: 1, price: 45.0 }],
+  subtotal: 80.0,
+  taxes: 6.99,
+  fees: 3.0,
 };
 
 describe('OrderCard component', () => {

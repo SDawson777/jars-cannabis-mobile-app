@@ -67,7 +67,7 @@ describe('useCategories hook', () => {
     expect(result.current.data).toBeDefined();
     expect(result.current.data?.length).toBe(3);
 
-    const flowerCategory = result.current.data?.find(c => c.id === 'flower');
+    const flowerCategory = result.current.data?.find((c: { id: string }) => c.id === 'flower');
     expect(flowerCategory?.emoji).toBe('🌿');
     expect(flowerCategory?.label).toBe('Flower');
   });

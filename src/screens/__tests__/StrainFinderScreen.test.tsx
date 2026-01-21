@@ -61,15 +61,8 @@ jest.mock('../../i18n/useTranslation', () => ({
   }),
 }));
 
-const mockBrand = {
-  primaryColor: '#3C5A47',
-  secondaryColor: '#8FA998',
-  logoUrl: 'https://example.com/logo.png',
-  brandName: 'Test Brand',
-};
-
 const renderWithProviders = (ui: React.ReactElement) => {
-  return render(<BrandProvider value={mockBrand}>{ui}</BrandProvider>);
+  return render(<BrandProvider>{ui}</BrandProvider>);
 };
 
 describe('StrainFinderScreen', () => {

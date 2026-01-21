@@ -16,7 +16,9 @@ import { useStore } from '../../context/StoreContext';
 
 const renderWithLoyalty = (loyaltyData: any) => {
   return render(
-    <LoyaltyContext.Provider value={{ data: loyaltyData, isLoading: false, error: null }}>
+    <LoyaltyContext.Provider
+      value={{ data: loyaltyData, isLoading: false, isError: false, error: null }}
+    >
       <WelcomeBanner />
     </LoyaltyContext.Provider>
   );

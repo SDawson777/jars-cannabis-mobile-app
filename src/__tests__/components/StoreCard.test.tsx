@@ -33,9 +33,11 @@ describe('StoreCard', () => {
   const mockStore = {
     id: 'store-1',
     name: 'JARS Midtown',
+    slug: 'jars-midtown',
     address: '123 Main St, Detroit, MI',
     phone: '555-1234',
-    hours: { open: '9am', close: '9pm' },
+    latitude: 42.3314,
+    longitude: -83.0458,
   };
 
   const defaultProps = {

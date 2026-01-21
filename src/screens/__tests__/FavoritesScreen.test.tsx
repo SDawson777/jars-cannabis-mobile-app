@@ -113,7 +113,7 @@ describe('FavoritesScreen', () => {
     const { UNSAFE_root } = render(<FavoritesScreen />);
     const pressables = UNSAFE_root.findAllByType(require('react-native').Pressable);
     // First pressable is back, heart buttons come after
-    const heartButton = pressables.find((p, i) => i > 0);
+    const heartButton = pressables.find((p: any, i: number) => i > 0);
     if (heartButton) {
       fireEvent.press(heartButton);
       expect(mockRemoveFavorite.mutate).toHaveBeenCalled();

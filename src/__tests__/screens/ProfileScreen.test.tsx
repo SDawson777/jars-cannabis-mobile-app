@@ -34,7 +34,18 @@ describe('ProfileScreen', () => {
     brandPrimary: '#2E7D32',
     brandSecondary: '#81C784',
     brandBackground: '#FFFFFF',
+    brandAccent: '#4CAF50',
     cornerRadius: 8,
+    logoUrl: undefined,
+    elevation: 'soft' as const,
+    loading: false,
+    debugInfo: {
+      weatherSource: 'time-of-day' as const,
+      lastUpdated: new Date('2024-01-01'),
+    },
+    cmsTheme: null,
+    weatherSimulation: { enabled: false, condition: null },
+    setWeatherSimulation: jest.fn(),
   };
 
   const mockAuthData = {
@@ -45,13 +56,17 @@ describe('ProfileScreen', () => {
   };
 
   const mockClearAuth = jest.fn();
+  const mockSetToken = jest.fn();
 
   const renderWithProviders = (ui: React.ReactElement, authData?: typeof mockAuthData | null) => {
     const authContext = {
-      data: authData || mockAuthData,
+      data: authData === null ? undefined : authData || mockAuthData,
       clearAuth: mockClearAuth,
-      setAuth: jest.fn(),
-      loading: false,
+      token: authData ? 'mock-token' : null,
+      setToken: mockSetToken,
+      isLoading: false,
+      isError: false,
+      error: null,
     };
 
     return render(
@@ -182,10 +197,13 @@ describe('ProfileScreen', () => {
   describe('Guest User', () => {
     it('displays sign in button for guest users when no data', () => {
       const authContext = {
-        data: null,
+        data: undefined,
         clearAuth: mockClearAuth,
-        setAuth: jest.fn(),
-        loading: false,
+        token: null,
+        setToken: mockSetToken,
+        isLoading: false,
+        isError: false,
+        error: null,
       };
 
       const { getByTestId } = render(
@@ -218,10 +236,13 @@ describe('ProfileScreen', () => {
 
     it('still shows menu options when no auth data', () => {
       const authContext = {
-        data: null,
+        data: undefined,
         clearAuth: mockClearAuth,
-        setAuth: jest.fn(),
-        loading: false,
+        token: null,
+        setToken: mockSetToken,
+        isLoading: false,
+        isError: false,
+        error: null,
       };
 
       const { getByText } = render(
@@ -248,8 +269,11 @@ describe('ProfileScreen', () => {
             value={{
               data: mockAuthData,
               clearAuth: mockClearAuth,
-              setAuth: jest.fn(),
-              loading: false,
+              token: 'mock-token',
+              setToken: mockSetToken,
+              isLoading: false,
+              isError: false,
+              error: null,
             }}
           >
             <ProfileScreen />
@@ -269,8 +293,11 @@ describe('ProfileScreen', () => {
             value={{
               data: mockAuthData,
               clearAuth: mockClearAuth,
-              setAuth: jest.fn(),
-              loading: false,
+              token: 'mock-token',
+              setToken: mockSetToken,
+              isLoading: false,
+              isError: false,
+              error: null,
             }}
           >
             <ProfileScreen />

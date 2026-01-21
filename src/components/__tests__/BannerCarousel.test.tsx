@@ -16,16 +16,19 @@ jest.mock('../CMSImage', () => {
 const mockBanners = [
   {
     __id: 'banner-1',
+    title: 'Summer Sale',
     image: { url: 'https://example.com/banner1.jpg', alt: 'Summer Sale' },
     cta: 'Shop Now',
   },
   {
     __id: 'banner-2',
+    title: 'New Arrivals',
     image: { url: 'https://example.com/banner2.jpg', alt: 'New Arrivals' },
     cta: 'Discover',
   },
   {
     __id: 'banner-3',
+    title: 'Free Delivery',
     image: { url: 'https://example.com/banner3.jpg', alt: 'Free Delivery' },
   },
 ];
@@ -58,6 +61,7 @@ describe('BannerCarousel', () => {
       const bannersWithoutCta = [
         {
           __id: 'banner-1',
+          title: 'No CTA Banner',
           image: { url: 'https://example.com/banner1.jpg', alt: 'No CTA Banner' },
         },
       ];

@@ -4,10 +4,13 @@ import { render, fireEvent } from '@testing-library/react-native';
 import TerpeneInfoModal from '../TerpeneInfoModal';
 
 const mockTerpene = {
+  key: 'myrcene' as const,
   name: 'Myrcene',
+  percent: 0.35,
   aromas: ['Earthy', 'Musky', 'Herbal'],
   effects: ['Relaxing', 'Sedating', 'Pain Relief'],
   strains: ['Blue Dream', 'OG Kush', 'Granddaddy Purple'],
+  waveColor: '#7CB342',
 };
 
 describe('TerpeneInfoModal', () => {

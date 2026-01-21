@@ -55,11 +55,17 @@ jest.mock('../../i18n/useTranslation', () => ({
 }));
 
 const mockTheme = {
+  colorTemp: 'warm' as const,
   brandPrimary: '#3C5A47',
   brandSecondary: '#8FA998',
   brandBackground: '#FAF8F4',
+  brandAccent: '#4CAF50',
+  cornerRadius: 8,
+  logoUrl: undefined,
+  elevation: 'soft' as const,
+  loading: false,
   debugInfo: {
-    weatherSource: 'mock',
+    weatherSource: 'time-of-day' as const,
     lastUpdated: new Date('2024-01-01'),
     fallbackReason: 'test reason',
     actualTemperature: 72,
@@ -68,6 +74,7 @@ const mockTheme = {
     location: { lat: 37.7749, lon: -122.4194 },
     simulation: { enabled: false, condition: null },
   },
+  cmsTheme: null,
   weatherSimulation: {
     enabled: false,
     condition: null,
@@ -75,7 +82,7 @@ const mockTheme = {
   setWeatherSimulation: mockSetWeatherSimulation,
 };
 
-const renderWithProviders = (ui, themeOverrides = {}) => {
+const renderWithProviders = (ui: React.ReactElement, themeOverrides = {}) => {
   const theme = { ...mockTheme, ...themeOverrides };
   return render(<ThemeContext.Provider value={theme}>{ui}</ThemeContext.Provider>);
 };

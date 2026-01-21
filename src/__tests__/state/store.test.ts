@@ -11,6 +11,7 @@ describe('usePreferredStore', () => {
   const mockStore = {
     id: 'store-1',
     name: 'Test Store',
+    slug: 'test-store',
     address: '123 Main St',
     latitude: 42.1234,
     longitude: -83.5678,

@@ -148,9 +148,9 @@ describe('useRecentSearches hook', () => {
       result.current.addRecentSearch('blue dream'); // Same, different case
     });
 
-    expect(result.current.recentSearches.filter(s => s.toLowerCase() === 'blue dream').length).toBe(
-      1
-    );
+    expect(
+      result.current.recentSearches.filter((s: string) => s.toLowerCase() === 'blue dream').length
+    ).toBe(1);
   });
 
   it('should clear recent searches', () => {

@@ -32,7 +32,7 @@ jest.mock('../../utils/haptic', () => ({
 }));
 
 const createThemeWrapper =
-  (colorTemp = 'neutral') =>
+  (colorTemp: 'warm' | 'neutral' | 'cool' = 'neutral') =>
   ({ children }: { children: React.ReactNode }) => (
     <ThemeContext.Provider
       value={{

@@ -26,7 +26,7 @@ jest.mock('../../../stores/useCartStore', () => ({
   useCartStore: jest.fn(),
 }));
 
-const mockUseCartStore = useCartStore as jest.Mock;
+const mockUseCartStore = useCartStore as unknown as jest.Mock;
 
 describe('useCartValidation', () => {
   const mockSetItems = jest.fn();

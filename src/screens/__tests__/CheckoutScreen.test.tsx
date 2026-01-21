@@ -132,10 +132,22 @@ jest.mock('../../../stores/useCartStore', () => ({
 }));
 
 const mockTheme = {
-  colorTemp: 'warm',
+  colorTemp: 'warm' as const,
   brandPrimary: '#3C5A47',
   brandSecondary: '#8FA998',
   brandBackground: '#FAF8F4',
+  brandAccent: '#4CAF50',
+  cornerRadius: 8,
+  logoUrl: undefined,
+  elevation: 'soft' as const,
+  loading: false,
+  debugInfo: {
+    weatherSource: 'time-of-day' as const,
+    lastUpdated: new Date('2024-01-01'),
+  },
+  cmsTheme: null,
+  weatherSimulation: { enabled: false, condition: null },
+  setWeatherSimulation: jest.fn(),
 };
 
 const renderWithProviders = (ui: React.ReactElement) => {

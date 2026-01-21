@@ -49,8 +49,20 @@ const mockThemeContext = {
   brandPrimary: '#4C9F70',
   brandSecondary: '#E8F5E9',
   brandBackground: '#FAF8F4',
+  brandAccent: '#4CAF50',
+  cornerRadius: 8,
   textColor: '#2C3E50',
   isDark: false,
+  logoUrl: undefined,
+  elevation: 'soft' as const,
+  loading: false,
+  debugInfo: {
+    weatherSource: 'time-of-day' as const,
+    lastUpdated: new Date('2024-01-01'),
+  },
+  cmsTheme: null,
+  weatherSimulation: { enabled: false, condition: null },
+  setWeatherSimulation: jest.fn(),
 };
 
 describe('ContactUsScreen', () => {

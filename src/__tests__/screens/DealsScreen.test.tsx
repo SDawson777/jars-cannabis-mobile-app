@@ -62,7 +62,15 @@ describe('DealsScreen', () => {
     brandPrimary: '#2E7D32',
     brandSecondary: '#81C784',
     brandBackground: '#FFFFFF',
+    brandAccent: '#FFD700',
     cornerRadius: 8,
+    logoUrl: undefined,
+    elevation: 'soft' as const,
+    loading: false,
+    debugInfo: { weatherSource: 'time-of-day' as const, lastUpdated: new Date() },
+    cmsTheme: null,
+    weatherSimulation: { enabled: false, condition: null },
+    setWeatherSimulation: jest.fn(),
   };
 
   const mockDeals: CMSDeal[] = [

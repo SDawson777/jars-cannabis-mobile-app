@@ -11,6 +11,8 @@ jest.mock('../../utils/haptic', () => ({
 const mockArticle = {
   __id: 'article-1',
   title: 'Understanding Cannabis Terpenes',
+  slug: 'understanding-cannabis-terpenes',
+  publishedAt: '2024-01-15T10:00:00Z',
   body: 'Terpenes are aromatic compounds found in many plants, including cannabis. They contribute to the unique scent and flavor profiles of different strains.',
   image: { url: 'https://example.com/article.jpg', alt: 'Terpenes' },
 };

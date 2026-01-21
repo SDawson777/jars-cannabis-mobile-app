@@ -45,7 +45,9 @@ describe('useAuth hook', () => {
           token: tokenValue,
           setToken: mockSetToken,
           clearAuth: mockClearAuth,
-          data: tokenValue ? { id: 'user-1', email: 'test@example.com' } : null,
+          data: tokenValue
+            ? { id: 'user-1', email: 'test@example.com', name: 'Test User' }
+            : undefined,
           isLoading: false,
           isError: false,
           error: null,
@@ -153,7 +155,7 @@ describe('useAuth hook', () => {
           token: null,
           setToken: mockSetToken,
           clearAuth: mockClearAuth,
-          data: null,
+          data: undefined,
           isLoading: true,
           isError: true,
           error: new Error('Auth error'),

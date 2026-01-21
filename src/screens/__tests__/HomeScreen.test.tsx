@@ -107,8 +107,11 @@ const createQueryClient = () =>
 const mockAuthContext = {
   data: { id: 'user-123', email: 'test@example.com', name: 'Test User' },
   isLoading: false,
-  signIn: jest.fn(),
-  signOut: jest.fn(),
+  token: 'mock-token',
+  setToken: jest.fn(),
+  clearAuth: jest.fn(),
+  isError: false,
+  error: null,
 };
 
 const renderWithProviders = (ui: React.ReactElement) => {

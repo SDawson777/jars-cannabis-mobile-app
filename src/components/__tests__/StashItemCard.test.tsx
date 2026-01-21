@@ -18,6 +18,7 @@ const mockItem = {
   name: 'Rainbow Rozay',
   strainType: 'Hybrid',
   purchaseDate: '2025-07-10',
+  status: 'in_stock' as const,
   imageUrl: 'https://example.com/image.jpg',
 };
 

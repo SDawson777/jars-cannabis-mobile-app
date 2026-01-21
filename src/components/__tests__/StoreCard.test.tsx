@@ -22,9 +22,10 @@ jest.mock('react-native-shimmer-placeholder', () => {
 const mockStore = {
   id: 'store-1',
   name: 'Nimbus Downtown',
+  slug: 'nimbus-downtown',
   address: '123 Main St, Denver, CO 80202',
-  lat: 39.7392,
-  lng: -104.9903,
+  latitude: 39.7392,
+  longitude: -104.9903,
   phone: '555-123-4567',
 };
 
