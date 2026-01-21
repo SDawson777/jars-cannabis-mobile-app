@@ -391,7 +391,7 @@ describe('AppSettingsScreen', () => {
 
       expect(Alert.alert).toHaveBeenCalledWith(
         'Weather Debug Info',
-        expect.stringContaining('Weather Source: mock'),
+        expect.stringContaining('Weather Source: time-of-day'),
         [{ text: 'OK' }]
       );
     });

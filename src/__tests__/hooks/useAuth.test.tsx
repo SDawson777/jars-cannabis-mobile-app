@@ -65,13 +65,17 @@ describe('useAuth hook', () => {
   it('should return isAuthenticated false when no token', () => {
     const { result } = renderHook(() => useAuth(), { wrapper: createWrapper(null) });
     expect(result.current.isAuthenticated).toBe(false);
-    expect(result.current.currentUser).toBeNull();
+    expect(result.current.currentUser).toBeUndefined();
   });
 
   it('should return isAuthenticated true when token exists', () => {
     const { result } = renderHook(() => useAuth(), { wrapper: createWrapper('valid-token') });
     expect(result.current.isAuthenticated).toBe(true);
-    expect(result.current.currentUser).toEqual({ id: 'user-1', email: 'test@example.com' });
+    expect(result.current.currentUser).toEqual({
+      id: 'user-1',
+      email: 'test@example.com',
+      name: 'Test User',
+    });
   });
 
   it('should sign in via backend when successful', async () => {

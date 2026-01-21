@@ -60,8 +60,8 @@ jest.mock('lucide-react-native', () => ({
 
 jest.mock('react-native-confetti-cannon', () => {
   const _React = require('react');
-  return React.forwardRef((props, ref) => {
-    React.useImperativeHandle(ref, () => ({
+  return _React.forwardRef((props: any, ref: any) => {
+    _React.useImperativeHandle(ref, () => ({
       start: jest.fn(),
     }));
     return null;
