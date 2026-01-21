@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -109,36 +109,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -149,36 +149,36 @@ import { createOrder, CreateOrderPayload, fetchOrders } from '../clients/orderCl
 import type { Order } from '../types/order';
 &nbsp;
 // Keys
-const ordersKey = <span class="cstat-no" title="statement not covered" >['orders'];</span>
-const orderKey = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(i</span>d: string) =&gt; <span class="cstat-no" title="statement not covered" >['orders', id];</span></span>
+const ordersKey = ['orders'];
+const orderKey = (id: string) =&gt; ['orders', id];
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useCreateOrder(</span>options?: {
+export function useCreateOrder(options?: {
   onSuccess?: (order: Order) =&gt; void;
   onError?: (err: any) =&gt; void;
 }) {
-  const qc = <span class="cstat-no" title="statement not covered" >useQueryClient();</span>
-  const mutation = <span class="cstat-no" title="statement not covered" >useMutation&lt;Order, any, CreateOrderPayload&gt;({</span>
+  const qc = useQueryClient();
+  const mutation = useMutation&lt;Order, any, CreateOrderPayload&gt;({
     mutationFn: createOrder,
-    onSuccess: <span class="fstat-no" title="function not covered" >(o</span>rder: Order, _vars: any, _ctx: any) =&gt; {
+    onSuccess: (order: Order, _vars: any, _ctx: any) =&gt; {
       // Optimistically prime individual order cache &amp; invalidate list
-<span class="cstat-no" title="statement not covered" >      qc.setQueryData(orderKey(order.id), order);</span>
-<span class="cstat-no" title="statement not covered" >      qc.invalidateQueries({ queryKey: ordersKey }).catch(<span class="fstat-no" title="function not covered" >()</span> =&gt; {});</span>
-<span class="cstat-no" title="statement not covered" >      options?.onSuccess?.(order);</span>
+      qc.setQueryData(orderKey(order.id), order);
+      qc.invalidateQueries({ queryKey: ordersKey }).catch(<span class="fstat-no" title="function not covered" >()</span> =&gt; {});
+      options?.onSuccess?.(order);
     },
-    onError: <span class="fstat-no" title="function not covered" >(e</span>rr: any) =&gt; {
-<span class="cstat-no" title="statement not covered" >      options?.onError?.(err);</span>
+    onError: (err: any) =&gt; {
+      options?.onError?.(err);
     },
   });
-<span class="cstat-no" title="statement not covered" >  return mutation;</span>
+  return mutation;
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useOrder(</span>orderId: string, enabled = <span class="branch-0 cbranch-no" title="branch not covered" >true)</span> {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;Order | undefined&gt;({</span>
+export function useOrder(orderId: string, enabled = true) {
+  return useQuery&lt;Order | undefined&gt;({
     queryKey: orderKey(orderId),
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
+    queryFn: async () =&gt; {
       // We currently only fetch full lists; for simplicity re-use fetchOrders and find
-      const { orders } = <span class="cstat-no" title="statement not covered" >await fetchOrders(1);</span>
-<span class="cstat-no" title="statement not covered" >      return orders.find(<span class="fstat-no" title="function not covered" >o </span>=&gt; <span class="cstat-no" title="statement not covered" >o.id === orderId)</span>;</span>
+      const { orders } = await fetchOrders(1);
+      return orders.find(o =&gt; o.id === orderId);
     },
     enabled: !!orderId &amp;&amp; enabled,
   });
@@ -190,7 +190,7 @@ export function <span class="fstat-no" title="function not covered" >useOrder(</
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

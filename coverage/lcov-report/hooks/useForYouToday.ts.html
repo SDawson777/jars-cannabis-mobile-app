@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">93.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>15/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">92.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>13/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -110,29 +110,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,30 +147,30 @@ import type { ForYouTodayPayload } from '../@types/personalization';
 import { phase4Client } from '../api/phase4Client';
 import { clientGet } from '../api/http';
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useForYouToday(</span>userId: string | undefined, storeId: string | undefined) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;ForYouTodayPayload&gt;({</span>
+export function useForYouToday(userId: string | undefined, storeId: string | undefined) {
+  return useQuery&lt;ForYouTodayPayload&gt;({
     queryKey: ['forYouToday', userId, storeId],
     enabled: !!userId &amp;&amp; !!storeId,
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-      const cacheKey = <span class="cstat-no" title="statement not covered" >`forYouToday:${userId}:${storeId}`;</span>
-      const _state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
+    queryFn: async () =&gt; {
+      const cacheKey = `forYouToday:${userId}:${storeId}`;
+      const _state = await NetInfo.fetch();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!_state.isConnected) {</span>
-        const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as ForYouTodayPayload;</span></span>
-<span class="cstat-no" title="statement not covered" >        throw new Error('Offline');</span>
+      if (!_state.isConnected) {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached) return JSON.parse(cached) as ForYouTodayPayload;
+        throw new Error('Offline');
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      try {</span>
-        const data = <span class="cstat-no" title="statement not covered" >await clientGet&lt;ForYouTodayPayload&gt;(</span>
+      try {
+        const data = await clientGet&lt;ForYouTodayPayload&gt;(
           phase4Client,
           `/personalization/home?userId=${userId}&amp;storeId=${storeId}`
         );
-<span class="cstat-no" title="statement not covered" >        await AsyncStorage.setItem(cacheKey, JSON.stringify(data));</span>
-<span class="cstat-no" title="statement not covered" >        return data;</span>
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
+        return data;
       } catch (err) {
-        const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >        if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as ForYouTodayPayload;</span></span>
+        const cached = await AsyncStorage.getItem(cacheKey);
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) return JSON.parse(cached) as ForYouTodayPayload;
 <span class="cstat-no" title="statement not covered" >        throw err;</span>
       }
     },
@@ -184,7 +184,7 @@ export function <span class="fstat-no" title="function not covered" >useForYouTo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

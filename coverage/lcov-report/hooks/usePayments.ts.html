@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">7.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/112</span>
+                <span class='fraction'>8/112</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">13.63% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/44</span>
+                <span class='fraction'>6/44</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">7.14% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/112</span>
+                <span class='fraction'>8/112</span>
             </div>
         
             
@@ -839,30 +839,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -876,11 +873,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1475,15 +1475,15 @@ export interface Tip {
 /**
  * Hook to fetch available payment processors
  */
-export function <span class="fstat-no" title="function not covered" >usePaymentProcessors(</span>) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;PaymentProcessorConfig[], Error&gt;({</span>
+export function usePaymentProcessors() {
+  return useQuery&lt;PaymentProcessorConfig[], Error&gt;({
     queryKey: ['payments', 'processors'],
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-      const res = <span class="cstat-no" title="statement not covered" >await clientGet&lt;{ processors: PaymentProcessorConfig[] }&gt;(</span>
+    queryFn: async () =&gt; {
+      const res = await clientGet&lt;{ processors: PaymentProcessorConfig[] }&gt;(
         phase4Client,
         '/payments/processors'
       );
-<span class="cstat-no" title="statement not covered" >      return res.processors;</span>
+      return res.processors;
     },
     staleTime: 60 * 60 * 1000, // 1 hour
   });
@@ -1492,11 +1492,11 @@ export function <span class="fstat-no" title="function not covered" >usePaymentP
 /**
  * Hook to check if a specific processor is configured
  */
-export function <span class="fstat-no" title="function not covered" >useProcessorStatus(</span>processor: PaymentProcessor) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;PaymentProcessorConfig, Error&gt;({</span>
+export function useProcessorStatus(processor: PaymentProcessor) {
+  return useQuery&lt;PaymentProcessorConfig, Error&gt;({
     queryKey: ['payments', 'processors', processor],
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-<span class="cstat-no" title="statement not covered" >      return await clientGet&lt;PaymentProcessorConfig&gt;(</span>
+    queryFn: async () =&gt; {
+      return await clientGet&lt;PaymentProcessorConfig&gt;(
         phase4Client,
         `/payments/processors/${processor}`
       );
@@ -1512,12 +1512,12 @@ export function <span class="fstat-no" title="function not covered" >useProcesso
 /**
  * Hook to fetch user's saved payment methods
  */
-export function <span class="fstat-no" title="function not covered" >usePaymentMethods(</span>) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;PaymentMethod[], Error&gt;({</span>
+export function usePaymentMethods() {
+  return useQuery&lt;PaymentMethod[], Error&gt;({
     queryKey: ['payments', 'methods'],
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-      const res = <span class="cstat-no" title="statement not covered" >await clientGet&lt;{ methods: PaymentMethod[] }&gt;(phase4Client, '/payments/methods');</span>
-<span class="cstat-no" title="statement not covered" >      return res.methods;</span>
+    queryFn: async () =&gt; {
+      const res = await clientGet&lt;{ methods: PaymentMethod[] }&gt;(phase4Client, '/payments/methods');
+      return res.methods;
     },
   });
 }
@@ -1981,7 +1981,7 @@ export function <span class="fstat-no" title="function not covered" >usePaymentF
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>6/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>12/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -111,30 +111,30 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -149,31 +149,31 @@ import { cmsClient } from '../api/cmsClient';
 import { useCMSPreview } from '../context/CMSPreviewContext';
 import type { CMSArticle } from '../types/cms';
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >fetchArticle(</span>slug: string, preview: boolean) {
-  const cacheKey = <span class="cstat-no" title="statement not covered" >`cms:article:${slug}${preview ? ':preview' : ''}`;</span>
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const res = <span class="cstat-no" title="statement not covered" >await cmsClient.get&lt;CMSArticle&gt;(`/content/articles/${slug}`, {</span>
+async function fetchArticle(slug: string, preview: boolean) {
+  const cacheKey = `cms:article:${slug}${preview ? ':preview' : ''}`;
+  try {
+    const res = await cmsClient.get&lt;CMSArticle&gt;(`/content/articles/${slug}`, {
       headers: preview ? { 'X-Preview': 'true' } : undefined,
     });
-<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));</span>
-<span class="cstat-no" title="statement not covered" >    return res.data;</span>
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));
+    return res.data;
   } catch (err) {
-    const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >    if (cached) <span class="cstat-no" title="statement not covered" >return JSON.parse(cached) as CMSArticle;</span></span>
+    const cached = await AsyncStorage.getItem(cacheKey);
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) return JSON.parse(cached) as CMSArticle;
 <span class="cstat-no" title="statement not covered" >    throw err;</span>
   }
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useArticleBySlug(</span>slug: string) {
-  const { preview } = <span class="cstat-no" title="statement not covered" >useCMSPreview();</span>
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;CMSArticle, Error&gt;({</span>
+export function useArticleBySlug(slug: string) {
+  const { preview } = useCMSPreview();
+  return useQuery&lt;CMSArticle, Error&gt;({
     queryKey: ['cmsArticle', slug, preview],
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-      const _state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
-<span class="cstat-no" title="statement not covered" >      if (!_state.isConnected) {</span>
+    queryFn: async () =&gt; {
+      const _state = await NetInfo.fetch();
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!_state.isConnected) {
 <span class="cstat-no" title="statement not covered" >        return fetchArticle(slug, preview);</span>
       }
-<span class="cstat-no" title="statement not covered" >      return fetchArticle(slug, preview);</span>
+      return fetchArticle(slug, preview);
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
@@ -187,7 +187,7 @@ export function <span class="fstat-no" title="function not covered" >useArticleB
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

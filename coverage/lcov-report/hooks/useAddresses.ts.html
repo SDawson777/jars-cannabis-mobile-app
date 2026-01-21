@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>8/24</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">31.25% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>5/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>8/24</span>
             </div>
         
             
@@ -250,33 +250,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -392,11 +392,11 @@ export interface AddressValidationResult {
 /**
  * Hook to fetch user's saved addresses
  */
-export function <span class="fstat-no" title="function not covered" >useAddresses(</span>) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;Address[], Error&gt;({</span>
+export function useAddresses() {
+  return useQuery&lt;Address[], Error&gt;({
     queryKey: ['addresses'],
-    queryFn: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-<span class="cstat-no" title="statement not covered" >      return clientGet&lt;Address[]&gt;(phase4Client, '/addresses');</span>
+    queryFn: async () =&gt; {
+      return clientGet&lt;Address[]&gt;(phase4Client, '/addresses');
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -405,21 +405,21 @@ export function <span class="fstat-no" title="function not covered" >useAddresse
 /**
  * Hook to create a new address
  */
-export function <span class="fstat-no" title="function not covered" >useCreateAddress(</span>) {
-  const queryClient = <span class="cstat-no" title="statement not covered" >useQueryClient();</span>
+export function useCreateAddress() {
+  const queryClient = useQueryClient();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return useMutation&lt;Address, Error, CreateAddressPayload&gt;({</span>
-    mutationFn: <span class="fstat-no" title="function not covered" >as</span>ync (payload: CreateAddressPayload) =&gt; {
-      const result = <span class="cstat-no" title="statement not covered" >await clientPost&lt;CreateAddressPayload, Address&gt;(</span>
+  return useMutation&lt;Address, Error, CreateAddressPayload&gt;({
+    mutationFn: async (payload: CreateAddressPayload) =&gt; {
+      const result = await clientPost&lt;CreateAddressPayload, Address&gt;(
         phase4Client,
         '/addresses',
         payload
       );
-<span class="cstat-no" title="statement not covered" >      logEvent('address_created', { state: payload.state });</span>
-<span class="cstat-no" title="statement not covered" >      return result;</span>
+      logEvent('address_created', { state: payload.state });
+      return result;
     },
-    onSuccess: <span class="fstat-no" title="function not covered" >()</span> =&gt; {
-<span class="cstat-no" title="statement not covered" >      queryClient.invalidateQueries({ queryKey: ['addresses'] });</span>
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: ['addresses'] });
     },
   });
 }
@@ -499,7 +499,7 @@ export function <span class="fstat-no" title="function not covered" >useSetDefau
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

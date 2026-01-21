@@ -9,6 +9,8 @@ module.exports = {
   TextInput: props => React.createElement('TextInput', props),
   Image: props => React.createElement('Image', props),
   Pressable: ({ children, ...props }) => React.createElement('Pressable', props, children),
+  Switch: ({ value, onValueChange, ...props }) =>
+    React.createElement('Switch', { ...props, value, onValueChange, role: 'switch' }),
   StyleSheet: {
     create: styles => styles,
     // flatten should accept an object or array of objects

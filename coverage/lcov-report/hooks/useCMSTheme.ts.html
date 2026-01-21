@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">89.47% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>17/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>6/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">89.47% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>17/19</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -126,46 +126,46 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -182,38 +182,38 @@ import { useQuery } from '@tanstack/react-query';
 import { cmsClient } from '../api/cmsClient';
 import type { CMSTheme } from '../types/cmsExtra';
 &nbsp;
-const CACHE_KEY = <span class="cstat-no" title="statement not covered" >'cms:theme';</span>
+const CACHE_KEY = 'cms:theme';
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >fetchTheme(</span>brandSlug?: string): Promise&lt;CMSTheme&gt; {
-  const state = <span class="cstat-no" title="statement not covered" >await NetInfo.fetch();</span>
-  const path = <span class="cstat-no" title="statement not covered" >brandSlug ? `/content/theme?brand=${brandSlug}` : '/content/theme';</span>
+async function fetchTheme(brandSlug?: string): Promise&lt;CMSTheme&gt; {
+  const state = await NetInfo.fetch();
+  const path = brandSlug ? `/content/theme?brand=${brandSlug}` : '/content/theme';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!state.isConnected) {</span>
-    const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(CACHE_KEY);</span>
-<span class="cstat-no" title="statement not covered" >    if (cached) {</span>
-<span class="cstat-no" title="statement not covered" >      return JSON.parse(cached) as CMSTheme;</span>
+  if (!state.isConnected) {
+    const cached = await AsyncStorage.getItem(CACHE_KEY);
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) {
+      return JSON.parse(cached) as CMSTheme;
     }
 <span class="cstat-no" title="statement not covered" >    throw new Error('Offline and no cached theme');</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const res = <span class="cstat-no" title="statement not covered" >await cmsClient.get&lt;CMSTheme&gt;(path);</span>
-<span class="cstat-no" title="statement not covered" >    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(res.data));</span>
-<span class="cstat-no" title="statement not covered" >    return res.data;</span>
+  try {
+    const res = await cmsClient.get&lt;CMSTheme&gt;(path);
+    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
+    return res.data;
   } catch (err) {
     // Fallback to cache on error
-    const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(CACHE_KEY);</span>
-<span class="cstat-no" title="statement not covered" >    if (cached) {</span>
-<span class="cstat-no" title="statement not covered" >      return JSON.parse(cached) as CMSTheme;</span>
+    const cached = await AsyncStorage.getItem(CACHE_KEY);
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) {
+      return JSON.parse(cached) as CMSTheme;
     }
 <span class="cstat-no" title="statement not covered" >    throw err;</span>
   }
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useCMSTheme(</span>brandSlug?: string) {
-<span class="cstat-no" title="statement not covered" >  return useQuery&lt;CMSTheme, Error&gt;({</span>
+export function useCMSTheme(brandSlug?: string) {
+  return useQuery&lt;CMSTheme, Error&gt;({
     queryKey: ['cmsTheme', brandSlug],
-    queryFn: <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >fetchTheme(brandSlug),</span>
+    queryFn: () =&gt; fetchTheme(brandSlug),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
     retry: 2,
@@ -221,7 +221,7 @@ export function <span class="fstat-no" title="function not covered" >useCMSTheme
 }
 &nbsp;
 // Default theme fallback
-export const DEFAULT_CMS_THEME: CMSTheme = <span class="cstat-no" title="statement not covered" >{</span>
+export const DEFAULT_CMS_THEME: CMSTheme = {
   brandSlug: 'default',
   primaryColor: '#2E5D46',
   secondaryColor: '#8CD24C',
@@ -238,7 +238,7 @@ export const DEFAULT_CMS_THEME: CMSTheme = <span class="cstat-no" title="stateme
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

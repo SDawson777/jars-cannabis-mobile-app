@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">58.82% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/17</span>
+                <span class='fraction'>16/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/10</span>
+                <span class='fraction'>9/10</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">58.82% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/17</span>
+                <span class='fraction'>16/17</span>
             </div>
         
             
@@ -111,34 +111,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">47x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">47x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -157,26 +157,26 @@ export function useCMSContent&lt;T&gt;(key: string[], path: string) {
     queryKey: [...key, preview],
     queryFn: async () =&gt; {
       const _state = await NetInfo.fetch();
-      const cacheKey = `cms:${path}${preview ? <span class="branch-0 cbranch-no" title="branch not covered" >':preview' </span>: ''}`;
+      const cacheKey = `cms:${path}${preview ? ':preview' : ''}`;
 &nbsp;
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (!_state.isConnected) {
-        const cached = <span class="cstat-no" title="statement not covered" >await AsyncStorage.getItem(cacheKey);</span>
-<span class="cstat-no" title="statement not covered" >        if (cached) {</span>
-<span class="cstat-no" title="statement not covered" >          return JSON.parse(cached) as T;</span>
+      if (!_state.isConnected) {
+        const cached = await AsyncStorage.getItem(cacheKey);
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (cached) {
+          return JSON.parse(cached) as T;
         }
 <span class="cstat-no" title="statement not covered" >        throw new Error('Offline');</span>
       }
 &nbsp;
       try {
         const res = await cmsClient.get&lt;T&gt;(path, {
-          headers: preview ? <span class="branch-0 cbranch-no" title="branch not covered" >{ 'X-Preview': 'true' } </span>: undefined,
+          headers: preview ? { 'X-Preview': 'true' } : undefined,
         });
-<span class="cstat-no" title="statement not covered" >        await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));</span>
-<span class="cstat-no" title="statement not covered" >        return res.data;</span>
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(res.data));
+        return res.data;
       } catch (err) {
         const cached = await AsyncStorage.getItem(cacheKey);
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (cached) {
-<span class="cstat-no" title="statement not covered" >          return JSON.parse(cached) as T;</span>
+        if (cached) {
+          return JSON.parse(cached) as T;
         }
         throw err;
       }
@@ -190,7 +190,7 @@ export function useCMSContent&lt;T&gt;(key: string[], path: string) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

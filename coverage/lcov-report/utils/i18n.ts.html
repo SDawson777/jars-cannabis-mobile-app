@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>4/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -98,7 +98,7 @@
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -113,25 +113,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as Localization from 'expo-localization';
 &nbsp;
-const translations = <span class="cstat-no" title="statement not covered" >{</span>
+const translations = {
   en: {
     language: 'Language',
     english: 'English',
@@ -146,21 +146,21 @@ const translations = <span class="cstat-no" title="statement not covered" >{</sp
   },
 };
 &nbsp;
-let currentLocale = <span class="cstat-no" title="statement not covered" >Localization.getLocales()[0]?.languageCode || 'en';</span>
+let currentLocale = Localization.getLocales()[0]?.languageCode || <span class="branch-1 cbranch-no" title="branch not covered" >'en';</span>
 &nbsp;
-export const setLocale = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(l</span>ocale: string) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  currentLocale = locale;</span>
+export const setLocale = (locale: string) =&gt; {
+  currentLocale = locale;
 };
 &nbsp;
-export const t = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(k</span>ey: keyof (typeof translations)['en']) =&gt; {</span>
+export const t = (key: keyof (typeof translations)['en']) =&gt; {
   type Strings = {
     language: string;
     english: string;
     spanish: string;
     selectLanguage: string;
   };
-  const locale = <span class="cstat-no" title="statement not covered" >(translations as Record&lt;string, Strings&gt;)[currentLocale] ? currentLocale : 'en';</span>
-<span class="cstat-no" title="statement not covered" >  return (translations as Record&lt;string, Strings&gt;)[locale][key as keyof Strings] || key;</span>
+  const locale = (translations as Record&lt;string, Strings&gt;)[currentLocale] ? currentLocale : 'en';
+  return (translations as Record&lt;string, Strings&gt;)[locale][key as keyof Strings] || <span class="branch-1 cbranch-no" title="branch not covered" >key;</span>
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -169,7 +169,7 @@ export const t = <span class="cstat-no" title="statement not covered" ><span cla
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

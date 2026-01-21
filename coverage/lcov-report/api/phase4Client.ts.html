@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">30% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/30</span>
+                <span class='fraction'>9/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">21.42% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/14</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">5.55% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>1/18</span>
+                <span class='fraction'>3/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">16.66% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>3/18</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">30% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/30</span>
+                <span class='fraction'>9/30</span>
             </div>
         
             
@@ -233,28 +233,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">37x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">37x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -262,13 +260,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -406,10 +406,10 @@ function createPhase4Client(): AxiosInstance {
     // Use axios's InternalAxiosRequestConfig here so the interceptor signature
     // matches axios expectations. We still avoid wide `any` usage when touching
     // headers by casting to a record.
-<span class="fstat-no" title="function not covered" >    (c</span>onfig: InternalAxiosRequestConfig) =&gt; {
-      const token = <span class="cstat-no" title="statement not covered" >getAuthToken();</span>
-<span class="cstat-no" title="statement not covered" >      if (token instanceof Promise) {</span>
-<span class="cstat-no" title="statement not covered" >        throw new Error('getAuthToken must be synchronous for Axios interceptors');</span>
+    (config: InternalAxiosRequestConfig) =&gt; {
+      const token = getAuthToken();
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (token instanceof Promise) {
+        throw new Error('getAuthToken must be synchronous for Axios interceptors');
       }
 <span class="cstat-no" title="statement not covered" >      if (token) {</span>
 <span class="cstat-no" title="statement not covered" >        if (!config.headers || Array.isArray(config.headers)) {</span>
@@ -428,8 +428,8 @@ function createPhase4Client(): AxiosInstance {
 }
 &nbsp;
 export const phase4Client = createPhase4Client();
-export async function <span class="fstat-no" title="function not covered" >getForYou&lt;</span>T = { items: CMSProduct[] }&gt;(storeId?: string): Promise&lt;T&gt; {
-<span class="cstat-no" title="statement not covered" >  return clientGet&lt;T&gt;(</span>
+export async function getForYou&lt;T = { items: CMSProduct[] }&gt;(storeId?: string): Promise&lt;T&gt; {
+  return clientGet&lt;T&gt;(
     phase4Client,
     `/recommendations/for-you${storeId ? `?storeId=${storeId}` : ''}`
   );
@@ -553,7 +553,7 @@ export async function <span class="fstat-no" title="function not covered" >getAw
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-16T03:43:23.712Z
+                at 2026-01-21T00:32:28.479Z
             </div>
         <script src="../prettify.js"></script>
         <script>

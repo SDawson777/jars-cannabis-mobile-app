@@ -14,6 +14,12 @@ jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
   notificationAsync: jest.fn(),
 }));
+jest.mock('react-native-haptic-feedback', () => ({
+  __esModule: true,
+  default: {
+    trigger: jest.fn(),
+  },
+}));
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(),
   setItemAsync: jest.fn(),
