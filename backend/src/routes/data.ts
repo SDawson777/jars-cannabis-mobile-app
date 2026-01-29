@@ -29,10 +29,10 @@ dataRouter.post('/data-transparency/export', authRequired, async (req, res, next
         prisma.user.findUnique({ where: { id: uid } }),
         prisma.userPreference.findUnique({ where: { userId: uid } }),
         prisma.accessibilitySetting.findUnique({ where: { userId: uid } }),
-        prisma.order.findMany({ where: { userId: uid }, include: { items: true } }),
-        prisma.review.findMany({ where: { userId: uid } }),
-        prisma.journalEntry.findMany({ where: { userId: uid } }),
-        prisma.userEvent.findMany({ where: { userId: uid } }),
+        prisma.order.findMany({ where: { userId: uid }, include: { items: true }, take: 1000 }),
+        prisma.review.findMany({ where: { userId: uid }, take: 500 }),
+        prisma.journalEntry.findMany({ where: { userId: uid }, take: 1000 }),
+        prisma.userEvent.findMany({ where: { userId: uid }, take: 5000 }),
       ]);
 
     const payload = { profile, preferences, accessibility, orders, reviews, journal, events };

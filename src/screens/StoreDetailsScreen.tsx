@@ -9,6 +9,7 @@ import {
   View,
   Text,
   Pressable,
+  TouchableOpacity,
   StyleSheet,
   LayoutAnimation,
   UIManager,
@@ -38,13 +39,41 @@ interface Store {
 export default function StoreDetailsScreen() {
   const navigation = useNavigation<StoreDetailsNavProp>();
   const route = useRoute<StoreDetailsRouteProp>();
-  const store: Store = route.params.store;
+  const store: Store | undefined = route.params?.store;
 
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
+
+  // Handle missing store param
+  if (!store) {
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: brandBackground,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: brandPrimary, fontSize: 18, marginBottom: 16 }}>Store not found</Text>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            paddingHorizontal: 24,
+            paddingVertical: 12,
+            borderWidth: 1,
+            borderColor: brandPrimary,
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ color: brandPrimary }}>Go Back</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;

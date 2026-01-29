@@ -389,9 +389,11 @@ ordersRouter.put('/orders/:id/cancel', requireAuth, async (req, res) => {
 
 // Order tracking (simple mock)
 ordersRouter.get('/orders/:id/tracking', requireAuth, async (req, res) => {
+  const uid = (req as any).user.userId as string;
   const id = req.params.id;
   const o = await prisma.order.findUnique({ where: { id } });
   if (!o) return res.status(404).json({ error: 'not found' });
+  if (o.userId !== uid) return res.status(403).json({ error: 'Forbidden' });
   res.json({
     tracking: {
       status: (o.status || 'unknown').toLowerCase(),
@@ -403,9 +405,11 @@ ordersRouter.get('/orders/:id/tracking', requireAuth, async (req, res) => {
 
 // Rate an order
 ordersRouter.post('/orders/:id/rate', requireAuth, async (req, res) => {
+  const uid = (req as any).user.userId as string;
   const id = req.params.id;
   const o = await prisma.order.findUnique({ where: { id } });
   if (!o) return res.status(404).json({ error: 'Order not found' });
+  if (o.userId !== uid) return res.status(403).json({ error: 'Forbidden' });
   if (String(o.status) !== 'COMPLETED')
     return res.status(400).json({ error: 'Order must be completed to rate' });
   // simple echo back

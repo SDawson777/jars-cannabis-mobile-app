@@ -1,7 +1,7 @@
 // src/screens/ProfileScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight, ShieldCheck, ShieldAlert } from 'lucide-react-native';
 import React, { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
@@ -19,6 +19,7 @@ import { AuthContext, AuthContextType } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight } from '../utils/haptic';
+import { useVerificationStatus } from '../hooks/useVerificationStatus';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -41,6 +42,7 @@ export default function ProfileScreen() {
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
   const auth = useContext(AuthContext) as AuthContextType;
   const { data, clearAuth } = auth || { data: undefined, clearAuth: undefined };
+  const { data: verificationStatus } = useVerificationStatus();
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -64,17 +66,35 @@ export default function ProfileScreen() {
               <Text accessibilityLabel="profile picture">IMG</Text>
             </Pressable>
             <View style={styles.profileInfo}>
-              <Text
-                testID="profile-name"
-                accessibilityRole="text"
-                style={[styles.name, { color: brandPrimary }]}
-              >
-                {' '}
-                {data?.name ?? 'Guest'}{' '}
-              </Text>
+              <View style={styles.nameRow}>
+                <Text
+                  testID="profile-name"
+                  accessibilityRole="text"
+                  style={[styles.name, { color: brandPrimary }]}
+                >
+                  {data?.name ?? 'Guest'}
+                </Text>
+                {/* Verification Badge */}
+                {verificationStatus?.verified ? (
+                  <View
+                    style={[styles.verificationBadge, styles.verifiedBadge]}
+                    testID="verified-badge"
+                  >
+                    <ShieldCheck size={14} color="#22C55E" />
+                    <Text style={styles.verifiedText}>Verified</Text>
+                  </View>
+                ) : (
+                  <View
+                    style={[styles.verificationBadge, styles.unverifiedBadge]}
+                    testID="unverified-badge"
+                  >
+                    <ShieldAlert size={14} color="#F59E0B" />
+                    <Text style={styles.unverifiedText}>Not Verified</Text>
+                  </View>
+                )}
+              </View>
               <Text testID="profile-email" style={[styles.email, { color: brandSecondary }]}>
-                {' '}
-                {data?.email ?? ''}{' '}
+                {data?.email ?? ''}
               </Text>
             </View>
             <Pressable
@@ -123,6 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   profileInfo: { flex: 1, marginHorizontal: 12 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   name: { fontSize: 18, fontWeight: '600' },
   email: { fontSize: 14, marginTop: 4 },
   row: {
@@ -133,4 +154,28 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   label: { fontSize: 16 },
+  verificationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  verifiedBadge: {
+    backgroundColor: '#DCFCE7',
+  },
+  unverifiedBadge: {
+    backgroundColor: '#FEF3C7',
+  },
+  verifiedText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#22C55E',
+  },
+  unverifiedText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#F59E0B',
+  },
 });

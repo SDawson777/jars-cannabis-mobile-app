@@ -1,27 +1,33 @@
 // src/screens/ArticleDetailScreen.tsx
-import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
+// Enhanced article detail with reading progress, estimated time, and engagement features
+
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronLeft } from 'lucide-react-native';
-import React, { useContext, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
-  ScrollView,
-  Pressable,
+  TouchableOpacity,
   StyleSheet,
   LayoutAnimation,
   UIManager,
   Platform,
   ActivityIndicator,
+  Animated,
+  Share,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 
 import CMSImage from '../components/CMSImage';
+import { QuizCard } from '../components/quiz';
 import { ThemeContext } from '../context/ThemeContext';
 import { useArticleBySlug } from '../hooks/useArticleBySlug';
 import type { RootStackParamList } from '../navigation/types';
-import { hapticLight } from '../utils/haptic';
-import { trackContentView, trackScreenView } from '../utils/analytics';
+import { getQuizForArticle, Quiz, QuizUserStatus } from '../services/quizService';
+import { hapticLight, hapticMedium } from '../utils/haptic';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -31,40 +37,105 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 type ArticleNavProp = NativeStackNavigationProp<RootStackParamList, 'ArticleDetail'>;
 type ArticleRouteProp = RouteProp<RootStackParamList, 'ArticleDetail'>;
 
+// Helper to estimate read time
+const estimateReadTime = (text: string): number => {
+  const wordsPerMinute = 200;
+  const wordCount = text.split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+};
+
 export default function ArticleDetailScreen() {
   const navigation = useNavigation<ArticleNavProp>();
   const route = useRoute<ArticleRouteProp>();
   const { slug } = route.params;
   const { data, isLoading, isError } = useArticleBySlug(slug);
 
+  // Quiz state - fetched using new service
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [quizUserStatus, setQuizUserStatus] = useState<QuizUserStatus | null>(null);
+  const [quizLoading, setQuizLoading] = useState(true);
+
+  // Reading progress
+  const [readingProgress, setReadingProgress] = useState(0);
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
 
-  // Track screen view
-  useFocusEffect(
-    useCallback(() => {
-      trackScreenView('ArticleDetailScreen', { slug });
-    }, [slug])
-  );
+  const readTime = useMemo(() => {
+    if (!data?.body) return 0;
+    return estimateReadTime(String(data.body));
+  }, [data?.body]);
 
-  // Track content view when article loads
-  useEffect(() => {
-    if (data) {
-      trackContentView('article', slug, { title: data.title });
+  const fetchQuiz = useCallback(async () => {
+    try {
+      setQuizLoading(true);
+      const response = await getQuizForArticle(slug);
+      setQuiz(response.quiz);
+      setQuizUserStatus(response.userStatus);
+    } catch (_error) {
+      // Quiz not found or other error - that's OK
+      setQuiz(null);
+      setQuizUserStatus(null);
+    } finally {
+      setQuizLoading(false);
     }
-  }, [data, slug]);
+  }, [slug]);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
+    fetchQuiz();
+
+    // Fade in content
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, [fetchQuiz, fadeAnim]);
+
+  // Update progress animation
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: readingProgress,
+      duration: 150,
+      useNativeDriver: false,
+    }).start();
+  }, [readingProgress, progressAnim]);
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;
 
   const handleBack = () => {
     hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     navigation.goBack();
   };
+
+  const handleShare = async () => {
+    hapticMedium();
+    try {
+      await Share.share({
+        message: `Check out this article: ${data?.title}`,
+        title: data?.title,
+      });
+    } catch (_error) {
+      // Share cancelled or failed
+    }
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const maxScroll = contentSize.height - layoutMeasurement.height;
+    if (maxScroll > 0) {
+      const progress = Math.min(100, (contentOffset.y / maxScroll) * 100);
+      setReadingProgress(progress);
+    }
+  };
+
+  const progressWidth = progressAnim.interpolate({
+    inputRange: [0, 100],
+    outputRange: ['0%', '100%'],
+  });
 
   if (isLoading) {
     return (
@@ -74,7 +145,8 @@ export default function ArticleDetailScreen() {
           { backgroundColor: bgColor, justifyContent: 'center', alignItems: 'center' },
         ]}
       >
-        <ActivityIndicator />
+        <ActivityIndicator size="large" color={brandPrimary} />
+        <Text style={[styles.loadingText, { color: brandSecondary }]}>Loading article...</Text>
       </SafeAreaView>
     );
   }
@@ -87,48 +159,272 @@ export default function ArticleDetailScreen() {
           { backgroundColor: bgColor, justifyContent: 'center', alignItems: 'center' },
         ]}
       >
-        <Text>Unable to load article.</Text>
+        <Ionicons name="alert-circle-outline" size={64} color={brandSecondary} />
+        <Text style={[styles.errorText, { color: brandPrimary }]}>Couldn't load article</Text>
+        <TouchableOpacity
+          style={[styles.retryButton, { backgroundColor: brandPrimary }]}
+          onPress={handleBack}
+        >
+          <Text style={styles.retryButtonText}>Go Back</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      <View style={[styles.header, { borderBottomColor: brandSecondary }]}>
-        <Pressable onPress={handleBack} style={styles.iconBtn}>
-          <ChevronLeft color={brandPrimary} size={24} />
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: brandPrimary }]}>{data.title}</Text>
-        <View style={styles.iconBtn} />
+      {/* Reading progress bar */}
+      <Animated.View
+        style={[styles.progressBar, { width: progressWidth, backgroundColor: brandPrimary }]}
+      />
+
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: '#E5E7EB' }]}>
+        <TouchableOpacity
+          onPress={handleBack}
+          style={styles.backButton}
+          accessibilityLabel="Go back"
+        >
+          <Ionicons name="chevron-back" size={24} color={brandPrimary} />
+        </TouchableOpacity>
+
+        <View style={styles.headerCenter}>
+          <Text style={[styles.progressText, { color: brandSecondary }]}>
+            {Math.round(readingProgress)}% read
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={handleShare}
+          style={styles.shareButton}
+          accessibilityLabel="Share article"
+        >
+          <Ionicons name="share-outline" size={22} color={brandPrimary} />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <Animated.ScrollView
+        contentContainerStyle={styles.content}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        style={{ opacity: fadeAnim }}
+      >
+        {/* Hero image */}
         {data.mainImage && (
-          <CMSImage uri={data.mainImage.url} alt={data.mainImage.alt} style={styles.hero} />
+          <View style={styles.heroContainer}>
+            <CMSImage uri={data.mainImage.url} alt={data.mainImage.alt} style={styles.hero} />
+            <View style={styles.heroOverlay} />
+          </View>
         )}
-        <Text style={styles.date}>{new Date(data.publishedAt).toLocaleDateString()}</Text>
+
+        {/* Article meta */}
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
+            <Ionicons name="calendar-outline" size={14} color={brandSecondary} />
+            <Text style={[styles.metaText, { color: brandSecondary }]}>
+              {new Date(data.publishedAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </Text>
+          </View>
+          <View style={styles.metaDot} />
+          <View style={styles.metaItem}>
+            <Ionicons name="time-outline" size={14} color={brandSecondary} />
+            <Text style={[styles.metaText, { color: brandSecondary }]}>{readTime} min read</Text>
+          </View>
+          {quiz && !quizUserStatus?.passed && (
+            <>
+              <View style={styles.metaDot} />
+              <View style={[styles.quizBadge, { backgroundColor: '#FEF3C7' }]}>
+                <Ionicons name="trophy" size={12} color="#F59E0B" />
+                <Text style={styles.quizBadgeText}>+{quiz.pointsReward} pts</Text>
+              </View>
+            </>
+          )}
+        </View>
+
+        {/* Title */}
+        <Text style={[styles.title, { color: brandPrimary }]}>{data.title}</Text>
+
+        {/* Divider */}
+        <View style={[styles.divider, { backgroundColor: '#E5E7EB' }]} />
+
+        {/* Article body */}
         <Text style={[styles.articleText, { color: brandSecondary }]}>{String(data.body)}</Text>
-      </ScrollView>
+
+        {/* Quiz Card - shows when quiz is available */}
+        {!quizLoading && quiz && (
+          <View style={styles.quizSection}>
+            <View style={styles.quizSectionHeader}>
+              <Ionicons name="school" size={20} color={brandPrimary} />
+              <Text style={[styles.quizSectionTitle, { color: brandPrimary }]}>
+                Test Your Knowledge
+              </Text>
+            </View>
+            <QuizCard quiz={quiz} userStatus={quizUserStatus} articleSlug={slug} />
+          </View>
+        )}
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={[styles.footerText, { color: brandSecondary }]}>Thanks for reading! 📚</Text>
+        </View>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+  },
+  progressBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: 3,
+    zIndex: 100,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  iconBtn: { width: 24, alignItems: 'center' },
-  headerTitle: { fontSize: 20, fontWeight: '600' },
-  content: { padding: 16 },
-  hero: { width: '100%', height: 200, borderRadius: 12, marginBottom: 12 },
-  date: { fontSize: 12, color: '#777', marginBottom: 8 },
+  backButton: {
+    padding: 6,
+    borderRadius: 20,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  progressText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  shareButton: {
+    padding: 6,
+    borderRadius: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  retryButton: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  content: {
+    paddingBottom: 40,
+  },
+  heroContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  hero: {
+    width: '100%',
+    height: 220,
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    // Subtle gradient effect
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 12,
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#9CA3AF',
+  },
+  quizBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+  },
+  quizBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#B45309',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    lineHeight: 36,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
   articleText: {
-    fontSize: 15,
-    lineHeight: 24,
+    fontSize: 17,
+    lineHeight: 28,
+    paddingHorizontal: 20,
+    letterSpacing: 0.3,
+  },
+  quizSection: {
+    marginTop: 32,
+    paddingHorizontal: 20,
+  },
+  quizSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  quizSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  footer: {
+    marginTop: 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
 });

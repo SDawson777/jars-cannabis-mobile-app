@@ -25,7 +25,7 @@ storesRouter.get('/stores', async (req, res) => {
       { state: { contains: q, mode: 'insensitive' } },
     ];
   }
-  const all = await prisma.store.findMany({ where, orderBy: { name: 'asc' } });
+  const all = await prisma.store.findMany({ where, orderBy: { name: 'asc' }, take: 100 });
   let filtered = all;
   if (lat && lng && radius) {
     const L = parseFloat(lat),

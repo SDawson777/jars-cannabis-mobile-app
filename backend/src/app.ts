@@ -42,30 +42,7 @@ import { addressesRouter } from './routes/addresses';
 import { storesRouter } from './routes/stores';
 import { phase4Router } from './routes/phase4';
 import { analyticsRouter } from './routes/analytics';
-import complianceRouter from './routes/compliance';
-import { checkoutRouter } from './routes/checkout';
-import { inventoryRouter } from './routes/inventory';
-import { searchRouter } from './routes/search';
-import { deliveryRouter } from './routes/delivery';
-import { walletRouter } from './routes/wallet';
-import { notificationRouter } from './routes/notifications';
-import { analyticsAdvancedRouter } from './routes/analyticsAdvanced';
-import { webhooksAdvancedRouter } from './routes/webhooksAdvanced';
-import { aiRecommendationsRouter } from './routes/aiRecommendations';
-import verificationRouter from './routes/verification';
-import educationRouter from './routes/education';
-import appointmentsRouter from './routes/appointments';
-import eventsRouter from './routes/events';
-import voiceRouter from './routes/voice';
-import localizationRouter from './routes/localization';
-import dynamicHomeRouter from './routes/dynamicHome';
-import favoritesRouter from './routes/favorites';
-import journalAdvancedRouter from './routes/journalAdvanced';
-import mapboxRouter from './routes/mapbox';
-import paymentsRouter from './routes/payments';
-import hardwareRouter from './routes/hardware';
-import smarthomeRouter from './routes/smarthome';
-import { configRouter } from './routes/config';
+import { quizzesRouter } from './routes/quizzes';
 import { logger } from './utils/logger';
 // rateLimit imported where applied per-route; not needed globally
 import { prisma } from './prismaClient';
@@ -262,30 +239,7 @@ const routers = [
   personalizationRouter,
   awardsApiRouter,
   stripeRouter,
-  complianceRouter,
-  checkoutRouter,
-  inventoryRouter,
-  searchRouter,
-  deliveryRouter,
-  walletRouter,
-  notificationRouter,
-  analyticsAdvancedRouter,
-  webhooksAdvancedRouter,
-  aiRecommendationsRouter,
-  verificationRouter,
-  educationRouter,
-  appointmentsRouter,
-  eventsRouter,
-  voiceRouter,
-  localizationRouter,
-  dynamicHomeRouter,
-  favoritesRouter,
-  journalAdvancedRouter,
-  mapboxRouter,
-  paymentsRouter,
-  hardwareRouter,
-  smarthomeRouter,
-  configRouter,
+  quizzesRouter,
 ];
 
 for (const r of routers) {

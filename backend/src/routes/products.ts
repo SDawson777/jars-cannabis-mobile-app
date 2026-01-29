@@ -58,14 +58,20 @@ productsRouter.get('/products', rateLimit('products_list'), async (req, res) => 
   if (strain) where.strainType = strain as any;
   if (brand) where.brand = { contains: brand, mode: 'insensitive' };
   if (thcMin || thcMax) where.thcPercent = {};
-  if (thcMin) where.thcPercent.gte = parseFloat(thcMin);
-  if (thcMax) where.thcPercent.lte = parseFloat(thcMax);
+  const thcMinNum = thcMin ? parseFloat(thcMin) : NaN;
+  const thcMaxNum = thcMax ? parseFloat(thcMax) : NaN;
+  if (!isNaN(thcMinNum)) where.thcPercent.gte = thcMinNum;
+  if (!isNaN(thcMaxNum)) where.thcPercent.lte = thcMaxNum;
   if (cbdMin || cbdMax) where.cbdPercent = {};
-  if (cbdMin) where.cbdPercent.gte = parseFloat(cbdMin);
-  if (cbdMax) where.cbdPercent.lte = parseFloat(cbdMax);
+  const cbdMinNum = cbdMin ? parseFloat(cbdMin) : NaN;
+  const cbdMaxNum = cbdMax ? parseFloat(cbdMax) : NaN;
+  if (!isNaN(cbdMinNum)) where.cbdPercent.gte = cbdMinNum;
+  if (!isNaN(cbdMaxNum)) where.cbdPercent.lte = cbdMaxNum;
   if (minPrice || maxPrice) where.defaultPrice = {};
-  if (minPrice) where.defaultPrice.gte = parseFloat(minPrice);
-  if (maxPrice) where.defaultPrice.lte = parseFloat(maxPrice);
+  const minPriceNum = minPrice ? parseFloat(minPrice) : NaN;
+  const maxPriceNum = maxPrice ? parseFloat(maxPrice) : NaN;
+  if (!isNaN(minPriceNum)) where.defaultPrice.gte = minPriceNum;
+  if (!isNaN(maxPriceNum)) where.defaultPrice.lte = maxPriceNum;
 
   const orderBy = (() => {
     if (!sort) return { name: 'asc' } as any;
@@ -81,8 +87,10 @@ productsRouter.get('/products', rateLimit('products_list'), async (req, res) => 
     return { [field]: desc ? 'desc' : 'asc' } as any;
   })();
 
-  const take = Math.max(1, Math.min(100, parseInt(limit)));
-  const skip = (Math.max(1, parseInt(page)) - 1) * take;
+  const limitParsed = parseInt(limit);
+  const pageParsed = parseInt(page);
+  const take = Math.max(1, Math.min(100, !isNaN(limitParsed) ? limitParsed : 24));
+  const skip = (Math.max(1, !isNaN(pageParsed) ? pageParsed : 1) - 1) * take;
 
   let items = await prisma.product.findMany({
     where,
@@ -119,8 +127,10 @@ productsRouter.get('/products', rateLimit('products_list'), async (req, res) => 
 
 // Reviews
 productsRouter.get('/products/:id/reviews', rateLimit('product_reviews_list'), async (req, res) => {
-  const page = parseInt((req.query.page as string) || '1');
-  const limit = Math.min(100, parseInt((req.query.limit as string) || '24'));
+  const pageRaw = parseInt((req.query.page as string) || '1');
+  const limitRaw = parseInt((req.query.limit as string) || '24');
+  const page = !isNaN(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+  const limit = !isNaN(limitRaw) && limitRaw > 0 ? Math.min(100, limitRaw) : 24;
   const sort = (req.query.sort as string) || '-createdAt';
   const orderBy = { [sort.replace('-', '')]: sort.startsWith('-') ? 'desc' : 'asc' } as any;
   const reviews = await prisma.review.findMany({

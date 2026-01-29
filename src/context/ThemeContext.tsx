@@ -431,9 +431,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
     // Extract RGB values and darken them
     const hex = color.replace('#', '');
-    const r = Math.max(0, parseInt(hex.substr(0, 2), 16) - 40);
-    const g = Math.max(0, parseInt(hex.substr(2, 2), 16) - 40);
-    const b = Math.max(0, parseInt(hex.substr(4, 2), 16) - 40);
+    const r = Math.max(0, parseInt(hex.substring(0, 2), 16) - 40);
+    const g = Math.max(0, parseInt(hex.substring(2, 4), 16) - 40);
+    const b = Math.max(0, parseInt(hex.substring(4, 6), 16) - 40);
 
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };

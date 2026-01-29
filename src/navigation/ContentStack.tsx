@@ -13,6 +13,7 @@ import EthicalAIDashboardScreen from '../screens/EthicalAIDashboardScreen';
 import HelpFAQScreen from '../screens/HelpFAQScreen';
 import LanguageSelectionScreen from '../screens/LanguageSelectionScreen';
 import PrivacyIntelligenceScreen from '../screens/PrivacyIntelligenceScreen';
+import QuizScreen from '../screens/QuizScreen';
 import TerpeneWheelScreen from '../screens/TerpeneWheelScreen';
 import LegalScreen from '../screens/profile/LegalScreen';
 
@@ -20,6 +21,7 @@ export type ContentStackParamList = {
   EducationalGreenhouse: undefined;
   ArticleList: undefined;
   ArticleDetail: { slug: string };
+  QuizScreen: { articleSlug: string };
   TerpeneWheel: undefined;
   CommunityGarden: undefined;
   DataTransparency: undefined;
@@ -41,6 +43,7 @@ export default function ContentStack() {
       <Stack.Screen name="EducationalGreenhouse" component={EducationalGreenhouseScreen} />
       <Stack.Screen name="ArticleList" component={ArticleListScreen} />
       <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+      <Stack.Screen name="QuizScreen" component={QuizScreen} />
       <Stack.Screen name="TerpeneWheel" component={TerpeneWheelScreen} />
       <Stack.Screen name="CommunityGarden" component={CommunityGardenScreen} />
       <Stack.Screen name="DataTransparency" component={DataTransparencyScreen} />

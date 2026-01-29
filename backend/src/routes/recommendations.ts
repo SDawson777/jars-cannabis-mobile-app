@@ -34,7 +34,7 @@ recommendationsRouter.get(
         // fetch stocked entries for the store and run reads together in a transaction for parity
         const [products, stocked] = await prisma.$transaction([
           productsQuery(),
-          prisma.storeProduct.findMany({ where: { storeId: String(storeId) } }),
+          prisma.storeProduct.findMany({ where: { storeId: String(storeId) }, take: 1000 }),
         ]);
         const inStock = new Set(stocked.map(s => s.productId));
         items = products.sort((a, b) => Number(inStock.has(b.id)) - Number(inStock.has(a.id)));
@@ -196,15 +196,20 @@ recommendationsRouter.get(
 
       // Build partial observation
       const partial: any = {};
-      if (tempC != null) partial.tempC = parseFloat(String(tempC));
-      if (cloudCoverPct != null) partial.cloudCoverPct = parseFloat(String(cloudCoverPct));
-      if (precipitationMm != null) partial.precipitationMm = parseFloat(String(precipitationMm));
+      const tempCNum = tempC != null ? parseFloat(String(tempC)) : NaN;
+      const cloudCoverPctNum = cloudCoverPct != null ? parseFloat(String(cloudCoverPct)) : NaN;
+      const precipitationMmNum = precipitationMm != null ? parseFloat(String(precipitationMm)) : NaN;
+      if (!isNaN(tempCNum)) partial.tempC = tempCNum;
+      if (!isNaN(cloudCoverPctNum)) partial.cloudCoverPct = cloudCoverPctNum;
+      if (!isNaN(precipitationMmNum)) partial.precipitationMm = precipitationMmNum;
       if (thunder === 'true') partial.thunder = true;
       if (snow === 'true') partial.snow = true;
 
+      const latNum = lat != null ? parseFloat(String(lat)) : NaN;
+      const lonNum = lon != null ? parseFloat(String(lon)) : NaN;
       const condition = await getCurrentWeatherCondition(
-        lat != null ? parseFloat(String(lat)) : undefined,
-        lon != null ? parseFloat(String(lon)) : undefined,
+        !isNaN(latNum) ? latNum : undefined,
+        !isNaN(lonNum) ? lonNum : undefined,
         partial
       );
 

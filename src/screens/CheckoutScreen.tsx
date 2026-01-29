@@ -1,9 +1,9 @@
 // src/screens/CheckoutScreen.tsx
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useStripe } from '@stripe/stripe-react-native';
 import { ChevronLeft, HelpCircle } from 'lucide-react-native';
-import React, { useState, useContext, useEffect, useCallback } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   SafeAreaView,
@@ -20,6 +20,7 @@ import {
 
 import { fetchPaymentSheetParams } from '../api/stripe';
 import { ThemeContext } from '../context/ThemeContext';
+import { logger } from '../lib/logger';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy } from '../utils/haptic';
 import { useCreateOrder } from '../hooks/useOrders';
@@ -28,8 +29,7 @@ import { useCartStore } from '../../stores/useCartStore';
 import { parseAddress, isValidParsedAddress } from '../utils/address';
 import { toast } from '../utils/toast';
 import { useTranslation } from '../i18n/useTranslation';
-import { trackScreenView, trackCommerceEvent, logEvent } from '../utils/analytics';
-import { useServiceAvailability } from '../hooks/useServiceAvailability';
+import verificationService from '../services/verificationService';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -49,9 +49,6 @@ export default function CheckoutScreen() {
   const navigation = useNavigation<CheckoutNavProp>();
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
 
-  // Check if payment services are available
-  const { paymentsEnabled, stripeMessage } = useServiceAvailability();
-
   const [step, setStep] = useState(0);
   const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [address, setAddress] = useState('');
@@ -60,61 +57,43 @@ export default function CheckoutScreen() {
   const [email, setEmail] = useState('');
   const [payment, setPayment] = useState<'online' | 'atPickup'>('atPickup');
   const [termsAccepted, setTermsAccepted] = useState(false);
-
-  // Get cart items for analytics
-  const cartItems = useCartStore(
-    (state: { items: { id: string; quantity: number; price?: number; [key: string]: any }[] }) =>
-      state.items
-  );
-  const cartTotal = cartItems.reduce(
-    (sum: number, item: any) => sum + (item.price || 0) * item.quantity,
-    0
-  );
-  const cartItemCount = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
-
-  // Track screen view on mount (begin_checkout)
-  useFocusEffect(
-    useCallback(() => {
-      trackScreenView('CheckoutScreen', { step: 0, item_count: cartItemCount });
-      trackCommerceEvent(
-        'begin_checkout',
-        cartItems.map((item: any) => ({
-          product_id: item.id,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        { total: cartTotal }
-      );
-    }, [cartItemCount, cartTotal])
-  );
-
+  const [_verificationChecked, setVerificationChecked] = useState(false);
   const { initPaymentSheet, presentPaymentSheet, isApplePaySupported, isGooglePaySupported } =
     useStripe();
   const { t } = useTranslation();
   const { preferredStoreId } = usePreferredStoreId.getState();
+
+  // Check if user needs ID verification before proceeding with checkout
+  useEffect(() => {
+    const checkVerification = async () => {
+      if (!preferredStoreId) return;
+      try {
+        const check = await verificationService.checkVerificationRequired(preferredStoreId);
+        if (check.requiresVerification) {
+          // Navigate to ID verification screen
+          navigation.navigate('IDVerification' as any, { returnTo: 'Checkout' });
+        } else {
+          setVerificationChecked(true);
+        }
+      } catch (error) {
+        // If verification check fails, assume user is verified to avoid blocking checkout
+        console.warn('Verification check failed:', error);
+        setVerificationChecked(true);
+      }
+    };
+    checkVerification();
+  }, [preferredStoreId, navigation]);
+
+  // Access cart store (currently only to ensure hydration; items implicitly used on backend)
+  useCartStore(
+    (state: { items: { id: string; quantity: number; [key: string]: any }[] }) => state.items
+  );
 
   // Access cart store for clearing after success (direct getState usage later to avoid re-renders)
   const [apiError, setApiError] = useState<string | null>(null);
   const createOrder = useCreateOrder({
     onSuccess: order => {
       hapticMedium();
-
-      // Track purchase event
-      trackCommerceEvent(
-        'purchase',
-        cartItems.map((item: any) => ({
-          product_id: item.id,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        {
-          order_id: order.id,
-          total: cartTotal,
-          payment_method: payment === 'online' ? 'card' : 'pay_at_pickup',
-          delivery_method: method,
-        }
-      );
-
       // Clear cart store (local) since backend empties cart
       try {
         const { setItems } = useCartStore.getState() as any;
@@ -126,10 +105,7 @@ export default function CheckoutScreen() {
     },
     onError: err => {
       hapticHeavy();
-      console.log('Order error:', err?.response?.data);
-
-      // Track checkout error
-      logEvent('checkout_error', { error: err?.response?.data?.error || 'unknown' });
+      logger.warn('Order creation error:', { error: err?.response?.data });
 
       // Handle compliance violations with specific messaging
       if (err?.response?.data?.error === 'compliance_violation') {
@@ -425,61 +401,28 @@ export default function CheckoutScreen() {
         {step === 2 && (
           <View style={styles.step}>
             <Text style={[styles.prompt, { color: brandPrimary }]}>{t('checkout.howPay')}</Text>
-
-            {/* Show warning if online payments are unavailable */}
-            {!paymentsEnabled && (
-              <View
-                style={[
-                  styles.warningBanner,
-                  { backgroundColor: '#FEF3C7', borderColor: '#F59E0B' },
-                ]}
-              >
-                <Text style={[styles.warningText, { color: '#92400E' }]}>
-                  {stripeMessage ||
-                    'Online payment is currently unavailable. Please select "Pay at Pickup".'}
-                </Text>
-              </View>
-            )}
-
             <View style={styles.optionColumn}>
-              {(['online', 'atPickup'] as const).map(opt => {
-                // Disable online payment option if Stripe is not configured
-                const isDisabled = opt === 'online' && !paymentsEnabled;
-
-                return (
-                  <Pressable
-                    key={opt}
-                    testID={opt === 'online' ? 'payment-method-selector' : `payment-method-${opt}`}
-                    style={[
-                      styles.optionCard,
-                      payment === opt && {
-                        borderColor: brandPrimary,
-                        borderWidth: 2,
-                      },
-                      isDisabled && {
-                        opacity: 0.5,
-                        backgroundColor: '#F3F4F6',
-                      },
-                    ]}
-                    onPress={() => {
-                      if (isDisabled) {
-                        toast('Online payment is currently unavailable');
-                        return;
-                      }
-                      hapticLight();
-                      setPayment(opt);
-                    }}
-                    disabled={isDisabled}
-                  >
-                    <Text
-                      style={[styles.optionText, { color: isDisabled ? '#9CA3AF' : brandPrimary }]}
-                    >
-                      {opt === 'online' ? t('checkout.payOnline') : t('checkout.payAtPickup')}
-                      {isDisabled ? ' (Unavailable)' : ''}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+              {(['online', 'atPickup'] as const).map(opt => (
+                <Pressable
+                  key={opt}
+                  testID={opt === 'online' ? 'payment-method-selector' : `payment-method-${opt}`}
+                  style={[
+                    styles.optionCard,
+                    payment === opt && {
+                      borderColor: brandPrimary,
+                      borderWidth: 2,
+                    },
+                  ]}
+                  onPress={() => {
+                    hapticLight();
+                    setPayment(opt);
+                  }}
+                >
+                  <Text style={[styles.optionText, { color: brandPrimary }]}>
+                    {opt === 'online' ? t('checkout.payOnline') : t('checkout.payAtPickup')}
+                  </Text>
+                </Pressable>
+              ))}
             </View>
           </View>
         )}
@@ -663,14 +606,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   errorText: { color: '#991B1B', fontSize: 14 },
-  warningBanner: {
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 16,
-  },
-  warningText: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
 });

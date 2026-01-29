@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -40,7 +40,10 @@ export default function OrderHistoryScreen() {
     getNextPageParam: (lastPage: OrdersResponse) => lastPage.nextPage,
   });
 
-  const orders = data?.pages.flatMap((p: OrdersResponse) => p.orders) ?? [];
+  const orders = useMemo(
+    () => data?.pages.flatMap((p: OrdersResponse) => p.orders) ?? [],
+    [data?.pages]
+  );
 
   useEffect(() => {
     if (error) {
@@ -50,6 +53,38 @@ export default function OrderHistoryScreen() {
 
   const bgColor =
     colorTemp === 'warm' ? '#FAF8F4' : colorTemp === 'cool' ? '#F7F9FA' : brandBackground;
+
+  // Memoized callbacks for list interactions
+  const handleOrderPress = useCallback((order: Order) => {
+    hapticLight();
+    setSelected(order);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    hapticMedium();
+    refetch();
+  }, [refetch]);
+
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage) fetchNextPage();
+  }, [hasNextPage, fetchNextPage]);
+
+  const handleCloseModal = useCallback(() => {
+    setSelected(null);
+  }, []);
+
+  // Memoized renderItem to prevent unnecessary re-renders
+  const renderOrderItem = useCallback(
+    ({ item }: { item: Order }) => (
+      <OrderCard
+        order={item}
+        onPress={() => handleOrderPress(item)}
+        primaryColor={brandPrimary}
+        secondaryColor={brandSecondary}
+      />
+    ),
+    [brandPrimary, brandSecondary, handleOrderPress]
+  );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
@@ -71,35 +106,15 @@ export default function OrderHistoryScreen() {
         <FlatList
           data={orders}
           keyExtractor={o => o.id}
-          renderItem={({ item }) => (
-            <OrderCard
-              order={item}
-              onPress={() => {
-                hapticLight();
-                setSelected(item);
-              }}
-              primaryColor={brandPrimary}
-              secondaryColor={brandSecondary}
-            />
-          )}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={() => {
-                hapticMedium();
-                refetch();
-              }}
-            />
-          }
-          onEndReached={() => {
-            if (hasNextPage) fetchNextPage();
-          }}
+          renderItem={renderOrderItem}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />}
+          onEndReached={handleEndReached}
           ListFooterComponent={
             isFetchingNextPage ? <ActivityIndicator style={{ margin: 16 }} /> : null
           }
         />
       )}
-      <OrderDetailModal order={selected} onClose={() => setSelected(null)} />
+      <OrderDetailModal order={selected} onClose={handleCloseModal} />
     </SafeAreaView>
   );
 }

@@ -81,11 +81,15 @@ export default function useDeepLinkHandler(stores: StoreData[]) {
     const subscription = Linking.addEventListener('url', listener);
 
     // Handle initial URL if app was opened from a deep link
-    Linking.getInitialURL().then(url => {
-      if (url) {
-        handle(url);
-      }
-    });
+    Linking.getInitialURL()
+      .then(url => {
+        if (url) {
+          handle(url);
+        }
+      })
+      .catch(error => {
+        logger.warn('Error getting initial deep link URL:', { error });
+      });
 
     return () => subscription.remove();
   }, [stores, navigation, setPreferredStore]);

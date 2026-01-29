@@ -1,6 +1,25 @@
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
+
+// Mock lucide-react-native icons globally
+jest.mock('lucide-react-native', () => {
+  const React = require('react');
+  const createMockIcon = (name: string) => {
+    const MockIcon = (props: any) => React.createElement('Text', props, name);
+    MockIcon.displayName = name;
+    return MockIcon;
+  };
+  return new Proxy({}, {
+    get: (_target, prop) => {
+      if (typeof prop === 'string') {
+        return createMockIcon(prop);
+      }
+      return undefined;
+    },
+  });
+});
+
 // Ensure UIManager.getViewManagerConfig exists in the test environment
 try {
   jest.mock('react-native/Libraries/ReactNative/UIManager', () => ({
@@ -50,6 +69,99 @@ try {
 } catch {
   /* no-op: NativeAnimatedHelper not available in this environment */
 }
+
+// Mock Animated module for proper interpolation in tests
+jest.mock('react-native', () => {
+  const RN = jest.requireActual('react-native');
+  
+  // Helper to create a mock animated value with working interpolate
+  const createMockAnimatedValue = (val: number) => ({
+    _value: val,
+    setValue: jest.fn(),
+    setOffset: jest.fn(),
+    flattenOffset: jest.fn(),
+    extractOffset: jest.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    removeAllListeners: jest.fn(),
+    stopAnimation: jest.fn((cb?: (val: number) => void) => cb && cb(val)),
+    resetAnimation: jest.fn((cb?: (val: number) => void) => cb && cb(val)),
+    interpolate: jest.fn((config: any) => ({
+      ...config,
+      _interpolation: true,
+    })),
+  });
+
+  // Mock Easing functions
+  const mockEasingFn = (t: number) => t;
+  const mockEasing = {
+    linear: mockEasingFn,
+    ease: mockEasingFn,
+    quad: mockEasingFn,
+    cubic: mockEasingFn,
+    poly: () => mockEasingFn,
+    sin: mockEasingFn,
+    circle: mockEasingFn,
+    exp: mockEasingFn,
+    elastic: () => mockEasingFn,
+    back: () => mockEasingFn,
+    bounce: mockEasingFn,
+    bezier: () => mockEasingFn,
+    in: (easing: any) => easing || mockEasingFn,
+    out: (easing: any) => easing || mockEasingFn,
+    inOut: (easing: any) => easing || mockEasingFn,
+  };
+
+  return {
+    ...RN,
+    Easing: mockEasing,
+    Animated: {
+      ...RN.Animated,
+      Value: jest.fn((val: number) => createMockAnimatedValue(val)),
+      timing: jest.fn(() => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      spring: jest.fn(() => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      loop: jest.fn((animation: any) => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      sequence: jest.fn((animations: any[]) => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      parallel: jest.fn((animations: any[]) => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      stagger: jest.fn((delay: number, animations: any[]) => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      delay: jest.fn((time: number) => ({
+        start: jest.fn((cb?: () => void) => cb && cb()),
+        stop: jest.fn(),
+        reset: jest.fn(),
+      })),
+      View: RN.View,
+      Text: RN.Text,
+      Image: RN.Image,
+      ScrollView: RN.ScrollView,
+      FlatList: RN.FlatList,
+      createAnimatedComponent: jest.fn((component: any) => component),
+    },
+  };
+});
 
 // Ensure __DEV__ is defined for tests that reference it
 (globalThis as any).__DEV__ = true;

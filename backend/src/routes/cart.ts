@@ -157,6 +157,17 @@ cartRouter.put('/cart/items/:itemId', requireAuth, async (req, res) => {
   const { quantity } = req.body || {};
   if (quantity && quantity < 1) return res.status(400).json({ error: 'quantity >= 1' });
   try {
+    const uid = (req as any).user.userId as string;
+    // First, verify the item belongs to the user's cart
+    const existingItem = await prisma.cartItem.findUnique({
+      where: { id: req.params.itemId },
+      include: { cart: true },
+    });
+    
+    if (!existingItem || existingItem.cart.userId !== uid) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    
     const item = await prisma.cartItem.update({
       where: { id: req.params.itemId },
       data: { quantity },
@@ -177,6 +188,17 @@ cartRouter.put('/cart/items/:itemId', requireAuth, async (req, res) => {
 
 cartRouter.delete('/cart/items/:itemId', requireAuth, async (req, res) => {
   try {
+    const uid = (req as any).user.userId as string;
+    // First, verify the item belongs to the user's cart
+    const item = await prisma.cartItem.findUnique({
+      where: { id: req.params.itemId },
+      include: { cart: true },
+    });
+    
+    if (!item || item.cart.userId !== uid) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    
     const deleted = await prisma.cartItem.delete({ where: { id: req.params.itemId } });
     const cart = await prisma.cart.findUnique({
       where: { id: deleted.cartId },

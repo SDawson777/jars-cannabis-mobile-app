@@ -156,6 +156,12 @@ phase4Router.get('/profile/preferences', (_req, res) => {
   return res.json(prefs);
 });
 phase4Router.put('/profile/preferences', (req, res) => {
-  prefs = { ...prefs, ...req.body };
+  // Whitelist allowed properties to prevent prototype pollution
+  const { highContrast, dyslexiaFont, reducedMotion } = req.body || {};
+  const updates: any = {};
+  if (typeof highContrast === 'boolean') updates.highContrast = highContrast;
+  if (typeof dyslexiaFont === 'boolean') updates.dyslexiaFont = dyslexiaFont;
+  if (typeof reducedMotion === 'boolean') updates.reducedMotion = reducedMotion;
+  prefs = { ...prefs, ...updates };
   return res.json(prefs);
 });

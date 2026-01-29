@@ -33,6 +33,7 @@ module.exports = {
     '^react-native-haptic-feedback$': '<rootDir>/tests/__mocks__/react-native-haptic-feedback.js',
     '^expo-localization$': '<rootDir>/tests/__mocks__/expo-localization.js',
     '^expo-location$': '<rootDir>/tests/__mocks__/expo-location.js',
+    '^expo-image$': '<rootDir>/tests/__mocks__/expo-image.js',
     '\\.(svg)$': '<rootDir>/tests/__mocks__/svgMock.js',
     '\\.(png|jpg|jpeg|gif|webp)$': '<rootDir>/tests/__mocks__/svgMock.js',
     '\\.(mp3|wav|mp4)$': '<rootDir>/tests/__mocks__/fileMock.js',
@@ -50,7 +51,8 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/e2e/', '<rootDir>/backend/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/__mocks__/**'],
-  // Coverage thresholds - set to current baseline with improved test coverage
-  // Target: 50% - incrementally increase as tests are added
-  coverageThreshold: { global: { branches: 28, functions: 18, lines: 26, statements: 26 } },
+  // Coverage thresholds - raised after adding tests for auth, secureStorage, i18n, analytics, apiClient
+  // Current coverage: Statements 36.4%, Branches 32.8%, Functions 31.4%, Lines 36.5%
+  // Next milestone: { branches: 40, functions: 35, lines: 40, statements: 40 }
+  coverageThreshold: { global: { branches: 31, functions: 30, lines: 35, statements: 35 } },
 };

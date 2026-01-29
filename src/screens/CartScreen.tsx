@@ -22,6 +22,7 @@ import {
 import { ThemeContext } from '../context/ThemeContext';
 import { useCart } from '../hooks/useCart';
 import { useCartValidation } from '../hooks/useCartValidation';
+import { logger } from '../lib/logger';
 import type { RootStackParamList } from '../navigation/types';
 import { hapticLight, hapticMedium, hapticHeavy, hapticError } from '../utils/haptic';
 import { useTranslation } from '../i18n/useTranslation';
@@ -38,6 +39,8 @@ const IMAGE_SIZE = 80;
 export default function CartScreen() {
   const navigation = useNavigation<CartNavProp>();
   const { colorTemp, brandPrimary, brandSecondary, brandBackground } = useContext(ThemeContext);
+
+  const { t } = useTranslation();
 
   // Use cart from useCart hook instead of Zustand directly
   const { cart, updateCart, applyPromo, isLoading } = useCart();
@@ -119,7 +122,7 @@ export default function CartScreen() {
         });
       } catch (error) {
         // Error handling - could show toast or retry
-        console.error('Failed to update cart:', error);
+        logger.error('Failed to update cart:', { error });
       }
     }
   };
@@ -139,14 +142,12 @@ export default function CartScreen() {
             await updateCart({ items: updatedItems });
             trackCommerceEvent('remove_from_cart', id, { quantity: item?.quantity ?? 1 });
           } catch (error) {
-            console.error('Failed to remove item:', error);
+            logger.error('Failed to remove item:', { error });
           }
         },
       },
     ]);
   };
-
-  const { t } = useTranslation();
 
   const applyPromoCode = async () => {
     if (!promo.trim()) {

@@ -1,7 +1,7 @@
 // src/screens/ShopScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useCallback, useMemo } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -167,31 +167,48 @@ export default function ShopScreen() {
           }
         : {};
 
-  const handleProduct = (product: CMSProduct) => {
-    hapticLight();
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    navigation.navigate('ProductDetail', {
-      // prefer explicit slug when present, otherwise fallback to ids
-      slug: (product as any).slug ?? (product as any).__id ?? (product as any).id,
-    });
-  };
+  const handleProduct = useCallback(
+    (product: CMSProduct) => {
+      hapticLight();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      navigation.navigate('ProductDetail', {
+        // prefer explicit slug when present, otherwise fallback to ids
+        slug: (product as any).slug ?? (product as any).__id ?? (product as any).id,
+      });
+    },
+    [navigation]
+  );
 
-  const handleAddToCart = (product: CMSProduct) => {
-    const addItem = cart?.addItem ?? cart?.updateCart ?? cart?.addToCart;
-    const productId = (product as any).id ?? (product as any).__id ?? (product as any).slug;
-    if (typeof addItem === 'function') {
-      const item: any = { productId, quantity: 1 };
-      if ((product as any).price != null) item.price = (product as any).price;
-      if ((product as any).variantId) item.variantId = (product as any).variantId;
-      if ((product as any).name) item.name = (product as any).name;
-      try {
-        // Call with flat legacy shape (expected by updated hook); tests allow this shape.
-        addItem(item);
-      } catch (_e) {
-        // Swallow non-critical cart add errors; UI tests rely on resilience here.
+  const handleAddToCart = useCallback(
+    (product: CMSProduct) => {
+      const addItem = cart?.addItem ?? cart?.updateCart ?? cart?.addToCart;
+      const productId = (product as any).id ?? (product as any).__id ?? (product as any).slug;
+      if (typeof addItem === 'function') {
+        const item: any = { productId, quantity: 1 };
+        if ((product as any).price != null) item.price = (product as any).price;
+        if ((product as any).variantId) item.variantId = (product as any).variantId;
+        if ((product as any).name) item.name = (product as any).name;
+        try {
+          // Call with flat legacy shape (expected by updated hook); tests allow this shape.
+          addItem(item);
+        } catch (_e) {
+          // Swallow non-critical cart add errors; UI tests rely on resilience here.
+        }
       }
-    }
-  };
+    },
+    [cart]
+  );
+
+  // Memoize filtered products to avoid recalculation on every render
+  const filteredProducts = useMemo(() => {
+    return products.filter((p: any) => {
+      const matchesCategory = selectedCategory ? (p as any).category === selectedCategory : true;
+      const matchesSearch = searchTerm
+        ? ((p as any).name || '').toLowerCase().includes(searchTerm.toLowerCase())
+        : true;
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, selectedCategory, searchTerm]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]} testID="shop-screen">
@@ -255,15 +272,7 @@ export default function ShopScreen() {
       ) : (
         <FlatList
           testID="product-list"
-          data={products.filter((p: any) => {
-            const matchesCategory = selectedCategory
-              ? (p as any).category === selectedCategory
-              : true;
-            const matchesSearch = searchTerm
-              ? ((p as any).name || '').toLowerCase().includes(searchTerm.toLowerCase())
-              : true;
-            return matchesCategory && matchesSearch;
-          })}
+          data={filteredProducts}
           ListEmptyComponent={() => (
             <View>
               <Text>No products found</Text>

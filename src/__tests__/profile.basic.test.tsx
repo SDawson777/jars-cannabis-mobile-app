@@ -82,6 +82,16 @@ jest.mock('../api/hooks/useUpdateUserProfile', () => ({
   useUpdateUserProfile: () => ({ mutateAsync: jest.fn().mockResolvedValue(true) }),
 }));
 
+// Mock verification status hook
+jest.mock('../hooks/useVerificationStatus', () => ({
+  useVerificationStatus: () => ({
+    data: { verified: true, status: 'approved' },
+    isLoading: false,
+    isError: false,
+  }),
+  VERIFICATION_STATUS_KEY: ['verification', 'status'],
+}));
+
 describe('Profile Basic Features', () => {
   beforeEach(() => {
     jest.clearAllMocks();

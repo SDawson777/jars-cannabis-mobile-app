@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { useI18nContext } from '../i18n/I18nProvider';
+import { logger } from '../lib/logger';
 import { saveSecure, getSecure } from '../utils/secureStorage';
 
 interface SettingsContextState {
@@ -55,7 +56,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch (_e) {
       void 0;
     }
-    await AsyncStorage.setItem('locale', value);
+    try {
+      await AsyncStorage.setItem('locale', value);
+    } catch (error) {
+      logger.warn('Failed to save locale setting', { error });
+    }
   };
 
   return (

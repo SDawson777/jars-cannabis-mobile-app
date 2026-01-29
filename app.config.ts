@@ -58,6 +58,54 @@ function resolveIOSGoogleServicesFile(): string {
   return defaultPath;
 }
 
+/**
+ * Validate Firebase config files exist and are not placeholders
+ * Logs warnings during build if production Firebase config is missing
+ */
+function validateFirebaseConfig(): void {
+  const isProduction = process.env.NODE_ENV === 'production' || 
+                       process.env.EXPO_PUBLIC_APP_ENV === 'production';
+  const isCI = process.env.CI === 'true';
+  
+  if (!isProduction && !isCI) {
+    // Skip validation in development
+    return;
+  }
+  
+  // Check Android config
+  const androidConfig = resolveAndroidGoogleServicesFile();
+  if (!fs.existsSync(androidConfig)) {
+    console.warn(
+      '⚠️ [Firebase Config] google-services.json not found at:', androidConfig,
+      '\n   Set GOOGLE_SERVICES_JSON_BASE64 in EAS secrets for production builds.'
+    );
+  } else {
+    try {
+      const content = fs.readFileSync(androidConfig, 'utf8');
+      if (content.includes('YOUR_ANDROID_API_KEY') || content.includes('placeholder')) {
+        console.warn(
+          '⚠️ [Firebase Config] google-services.json appears to be a placeholder.',
+          '\n   Replace with actual Firebase config from Firebase Console.'
+        );
+      }
+    } catch (e) {
+      // Ignore read errors
+    }
+  }
+  
+  // Check iOS config
+  const iosConfig = resolveIOSGoogleServicesFile();
+  if (!fs.existsSync(iosConfig)) {
+    console.warn(
+      '⚠️ [Firebase Config] GoogleService-Info.plist not found at:', iosConfig,
+      '\n   Set GOOGLESERVICE_PLIST_BASE64 in EAS secrets for production builds.'
+    );
+  }
+}
+
+// Run validation at config load time
+validateFirebaseConfig();
+
 const config: ExpoConfig = {
   name: 'Nimbus Cannabis OS',
   slug: 'nimbus-cannabis-mobile',

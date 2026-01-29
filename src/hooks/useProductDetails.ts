@@ -44,7 +44,13 @@ export function useProductDetails(productId: string | undefined, storeId?: strin
       const _state = await NetInfo.fetch();
       if (!_state.isConnected) {
         const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) return JSON.parse(cached) as ProductDetails;
+        if (cached) {
+          try {
+            return JSON.parse(cached) as ProductDetails;
+          } catch {
+            // Corrupted cache data, ignore
+          }
+        }
         throw new Error('Offline');
       }
       try {
@@ -53,7 +59,13 @@ export function useProductDetails(productId: string | undefined, storeId?: strin
         return data;
       } catch (err) {
         const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) return JSON.parse(cached) as ProductDetails;
+        if (cached) {
+          try {
+            return JSON.parse(cached) as ProductDetails;
+          } catch {
+            // Corrupted cache data, fallthrough
+          }
+        }
         throw err;
       }
     },

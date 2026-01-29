@@ -16,6 +16,8 @@ export type RootStackParamList = {
   SplashScreen: undefined;
   Onboarding: undefined;
   AgeVerification: undefined;
+  /** ID verification for first-time checkout - requires verification before proceeding */
+  IDVerification: { returnTo?: string } | undefined;
   LoginSignUpDecision: undefined;
   Login: undefined;
   SignUp: undefined;
@@ -56,6 +58,8 @@ export type RootStackParamList = {
   ArticleList: undefined;
   /** Now requires a slug param */
   ArticleDetail: { slug: string };
+  /** Quiz screen - requires articleSlug to fetch quiz */
+  QuizScreen: { articleSlug: string };
   TerpeneWheel: undefined;
   CommunityGarden: undefined;
   ConciergeChat: undefined;
