@@ -44,7 +44,7 @@ const mockTheme = {
   elevation: 'soft' as const,
   loading: false,
   debugInfo: {
-    weatherSource: 'time-of-day',
+    weatherSource: 'time-of-day' as const,
     lastUpdated: new Date('2024-01-01T00:00:00Z'),
   },
   cmsTheme: null,
