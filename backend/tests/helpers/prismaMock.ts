@@ -552,6 +552,18 @@ export const prisma = {
       const cart = (Object.values(carts) as any[]).find((c: any) => c.id === cartId);
       return cart ? cart.items || [] : [];
     },
+    findUnique: async ({ where: { id }, include }: any) => {
+      for (const cart of Object.values(carts)) {
+        const item = (cart as any).items?.find((i: any) => i.id === id);
+        if (item) {
+          if (include?.cart) {
+            return { ...item, cart, cartId: (cart as any).id };
+          }
+          return { ...item, cartId: (cart as any).id };
+        }
+      }
+      return null;
+    },
     create: async ({ data }: any) => {
       const id = randId('ci');
       const item = { id, ...data };

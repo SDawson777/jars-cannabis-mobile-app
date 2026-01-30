@@ -164,7 +164,11 @@ cartRouter.put('/cart/items/:itemId', requireAuth, async (req, res) => {
       include: { cart: true },
     });
 
-    if (!existingItem || existingItem.cart.userId !== uid) {
+    if (!existingItem) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    if (existingItem.cart.userId !== uid) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
@@ -195,7 +199,11 @@ cartRouter.delete('/cart/items/:itemId', requireAuth, async (req, res) => {
       include: { cart: true },
     });
 
-    if (!item || item.cart.userId !== uid) {
+    if (!item) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    if (item.cart.userId !== uid) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
