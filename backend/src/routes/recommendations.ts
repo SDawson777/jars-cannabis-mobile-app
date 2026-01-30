@@ -198,7 +198,8 @@ recommendationsRouter.get(
       const partial: any = {};
       const tempCNum = tempC != null ? parseFloat(String(tempC)) : NaN;
       const cloudCoverPctNum = cloudCoverPct != null ? parseFloat(String(cloudCoverPct)) : NaN;
-      const precipitationMmNum = precipitationMm != null ? parseFloat(String(precipitationMm)) : NaN;
+      const precipitationMmNum =
+        precipitationMm != null ? parseFloat(String(precipitationMm)) : NaN;
       if (!isNaN(tempCNum)) partial.tempC = tempCNum;
       if (!isNaN(cloudCoverPctNum)) partial.cloudCoverPct = cloudCoverPctNum;
       if (!isNaN(precipitationMmNum)) partial.precipitationMm = precipitationMmNum;

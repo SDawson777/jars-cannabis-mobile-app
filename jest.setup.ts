@@ -10,14 +10,17 @@ jest.mock('lucide-react-native', () => {
     MockIcon.displayName = name;
     return MockIcon;
   };
-  return new Proxy({}, {
-    get: (_target, prop) => {
-      if (typeof prop === 'string') {
-        return createMockIcon(prop);
-      }
-      return undefined;
-    },
-  });
+  return new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (typeof prop === 'string') {
+          return createMockIcon(prop);
+        }
+        return undefined;
+      },
+    }
+  );
 });
 
 // Ensure UIManager.getViewManagerConfig exists in the test environment
@@ -73,7 +76,7 @@ try {
 // Mock Animated module for proper interpolation in tests
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
-  
+
   // Helper to create a mock animated value with working interpolate
   const createMockAnimatedValue = (val: number) => ({
     _value: val,
