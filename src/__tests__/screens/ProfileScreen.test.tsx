@@ -253,9 +253,10 @@ describe('ProfileScreen', () => {
       const { getByTestId } = renderWithProviders(<ProfileScreen />, userWithNullName);
 
       const nameText = getByTestId('profile-name');
-      const textContent = nameText.props.children
-        .filter((c: any) => typeof c === 'string')
-        .join('');
+      const children = nameText.props.children;
+      const textContent = Array.isArray(children)
+        ? children.filter((c: any) => typeof c === 'string').join('')
+        : String(children);
       expect(textContent).toContain('Guest');
     });
 
@@ -321,24 +322,29 @@ describe('ProfileScreen', () => {
     });
 
     it('applies cool theme background', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
       const coolTheme = { ...mockTheme, colorTemp: 'cool' as const };
 
       const { root } = render(
-        <ThemeContext.Provider value={coolTheme}>
-          <AuthContext.Provider
-            value={{
-              data: mockAuthData,
-              clearAuth: mockClearAuth,
-              token: 'mock-token',
-              setToken: mockSetToken,
-              isLoading: false,
-              isError: false,
-              error: null,
-            }}
-          >
-            <ProfileScreen />
-          </AuthContext.Provider>
-        </ThemeContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeContext.Provider value={coolTheme}>
+            <AuthContext.Provider
+              value={{
+                data: mockAuthData,
+                clearAuth: mockClearAuth,
+                token: 'mock-token',
+                setToken: mockSetToken,
+                isLoading: false,
+                isError: false,
+                error: null,
+              }}
+            >
+              <ProfileScreen />
+            </AuthContext.Provider>
+          </ThemeContext.Provider>
+        </QueryClientProvider>
       );
 
       expect(root).toBeTruthy();
