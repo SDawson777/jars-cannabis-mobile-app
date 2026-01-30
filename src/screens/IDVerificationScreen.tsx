@@ -6,7 +6,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChevronLeft, Shield, AlertCircle, CheckCircle2 } from 'lucide-react-native';
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { useForm, Controller, type ControllerRenderProps } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import {
   SafeAreaView,
   View,
@@ -82,10 +82,12 @@ const documentTypes: { value: DocumentType; label: string }[] = [
   { value: 'state_id', label: 'State ID' },
 ];
 
-type IDVerificationField<TFieldName extends keyof IDVerificationFormData> = ControllerRenderProps<
-  IDVerificationFormData,
-  TFieldName
->;
+type IDVerificationField<TFieldName extends keyof IDVerificationFormData> = {
+  name: TFieldName;
+  value: IDVerificationFormData[TFieldName];
+  onChange: (value: IDVerificationFormData[TFieldName]) => void;
+  onBlur: () => void;
+};
 
 export default function IDVerificationScreen() {
   const navigation = useNavigation<IDVerificationNavProp>();

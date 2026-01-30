@@ -18,7 +18,7 @@ const mockItem = {
   strainType: 'Hybrid',
   purchaseDate: '2024-01-15',
   imageUrl: 'https://example.com/blue-dream.jpg',
-  status: 'in_stock',
+  status: 'in_stock' as const,
 };
 
 describe('StashItemCard', () => {

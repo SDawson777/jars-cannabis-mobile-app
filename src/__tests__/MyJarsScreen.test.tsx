@@ -18,14 +18,14 @@ jest.mock('lucide-react-native', () => ({
 }));
 
 const mockTheme = {
-  colorTemp: 'neutral',
+  colorTemp: 'neutral' as const,
   brandPrimary: '#000',
   brandSecondary: '#333',
   brandBackground: '#fff',
   brandAccent: '#0f0',
   cornerRadius: 8,
   logoUrl: undefined,
-  elevation: 'soft',
+  elevation: 'soft' as const,
   loading: false,
   debugInfo: {
     weatherSource: 'time-of-day',
