@@ -16,7 +16,9 @@ describe('CMSPreviewContext', () => {
     mockedLinking.getInitialURL.mockResolvedValue(null);
 
     const { result } = renderHook(() => useCMSPreview(), {
-      wrapper: ({ children }) => <CMSPreviewProvider>{children}</CMSPreviewProvider>,
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <CMSPreviewProvider>{children}</CMSPreviewProvider>
+      ),
     });
 
     await waitFor(() => {
@@ -28,7 +30,9 @@ describe('CMSPreviewContext', () => {
     mockedLinking.getInitialURL.mockResolvedValue('nimbus://app?preview=true');
 
     const { result } = renderHook(() => useCMSPreview(), {
-      wrapper: ({ children }) => <CMSPreviewProvider>{children}</CMSPreviewProvider>,
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <CMSPreviewProvider>{children}</CMSPreviewProvider>
+      ),
     });
 
     await waitFor(() => {
@@ -40,7 +44,9 @@ describe('CMSPreviewContext', () => {
     mockedLinking.getInitialURL.mockResolvedValue('nimbus://app?mode=production');
 
     const { result } = renderHook(() => useCMSPreview(), {
-      wrapper: ({ children }) => <CMSPreviewProvider>{children}</CMSPreviewProvider>,
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <CMSPreviewProvider>{children}</CMSPreviewProvider>
+      ),
     });
 
     await waitFor(() => {
@@ -52,7 +58,9 @@ describe('CMSPreviewContext', () => {
     mockedLinking.getInitialURL.mockResolvedValue(null);
 
     const { result } = renderHook(() => useCMSPreview(), {
-      wrapper: ({ children }) => <CMSPreviewProvider>{children}</CMSPreviewProvider>,
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <CMSPreviewProvider>{children}</CMSPreviewProvider>
+      ),
     });
 
     await waitFor(() => {
@@ -76,7 +84,9 @@ describe('CMSPreviewContext', () => {
     mockedLinking.getInitialURL.mockRejectedValue(new Error('Linking error'));
 
     const { result } = renderHook(() => useCMSPreview(), {
-      wrapper: ({ children }) => <CMSPreviewProvider>{children}</CMSPreviewProvider>,
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <CMSPreviewProvider>{children}</CMSPreviewProvider>
+      ),
     });
 
     await waitFor(() => {

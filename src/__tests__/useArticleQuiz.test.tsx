@@ -30,8 +30,21 @@ describe('useArticleQuiz', () => {
   it('should fetch quiz for a valid article slug', async () => {
     const mockQuiz = {
       id: 'quiz-1',
+      articleSlug: 'cannabis-101',
       title: 'Cannabis 101 Quiz',
-      questions: [{ id: 'q1', question: 'What is THC?', options: ['Option A', 'Option B'] }],
+      description: 'Basics',
+      pointsReward: 25,
+      passThreshold: 70,
+      questions: [
+        {
+          id: 'q1',
+          text: 'What is THC?',
+          options: [
+            { id: 'opt-a', text: 'Option A' },
+            { id: 'opt-b', text: 'Option B' },
+          ],
+        },
+      ],
     };
     mockedGetQuizForArticle.mockResolvedValue(mockQuiz);
 

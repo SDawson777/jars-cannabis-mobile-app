@@ -19,7 +19,14 @@ describe('AI and weather recommendation types', () => {
         tags: ['energetic', 'uplifting'],
         description: 'Perfect weather for outdoor activities with energizing strains',
         products: [
-          { __id: 'prod-1', name: 'Sour Diesel', slug: 'sour-diesel', price: 50.0, type: 'flower' },
+          {
+            __id: 'prod-1',
+            name: 'Sour Diesel',
+            slug: 'sour-diesel',
+            price: 50.0,
+            type: 'flower',
+            image: { url: 'https://example.com/sour-diesel.jpg' },
+          },
         ],
       };
 
@@ -78,9 +85,30 @@ describe('AI and weather recommendation types', () => {
 
     it('supports multiple product recommendations', () => {
       const products: CMSProduct[] = [
-        { __id: '1', name: 'Product 1', slug: 'product-1', price: 30.0, type: 'flower' },
-        { __id: '2', name: 'Product 2', slug: 'product-2', price: 40.0, type: 'edible' },
-        { __id: '3', name: 'Product 3', slug: 'product-3', price: 50.0, type: 'vape' },
+        {
+          __id: '1',
+          name: 'Product 1',
+          slug: 'product-1',
+          price: 30.0,
+          type: 'flower',
+          image: { url: 'https://example.com/product-1.jpg' },
+        },
+        {
+          __id: '2',
+          name: 'Product 2',
+          slug: 'product-2',
+          price: 40.0,
+          type: 'edible',
+          image: { url: 'https://example.com/product-2.jpg' },
+        },
+        {
+          __id: '3',
+          name: 'Product 3',
+          slug: 'product-3',
+          price: 50.0,
+          type: 'vape',
+          image: { url: 'https://example.com/product-3.jpg' },
+        },
       ];
 
       const response: WeatherRecommendationsResponse = {
@@ -497,7 +525,16 @@ describe('AI and weather recommendation types', () => {
           condition: 'sunny',
           tags: ['energetic'],
           description: 'Sunny day recommendations',
-          products: [{ __id: '1', name: 'Product', slug: 'product', price: 30.0, type: 'flower' }],
+          products: [
+            {
+              __id: '1',
+              name: 'Product',
+              slug: 'product',
+              price: 30.0,
+              type: 'flower',
+              image: { url: 'https://example.com/product.jpg' },
+            },
+          ],
         },
         selectedProduct: {
           __id: '1',
@@ -505,6 +542,7 @@ describe('AI and weather recommendation types', () => {
           slug: 'product',
           price: 30.0,
           type: 'flower',
+          image: { url: 'https://example.com/product.jpg' },
         },
       };
 

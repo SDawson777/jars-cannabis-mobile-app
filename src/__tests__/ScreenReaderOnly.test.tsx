@@ -25,7 +25,7 @@ describe('ScreenReaderOnly', () => {
   });
 
   it('should handle empty content', () => {
-    const { toJSON } = render(<ScreenReaderOnly></ScreenReaderOnly>);
+    const { toJSON } = render(<ScreenReaderOnly>{''}</ScreenReaderOnly>);
     expect(toJSON()).toBeTruthy();
   });
 });

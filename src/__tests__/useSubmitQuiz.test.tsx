@@ -34,6 +34,8 @@ describe('useSubmitQuiz', () => {
     const mockResponse = {
       passed: true,
       score: 80,
+      correctCount: 4,
+      totalQuestions: 5,
       pointsEarned: 50,
       message: 'Great job!',
     };
@@ -45,7 +47,7 @@ describe('useSubmitQuiz', () => {
     await act(async () => {
       result.current.mutate({
         quizId: 'quiz-1',
-        answers: [{ questionId: 'q1', selectedOption: 0 }],
+        answers: [{ questionId: 'q1', selectedOptionId: 'opt-1' }],
         articleSlug: 'cannabis-101',
       });
     });
@@ -57,7 +59,7 @@ describe('useSubmitQuiz', () => {
     expect(result.current.data).toEqual(mockResponse);
     expect(onSuccess).toHaveBeenCalledWith(mockResponse);
     expect(mockedSubmitQuiz).toHaveBeenCalledWith('quiz-1', [
-      { questionId: 'q1', selectedOption: 0 },
+      { questionId: 'q1', selectedOptionId: 'opt-1' },
     ]);
   });
 
@@ -70,7 +72,7 @@ describe('useSubmitQuiz', () => {
     await act(async () => {
       result.current.mutate({
         quizId: 'quiz-1',
-        answers: [{ questionId: 'q1', selectedOption: 0 }],
+        answers: [{ questionId: 'q1', selectedOptionId: 'opt-1' }],
         articleSlug: 'cannabis-101',
       });
     });
@@ -84,7 +86,13 @@ describe('useSubmitQuiz', () => {
   });
 
   it('should work without options', async () => {
-    const mockResponse = { passed: true, score: 100, pointsEarned: 100 };
+    const mockResponse = {
+      passed: true,
+      score: 100,
+      correctCount: 10,
+      totalQuestions: 10,
+      pointsEarned: 100,
+    };
     mockedSubmitQuiz.mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => useSubmitQuiz(), { wrapper: createWrapper() });

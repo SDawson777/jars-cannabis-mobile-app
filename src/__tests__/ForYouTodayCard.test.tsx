@@ -20,8 +20,8 @@ describe('ForYouTodayCard', () => {
     greeting: 'Good Morning!',
     message: 'Based on your preferences, we recommend:',
     products: [
-      { id: 'prod1', name: 'Blue Dream', image: 'url1', category: 'Flower' },
-      { id: 'prod2', name: 'Sour Diesel', image: 'url2', category: 'Flower' },
+      { id: 'prod1', name: 'Blue Dream', price: 35, imageUrl: 'url1' },
+      { id: 'prod2', name: 'Sour Diesel', price: 42, imageUrl: 'url2' },
     ],
     ctaText: 'View All Recommendations',
   };

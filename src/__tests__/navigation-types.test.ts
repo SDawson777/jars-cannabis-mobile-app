@@ -185,10 +185,10 @@ describe('navigation types', () => {
           status: 'shipped',
         };
 
-        const withoutStatus: RootStackParamList['OrderTracking'] = undefined;
+        const withoutStatus: RootStackParamList['OrderTracking'] = {};
 
         expect(withStatus?.status).toBe('shipped');
-        expect(withoutStatus).toBeUndefined();
+        expect(withoutStatus.status).toBeUndefined();
       });
 
       it('defines EditProfile with optional profile param', () => {
@@ -196,10 +196,10 @@ describe('navigation types', () => {
           profile: { name: 'John Doe', email: 'john@example.com' },
         };
 
-        const withoutProfile: RootStackParamList['EditProfile'] = undefined;
+        const withoutProfile: RootStackParamList['EditProfile'] = {};
 
         expect(withProfile?.profile.name).toBe('John Doe');
-        expect(withoutProfile).toBeUndefined();
+        expect(withoutProfile.profile).toBeUndefined();
       });
 
       it('defines JournalEntry with optional journalEntry param', () => {

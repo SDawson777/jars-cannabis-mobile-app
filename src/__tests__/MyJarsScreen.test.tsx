@@ -18,10 +18,25 @@ jest.mock('lucide-react-native', () => ({
 }));
 
 const mockTheme = {
+  colorTemp: 'neutral',
   brandPrimary: '#000',
+  brandSecondary: '#333',
   brandBackground: '#fff',
-  textPrimary: '#000',
-  textSecondary: '#666',
+  brandAccent: '#0f0',
+  cornerRadius: 8,
+  logoUrl: undefined,
+  elevation: 'soft',
+  loading: false,
+  debugInfo: {
+    weatherSource: 'time-of-day',
+    lastUpdated: new Date('2024-01-01T00:00:00Z'),
+  },
+  cmsTheme: null,
+  weatherSimulation: {
+    enabled: false,
+    condition: null,
+  },
+  setWeatherSimulation: jest.fn(),
 };
 
 describe('MyJarsScreen', () => {

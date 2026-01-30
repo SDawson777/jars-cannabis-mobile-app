@@ -34,18 +34,15 @@ describe('ProductDropCarousel', () => {
         url: 'https://example.com/summer.jpg',
         alt: 'Summer sale products',
       },
-      slug: 'summer-sale',
     },
     {
       __id: 'drop-2',
       title: 'New Arrivals',
-      highlight: null,
       items: 8,
       image: {
         url: 'https://example.com/new.jpg',
         alt: 'New arrival products',
       },
-      slug: 'new-arrivals',
     },
     {
       __id: 'drop-3',
@@ -56,7 +53,6 @@ describe('ProductDropCarousel', () => {
         url: 'https://example.com/bestsellers.jpg',
         alt: 'Best selling products',
       },
-      slug: 'best-sellers',
     },
   ];
 
@@ -92,11 +88,11 @@ describe('ProductDropCarousel', () => {
     expect(getByText('Top picks this week')).toBeTruthy();
   });
 
-  it('does not render highlight when null', () => {
+  it('does not render highlight when missing', () => {
     const { queryByText } = render(<ProductDropCarousel drops={mockDrops} />);
 
-    // New Arrivals has null highlight
-    expect(queryByText('null')).toBeNull();
+    // New Arrivals has no highlight
+    expect(queryByText('undefined')).toBeNull();
   });
 
   it('calls onPress callback when drop is pressed', () => {

@@ -14,8 +14,23 @@ describe('quizClient', () => {
     it('should fetch quiz for an article', async () => {
       const mockQuiz = {
         id: 'quiz-1',
+        articleSlug: 'cannabis-101',
         title: 'Cannabis 101 Quiz',
-        questions: [{ id: 'q1', question: 'What is THC?', options: ['A', 'B', 'C', 'D'] }],
+        description: 'Basic cannabis knowledge',
+        pointsReward: 50,
+        passThreshold: 70,
+        questions: [
+          {
+            id: 'q1',
+            text: 'What is THC?',
+            options: [
+              { id: 'opt-a', text: 'A' },
+              { id: 'opt-b', text: 'B' },
+              { id: 'opt-c', text: 'C' },
+              { id: 'opt-d', text: 'D' },
+            ],
+          },
+        ],
       };
       mockedCmsClient.get.mockResolvedValue({ data: { quiz: mockQuiz } });
 
@@ -57,15 +72,15 @@ describe('quizClient', () => {
       const mockResponse = {
         passed: true,
         score: 80,
-        pointsEarned: 50,
-        correctAnswers: 4,
+        correctCount: 4,
         totalQuestions: 5,
+        pointsEarned: 50,
       };
       mockedCmsClient.post.mockResolvedValue({ data: mockResponse });
 
       const answers = [
-        { questionId: 'q1', selectedOption: 0 },
-        { questionId: 'q2', selectedOption: 2 },
+        { questionId: 'q1', selectedOptionId: 'opt-1' },
+        { questionId: 'q2', selectedOptionId: 'opt-2' },
       ];
 
       const result = await submitQuiz('quiz-1', answers);
@@ -83,7 +98,9 @@ describe('quizClient', () => {
     });
 
     it('should submit empty answers array', async () => {
-      mockedCmsClient.post.mockResolvedValue({ data: { passed: false, score: 0 } });
+      mockedCmsClient.post.mockResolvedValue({
+        data: { passed: false, score: 0, correctCount: 0, totalQuestions: 0, pointsEarned: 0 },
+      });
 
       const result = await submitQuiz('quiz-2', []);
 

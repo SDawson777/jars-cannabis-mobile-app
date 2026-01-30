@@ -41,7 +41,8 @@ interface Props {
 // Confetti piece component
 const ConfettiPiece: React.FC<{ delay: number; color: string }> = ({ delay, color }) => {
   const translateY = useRef(new Animated.Value(-50)).current;
-  const translateX = useRef(new Animated.Value(Math.random() * SCREEN_WIDTH)).current;
+  const initialX = useRef(Math.random() * SCREEN_WIDTH).current;
+  const translateX = useRef(new Animated.Value(initialX)).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
@@ -55,7 +56,7 @@ const ConfettiPiece: React.FC<{ delay: number; color: string }> = ({ delay, colo
         useNativeDriver: true,
       }),
       Animated.timing(translateX, {
-        toValue: translateX._value + (Math.random() - 0.5) * 100,
+        toValue: initialX + (Math.random() - 0.5) * 100,
         duration: 3000 + Math.random() * 2000,
         delay,
         easing: Easing.linear,

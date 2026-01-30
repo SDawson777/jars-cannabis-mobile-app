@@ -24,7 +24,6 @@ const mockBanners = [
     __id: 'banner-2',
     title: 'Banner 2',
     image: { url: 'https://example.com/2.jpg', alt: 'banner2' },
-    cta: null,
     link: '/deals',
   },
 ];
@@ -54,13 +53,12 @@ describe('BannerCarousel', () => {
     expect(haptic.hapticLight).toHaveBeenCalled();
   });
 
-  it('should render without CTA text when cta is null', () => {
+  it('should render without CTA text when cta is missing', () => {
     const singleBanner = [
       {
         __id: 'banner-no-cta',
         title: 'No CTA',
         image: { url: 'https://example.com/3.jpg', alt: 'no-cta' },
-        cta: null,
         link: '/no-cta',
       },
     ];
