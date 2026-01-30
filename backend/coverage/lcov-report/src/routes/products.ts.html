@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">75.45% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>75/100</span>
+                <span class='fraction'>83/110</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">40.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>22/55</span>
+                <span class='fraction'>32/79</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">79.01% </span>
+                <span class="strong">79.12% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>64/81</span>
+                <span class='fraction'>72/91</span>
             </div>
         
             
@@ -254,7 +254,17 @@
 <a name='L189'></a><a href='#L189'>189</a>
 <a name='L190'></a><a href='#L190'>190</a>
 <a name='L191'></a><a href='#L191'>191</a>
-<a name='L192'></a><a href='#L192'>192</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">23x</span>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-yes">23x</span>
@@ -322,6 +332,12 @@
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
@@ -337,6 +353,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -375,6 +393,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -505,14 +525,20 @@ productsRouter.get('/products', rateLimit('products_list'), async (req, res) =&g
   <span class="missing-if-branch" title="if path not taken" >I</span>if (strain) <span class="cstat-no" title="statement not covered" >where.strainType = strain as any;</span>
   <span class="missing-if-branch" title="if path not taken" >I</span>if (brand) <span class="cstat-no" title="statement not covered" >where.brand = { contains: brand, mode: 'insensitive' };</span>
   <span class="missing-if-branch" title="if path not taken" >I</span>if (thcMin || thcMax) <span class="cstat-no" title="statement not covered" >where.thcPercent = {};</span>
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (thcMin) <span class="cstat-no" title="statement not covered" >where.thcPercent.gte = parseFloat(thcMin);</span>
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (thcMax) <span class="cstat-no" title="statement not covered" >where.thcPercent.lte = parseFloat(thcMax);</span>
+  const thcMinNum = thcMin ? <span class="branch-0 cbranch-no" title="branch not covered" >parseFloat(thcMin) </span>: NaN;
+  const thcMaxNum = thcMax ? <span class="branch-0 cbranch-no" title="branch not covered" >parseFloat(thcMax) </span>: NaN;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!isNaN(thcMinNum)) <span class="cstat-no" title="statement not covered" >where.thcPercent.gte = thcMinNum;</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!isNaN(thcMaxNum)) <span class="cstat-no" title="statement not covered" >where.thcPercent.lte = thcMaxNum;</span>
   <span class="missing-if-branch" title="if path not taken" >I</span>if (cbdMin || cbdMax) <span class="cstat-no" title="statement not covered" >where.cbdPercent = {};</span>
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (cbdMin) <span class="cstat-no" title="statement not covered" >where.cbdPercent.gte = parseFloat(cbdMin);</span>
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (cbdMax) <span class="cstat-no" title="statement not covered" >where.cbdPercent.lte = parseFloat(cbdMax);</span>
+  const cbdMinNum = cbdMin ? <span class="branch-0 cbranch-no" title="branch not covered" >parseFloat(cbdMin) </span>: NaN;
+  const cbdMaxNum = cbdMax ? <span class="branch-0 cbranch-no" title="branch not covered" >parseFloat(cbdMax) </span>: NaN;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!isNaN(cbdMinNum)) <span class="cstat-no" title="statement not covered" >where.cbdPercent.gte = cbdMinNum;</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!isNaN(cbdMaxNum)) <span class="cstat-no" title="statement not covered" >where.cbdPercent.lte = cbdMaxNum;</span>
   if (minPrice || maxPrice) where.defaultPrice = {};
-  if (minPrice) where.defaultPrice.gte = parseFloat(minPrice);
-  if (maxPrice) where.defaultPrice.lte = parseFloat(maxPrice);
+  const minPriceNum = minPrice ? parseFloat(minPrice) : NaN;
+  const maxPriceNum = maxPrice ? parseFloat(maxPrice) : NaN;
+  if (!isNaN(minPriceNum)) where.defaultPrice.gte = minPriceNum;
+  if (!isNaN(maxPriceNum)) where.defaultPrice.lte = maxPriceNum;
 &nbsp;
   const orderBy = (() =&gt; {
     if (!sort) return { name: 'asc' } as any;
@@ -528,8 +554,10 @@ productsRouter.get('/products', rateLimit('products_list'), async (req, res) =&g
 <span class="cstat-no" title="statement not covered" >    return { [field]: desc ? 'desc' : 'asc' } as any;</span>
   })();
 &nbsp;
-  const take = Math.max(1, Math.min(100, parseInt(limit)));
-  const skip = (Math.max(1, parseInt(page)) - 1) * take;
+  const limitParsed = parseInt(limit);
+  const pageParsed = parseInt(page);
+  const take = Math.max(1, Math.min(100, !isNaN(limitParsed) ? limitParsed : <span class="branch-1 cbranch-no" title="branch not covered" >24)</span>);
+  const skip = (Math.max(1, !isNaN(pageParsed) ? pageParsed : <span class="branch-1 cbranch-no" title="branch not covered" >1)</span> - 1) * take;
 &nbsp;
   let items = await prisma.product.findMany({
     where,
@@ -566,8 +594,10 @@ productsRouter.get('/products', rateLimit('products_list'), async (req, res) =&g
 &nbsp;
 // Reviews
 productsRouter.get('/products/:id/reviews', rateLimit('product_reviews_list'), <span class="fstat-no" title="function not covered" >async </span>(req, res) =&gt; {
-  const page = <span class="cstat-no" title="statement not covered" >parseInt((req.query.page as string) || '1');</span>
-  const limit = <span class="cstat-no" title="statement not covered" >Math.min(100, parseInt((req.query.limit as string) || '24'));</span>
+  const pageRaw = <span class="cstat-no" title="statement not covered" >parseInt((req.query.page as string) || '1');</span>
+  const limitRaw = <span class="cstat-no" title="statement not covered" >parseInt((req.query.limit as string) || '24');</span>
+  const page = <span class="cstat-no" title="statement not covered" >!isNaN(pageRaw) &amp;&amp; pageRaw &gt; 0 ? pageRaw : 1;</span>
+  const limit = <span class="cstat-no" title="statement not covered" >!isNaN(limitRaw) &amp;&amp; limitRaw &gt; 0 ? Math.min(100, limitRaw) : 24;</span>
   const sort = (<span class="cstat-no" title="statement not covered" >req.query.sort as string) || '-createdAt';</span>
   const orderBy = <span class="cstat-no" title="statement not covered" >{ [sort.replace('-', '')]: sort.startsWith('-') ? 'desc' : 'asc' } as any;</span>
   const reviews = <span class="cstat-no" title="statement not covered" >await prisma.review.findMany({</span>
@@ -643,7 +673,7 @@ productsRouter.get('/products/:id', rateLimit('products_detail'), async (req, re
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-21T05:07:38.129Z
+                at 2026-01-30T23:02:02.427Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

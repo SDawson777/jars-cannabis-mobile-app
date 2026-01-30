@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.15% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/13</span>
+                <span class='fraction'>0/13</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.15% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/13</span>
+                <span class='fraction'>0/13</span>
             </div>
         
             
@@ -159,38 +159,14 @@
 <a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -206,6 +182,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -213,7 +199,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -252,15 +252,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// backend/src/routes/config.ts
 // Configuration and feature flags endpoint
 &nbsp;
-import { Router, Request, Response } from 'express';
+<span class="cstat-no" title="statement not covered" >import { Router, Request, Response } from 'express';</span>
 &nbsp;
-export const configRouter = Router();
+export const <span class="cstat-no" title="statement not covered" >configRouter = Router();</span>
 &nbsp;
 /**
  * Feature flag configuration
  * These can be updated via CMS/admin panel in production
  */
-const featureFlags = {
+const featureFlags = <span class="cstat-no" title="statement not covered" >{</span>
   enableCtaPulseAnimation: true,
   enableEnhancedHaptics: true,
   enableTerpeneAnimations: false,
@@ -275,7 +275,7 @@ const featureFlags = {
  * GET /config/feature-flags
  * Returns current feature flag configuration
  */
-configRouter.get('/config/feature-flags', <span class="fstat-no" title="function not covered" >(_</span>req: Request, res: Response) =&gt; {
+<span class="cstat-no" title="statement not covered" >configRouter.get('/config/feature-flags', <span class="fstat-no" title="function not covered" >(_</span>req: Request, res: Response) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  res.json(featureFlags);</span>
 });
 &nbsp;
@@ -283,7 +283,7 @@ configRouter.get('/config/feature-flags', <span class="fstat-no" title="function
  * GET /config/app
  * Returns general app configuration
  */
-configRouter.get('/config/app', <span class="fstat-no" title="function not covered" >(_</span>req: Request, res: Response) =&gt; {
+<span class="cstat-no" title="statement not covered" >configRouter.get('/config/app', <span class="fstat-no" title="function not covered" >(_</span>req: Request, res: Response) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  res.json({</span>
     version: process.env.APP_VERSION || '1.0.0',
     minSupportedVersion: '1.0.0',
@@ -306,7 +306,7 @@ configRouter.get('/config/app', <span class="fstat-no" title="function not cover
  * Returns availability status of external services
  * Mobile app uses this to enable/disable features based on backend configuration
  */
-configRouter.get('/config/services', <span class="fstat-no" title="function not covered" >(_</span>req: Request, res: Response) =&gt; {
+<span class="cstat-no" title="statement not covered" >configRouter.get('/config/services', <span class="fstat-no" title="function not covered" >(_</span>req: Request, res: Response) =&gt; {</span>
   // Check which services are configured
   const stripeConfigured = <span class="cstat-no" title="statement not covered" >!!(</span>
     process.env.STRIPE_SECRET_KEY &amp;&amp; process.env.STRIPE_SECRET_KEY.length &gt; 10
@@ -349,7 +349,7 @@ configRouter.get('/config/services', <span class="fstat-no" title="function not 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-21T05:07:38.129Z
+                at 2026-01-30T23:02:02.427Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

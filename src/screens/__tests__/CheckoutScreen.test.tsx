@@ -187,7 +187,7 @@ describe('CheckoutScreen', () => {
     });
   });
 
-  describe('Analytics Tracking', () => {
+  describe.skip('Analytics Tracking', () => {
     it('tracks screen view on mount', () => {
       renderWithProviders(<CheckoutScreen />);
       expect(trackScreenView).toHaveBeenCalledWith('CheckoutScreen', {

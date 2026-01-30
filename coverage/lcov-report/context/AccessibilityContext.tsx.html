@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,22 +94,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { createContext, useContext, useState, ReactNode } from 'react';
 &nbsp;
@@ -118,22 +118,22 @@ interface AccessibilityState {
   toggleContrast: () =&gt; void;
 }
 &nbsp;
-const AccessibilityContext = <span class="cstat-no" title="statement not covered" >createContext&lt;AccessibilityState | undefined&gt;(undefined);</span>
+const AccessibilityContext = createContext&lt;AccessibilityState | undefined&gt;(undefined);
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >AccessibilityProvider(</span>{ children }: { children: ReactNode }) {
-  const [increaseContrast, setIncreaseContrast] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
-  const toggleContrast = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setIncreaseContrast(<span class="fstat-no" title="function not covered" >v </span>=&gt; <span class="cstat-no" title="statement not covered" >!v)</span>;</span></span>
-<span class="cstat-no" title="statement not covered" >  return (</span>
+export function AccessibilityProvider({ children }: { children: ReactNode }) {
+  const [increaseContrast, setIncreaseContrast] = useState(false);
+  const toggleContrast = () =&gt; setIncreaseContrast(v =&gt; !v);
+  return (
     &lt;AccessibilityContext.Provider value={{ increaseContrast, toggleContrast }}&gt;
       {children}
     &lt;/AccessibilityContext.Provider&gt;
   );
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useAccessibility(</span>) {
-  const ctx = <span class="cstat-no" title="statement not covered" >useContext(AccessibilityContext);</span>
-<span class="cstat-no" title="statement not covered" >  if (!ctx) <span class="cstat-no" title="statement not covered" >throw new Error('useAccessibility must be within AccessibilityProvider');</span></span>
-<span class="cstat-no" title="statement not covered" >  return ctx;</span>
+export function useAccessibility() {
+  const ctx = useContext(AccessibilityContext);
+  if (!ctx) throw new Error('useAccessibility must be within AccessibilityProvider');
+  return ctx;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -142,7 +142,7 @@ export function <span class="fstat-no" title="function not covered" >useAccessib
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-21T05:03:47.311Z
+                at 2026-01-30T23:00:39.076Z
             </div>
         <script src="../prettify.js"></script>
         <script>

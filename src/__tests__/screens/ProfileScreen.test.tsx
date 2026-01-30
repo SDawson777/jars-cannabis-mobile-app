@@ -3,6 +3,8 @@
 // Mock lucide icons
 jest.mock('lucide-react-native', () => ({
   ChevronRight: () => null,
+  ShieldCheck: () => null,
+  ShieldAlert: () => null,
 }));
 
 // Mock navigation
@@ -213,6 +215,10 @@ describe('ProfileScreen', () => {
 
   describe('Guest User', () => {
     it('displays sign in button for guest users when no data', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+
       const authContext = {
         data: undefined,
         clearAuth: mockClearAuth,
@@ -224,11 +230,13 @@ describe('ProfileScreen', () => {
       };
 
       const { getByTestId } = render(
-        <ThemeContext.Provider value={mockTheme}>
-          <AuthContext.Provider value={authContext}>
-            <ProfileScreen />
-          </AuthContext.Provider>
-        </ThemeContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeContext.Provider value={mockTheme}>
+            <AuthContext.Provider value={authContext}>
+              <ProfileScreen />
+            </AuthContext.Provider>
+          </ThemeContext.Provider>
+        </QueryClientProvider>
       );
 
       expect(getByTestId('sign-in-button')).toBeTruthy();
@@ -252,6 +260,10 @@ describe('ProfileScreen', () => {
     });
 
     it('still shows menu options when no auth data', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+
       const authContext = {
         data: undefined,
         clearAuth: mockClearAuth,
@@ -263,11 +275,13 @@ describe('ProfileScreen', () => {
       };
 
       const { getByText } = render(
-        <ThemeContext.Provider value={mockTheme}>
-          <AuthContext.Provider value={authContext}>
-            <ProfileScreen />
-          </AuthContext.Provider>
-        </ThemeContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeContext.Provider value={mockTheme}>
+            <AuthContext.Provider value={authContext}>
+              <ProfileScreen />
+            </AuthContext.Provider>
+          </ThemeContext.Provider>
+        </QueryClientProvider>
       );
 
       expect(getByText('Edit Profile')).toBeTruthy();
@@ -278,24 +292,29 @@ describe('ProfileScreen', () => {
 
   describe('Theme Integration', () => {
     it('applies warm theme background', () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
       const warmTheme = { ...mockTheme, colorTemp: 'warm' as const };
 
       const { root } = render(
-        <ThemeContext.Provider value={warmTheme}>
-          <AuthContext.Provider
-            value={{
-              data: mockAuthData,
-              clearAuth: mockClearAuth,
-              token: 'mock-token',
-              setToken: mockSetToken,
-              isLoading: false,
-              isError: false,
-              error: null,
-            }}
-          >
-            <ProfileScreen />
-          </AuthContext.Provider>
-        </ThemeContext.Provider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeContext.Provider value={warmTheme}>
+            <AuthContext.Provider
+              value={{
+                data: mockAuthData,
+                clearAuth: mockClearAuth,
+                token: 'mock-token',
+                setToken: mockSetToken,
+                isLoading: false,
+                isError: false,
+                error: null,
+              }}
+            >
+              <ProfileScreen />
+            </AuthContext.Provider>
+          </ThemeContext.Provider>
+        </QueryClientProvider>
       );
 
       expect(root).toBeTruthy();
