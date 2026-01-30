@@ -37,7 +37,7 @@ interface TestData {
 describe('useCMSContent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedUseCMSPreview.mockReturnValue({ preview: false, setPreview: jest.fn() });
+    mockedUseCMSPreview.mockReturnValue({ preview: false, toggle: jest.fn() });
   });
 
   it('should fetch content when online', async () => {
@@ -62,7 +62,7 @@ describe('useCMSContent', () => {
   });
 
   it('should include preview header when preview mode is enabled', async () => {
-    mockedUseCMSPreview.mockReturnValue({ preview: true, setPreview: jest.fn() });
+    mockedUseCMSPreview.mockReturnValue({ preview: true, toggle: jest.fn() });
     mockedNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
     mockedCmsClient.get.mockResolvedValue({ data: { items: [] } });
     mockedAsyncStorage.setItem.mockResolvedValue(undefined);

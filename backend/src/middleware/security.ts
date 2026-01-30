@@ -45,7 +45,10 @@ export function sanitizeInput() {
       // Sanitize query parameters
       if (req.query) {
         for (const key in req.query) {
-          if (Object.prototype.hasOwnProperty.call(req.query, key) && typeof req.query[key] === 'string') {
+          if (
+            Object.prototype.hasOwnProperty.call(req.query, key) &&
+            typeof req.query[key] === 'string'
+          ) {
             req.query[key] = sanitizeString(req.query[key] as string);
           }
         }

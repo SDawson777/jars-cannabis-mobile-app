@@ -52,7 +52,9 @@ describe('stripe API', () => {
       await fetchPaymentSheetParams();
 
       const call = mockedFetchJson.mock.calls[0];
-      const body = JSON.parse(call[1].body);
+      const options = call?.[1];
+      expect(options).toBeDefined();
+      const body = JSON.parse((options as { body: string }).body);
       expect(body.platform).toBe('ios');
     });
   });

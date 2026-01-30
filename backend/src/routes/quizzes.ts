@@ -15,7 +15,7 @@ const p = prisma as any;
  */
 async function getUserQuizStatus(quizId: string, userId: string) {
   if (!p.quizAttempt) return null;
-  
+
   const attempts = await p.quizAttempt.findMany({
     where: { quizId, userId },
     orderBy: { createdAt: 'desc' },

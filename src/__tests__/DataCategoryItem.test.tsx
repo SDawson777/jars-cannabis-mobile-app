@@ -4,8 +4,8 @@ import DataCategoryItem from '../components/DataCategoryItem';
 
 describe('DataCategoryItem', () => {
   const mockCategory = {
+    id: 'category-1',
     label: 'Test Category',
-    description: 'Test description',
   };
 
   it('should render category label', () => {

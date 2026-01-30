@@ -1,12 +1,12 @@
 import React from 'react';
 import { Image as ExpoImage } from 'expo-image';
-import { ImageStyle, StyleProp, ViewStyle } from 'react-native';
+import { ImageStyle, StyleProp } from 'react-native';
 
 interface Props {
   uri: string;
   alt?: string;
   aspectRatio?: number;
-  style?: StyleProp<ImageStyle | ViewStyle>;
+  style?: StyleProp<ImageStyle>;
 }
 
 // Blurhash placeholder for loading state (neutral gray)

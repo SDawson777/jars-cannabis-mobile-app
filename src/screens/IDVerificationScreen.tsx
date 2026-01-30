@@ -82,6 +82,13 @@ const documentTypes: { value: DocumentType; label: string }[] = [
   { value: 'state_id', label: 'State ID' },
 ];
 
+type IDVerificationField<TFieldName extends keyof IDVerificationFormData> = {
+  name: TFieldName;
+  value: IDVerificationFormData[TFieldName];
+  onChange: (value: IDVerificationFormData[TFieldName]) => void;
+  onBlur: () => void;
+};
+
 export default function IDVerificationScreen() {
   const navigation = useNavigation<IDVerificationNavProp>();
   const route = useRoute<IDVerificationRouteProp>();
@@ -278,37 +285,40 @@ export default function IDVerificationScreen() {
             <Controller
               control={control}
               name="documentType"
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.documentTypeContainer}>
-                  {documentTypes.map(docType => (
-                    <Pressable
-                      key={docType.value}
-                      style={[
-                        styles.documentTypeOption,
-                        {
-                          borderColor: value === docType.value ? brandPrimary : '#E5E7EB',
-                          backgroundColor: value === docType.value ? `${brandPrimary}10` : '#FFF',
-                        },
-                      ]}
-                      onPress={() => {
-                        hapticLight();
-                        onChange(docType.value);
-                      }}
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected: value === docType.value }}
-                    >
-                      <Text
+              render={({ field }: { field: IDVerificationField<'documentType'> }) => {
+                const { onChange, value } = field;
+                return (
+                  <View style={styles.documentTypeContainer}>
+                    {documentTypes.map(docType => (
+                      <Pressable
+                        key={docType.value}
                         style={[
-                          styles.documentTypeText,
-                          { color: value === docType.value ? brandPrimary : brandSecondary },
+                          styles.documentTypeOption,
+                          {
+                            borderColor: value === docType.value ? brandPrimary : '#E5E7EB',
+                            backgroundColor: value === docType.value ? `${brandPrimary}10` : '#FFF',
+                          },
                         ]}
+                        onPress={() => {
+                          hapticLight();
+                          onChange(docType.value);
+                        }}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected: value === docType.value }}
                       >
-                        {docType.label}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
-              )}
+                        <Text
+                          style={[
+                            styles.documentTypeText,
+                            { color: value === docType.value ? brandPrimary : brandSecondary },
+                          ]}
+                        >
+                          {docType.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                );
+              }}
             />
             {errors.documentType && (
               <Text style={styles.fieldError}>{errors.documentType.message}</Text>
@@ -323,26 +333,29 @@ export default function IDVerificationScreen() {
             <Controller
               control={control}
               name="dateOfBirth"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: errors.dateOfBirth ? '#DC2626' : '#E5E7EB',
-                      color: brandPrimary,
-                    },
-                  ]}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor="#9CA3AF"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="numbers-and-punctuation"
-                  maxLength={10}
-                  autoCapitalize="none"
-                  testID="dob-input"
-                />
-              )}
+              render={({ field }: { field: IDVerificationField<'dateOfBirth'> }) => {
+                const { onChange, onBlur, value } = field;
+                return (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        borderColor: errors.dateOfBirth ? '#DC2626' : '#E5E7EB',
+                        color: brandPrimary,
+                      },
+                    ]}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor="#9CA3AF"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    keyboardType="numbers-and-punctuation"
+                    maxLength={10}
+                    autoCapitalize="none"
+                    testID="dob-input"
+                  />
+                );
+              }}
             />
             {errors.dateOfBirth && (
               <Text style={styles.fieldError}>{errors.dateOfBirth.message}</Text>
@@ -360,26 +373,29 @@ export default function IDVerificationScreen() {
             <Controller
               control={control}
               name="state"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: errors.state ? '#DC2626' : '#E5E7EB',
-                      color: brandPrimary,
-                    },
-                  ]}
-                  placeholder="CA"
-                  placeholderTextColor="#9CA3AF"
-                  value={value}
-                  onChangeText={text => onChange(text.toUpperCase())}
-                  onBlur={onBlur}
-                  keyboardType="default"
-                  maxLength={2}
-                  autoCapitalize="characters"
-                  testID="state-input"
-                />
-              )}
+              render={({ field }: { field: IDVerificationField<'state'> }) => {
+                const { onChange, onBlur, value } = field;
+                return (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        borderColor: errors.state ? '#DC2626' : '#E5E7EB',
+                        color: brandPrimary,
+                      },
+                    ]}
+                    placeholder="CA"
+                    placeholderTextColor="#9CA3AF"
+                    value={value}
+                    onChangeText={text => onChange(text.toUpperCase())}
+                    onBlur={onBlur}
+                    keyboardType="default"
+                    maxLength={2}
+                    autoCapitalize="characters"
+                    testID="state-input"
+                  />
+                );
+              }}
             />
             {errors.state && <Text style={styles.fieldError}>{errors.state.message}</Text>}
             <Text style={[styles.hint, { color: brandSecondary }]}>
@@ -392,29 +408,32 @@ export default function IDVerificationScreen() {
             <Controller
               control={control}
               name="consentGiven"
-              render={({ field: { onChange, value } }) => (
-                <Pressable
-                  style={styles.consentRow}
-                  onPress={() => {
-                    hapticLight();
-                    onChange(!value);
-                  }}
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: value }}
-                >
-                  <Switch
-                    value={value}
-                    onValueChange={onChange}
-                    trackColor={{ false: '#E5E7EB', true: brandPrimary }}
-                    thumbColor={value ? '#FFF' : '#FFF'}
-                    testID="consent-switch"
-                  />
-                  <Text style={[styles.consentText, { color: brandSecondary }]}>
-                    {t('verification.consentText') ||
-                      'I consent to the verification of my age and identity for compliance purposes. I confirm the information provided is accurate.'}
-                  </Text>
-                </Pressable>
-              )}
+              render={({ field }: { field: IDVerificationField<'consentGiven'> }) => {
+                const { onChange, value } = field;
+                return (
+                  <Pressable
+                    style={styles.consentRow}
+                    onPress={() => {
+                      hapticLight();
+                      onChange(!value);
+                    }}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: value }}
+                  >
+                    <Switch
+                      value={value}
+                      onValueChange={onChange}
+                      trackColor={{ false: '#E5E7EB', true: brandPrimary }}
+                      thumbColor={value ? '#FFF' : '#FFF'}
+                      testID="consent-switch"
+                    />
+                    <Text style={[styles.consentText, { color: brandSecondary }]}>
+                      {t('verification.consentText') ||
+                        'I consent to the verification of my age and identity for compliance purposes. I confirm the information provided is accurate.'}
+                    </Text>
+                  </Pressable>
+                );
+              }}
             />
             {errors.consentGiven && (
               <Text style={styles.fieldError}>{errors.consentGiven.message}</Text>

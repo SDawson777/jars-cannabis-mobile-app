@@ -63,20 +63,21 @@ function resolveIOSGoogleServicesFile(): string {
  * Logs warnings during build if production Firebase config is missing
  */
 function validateFirebaseConfig(): void {
-  const isProduction = process.env.NODE_ENV === 'production' || 
-                       process.env.EXPO_PUBLIC_APP_ENV === 'production';
+  const isProduction =
+    process.env.NODE_ENV === 'production' || process.env.EXPO_PUBLIC_APP_ENV === 'production';
   const isCI = process.env.CI === 'true';
-  
+
   if (!isProduction && !isCI) {
     // Skip validation in development
     return;
   }
-  
+
   // Check Android config
   const androidConfig = resolveAndroidGoogleServicesFile();
   if (!fs.existsSync(androidConfig)) {
     console.warn(
-      '⚠️ [Firebase Config] google-services.json not found at:', androidConfig,
+      '⚠️ [Firebase Config] google-services.json not found at:',
+      androidConfig,
       '\n   Set GOOGLE_SERVICES_JSON_BASE64 in EAS secrets for production builds.'
     );
   } else {
@@ -92,12 +93,13 @@ function validateFirebaseConfig(): void {
       // Ignore read errors
     }
   }
-  
+
   // Check iOS config
   const iosConfig = resolveIOSGoogleServicesFile();
   if (!fs.existsSync(iosConfig)) {
     console.warn(
-      '⚠️ [Firebase Config] GoogleService-Info.plist not found at:', iosConfig,
+      '⚠️ [Firebase Config] GoogleService-Info.plist not found at:',
+      iosConfig,
       '\n   Set GOOGLESERVICE_PLIST_BASE64 in EAS secrets for production builds.'
     );
   }

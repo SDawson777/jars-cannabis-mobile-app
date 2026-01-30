@@ -10,14 +10,17 @@ jest.mock('lucide-react-native', () => {
     MockIcon.displayName = name;
     return MockIcon;
   };
-  return new Proxy({}, {
-    get: (_target, prop) => {
-      if (typeof prop === 'string') {
-        return createMockIcon(prop);
-      }
-      return undefined;
-    },
-  });
+  return new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (typeof prop === 'string') {
+          return createMockIcon(prop);
+        }
+        return undefined;
+      },
+    }
+  );
 });
 
 // Ensure UIManager.getViewManagerConfig exists in the test environment
@@ -73,7 +76,7 @@ try {
 // Mock Animated module for proper interpolation in tests
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
-  
+
   // Helper to create a mock animated value with working interpolate
   const createMockAnimatedValue = (val: number) => ({
     _value: val,
@@ -128,27 +131,27 @@ jest.mock('react-native', () => {
         stop: jest.fn(),
         reset: jest.fn(),
       })),
-      loop: jest.fn((animation: any) => ({
+      loop: jest.fn((_animation: any) => ({
         start: jest.fn((cb?: () => void) => cb && cb()),
         stop: jest.fn(),
         reset: jest.fn(),
       })),
-      sequence: jest.fn((animations: any[]) => ({
+      sequence: jest.fn((_animations: any[]) => ({
         start: jest.fn((cb?: () => void) => cb && cb()),
         stop: jest.fn(),
         reset: jest.fn(),
       })),
-      parallel: jest.fn((animations: any[]) => ({
+      parallel: jest.fn((_animations: any[]) => ({
         start: jest.fn((cb?: () => void) => cb && cb()),
         stop: jest.fn(),
         reset: jest.fn(),
       })),
-      stagger: jest.fn((delay: number, animations: any[]) => ({
+      stagger: jest.fn((_delay: number, _animations: any[]) => ({
         start: jest.fn((cb?: () => void) => cb && cb()),
         stop: jest.fn(),
         reset: jest.fn(),
       })),
-      delay: jest.fn((time: number) => ({
+      delay: jest.fn((_time: number) => ({
         start: jest.fn((cb?: () => void) => cb && cb()),
         stop: jest.fn(),
         reset: jest.fn(),

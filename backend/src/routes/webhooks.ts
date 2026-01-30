@@ -26,38 +26,38 @@ webhookRouter.post('/stripe', raw({ type: 'application/json' }), async (req, res
 
   // Verify webhook signature if secret is configured
   let event: Stripe.Event | null = null;
-  
+
   // In production, always require signature verification
   if (env.NODE_ENV === 'production' && !webhookSecret) {
-    logger.error('webhook.stripe.no_secret', { message: 'Webhook secret not configured in production' });
+    logger.error('webhook.stripe.no_secret', {
+      message: 'Webhook secret not configured in production',
+    });
     return res.status(500).json({ error: 'Webhook verification not configured' });
   }
-  
+
   if (webhookSecret) {
     // Secret is configured, signature is required
     if (!sig) {
       logger.warn('webhook.stripe.missing_signature', { hasSecret: true });
       return res.status(400).json({ error: 'Missing webhook signature' });
     }
-    
+
     const s = getStripe();
     if (!s) {
       logger.error('webhook.stripe.no_client', { message: 'Stripe client not initialized' });
       return res.status(500).json({ error: 'Stripe not configured' });
     }
     try {
-      event = s.webhooks.constructEvent(
-        req.body,
-        sig,
-        webhookSecret
-      );
+      event = s.webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err: any) {
       logger.warn('webhook.stripe.signature_failed', { error: err?.message });
       return res.status(400).json({ error: 'Webhook signature verification failed' });
     }
   } else {
     // Development mode only - allow unverified webhooks for testing
-    logger.warn('webhook.stripe.dev_mode', { message: 'Processing webhook without signature verification' });
+    logger.warn('webhook.stripe.dev_mode', {
+      message: 'Processing webhook without signature verification',
+    });
     event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   }
 

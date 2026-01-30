@@ -262,6 +262,7 @@ describe('cart and product types', () => {
         slug: 'blue-dream',
         price: 45.0,
         type: 'flower',
+        image: { url: 'https://cdn.example.com/blue-dream.jpg' },
       };
 
       const details: ProductDetails = {
@@ -283,6 +284,7 @@ describe('cart and product types', () => {
         slug: 'pre-roll',
         price: 12.0,
         type: 'flower',
+        image: { url: 'https://cdn.example.com/pre-roll.jpg' },
       };
 
       const details: ProductDetails = {
@@ -302,6 +304,7 @@ describe('cart and product types', () => {
         price: 50.0,
         type: 'flower',
         effects: ['energetic', 'creative', 'focused'],
+        image: { url: 'https://cdn.example.com/sour-diesel.jpg' },
       };
 
       const details: ProductDetails = {
@@ -333,15 +336,36 @@ describe('cart and product types', () => {
     it('supports different product types', () => {
       const products: ProductDetails[] = [
         {
-          product: { __id: '1', name: 'Flower', slug: 'flower', price: 45.0, type: 'flower' },
+          product: {
+            __id: '1',
+            name: 'Flower',
+            slug: 'flower',
+            price: 45.0,
+            type: 'flower',
+            image: { url: 'https://cdn.example.com/flower.jpg' },
+          },
           variants: [],
         },
         {
-          product: { __id: '2', name: 'Edible', slug: 'edible', price: 25.0, type: 'edible' },
+          product: {
+            __id: '2',
+            name: 'Edible',
+            slug: 'edible',
+            price: 25.0,
+            type: 'edible',
+            image: { url: 'https://cdn.example.com/edible.jpg' },
+          },
           variants: [],
         },
         {
-          product: { __id: '3', name: 'Vape', slug: 'vape', price: 50.0, type: 'vape' },
+          product: {
+            __id: '3',
+            name: 'Vape',
+            slug: 'vape',
+            price: 50.0,
+            type: 'vape',
+            image: { url: 'https://cdn.example.com/vape.jpg' },
+          },
           variants: [],
         },
       ];
@@ -352,7 +376,14 @@ describe('cart and product types', () => {
 
     it('can find default variant', () => {
       const details: ProductDetails = {
-        product: { __id: '1', name: 'Product', slug: 'product', price: 40.0, type: 'flower' },
+        product: {
+          __id: '1',
+          name: 'Product',
+          slug: 'product',
+          price: 40.0,
+          type: 'flower',
+          image: { url: 'https://cdn.example.com/product.jpg' },
+        },
         variants: [
           { id: 'var-1', name: '1g', price: 15.0, stock: 20 },
           { id: 'var-2', name: '3.5g', price: 40.0, stock: 15 },
@@ -419,7 +450,14 @@ describe('cart and product types', () => {
 
       const context: CartContext = {
         details: {
-          product: { __id: '1', name: 'Test', slug: 'test', price: 30.0, type: 'flower' },
+          product: {
+            __id: '1',
+            name: 'Test',
+            slug: 'test',
+            price: 30.0,
+            type: 'flower',
+            image: { url: 'https://cdn.example.com/test.jpg' },
+          },
           variants: [{ id: 'var-1', name: '1g', price: 15.0, stock: 10 }],
         },
         selectedVariant: { id: 'var-1', name: '1g', price: 15.0, stock: 10 },

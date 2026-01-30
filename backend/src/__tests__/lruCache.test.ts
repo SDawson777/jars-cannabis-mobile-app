@@ -47,7 +47,7 @@ describe('LRUCache', () => {
       cache.set('a', 1);
       cache.set('b', 2);
       cache.set('c', 3); // Should evict 'a'
-      
+
       expect(cache.has('a')).toBe(false);
       expect(cache.get('a')).toBeUndefined();
       expect(cache.get('b')).toBe(2);
@@ -58,7 +58,7 @@ describe('LRUCache', () => {
       const cache = new LRUCache<string, number>(1);
       cache.set('a', 1);
       cache.set('b', 2); // Should evict 'a'
-      
+
       expect(cache.has('a')).toBe(false);
       expect(cache.has('b')).toBe(true);
       expect(cache.size()).toBe(1);
@@ -78,7 +78,7 @@ describe('LRUCache', () => {
       cache.set('c', 3);
       cache.set('d', 4);
       cache.set('e', 5);
-      
+
       expect(cache.size()).toBe(3);
       expect(cache.has('a')).toBe(false);
       expect(cache.has('b')).toBe(false);
@@ -94,13 +94,13 @@ describe('LRUCache', () => {
       cache.set('a', 1);
       cache.set('b', 2);
       cache.set('c', 3);
-      
+
       // Access 'a', making it most recent
       cache.get('a');
-      
+
       // Add new item, should evict 'b' (now least recent)
       cache.set('d', 4);
-      
+
       expect(cache.has('b')).toBe(false);
       expect(cache.has('a')).toBe(true);
       expect(cache.has('c')).toBe(true);
@@ -112,7 +112,7 @@ describe('LRUCache', () => {
       cache.set('a', 1);
       cache.set('b', 2);
       expect(cache.size()).toBe(2);
-      
+
       cache.set('a', 10); // Update existing
       expect(cache.size()).toBe(2);
       expect(cache.get('a')).toBe(10);
@@ -122,13 +122,13 @@ describe('LRUCache', () => {
       const cache = new LRUCache<string, number>(2);
       cache.set('a', 1);
       cache.set('b', 2);
-      
+
       // Update 'a', making it most recent
       cache.set('a', 10);
-      
+
       // Add new item, should evict 'b'
       cache.set('c', 3);
-      
+
       expect(cache.has('b')).toBe(false);
       expect(cache.has('a')).toBe(true);
       expect(cache.has('c')).toBe(true);
@@ -194,7 +194,7 @@ describe('product price cache helpers', () => {
         price: 29.99,
         timestamp: Date.now() - 31_000, // 31 seconds ago (past 30s TTL)
       });
-      
+
       expect(getCachedPrice('product-123')).toBeUndefined();
     });
 
@@ -203,7 +203,7 @@ describe('product price cache helpers', () => {
         price: 29.99,
         timestamp: Date.now() - 29_000, // 29 seconds ago
       });
-      
+
       expect(getCachedPrice('product-123')).toBe(29.99);
     });
   });
@@ -213,7 +213,7 @@ describe('product price cache helpers', () => {
       const before = Date.now();
       setCachedPrice('product-456', 49.99);
       const after = Date.now();
-      
+
       const entry = productPriceCache.get('product-456');
       expect(entry?.price).toBe(49.99);
       expect(entry?.timestamp).toBeGreaterThanOrEqual(before);
@@ -223,7 +223,7 @@ describe('product price cache helpers', () => {
     it('overwrites existing cached price', () => {
       setCachedPrice('product-789', 19.99);
       setCachedPrice('product-789', 24.99);
-      
+
       expect(getCachedPrice('product-789')).toBe(24.99);
     });
 
@@ -244,10 +244,10 @@ describe('product price cache helpers', () => {
       for (let i = 0; i < 101; i++) {
         setCachedPrice(`product-${i}`, i * 10);
       }
-      
+
       // First entry should be evicted
       expect(getCachedPrice('product-0')).toBeUndefined();
-      
+
       // Recent entries should exist
       expect(getCachedPrice('product-100')).toBe(1000);
       expect(productPriceCache.size()).toBe(100);
@@ -257,7 +257,7 @@ describe('product price cache helpers', () => {
       setCachedPrice('product-a', 10.0);
       setCachedPrice('product-b', 20.0);
       setCachedPrice('product-c', 30.0);
-      
+
       expect(getCachedPrice('product-a')).toBe(10.0);
       expect(getCachedPrice('product-b')).toBe(20.0);
       expect(getCachedPrice('product-c')).toBe(30.0);
@@ -266,9 +266,9 @@ describe('product price cache helpers', () => {
     it('clears all cached prices', () => {
       setCachedPrice('product-1', 10.0);
       setCachedPrice('product-2', 20.0);
-      
+
       productPriceCache.clear();
-      
+
       expect(getCachedPrice('product-1')).toBeUndefined();
       expect(getCachedPrice('product-2')).toBeUndefined();
       expect(productPriceCache.size()).toBe(0);

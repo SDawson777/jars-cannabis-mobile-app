@@ -21,6 +21,7 @@ jest.mock('lucide-react-native', () => ({
 const mockStore = {
   id: 'store-1',
   name: 'Downtown Dispensary',
+  slug: 'downtown-dispensary',
   address: '123 Main St, City, ST 12345',
   latitude: 40.7128,
   longitude: -74.006,

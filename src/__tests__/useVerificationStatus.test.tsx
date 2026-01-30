@@ -2,10 +2,18 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useVerificationStatus } from '../hooks/useVerificationStatus';
-import * as verificationService from '../services/verificationService';
+import { verificationService } from '../services/verificationService';
+
+const mockGetUserVerificationStatus = jest.fn();
 
 jest.mock('../services/verificationService', () => ({
-  getUserVerificationStatus: jest.fn(),
+  __esModule: true,
+  default: {
+    getUserVerificationStatus: mockGetUserVerificationStatus,
+  },
+  verificationService: {
+    getUserVerificationStatus: mockGetUserVerificationStatus,
+  },
 }));
 
 const createWrapper = () => {
@@ -24,8 +32,9 @@ describe('useVerificationStatus', () => {
 
   it('should fetch verification status', async () => {
     const mockStatus = {
-      status: 'verified',
-      verifiedAt: '2024-01-01T00:00:00Z',
+      verified: true,
+      status: 'approved',
+      verificationDate: '2024-01-01T00:00:00Z',
     };
     (verificationService.getUserVerificationStatus as jest.Mock).mockResolvedValue(mockStatus);
 
@@ -42,7 +51,8 @@ describe('useVerificationStatus', () => {
 
   it('should call verification service', async () => {
     const mockStatus = {
-      status: 'unverified',
+      verified: false,
+      status: 'pending',
     };
     (verificationService.getUserVerificationStatus as jest.Mock).mockResolvedValue(mockStatus);
 
@@ -59,6 +69,7 @@ describe('useVerificationStatus', () => {
 
   it('should return loading state initially', () => {
     (verificationService.getUserVerificationStatus as jest.Mock).mockResolvedValue({
+      verified: false,
       status: 'pending',
     });
 

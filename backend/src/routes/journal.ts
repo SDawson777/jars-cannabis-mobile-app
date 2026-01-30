@@ -8,11 +8,11 @@ journalRouter.get('/journal/entries', requireAuth, async (req, res) => {
   const uid = (req as any).user.userId as string;
   const pageRaw = parseInt((req.query.page as string) || '1');
   const limitRaw = parseInt((req.query.limit as string) || '24');
-  
+
   // Validate parsed integers to prevent NaN issues
   const page = !isNaN(pageRaw) && pageRaw > 0 ? pageRaw : 1;
   const limit = !isNaN(limitRaw) && limitRaw > 0 ? Math.min(100, limitRaw) : 24;
-  
+
   const items = await prisma.journalEntry.findMany({
     where: { userId: uid },
     orderBy: { updatedAt: 'desc' },

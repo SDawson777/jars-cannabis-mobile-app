@@ -9,6 +9,9 @@ const mockOrder = {
   total: 49.99,
   status: 'completed',
   items: [],
+  subtotal: 45.0,
+  taxes: 3.0,
+  fees: 1.99,
 };
 
 describe('OrderCard', () => {
