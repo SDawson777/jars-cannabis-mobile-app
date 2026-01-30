@@ -2,17 +2,11 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useVerificationStatus } from '../hooks/useVerificationStatus';
-import { verificationService } from '../services/verificationService';
-
-const mockGetUserVerificationStatus = jest.fn();
+import * as verificationServiceModule from '../services/verificationService';
 
 jest.mock('../services/verificationService', () => ({
-  __esModule: true,
-  default: {
-    getUserVerificationStatus: mockGetUserVerificationStatus,
-  },
   verificationService: {
-    getUserVerificationStatus: mockGetUserVerificationStatus,
+    getUserVerificationStatus: jest.fn(),
   },
 }));
 
@@ -36,7 +30,9 @@ describe('useVerificationStatus', () => {
       status: 'approved',
       verificationDate: '2024-01-01T00:00:00Z',
     };
-    (verificationService.getUserVerificationStatus as jest.Mock).mockResolvedValue(mockStatus);
+    (
+      verificationServiceModule.verificationService.getUserVerificationStatus as jest.Mock
+    ).mockResolvedValue(mockStatus);
 
     const { result } = renderHook(() => useVerificationStatus(), {
       wrapper: createWrapper(),
@@ -54,7 +50,9 @@ describe('useVerificationStatus', () => {
       verified: false,
       status: 'pending',
     };
-    (verificationService.getUserVerificationStatus as jest.Mock).mockResolvedValue(mockStatus);
+    (
+      verificationServiceModule.verificationService.getUserVerificationStatus as jest.Mock
+    ).mockResolvedValue(mockStatus);
 
     const { result } = renderHook(() => useVerificationStatus(), {
       wrapper: createWrapper(),
@@ -64,11 +62,15 @@ describe('useVerificationStatus', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(verificationService.getUserVerificationStatus).toHaveBeenCalled();
+    expect(
+      verificationServiceModule.verificationService.getUserVerificationStatus
+    ).toHaveBeenCalled();
   });
 
   it('should return loading state initially', () => {
-    (verificationService.getUserVerificationStatus as jest.Mock).mockResolvedValue({
+    (
+      verificationServiceModule.verificationService.getUserVerificationStatus as jest.Mock
+    ).mockResolvedValue({
       verified: false,
       status: 'pending',
     });

@@ -23,10 +23,21 @@ jest.mock('../../utils/haptic', () => ({
 
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProfileScreen from '../../screens/ProfileScreen';
 import { ThemeContext } from '../../context/ThemeContext';
 import { AuthContext } from '../../context/AuthContext';
 import * as haptic from '../../utils/haptic';
+
+// Mock verificationService
+jest.mock('../../services/verificationService', () => ({
+  verificationService: {
+    getUserVerificationStatus: jest.fn().mockResolvedValue({
+      verified: false,
+      status: 'pending',
+    }),
+  },
+}));
 
 describe('ProfileScreen', () => {
   const mockTheme = {
@@ -59,6 +70,10 @@ describe('ProfileScreen', () => {
   const mockSetToken = jest.fn();
 
   const renderWithProviders = (ui: React.ReactElement, authData?: typeof mockAuthData | null) => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
     const authContext = {
       data: authData === null ? undefined : authData || mockAuthData,
       clearAuth: mockClearAuth,
@@ -70,9 +85,11 @@ describe('ProfileScreen', () => {
     };
 
     return render(
-      <ThemeContext.Provider value={mockTheme}>
-        <AuthContext.Provider value={authContext}>{ui}</AuthContext.Provider>
-      </ThemeContext.Provider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeContext.Provider value={mockTheme}>
+          <AuthContext.Provider value={authContext}>{ui}</AuthContext.Provider>
+        </ThemeContext.Provider>
+      </QueryClientProvider>
     );
   };
 

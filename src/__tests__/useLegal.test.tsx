@@ -1,10 +1,16 @@
-import { renderHook } from '@testing-library/react-native';
+import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLegal } from '../hooks/useLegal';
-import * as useCMSContentModule from '../hooks/useCMSContent';
+import { cmsClient } from '../api/cmsClient';
 
-jest.mock('../hooks/useCMSContent');
+jest.mock('../api/cmsClient');
+jest.mock('@react-native-community/netinfo', () => ({
+  fetch: jest.fn().mockResolvedValue({ isConnected: true }),
+}));
+
+const mockedCmsClient = cmsClient as jest.Mocked<typeof cmsClient>;
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -18,60 +24,57 @@ const createWrapper = () => {
 describe('useLegal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    AsyncStorage.clear();
   });
 
-  it('should call useCMSContent with correct parameters', () => {
-    const mockUseCMSContent = jest.fn().mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-    });
-    (useCMSContentModule.useCMSContent as jest.Mock) = mockUseCMSContent;
+  it('should call cmsClient with correct path', async () => {
+    const mockLegalContent = {
+      terms: 'TOS content',
+      privacy: 'Privacy content',
+    };
+    mockedCmsClient.get.mockResolvedValue({ data: mockLegalContent });
 
     renderHook(() => useLegal(), { wrapper: createWrapper() });
 
-    expect(mockUseCMSContent).toHaveBeenCalledWith(['legal'], '/content/legal');
+    await waitFor(() => {
+      expect(mockedCmsClient.get).toHaveBeenCalledWith('/content/legal');
+    });
   });
 
-  it('should return legal content when loaded', () => {
+  it('should return legal content when loaded', async () => {
     const mockLegalContent = {
-      termsOfService: 'TOS content',
-      privacyPolicy: 'Privacy content',
-      disclaimer: 'Disclaimer content',
+      terms: 'TOS content',
+      privacy: 'Privacy content',
     };
-    (useCMSContentModule.useCMSContent as jest.Mock).mockReturnValue({
-      data: mockLegalContent,
-      isLoading: false,
-      error: null,
-    });
+    mockedCmsClient.get.mockResolvedValue({ data: mockLegalContent });
 
     const { result } = renderHook(() => useLegal(), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data).toEqual(mockLegalContent);
   });
 
   it('should return loading state', () => {
-    (useCMSContentModule.useCMSContent as jest.Mock).mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-    });
+    mockedCmsClient.get.mockImplementation(() => new Promise(() => {})); // Never resolves
 
     const { result } = renderHook(() => useLegal(), { wrapper: createWrapper() });
 
     expect(result.current.isLoading).toBe(true);
   });
 
-  it('should handle error state', () => {
+  it('should handle error state', async () => {
     const mockError = new Error('Failed to fetch legal content');
-    (useCMSContentModule.useCMSContent as jest.Mock).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: mockError,
-    });
+    mockedCmsClient.get.mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useLegal(), { wrapper: createWrapper() });
 
-    expect(result.current.error).toEqual(mockError);
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+
+    expect(result.current.error?.message).toBe('Failed to fetch legal content');
   });
 });

@@ -1,10 +1,17 @@
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEducationalArticles } from '../hooks/useEducationalArticles';
 import { cmsClient } from '../api/cmsClient';
 
 jest.mock('../api/cmsClient');
+jest.mock('@react-native-community/netinfo', () => ({
+  fetch: jest.fn().mockResolvedValue({ isConnected: true }),
+}));
+jest.mock('../context/CMSPreviewContext', () => ({
+  useCMSPreview: () => ({ isPreview: false }),
+}));
 
 const mockedCmsClient = cmsClient as jest.Mocked<typeof cmsClient>;
 
@@ -25,6 +32,7 @@ const createWrapper = () => {
 describe('useEducationalArticles', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    AsyncStorage.clear();
   });
 
   it('should fetch articles successfully', async () => {
@@ -41,7 +49,7 @@ describe('useEducationalArticles', () => {
     });
 
     expect(result.current.data).toEqual(mockArticles);
-    expect(mockedCmsClient.get).toHaveBeenCalledWith('/api/greenhouse/articles');
+    expect(mockedCmsClient.get).toHaveBeenCalledWith('/content/articles', { headers: undefined });
   });
 
   it('should handle empty articles list', async () => {

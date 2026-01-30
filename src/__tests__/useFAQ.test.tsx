@@ -22,7 +22,7 @@ describe('useFAQQuery', () => {
 
   it('should call useCMSContent with correct parameters', () => {
     const mockUseCMSContent = jest.fn().mockReturnValue({
-      data: [],
+      data: { items: [] },
       isLoading: false,
       error: null,
     });
@@ -30,7 +30,7 @@ describe('useFAQQuery', () => {
 
     renderHook(() => useFAQQuery(), { wrapper: createWrapper() });
 
-    expect(mockUseCMSContent).toHaveBeenCalledWith(['fa_q'], '/content/fa_q');
+    expect(mockUseCMSContent).toHaveBeenCalledWith(['faq'], '/content/faq');
   });
 
   it('should return FAQ items when loaded', () => {
@@ -39,7 +39,7 @@ describe('useFAQQuery', () => {
       { id: '2', question: 'Q2', answer: 'A2' },
     ];
     (useCMSContentModule.useCMSContent as jest.Mock).mockReturnValue({
-      data: mockFAQs,
+      data: { items: mockFAQs },
       isLoading: false,
       error: null,
     });
